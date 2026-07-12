@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency, formatDateTime, getProposalStatusDisplay } from '@/lib/constants';
 import { buildCustomerProposalHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildProposalBookingCreateHref } from '@/lib/admin/proposalWorkspaceHref';
 import ProposalOwnerPanel from '../ProposalOwnerPanel';
 import { AdminPage } from '../../components/AdminPage';
 
@@ -39,6 +41,18 @@ export default async function ProposalDetailPage({ params }: Props) {
   const editorHref = proposal.customerId
     ? buildCustomerProposalHref(proposal.customerId, proposal.id)
     : null;
+  const bookingAction = proposal.bookingId && proposal.booking
+    ? { href: buildBookingHref(proposal.booking.id), label: 'Obrir reserva' }
+    : proposal.status === 'ACCEPTED' && proposal.sentAt && proposal.pdfUrl && proposal.pdfKey
+      ? {
+          href: buildProposalBookingCreateHref({
+            proposalId: proposal.id,
+            leadId: proposal.leadId,
+            customerId: proposal.customerId,
+          }),
+          label: 'Crear reserva',
+        }
+      : null;
 
   return (
     <AdminPage
@@ -57,17 +71,29 @@ export default async function ProposalDetailPage({ params }: Props) {
         </span>
       }
       actions={
-        editorHref ? (
-          <Link
-            href={editorHref}
-            className="ap-btn ap-btn--primary"
-          >
-            Obrir editor
-          </Link>
-        ) : (
-          <span className="text-xs italic text-[var(--t3)]">
-            Vincula un client per editar el pressupost
-          </span>
+        (
+          <div className="flex flex-wrap items-center gap-2">
+            {editorHref ? (
+              <Link
+                href={editorHref}
+                className="ap-btn ap-btn--primary"
+              >
+                Obrir editor
+              </Link>
+            ) : (
+              <span className="text-xs italic text-[var(--t3)]">
+                Vincula un client per editar el pressupost
+              </span>
+            )}
+            {bookingAction && (
+              <Link
+                href={bookingAction.href}
+                className="ap-btn ap-btn--primary"
+              >
+                {bookingAction.label}
+              </Link>
+            )}
+          </div>
         )
       }
     >

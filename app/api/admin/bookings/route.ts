@@ -16,6 +16,7 @@ const requiredTrimmedString = z.string().trim().min(1);
 const optionalTrimmedString = z.string().trim().optional();
 
 const bookingSchema = z.object({
+  proposalId: optionalTrimmedString,
   leadId: optionalTrimmedString,
   customerId: optionalTrimmedString,
   sourceCollaboratorId: z.string().trim().nullable().optional(),

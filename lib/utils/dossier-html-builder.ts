@@ -4,7 +4,6 @@ import { formatCurrency } from '@/lib/constants';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { computeDossierTransportBudget } from '@/lib/services/dossierMarginGuardService';
 import { orderDossierProductsForDossier } from '@/lib/services/dossierProductMappingService';
-import { applyDatePricing, type DatePricingLocale } from '@/lib/services/pricing/datePricingService';
 
 /** Càrrec de transport al client per a la ruta del dossier (un sol cervell). */
 function dossierTravelBudget(travelKm: number, travelTollsEur = 0) {
@@ -62,7 +61,6 @@ export type DossierCopy = {
     travelBreakdownPeople: string;
     travelBreakdownTolls: string;
     travelBreakdownMeals: string;
-    seasonDetail: string;
     vatNote: string;
   };
   cta: { label: string };
@@ -79,11 +77,6 @@ function escHtml(s: string): string {
 function formatOfferCount(copy: DossierCopy, count: number): string {
   const template = count === 1 ? copy.intro.offerCountOne : copy.intro.offerCountMany;
   return template.replace('{count}', String(count));
-}
-
-function resolveDatePricingLocale(locale: string): DatePricingLocale {
-  const language = locale.split('-')[0];
-  return language === 'es' || language === 'en' ? language : 'ca';
 }
 
 /** Numeral editorial gran per a la portada del capítol (01 → I, etc. → fem servir el número amb zero). */
@@ -193,7 +186,6 @@ function buildProposalBlock(
   travelKm: number,
   travelTollsEur: number,
   location?: string,
-  eventDate?: Date | string | null,
 ): string {
   if (products.length === 0) return '';
 
@@ -226,23 +218,6 @@ function buildProposalBlock(
       </li>`;
     })
     .join('\n      ');
-  const servicesBase = products.reduce(
-    (sum, product) => sum + (typeof product.priceFrom === 'number' && Number.isFinite(product.priceFrom) ? product.priceFrom : 0),
-    0,
-  );
-  const seasonPricing = applyDatePricing(servicesBase, eventDate ?? null, resolveDatePricingLocale(locale));
-  const seasonSection = seasonPricing.surchargeEur > 0 && seasonPricing.appliedRule ? `
-    <div class="bud-season">
-      <span class="bud-season-copy">
-        <strong>${escHtml(seasonPricing.appliedRule.label)}</strong>
-        <small>${fill(copy.budget.seasonDetail, {
-          pct: new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(seasonPricing.surchargePct),
-          base: formatCurrency(seasonPricing.basePrice, locale),
-        })}</small>
-      </span>
-      <span class="bud-season-price">${money(seasonPricing.surchargeEur)}</span>
-    </div>` : '';
-
   // Desplaçament JUST DESPRÉS dels productes: ruta real, cost client i desglossament
   // comercial dels conceptes que expliquen el preu sense convertir-los en productes.
   const travelBudget = dossierTravelBudget(travelKm, travelTollsEur);
@@ -308,7 +283,6 @@ function buildProposalBlock(
     <ul class="resum-list">
       ${rows}
     </ul>
-    ${seasonSection}
     ${travelSection}
     <p class="bud-note">${escHtml(copy.budget.vatNote)}</p>
   </section>`;
@@ -318,7 +292,7 @@ export function buildDossierHtml(
   client: DossierClientInfo,
   products: AnimacioProduct[],
   copy: DossierCopy,
-  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string; eventDate?: Date | string | null; assetBaseUrl?: string } = {},
+  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string; assetBaseUrl?: string } = {},
 ): string {
   const locale = options.locale || 'ca-ES';
   // Idioma del document derivat del locale (ca-ES → ca), mai hardcoded.
@@ -335,7 +309,7 @@ export function buildDossierHtml(
     .map((p, i) => buildProductBlock(p, i + 1, copy, locale, options.logoDataUri, false, options.assetBaseUrl))
     .join('\n');
 
-  const proposalBloc = buildProposalBlock(orderedProducts, copy, locale, options.travelKm ?? 0, options.travelTollsEur ?? 0, options.location, options.eventDate);
+  const proposalBloc = buildProposalBlock(orderedProducts, copy, locale, options.travelKm ?? 0, options.travelTollsEur ?? 0, options.location);
 
   const salutacioHtml = escHtml(salutacio).replace(/\n\n/g, '<br><br>');
 
@@ -596,24 +570,6 @@ export function buildDossierHtml(
     }
     .resum-card-preu { display: block; font-size: 21px; font-weight: 600; color: var(--o-ink); letter-spacing: 0.005em; }
     .resum-card-preu--mida { color: var(--o-ink-mute); font-style: italic; }
-    .bud-season {
-      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center;
-      margin: 0 0 30px; padding: 18px 20px;
-      border: 1px solid var(--o-gold-bright); background: var(--o-paper-card);
-    }
-    .bud-season-copy { display: grid; gap: 4px; min-width: 0; }
-    .bud-season-copy strong {
-      font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-      font-size: 24px; line-height: 1.08; font-weight: 600; color: var(--o-ink);
-    }
-    .bud-season-copy small {
-      font-family: 'Inter', Arial, sans-serif; font-size: 11px; line-height: 1.45; color: var(--o-ink-mute);
-    }
-    .bud-season-price {
-      font-size: 24px; line-height: 1; font-weight: 600; color: var(--o-gold-deep);
-      white-space: nowrap; font-variant-numeric: tabular-nums;
-    }
-
     /* ---------- DESPLAÇAMENT (dins la pàgina de proposta) ---------- */
     .bud-group-label { font-family: 'Inter', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--o-gold); margin: 34px 0 10px; }
     /* Desplaçament = mini-capítol: mateixa estructura de marcador que els capítols
@@ -679,7 +635,6 @@ export function buildDossierHtml(
       .resum-title { font-size: 32px; }
       .resum-list { grid-template-columns: 1fr; }
       .resum-card { min-height: 112px; }
-      .bud-season { grid-template-columns: 1fr; gap: 10px; }
       .bud-travel { gap: 16px; }
       .bud-travel-marker { width: 20px; padding-top: 5px; }
       .bud-travel-dot { width: 14px; height: 14px; }
@@ -705,7 +660,7 @@ export function buildDossierHtml(
       .product-page, .resum-page { padding-top: 0; }
       .producte-media { padding: 6px; }
       .producte-media img { max-height: 320px; }
-      .producte, .resum-card, .bud-season, .bud-travel, .bud-travel-price, .cta, .peu { page-break-inside: avoid; }
+      .producte, .resum-card, .bud-travel, .bud-travel-price, .cta, .peu { page-break-inside: avoid; }
     }
   </style>
   ${options.autoPrint ? '<script>window.addEventListener("load", function(){ window.print(); });</script>' : ''}

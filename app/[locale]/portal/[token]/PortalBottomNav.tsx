@@ -78,11 +78,11 @@ export default function PortalBottomNav({ basePath, accentHex, labels, hiddenIte
   return (
     <nav
       aria-label={labels.ariaLabel}
-      className="fixed bottom-0 inset-x-0 z-40"
+      className="fixed bottom-0 inset-x-0 z-40 md:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div
-        className="border-t border-white/[0.08] bg-black/80"
+        className="min-h-[var(--o-portal-bottom-nav-h)] border-t border-white/[0.08] bg-black/80"
         style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
       >
         <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-2">

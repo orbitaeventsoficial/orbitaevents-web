@@ -1,8 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { projectAdminTodayActions, projectNextEventEconomicTodayAction, projectPostEventTodayAction } from '@/app/admin/lib/today-actions';
+import {
+  projectAdminTodayActions,
+  projectContractWorkflowTodayAction,
+  projectDossierDraftTodayAction,
+  projectNextEventEconomicTodayAction,
+  projectPostEventTodayAction,
+  projectProposalBookingConversionTodayAction,
+  projectProposalDraftTodayAction,
+} from '@/app/admin/lib/today-actions';
 import type { BriefAction } from '@/lib/services/dailyBriefService';
+import type { ContractWorkflowSuggestion } from '@/lib/services/contractWorkflowSuggestionService';
+import type { DossierDraftSuggestion } from '@/lib/services/dossierDraftSuggestionService';
 import type { NextBestAction } from '@/lib/services/nextBestActionService';
+import type { ProposalBookingConversionSuggestion } from '@/lib/services/proposalBookingConversionSuggestionService';
+import type { ProposalDraftSuggestion } from '@/lib/services/proposalDraftSuggestionService';
 
 function nbaAction(overrides: Partial<NextBestAction> = {}): NextBestAction {
   return {
@@ -30,6 +42,82 @@ function briefAction(overrides: Partial<BriefAction> = {}): BriefAction {
     label: 'Tancar tasques',
     detail: 'Hi ha tasques vencudes',
     href: '/admin/tasks',
+    ...overrides,
+  };
+}
+
+function dossierDraftAction(overrides: Partial<DossierDraftSuggestion> = {}): DossierDraftSuggestion {
+  return {
+    leadId: 'lead-doc-1',
+    name: 'Cristina',
+    status: 'NEGOTIATING',
+    priority: 'HIGH',
+    score: 88,
+    band: 'ALTA',
+    href: '/admin/dossiers?leadId=lead-doc-1',
+    reasons: ['Sense dossier actiu', 'Bolo configurat', 'Data propera'],
+    eventDate: new Date('2026-07-17T20:30:00.000Z'),
+    daysUntilEvent: 4,
+    budget: null,
+    serviceLinesCount: 2,
+    ...overrides,
+  };
+}
+
+function contractWorkflowAction(overrides: Partial<ContractWorkflowSuggestion> = {}): ContractWorkflowSuggestion {
+  return {
+    proposalId: 'prop-contract-1',
+    reference: 'PROP-2026-0001',
+    customerId: 'cust-1',
+    name: 'Anna',
+    total: 1200,
+    action: 'SEND_CONTRACT',
+    score: 108,
+    band: 'ALTA',
+    href: '/admin/clientes/cust-1?tab=proposals',
+    reasons: ['Pressupost acceptat', 'Contracte generat', 'Pendent d\'enviar'],
+    contractStatus: 'DRAFT',
+    contractReference: 'CTR-2026-0001',
+    daysSinceAccepted: 2,
+    daysSinceSent: null,
+    daysUntilEvent: 6,
+    ...overrides,
+  };
+}
+
+function proposalDraftAction(overrides: Partial<ProposalDraftSuggestion> = {}): ProposalDraftSuggestion {
+  return {
+    proposalId: 'prop-draft-1',
+    reference: 'PROP-2026-0027',
+    customerId: 'cust-1',
+    leadId: 'lead-1',
+    bookingId: null,
+    name: 'Cristina',
+    total: 302.5,
+    score: 91,
+    band: 'ALTA',
+    href: '/admin/presupuestos?customerId=cust-1&proposalId=prop-draft-1',
+    reasons: ['Pressupost en esborrany', 'Client assignat', 'Bolo vinculat'],
+    daysSinceUpdated: 0,
+    daysUntilEvent: 8,
+    ...overrides,
+  };
+}
+
+function proposalBookingAction(overrides: Partial<ProposalBookingConversionSuggestion> = {}): ProposalBookingConversionSuggestion {
+  return {
+    proposalId: 'prop-booking-1',
+    reference: 'PROP-2026-0042',
+    customerId: 'cust-1',
+    leadId: 'lead-1',
+    name: 'Anna',
+    total: 1200,
+    score: 126,
+    band: 'ALTA',
+    href: '/admin/bookings/new?proposalId=prop-booking-1&leadId=lead-1&prefill=lead',
+    reasons: ['Pressupost acceptat', 'Reserva pendent de crear', 'Data propera'],
+    daysSinceAccepted: 2,
+    daysUntilEvent: 6,
     ...overrides,
   };
 }
@@ -145,6 +233,128 @@ describe('projectAdminTodayActions', () => {
     expect(actions[1]).toMatchObject({
       source: 'brief',
       label: 'Tancar tasques',
+    });
+  });
+
+  it('projecta dossiers pendents com a accio documental executiva', () => {
+    const action = projectDossierDraftTodayAction(dossierDraftAction());
+
+    expect(action).toMatchObject({
+      id: 'document-dossier-lead-doc-1',
+      href: '/admin/dossiers?leadId=lead-doc-1',
+      label: 'Preparar dossier: Cristina',
+      badge: 'Document · ALTA',
+      badgeClass: 'ap-badge ap-badge--danger',
+      source: 'document',
+      sourceId: 'lead-doc-1',
+      queuePriority: 100,
+    });
+    expect(action.detail).toContain('Sense dossier actiu');
+    expect(action.detail).toContain('data en 4 dies');
+    expect(action.detail).toContain('2 línies de bolo');
+  });
+
+  it('fa pujar document pendent abans del fallback generic del brief', () => {
+    const document = projectDossierDraftTodayAction(dossierDraftAction({ score: 74, band: 'MITJANA' }));
+    const actions = projectAdminTodayActions([], [briefAction({ label: 'Revisar el dia' })], 3, [document]);
+
+    expect(actions.map((action) => action.source)).toEqual(['document', 'brief']);
+    expect(actions[0]).toMatchObject({
+      label: 'Preparar dossier: Cristina',
+      badge: 'Document · MITJANA',
+    });
+  });
+
+  it('projecta contractes pendents com a accio documental executiva', () => {
+    const action = projectContractWorkflowTodayAction(contractWorkflowAction());
+
+    expect(action).toMatchObject({
+      id: 'document-contract-prop-contract-1',
+      href: '/admin/clientes/cust-1?tab=proposals',
+      label: 'Enviar contracte: Anna',
+      badge: 'Contracte · ALTA',
+      badgeClass: 'ap-badge ap-badge--danger',
+      source: 'document',
+      sourceId: 'prop-contract-1',
+      queuePriority: 115,
+    });
+    expect(action.detail).toContain('Pressupost acceptat');
+    expect(action.detail).toContain('data en 6 dies');
+    expect(action.detail).toContain('1.200');
+  });
+
+  it('fa pujar contracte pendent abans del fallback generic del brief', () => {
+    const document = projectContractWorkflowTodayAction(contractWorkflowAction({
+      action: 'GENERATE_CONTRACT',
+      score: 76,
+      band: 'MITJANA',
+      contractReference: null,
+    }));
+    const actions = projectAdminTodayActions([], [briefAction({ label: 'Revisar el dia' })], 3, [document]);
+
+    expect(actions.map((action) => action.source)).toEqual(['document', 'brief']);
+    expect(actions[0]).toMatchObject({
+      label: 'Generar contracte: Anna',
+      badge: 'Contracte · MITJANA',
+    });
+  });
+
+  it('projecta pressupostos draft com a accio documental cap al Studio', () => {
+    const action = projectProposalDraftTodayAction(proposalDraftAction());
+
+    expect(action).toMatchObject({
+      id: 'document-proposal-prop-draft-1',
+      href: '/admin/presupuestos?customerId=cust-1&proposalId=prop-draft-1',
+      label: 'Revisar pressupost: Cristina',
+      badge: 'Pressupost · ALTA',
+      badgeClass: 'ap-badge ap-badge--danger',
+      source: 'document',
+      sourceId: 'prop-draft-1',
+      queuePriority: 105,
+    });
+    expect(action.detail).toContain('Pressupost en esborrany');
+    expect(action.detail).toContain('data en 8 dies');
+    expect(action.detail).toContain('303');
+  });
+
+  it('projecta pressupostos acceptats sense reserva com a accio de creacio de reserva', () => {
+    const action = projectProposalBookingConversionTodayAction(proposalBookingAction());
+
+    expect(action).toMatchObject({
+      id: 'document-proposal-booking-prop-booking-1',
+      href: '/admin/bookings/new?proposalId=prop-booking-1&leadId=lead-1&prefill=lead',
+      label: 'Crear reserva: Anna',
+      badge: 'Reserva · ALTA',
+      badgeClass: 'ap-badge ap-badge--danger',
+      source: 'document',
+      sourceId: 'prop-booking-1',
+      queuePriority: 130,
+    });
+    expect(action.detail).toContain('Pressupost acceptat');
+    expect(action.detail).toContain('Reserva pendent de crear');
+    expect(action.detail).toContain('data en 6 dies');
+    expect(action.detail).toContain('1.200');
+  });
+
+  it('fa pujar reserva pendent per sobre de contracte pendent', () => {
+    const booking = projectProposalBookingConversionTodayAction(proposalBookingAction({ score: 120, band: 'ALTA' }));
+    const contract = projectContractWorkflowTodayAction(contractWorkflowAction({ score: 108, band: 'ALTA' }));
+    const actions = projectAdminTodayActions([], [], 2, [contract, booking]);
+
+    expect(actions.map((action) => action.id)).toEqual([
+      'document-proposal-booking-prop-booking-1',
+      'document-contract-prop-contract-1',
+    ]);
+  });
+
+  it('fa pujar pressupost draft abans del fallback generic del brief', () => {
+    const document = projectProposalDraftTodayAction(proposalDraftAction({ score: 76, band: 'MITJANA' }));
+    const actions = projectAdminTodayActions([], [briefAction({ label: 'Revisar el dia' })], 3, [document]);
+
+    expect(actions.map((action) => action.source)).toEqual(['document', 'brief']);
+    expect(actions[0]).toMatchObject({
+      label: 'Revisar pressupost: Cristina',
+      badge: 'Pressupost · MITJANA',
     });
   });
 

@@ -66,7 +66,7 @@ export function getClientPortalContractSummary(
 ): ClientPortalContractSummary | null {
   const proposal = proposals.find((item) => item.contractReference && item.contractStatus);
   if (!proposal || !proposal.contractReference || !proposal.contractStatus) return null;
-  const pdfUrl = proposal.contractPdfUrl || proposal.pdfUrl;
+  const pdfUrl = proposal.contractPdfUrl;
   const signatureState = getClientPortalContractSignatureState({
     status: proposal.contractStatus,
     signedAt: proposal.contractSignedAt,

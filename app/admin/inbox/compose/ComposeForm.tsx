@@ -1,12 +1,17 @@
 // app/admin/inbox/compose/ComposeForm.tsx
-// Redactor de correu/pressupost — 100% canònic (AdminPage + .ap-*/.adm-input)
+// Redactor de correu — 100% canònic (AdminPage + .ap-*/.adm-input)
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatDateSimple, formatCurrency, getEventLabel } from '@/lib/constants';
+import { formatDateSimple, getEventLabel } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { generateSmartTemplates, generateAllTemplates, type SmartTemplate } from '@/lib/services/inboxTemplateService';
+import {
+  generateSmartTemplates,
+  generateAllTemplates,
+  type SmartTemplate,
+  type TemplateKey,
+} from '@/lib/services/inboxTemplateService';
 import type { BulkComposeSegmentAudience } from '@/lib/services/bulkComposeSegmentService';
 
 interface Lead {
@@ -25,15 +30,9 @@ interface Lead {
   message: string | null;
 }
 
-interface Pack {
-  id: string;
-  price: number;
-  translations: { locale: string; name: string; description: string | null; features: string[] }[];
-}
-
 interface Props {
   leads: Lead[];
-  packs: Pack[];
+  packs: unknown[];
   returnHref: string;
   initialLeadId?: string;
   initialCustomer?: {
@@ -47,9 +46,30 @@ interface Props {
   initialSegmentAudience?: BulkComposeSegmentAudience;
 }
 
+const TEMPLATE_QUERY_ALIASES: Record<string, TemplateKey> = {
+  recordatori: 'seguiment',
+};
+
+function normalizeInitialTemplateKey(value?: string): TemplateKey | null {
+  if (!value) return null;
+  const normalized = value.trim();
+  if (!normalized) return null;
+  if (normalized in TEMPLATE_QUERY_ALIASES) return TEMPLATE_QUERY_ALIASES[normalized];
+  const allowed: TemplateKey[] = [
+    'primer-contacte',
+    'seguiment',
+    'seguiment-pressupost',
+    'confirmacio-data',
+    'agraiment-post-event',
+    'reactivacio',
+    'referral',
+  ];
+  return allowed.includes(normalized as TemplateKey) ? (normalized as TemplateKey) : null;
+}
+
 export default function ComposeForm({
   leads,
-  packs,
+  packs: _packs,
   returnHref,
   initialLeadId,
   initialCustomer,
@@ -59,25 +79,22 @@ export default function ComposeForm({
 }: Props) {
   const router = useRouter();
   const lastAppliedTemplateRef = useRef<{ key: string; subject: string; body: string } | null>(null);
-  const [mode, setMode] = useState<'email' | 'quote'>('email');
   const [selectedLeadId, setSelectedLeadId] = useState(initialLeadId || '');
   const [to, setTo] = useState(initialTo || '');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [activeTemplateKey, setActiveTemplateKey] = useState<string | null>(null);
   const [locale, setLocale] = useState('ca');
-  const [selectedPackId, setSelectedPackId] = useState('');
-  const [price, setPrice] = useState('');
-  const [extras, setExtras] = useState<string[]>([]);
-  const [notes, setNotes] = useState('');
-  const [customMessage, setCustomMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const isBulkSegmentMode = Boolean(initialSegmentAudience);
 
   const selectedLead = leads.find((lead) => lead.id === selectedLeadId);
-  const selectedPack = packs.find((pack) => pack.id === selectedPackId);
+  const normalizedInitialTemplateKey = useMemo(
+    () => normalizeInitialTemplateKey(initialTemplate),
+    [initialTemplate]
+  );
 
   useEffect(() => {
     if (initialLeadId) setSelectedLeadId(initialLeadId);
@@ -115,16 +132,12 @@ export default function ComposeForm({
     setSubject(template.subject);
     setBody(template.body);
     setActiveTemplateKey(template.key);
-    if (template.mode === 'quote') setMode('quote');
-    else setMode('email');
   }
 
   useEffect(() => {
     if (selectedLead) {
       setTo(selectedLead.email);
       setLocale(selectedLead.preferredLocale || 'ca');
-      if (selectedLead.interestedPackId) setSelectedPackId(selectedLead.interestedPackId);
-      if (selectedLead.interestedExtras?.length) setExtras(selectedLead.interestedExtras);
     }
   }, [selectedLeadId, selectedLead]);
 
@@ -144,13 +157,16 @@ export default function ComposeForm({
     };
     if (subject !== activeTemplate.subject) setSubject(activeTemplate.subject);
     if (body !== activeTemplate.body) setBody(activeTemplate.body);
-    if (mode !== activeTemplate.mode) setMode(activeTemplate.mode as 'email' | 'quote');
-  }, [activeTemplateKey, smartTemplates, subject, body, mode]);
+  }, [activeTemplateKey, smartTemplates, subject, body]);
 
   useEffect(() => {
-    if (initialTemplate === 'enviament-pressupost') { setMode('quote'); return; }
-    if (initialTemplate === 'primer-contacte' || initialTemplate === 'recordatori') setMode('email');
-  }, [initialTemplate]);
+    if (!normalizedInitialTemplateKey) return;
+    if (activeTemplateKey) return;
+    if (subject.trim() || body.trim()) return;
+    const template = smartTemplates.find((tpl) => tpl.key === normalizedInitialTemplateKey);
+    if (!template) return;
+    applyTemplate(template);
+  }, [activeTemplateKey, body, normalizedInitialTemplateKey, smartTemplates, subject]);
 
   useEffect(() => {
     if (selectedLeadId) return;
@@ -171,50 +187,8 @@ export default function ComposeForm({
     }
   }, [initialCustomer, initialTemplate, selectedLeadId, subject, body]);
 
-  useEffect(() => {
-    if (selectedPack) setPrice(selectedPack.price.toString());
-  }, [selectedPackId, selectedPack]);
-
   async function handleSend() {
     setError('');
-
-    if (mode === 'quote') {
-      const hasRecipient = selectedLeadId || to.trim();
-      if (!hasRecipient || !selectedPackId || !price) {
-        setError('Selecciona un lead o escriu un email, pack i preu');
-        return;
-      }
-      setSending(true);
-      try {
-        const res = await fetchWithCsrf('/api/admin/emails/quote', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            leadId: selectedLeadId || undefined,
-            customerId: initialCustomer?.id || undefined,
-            to: selectedLeadId ? undefined : to.trim(),
-            packId: selectedPackId,
-            price: parseFloat(price),
-            extras,
-            notes,
-            customMessage,
-            locale,
-          }),
-        });
-        if (res.ok) {
-          setSent(true);
-          setTimeout(() => router.push(returnHref), 1500);
-        } else {
-          const data = await res.json();
-          setError(data.error || 'Error enviant pressupost');
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error de connexió');
-      } finally {
-        setSending(false);
-      }
-      return;
-    }
 
     if ((!isBulkSegmentMode && !to) || !subject || !body) {
       setError('Omple tots els camps');
@@ -260,7 +234,7 @@ export default function ComposeForm({
   if (sent) {
     return (
       <div className="ap-inline-alert ap-inline-alert--success" role="status">
-        ✓ {mode === 'quote' ? 'Pressupost enviat!' : isBulkSegmentMode ? 'Campanya enviada!' : 'Correu enviat!'}
+        ✓ {isBulkSegmentMode ? 'Campanya enviada!' : 'Correu enviat!'}
       </div>
     );
   }
@@ -269,30 +243,8 @@ export default function ComposeForm({
 
   return (
     <div className="grid gap-4">
-      {/* Toggle mode */}
-      <div className="ap-tabs-nav" role="tablist" aria-label="Tipus de redacció">
-        <button
-          type="button"
-          role="tab"
-          onClick={() => setMode('email')}
-          aria-selected={mode === 'email'}
-          className={`ap-tab ${mode === 'email' ? 'ap-tab--active' : 'ap-tab--idle'}`}
-        >
-          ✉ Correu normal
-        </button>
-        <button
-          type="button"
-          role="tab"
-          onClick={() => setMode('quote')}
-          aria-selected={mode === 'quote'}
-          className={`ap-tab ${mode === 'quote' ? 'ap-tab--active' : 'ap-tab--idle'}`}
-        >
-          Pressupost
-        </button>
-      </div>
-
       {/* Plantilles intel·ligents (mode email) */}
-      {mode === 'email' && smartTemplates.length > 0 && (
+      {smartTemplates.length > 0 && (
         <section className="ap-card">
           <div className="ap-card-body">
             <p className={labelClass}>Plantilles intel·ligents</p>
@@ -322,7 +274,7 @@ export default function ComposeForm({
       )}
 
       {/* Audiència segmentada */}
-      {mode === 'email' && initialSegmentAudience && (
+      {initialSegmentAudience && (
         <section className="ap-card">
           <div className="ap-card-body">
             <p className={labelClass}>Audiència segmentada</p>
@@ -413,171 +365,50 @@ export default function ComposeForm({
             </div>
           )}
 
-          {/* MODE PRESSUPOST */}
-          {mode === 'quote' ? (
-            <>
-              {!selectedLeadId && (
-                <div className="grid gap-1.5">
-                  <label htmlFor="cf-email-q" className={labelClass}>Correu del client *</label>
-                  <input
-                    id="cf-email-q"
-                    type="email"
-                    value={to}
-                    onChange={(e) => setTo(e.target.value)}
-                    className="adm-input"
-                    placeholder="email@exemple.com"
-                  />
-                </div>
-              )}
+          <div className="grid gap-1.5">
+            <label htmlFor="cf-to" className={labelClass}>Per a *</label>
+            {isBulkSegmentMode ? (
+              <div className="adm-input flex items-center justify-between">
+                <span>{initialSegmentAudience?.label}</span>
+                <span className="text-xs text-[var(--t3)]">
+                  {initialSegmentAudience?.recipients.length} contactes
+                </span>
+              </div>
+            ) : (
+              <input
+                id="cf-to"
+                type="email"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                className="adm-input"
+                placeholder="email@exemple.com"
+              />
+            )}
+          </div>
 
-              <div className="grid gap-1.5">
-                <span className={labelClass}>Pack recomanat *</span>
-                <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(12.5rem,1fr))]">
-                  {packs.map((pack) => {
-                    const name =
-                      pack.translations.find((t) => t.locale === locale)?.name ||
-                      pack.translations[0]?.name;
-                    const isSelected = selectedPackId === pack.id;
-                    return (
-                      <button
-                        key={pack.id}
-                        type="button"
-                        onClick={() => setSelectedPackId(pack.id)}
-                        aria-pressed={isSelected}
-                        className={`rounded-[var(--o-r-md)] border p-3.5 text-left transition-colors ${
-                          isSelected
-                            ? 'border-[var(--hair-gold)] bg-[var(--raised)] text-[var(--gold-bright)]'
-                            : 'border-[var(--line2)] bg-[var(--sunk)] text-[var(--t)] hover:bg-[var(--raised)]'
-                        }`}
-                      >
-                        <p className="text-base font-bold">{name}</p>
-                        <p className="mt-1 text-lg font-bold text-[var(--gold-bright)]">
-                          {formatCurrency(pack.price)}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+          <div className="grid gap-1.5">
+            <label htmlFor="cf-subj" className={labelClass}>Assumpte *</label>
+            <input
+              id="cf-subj"
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              className="adm-input"
+              placeholder="Assumpte de l'email"
+            />
+          </div>
 
-              <div className="grid gap-1.5">
-                <label htmlFor="cf-price" className={labelClass}>Preu total (€) *</label>
-                <input
-                  id="cf-price"
-                  type="number"
-                  min={0}
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  className="adm-input text-xl font-bold"
-                  placeholder="0"
-                />
-              </div>
-
-              <div className="grid gap-1.5">
-                <label htmlFor="cf-extras" className={labelClass}>Extras inclosos</label>
-                <textarea
-                  id="cf-extras"
-                  value={extras.join('\n')}
-                  onChange={(e) => setExtras(e.target.value.split('\n').filter(Boolean))}
-                  rows={3}
-                  className="adm-input adm-input--textarea"
-                  placeholder="Un extra per línia..."
-                />
-              </div>
-
-              <div className="grid gap-1.5">
-                <label htmlFor="cf-custmsg" className={labelClass}>Missatge personalitzat (opcional)</label>
-                <textarea
-                  id="cf-custmsg"
-                  value={customMessage}
-                  onChange={(e) => setCustomMessage(e.target.value)}
-                  rows={4}
-                  className="adm-input adm-input--textarea"
-                  placeholder="Afegeix un missatge personalitzat..."
-                />
-              </div>
-
-              <div className="grid gap-1.5">
-                <label htmlFor="cf-notes" className={labelClass}>Notes addicionals</label>
-                <textarea
-                  id="cf-notes"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={2}
-                  className="adm-input adm-input--textarea"
-                  placeholder="Notes que apareixeran al pressupost..."
-                />
-              </div>
-
-              <div className="grid gap-1.5">
-                <span className={labelClass}>Idioma del pressupost</span>
-                <div className="ap-tabs-nav" role="group" aria-label="Idioma del pressupost">
-                  {[
-                    { code: 'ca', label: 'Català' },
-                    { code: 'es', label: 'Castellà' },
-                  ].map((lang) => (
-                    <button
-                      key={lang.code}
-                      type="button"
-                      onClick={() => setLocale(lang.code)}
-                      aria-pressed={locale === lang.code}
-                      className={`ap-tab ${locale === lang.code ? 'ap-tab--active' : 'ap-tab--idle'}`}
-                    >
-                      {lang.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>
-          ) : (
-            /* MODE CORREU NORMAL */
-            <>
-              <div className="grid gap-1.5">
-                <label htmlFor="cf-to" className={labelClass}>Per a *</label>
-                {isBulkSegmentMode ? (
-                  <div className="adm-input flex items-center justify-between">
-                    <span>{initialSegmentAudience?.label}</span>
-                    <span className="text-xs text-[var(--t3)]">
-                      {initialSegmentAudience?.recipients.length} contactes
-                    </span>
-                  </div>
-                ) : (
-                  <input
-                    id="cf-to"
-                    type="email"
-                    value={to}
-                    onChange={(e) => setTo(e.target.value)}
-                    className="adm-input"
-                    placeholder="email@exemple.com"
-                  />
-                )}
-              </div>
-
-              <div className="grid gap-1.5">
-                <label htmlFor="cf-subj" className={labelClass}>Assumpte *</label>
-                <input
-                  id="cf-subj"
-                  type="text"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  className="adm-input"
-                  placeholder="Assumpte de l'email"
-                />
-              </div>
-
-              <div className="grid gap-1.5">
-                <label htmlFor="cf-body" className={labelClass}>Missatge *</label>
-                <textarea
-                  id="cf-body"
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  rows={10}
-                  className="adm-input adm-input--textarea"
-                  placeholder="Escriu el teu missatge..."
-                />
-              </div>
-            </>
-          )}
+          <div className="grid gap-1.5">
+            <label htmlFor="cf-body" className={labelClass}>Missatge *</label>
+            <textarea
+              id="cf-body"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={10}
+              className="adm-input adm-input--textarea"
+              placeholder="Escriu el teu missatge..."
+            />
+          </div>
         </div>
 
         {/* Barra d'enviament */}
@@ -606,9 +437,7 @@ export default function ComposeForm({
             >
               {sending
                 ? 'Enviant...'
-                : mode === 'quote'
-                  ? 'Envia pressupost'
-                  : isBulkSegmentMode
+                : isBulkSegmentMode
                     ? 'Envia campanya'
                     : 'Envia correu'}
             </button>

@@ -29,6 +29,20 @@ describe('CLIENT_PORTAL_MESSAGES', () => {
     expect(CLIENT_PORTAL_MESSAGES.en.packLabel).not.toBe('Pack');
   });
 
+  it('localitza els documents d’albarà del portal', () => {
+    expect(CLIENT_PORTAL_MESSAGES.ca.deliveryNoteLabel).toBe('Albarà');
+    expect(CLIENT_PORTAL_MESSAGES.es.deliveryNoteDownloadPdf).toBe('Descargar PDF del albarán');
+    expect(CLIENT_PORTAL_MESSAGES.en.deliveryNoteStatusSigned).toBe('Signed');
+  });
+
+  it('nomena l’estat post-event del portal com a email canònic, no feedback legacy', () => {
+    expect(CLIENT_PORTAL_MESSAGES.ca.postEventEmailSent).toBe('Email post-event enviat');
+    expect(CLIENT_PORTAL_MESSAGES.es.postEventEmailPending).toBe('Email post-event pendiente');
+    expect(CLIENT_PORTAL_MESSAGES.en.postEventEmailSent).toBe('Post-event email sent');
+    expect(CLIENT_PORTAL_MESSAGES.ca).not.toHaveProperty('feedbackSent');
+    expect(CLIENT_PORTAL_MESSAGES.ca).not.toHaveProperty('pendingClose');
+  });
+
   it('localitza el comptador de fotos de la galeria amb singular i plural', () => {
     expect(getClientPortalGalleryPhotoCountLabel('ca', 1)).toBe('1 foto');
     expect(getClientPortalGalleryPhotoCountLabel('es', 2)).toBe('2 fotos');

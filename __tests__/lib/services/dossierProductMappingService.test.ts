@@ -67,6 +67,23 @@ describe('dossierProductMappingService', () => {
     });
   });
 
+  it('prioritza l ID de catàleg de notes abans de fer matching per nom o partner', () => {
+    const ids = productIdsFromDossierServiceLines(
+      [{
+        collaboratorId: 'carlos-lucas-fernandez',
+        kind: 'PROVIDER_SERVICE',
+        label: 'Animació musical venuda amb nom comercial canviat',
+        revenueAmount: 250,
+        costAmount: 200,
+        quantity: 1,
+        notes: 'Producte de catàleg: masq-bingo',
+      }],
+      products,
+    );
+
+    expect(ids).toEqual(['collab:masq-bingo']);
+  });
+
   it('ordena el dossier amb experiències visuals abans que extres/equipament', () => {
     const bubble: AnimacioProduct = {
       id: 'orbita:bombolles',

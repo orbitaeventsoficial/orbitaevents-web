@@ -31,6 +31,28 @@ describe('bookingEconomics', () => {
     expect(result.marginPct).toBeGreaterThan(0);
   });
 
+  it('no duplica cost de ruta antic quan travelCost conviu amb línies [travel-cost]', () => {
+    const result = computeDashboardNextEventEconomics({
+      total: 1000,
+      depositPaid: true,
+      remainingPaid: true,
+      extraHours: 0,
+      travelCost: 158,
+      distanceKm: 422,
+      pack: { price: 0, extraHourPrice: 0 },
+      serviceLines: [
+        { revenueAmount: 240, costAmount: 200, quantity: 1, collaboratorId: 'masquerade', kind: 'PROVIDER_SERVICE', label: 'Bingo Musical' },
+        { revenueAmount: 0, costAmount: 75, quantity: 1, collaboratorId: 'masquerade', kind: 'OTHER', label: 'Vehicle ruta', notes: '[travel-cost] vehicle · 422.0 km' },
+        { revenueAmount: 0, costAmount: 83, quantity: 1, collaboratorId: 'masquerade', kind: 'OTHER', label: 'Temps ruta passatger', notes: '[travel-cost] PASSENGER · 5.50 h' },
+      ],
+    }, PROFITABILITY_MODEL_DEFAULTS);
+
+    // 45 operatiu fix + 158 travelCost + 200 servei partner.
+    // Les dues línies [travel-cost] són repartiment, no segon cost de marge.
+    expect(result.directCost).toBe(403);
+    expect(result.netMargin).toBe(577);
+  });
+
   it('projecta nomes bolos amb marge critic o caixa pendent imminent i els prioritza', () => {
     const now = new Date('2026-07-07T10:00:00.000Z');
     const rows = [

@@ -56,11 +56,36 @@ export interface CustomerHubOperatingSummary {
   };
 }
 
+export interface CustomerSegmentFilterState {
+  lifecycleStage: CustomerLifecycleValue | '';
+  tag: string;
+  healthScoreMax: number | null;
+  minSpent: number | null;
+}
+
 export { PRIORITY_FILTER_STYLES } from '@/lib/constants';
-import { EXECUTION_PRIORITY_HINTS, CUSTOMER_NEXT_STEPS } from '@/lib/constants';
+import {
+  CUSTOMER_NEXT_STEPS,
+  CUSTOMER_SEGMENTS,
+  EXECUTION_PRIORITY_HINTS,
+  type CustomerLifecycleValue,
+} from '@/lib/constants';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
+
+export function resolveCustomerSegmentFilter(segmentId: string | null | undefined): CustomerSegmentFilterState | null {
+  const segment = CUSTOMER_SEGMENTS.find((item) => item.id === segmentId);
+  if (!segment) return null;
+
+  const filter = segment.filter;
+  return {
+    lifecycleStage: 'lifecycleStage' in filter ? filter.lifecycleStage : '',
+    tag: 'tag' in filter ? filter.tag : '',
+    healthScoreMax: 'healthScoreMax' in filter ? filter.healthScoreMax : null,
+    minSpent: 'minSpent' in filter ? filter.minSpent : null,
+  };
+}
 
 export function getNextStep(customer: Customer): { label: string; href: string; hint: string } {
   if ((customer.total_events || 0) > 0) {
@@ -160,4 +185,3 @@ export function buildCustomerHubOperatingSummary(
         },
   };
 }
-

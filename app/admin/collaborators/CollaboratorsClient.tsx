@@ -74,6 +74,7 @@ export default function CollaboratorsClient() {
   // Filtre per rol (fa operatiu CLIENT_PARTNER = «Ens contracta com a partner»):
   // permet aïllar els socis-clients de la resta de col·laboradors.
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
+  const [showInactiveProducts, setShowInactiveProducts] = useState(false);
   const visibleCollaborators = roleFilter === 'ALL'
     ? collaborators
     : collaborators.filter((c) => (c.roles || []).includes(roleFilter));
@@ -248,6 +249,14 @@ export default function CollaboratorsClient() {
                 </button>
               );
             })}
+            <label className="inline-flex items-center gap-2 rounded-lg border border-[var(--line)] px-3 py-2 text-xs font-semibold text-[var(--t2)]">
+              <input
+                type="checkbox"
+                checked={showInactiveProducts}
+                onChange={(event) => setShowInactiveProducts(event.target.checked)}
+              />
+              Mostrar productes inactius
+            </label>
           </div>
         </div>
       </div>
@@ -398,61 +407,72 @@ export default function CollaboratorsClient() {
         </div>
       ) : (
         <div className="space-y-4">
-          {visibleCollaborators.map((c) => (
-            <div
-              key={c.id}
-              className={`ap-card rounded-xl p-5 transition-colors ${
-                c.isActive ? 'hover:admin-tone-bg-neutral' : 'opacity-60 admin-tone-idle'
-              }`}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                  <div className="mb-1 flex items-center gap-3">
-                    <h3 className="ap-h2">{c.name}</h3>
-                    {c.company && <span className="text-sm admin-tone-text-neutral">{c.company}</span>}
-                    <span className={getPricingBadge(c.pricingModel)}>
-                      {c.pricingModel === 'DISCOUNT' ? `${c.commissionPct}% descompte` : `Net + ${c.commissionPct}%`}
-                    </span>
-                    {!c.isActive && <span className="ap-badge">Inactiu</span>}
-                  </div>
-                  <div className="flex items-center gap-4 text-sm admin-tone-text-neutral">
-                    {c.specialty && <span className="font-medium text-[color:var(--ax-gold)]">{c.specialty}</span>}
-                    {(c.roles || []).map((role) => (
-                      <span key={role} className="ap-badge">{COLLABORATOR_ROLE_OPTIONS.find((option) => option.value === role)?.label || role}</span>
-                    ))}
-                    {c.costPerHour != null && <span className="text-[var(--t2)]">{c.costPerHour}€/h</span>}
-                    {((c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)) > 0 && (
-                      <span className="text-[color:var(--ax-success)]">
-                        {(c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)} bolos passats
+          {visibleCollaborators.map((c) => {
+            const allProducts = c.products || [];
+            const activeProducts = allProducts.filter((product) => product.isActive);
+            const productsForPanel = showInactiveProducts ? allProducts : activeProducts;
+            const hiddenInactiveProducts = Math.max(0, allProducts.length - productsForPanel.length);
+            return (
+              <div
+                key={c.id}
+                className={`ap-card rounded-xl p-5 transition-colors ${
+                  c.isActive ? 'hover:admin-tone-bg-neutral' : 'opacity-60 admin-tone-idle'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center gap-3">
+                      <h3 className="ap-h2">{c.name}</h3>
+                      {c.company && <span className="text-sm admin-tone-text-neutral">{c.company}</span>}
+                      <span className={getPricingBadge(c.pricingModel)}>
+                        {c.pricingModel === 'DISCOUNT' ? `${c.commissionPct}% descompte` : `Net + ${c.commissionPct}%`}
                       </span>
-                    )}
-                    {c.email && <span>{c.email}</span>}
-                    {c.phone && <span>{c.phone}</span>}
+                      {!c.isActive && <span className="ap-badge">Inactiu</span>}
+                    </div>
+                    <div className="flex items-center gap-4 text-sm admin-tone-text-neutral">
+                      {c.specialty && <span className="font-medium text-[color:var(--ax-gold)]">{c.specialty}</span>}
+                      {(c.roles || []).map((role) => (
+                        <span key={role} className="ap-badge">{COLLABORATOR_ROLE_OPTIONS.find((option) => option.value === role)?.label || role}</span>
+                      ))}
+                      {c.costPerHour != null && <span className="text-[var(--t2)]">{c.costPerHour}€/h</span>}
+                      {((c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)) > 0 && (
+                        <span className="text-[color:var(--ax-success)]">
+                          {(c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)} bolos passats
+                        </span>
+                      )}
+                      {c.email && <span>{c.email}</span>}
+                      {c.phone && <span>{c.phone}</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/admin/collaborators/${c.id}`} className="ap-btn ap-btn--primary">
+                      Obrir fitxa
+                    </Link>
+                    <button onClick={() => handleToggleActive(c)} className="ap-btn ap-btn--secondary">
+                      {c.isActive ? 'Desactivar' : 'Activar'}
+                    </button>
+                    <button onClick={() => handleEdit(c)} className="ap-btn ap-btn--secondary">
+                      Editar
+                    </button>
+                    <button onClick={() => handleDelete(c.id)} className="ap-btn ap-btn--danger">
+                      Eliminar
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Link href={`/admin/collaborators/${c.id}`} className="ap-btn ap-btn--primary">
-                    Obrir fitxa
-                  </Link>
-                  <button onClick={() => handleToggleActive(c)} className="ap-btn ap-btn--secondary">
-                    {c.isActive ? 'Desactivar' : 'Activar'}
-                  </button>
-                  <button onClick={() => handleEdit(c)} className="ap-btn ap-btn--secondary">
-                    Editar
-                  </button>
-                  <button onClick={() => handleDelete(c.id)} className="ap-btn ap-btn--danger">
-                    Eliminar
-                  </button>
-                </div>
-              </div>
 
-              <CollaboratorProductsPanel
-                collaboratorId={c.id}
-                products={c.products || []}
-                onChanged={load}
-              />
-            </div>
-          ))}
+                {hiddenInactiveProducts > 0 && (
+                  <p className="mt-3 text-xs text-[var(--t3)]">
+                    {hiddenInactiveProducts} productes inactius ocults. Activa el filtre per revisar-los.
+                  </p>
+                )}
+                <CollaboratorProductsPanel
+                  collaboratorId={c.id}
+                  products={productsForPanel}
+                  onChanged={load}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
       <ConfirmDialog {...dialogProps} />

@@ -48,12 +48,17 @@ describe('GET /api/admin/custom-quotes (list)', () => {
 });
 
 describe('POST /api/admin/custom-quotes', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockCreate.mockResolvedValue({ status: 201, body: { id: 'cq-2' } }); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRequireAuth.mockReturnValue(null);
+    mockVerifyCsrf.mockReturnValue(null);
+    mockCreate.mockResolvedValue({ status: 410, body: { error: 'Retirat', canonicalRoute: '/admin/presupuestos' } });
+  });
 
-  it('crea custom quote', async () => {
+  it('retorna la retirada canònica de custom quotes', async () => {
     const req = new NextRequest('http://localhost/api/admin/custom-quotes', { method: 'POST', body: JSON.stringify({ title: 'Pressupost especial' }), headers: { 'Content-Type': 'application/json' } });
     const res = await POST(req);
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(410);
     expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockCreate).toHaveBeenCalledWith({ title: 'Pressupost especial' });
   });
@@ -97,11 +102,16 @@ describe('GET /api/admin/custom-quotes/[id]', () => {
 });
 
 describe('PATCH /api/admin/custom-quotes/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRequireAuth.mockReturnValue(null);
+    mockVerifyCsrf.mockReturnValue(null);
+    mockUpdate.mockResolvedValue({ status: 410, body: { error: 'Retirat', canonicalRoute: '/admin/presupuestos' } });
+  });
 
-  it('actualitza correctament', async () => {
+  it('retorna la retirada canònica de custom quotes', async () => {
     const req = new NextRequest('http://localhost/api/admin/custom-quotes/cq-1', { method: 'PATCH', body: JSON.stringify({ title: 'Nou' }), headers: { 'Content-Type': 'application/json' } });
-    expect((await PATCH(req, { params: { id: 'cq-1' } })).status).toBe(200);
+    expect((await PATCH(req, { params: { id: 'cq-1' } })).status).toBe(410);
     expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockUpdate).toHaveBeenCalledWith('cq-1', { title: 'Nou' });
   });
@@ -124,11 +134,16 @@ describe('PATCH /api/admin/custom-quotes/[id]', () => {
 });
 
 describe('DELETE /api/admin/custom-quotes/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockDelete.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRequireAuth.mockReturnValue(null);
+    mockVerifyCsrf.mockReturnValue(null);
+    mockDelete.mockResolvedValue({ status: 410, body: { error: 'Retirat', canonicalRoute: '/admin/presupuestos' } });
+  });
 
-  it('elimina correctament', async () => {
+  it('retorna la retirada canònica de custom quotes', async () => {
     const req = new NextRequest('http://localhost/api/admin/custom-quotes/cq-1', { method: 'DELETE' });
-    expect((await DELETE(req, { params: { id: 'cq-1' } })).status).toBe(200);
+    expect((await DELETE(req, { params: { id: 'cq-1' } })).status).toBe(410);
     expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockDelete).toHaveBeenCalledWith('cq-1');
   });

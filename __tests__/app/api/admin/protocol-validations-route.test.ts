@@ -135,6 +135,19 @@ describe('/api/admin/protocol/validations', () => {
     });
   });
 
+  it('POST rebutja validar un Canvi que no existeix al protocol viu', async () => {
+    const req = new NextRequest('http://localhost/api/admin/protocol/validations', {
+      method: 'POST',
+      body: JSON.stringify({ canviN: 999999 }),
+    });
+
+    const res = await POST(req);
+
+    expect(res.status).toBe(404);
+    await expect(res.json()).resolves.toEqual({ ok: false, error: 'unknown-canvi' });
+    expect(mockRecordCanviValidation).not.toHaveBeenCalled();
+  });
+
   it('DELETE valida el body i elimina la validacio', async () => {
     const req = new NextRequest('http://localhost/api/admin/protocol/validations', {
       method: 'DELETE',
@@ -148,6 +161,19 @@ describe('/api/admin/protocol/validations', () => {
     expect(mockRemoveCanviValidation).toHaveBeenCalledWith(465);
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ ok: true, removed: true });
+  });
+
+  it('DELETE rebutja desfer un Canvi que no existeix al protocol viu', async () => {
+    const req = new NextRequest('http://localhost/api/admin/protocol/validations', {
+      method: 'DELETE',
+      body: JSON.stringify({ canviN: 999999 }),
+    });
+
+    const res = await DELETE(req);
+
+    expect(res.status).toBe(404);
+    await expect(res.json()).resolves.toEqual({ ok: false, error: 'unknown-canvi' });
+    expect(mockRemoveCanviValidation).not.toHaveBeenCalled();
   });
 
   it('DELETE retorna 400 amb body invalid', async () => {

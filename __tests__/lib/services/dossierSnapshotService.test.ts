@@ -30,7 +30,6 @@ describe('dossierSnapshotService', () => {
       travelKm: 422.345,
       travelTollsEur: 18.456,
       travelLocation: " l'Aldosa ",
-      eventDate: '2026-07-17T20:30:00.000Z',
     });
 
     expect(snapshot).toMatchObject({
@@ -38,7 +37,6 @@ describe('dossierSnapshotService', () => {
       travelKm: 422.35,
       travelTollsEur: 18.46,
       travelLocation: "l'Aldosa",
-      eventDate: '2026-07-17',
       products: [
         expect.objectContaining({
           id: 'collab:bingo',

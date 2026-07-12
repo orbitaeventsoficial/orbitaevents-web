@@ -3,8 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   buildLeadBookingPrefillHref,
   buildLeadComposeHref,
-  buildLeadPaymentsHref,
-  buildLeadTaskHref,
   buildLeadWorkspaceHref,
 } from '@/lib/admin/leadWorkspaceHref';
 
@@ -23,12 +21,4 @@ describe('leadWorkspaceHref', () => {
     expect(buildLeadBookingPrefillHref('lead-1')).toBe('/admin/bookings/new?leadId=lead-1&prefill=lead');
   });
 
-  it('prioritza booking i customer quan resol cobraments i tasques', () => {
-    expect(buildLeadPaymentsHref({ leadId: 'lead-1', bookingId: 'booking-1', customerId: 'customer-1' })).toBe('/admin/bookings/booking-1');
-    expect(buildLeadPaymentsHref({ leadId: 'lead-1', customerId: 'customer-1' })).toBe('/admin/bookings?customerId=customer-1');
-    expect(buildLeadPaymentsHref({ leadId: 'lead-1' })).toBe('/admin/leads/lead-1');
-
-    expect(buildLeadTaskHref({ leadId: 'lead-1', customerId: 'customer-1' })).toBe('/admin/tasks?customerId=customer-1');
-    expect(buildLeadTaskHref({ leadId: 'lead-1' })).toBe('/admin/leads/lead-1');
-  });
 });

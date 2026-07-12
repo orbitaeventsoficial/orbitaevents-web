@@ -24,7 +24,7 @@ vi.mock('@/lib/auth', () => ({
 vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 vi.mock('@/lib/logger', () => ({ log: { error: mockLogError } }));
 vi.mock('@/lib/services/fuelReferenceService', () => ({
-  getFuelCostPerKmReference: mockGetFuelReference,
+  getEffectiveVehicleCostPerKm: mockGetFuelReference,
   refreshFuelReferenceNow: mockRefreshFuelReference,
 }));
 
@@ -72,6 +72,7 @@ describe('POST /api/admin/fuel/reference', () => {
     mockRequirePermission.mockReturnValue(null);
     mockVerifyCsrf.mockReturnValue(null);
     mockRefreshFuelReference.mockResolvedValue({ costPerKm: 0.14, source: 'refreshed' });
+    mockGetFuelReference.mockResolvedValue({ costPerKm: 0.15, source: 'effective' });
   });
 
   it('rebutja sense auth abans de permisos o CSRF', async () => {
@@ -115,10 +116,11 @@ describe('POST /api/admin/fuel/reference', () => {
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({
       ok: true,
-      costPerKm: 0.14,
-      source: 'refreshed',
+      costPerKm: 0.15,
+      source: 'effective',
     });
     expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockRefreshFuelReference).toHaveBeenCalledTimes(1);
+    expect(mockGetFuelReference).toHaveBeenCalledTimes(1);
   });
 });

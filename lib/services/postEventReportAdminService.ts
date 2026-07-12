@@ -30,7 +30,16 @@ export async function createAdminPostEventReport(input: PostEventReportInput) {
     return { status: 400, body: { ok: false, error: 'bookingId es requerido' } };
   }
 
-  const booking = await prisma.booking.findUnique({ where: { id: input.bookingId } });
+  const booking = await prisma.booking.findUnique({
+    where: { id: input.bookingId },
+    select: {
+      id: true,
+      reference: true,
+      status: true,
+      customerId: true,
+      lead: { select: { customerId: true } },
+    },
+  });
   if (!booking) {
     return { status: 404, body: { ok: false, error: 'Reserva no trobada' } };
   }
@@ -59,27 +68,27 @@ export async function createAdminPostEventReport(input: PostEventReportInput) {
     return { status: 400, body: { ok: false, error: danceFloorLevel.error } };
   }
 
-  const report = await prisma.postEventReport.create({
-    data: {
-      bookingId: input.bookingId,
-      actualStartTime: input.startTime || null,
-      actualEndTime: input.endTime || null,
-      soundQuality: soundQuality.value,
-      maxDancefloor: danceFloorLevel.value !== null ? danceFloorLevel.value * 20 : null,
-      mainStyle: input.musicStyles || null,
-      incidentDescription: input.incidents || null,
-      hadIncidents: !!input.incidents && input.incidents.trim() !== '',
-      lessonsLearned: input.eventSummary || null,
-      whatToImprove: input.notes || null,
-      status,
-      completedAt: status === 'COMPLETED' ? new Date() : null,
-      genresWorked: [],
-      genresFailed: [],
-      lightingUsed: [],
-      effectsUsed: [],
-      gamesPlayed: [],
-    },
-  });
+  const reportData = {
+    bookingId: input.bookingId,
+    actualStartTime: input.startTime || null,
+    actualEndTime: input.endTime || null,
+    soundQuality: soundQuality.value,
+    maxDancefloor: danceFloorLevel.value !== null ? danceFloorLevel.value * 20 : null,
+    mainStyle: input.musicStyles || null,
+    incidentDescription: input.incidents || null,
+    hadIncidents: !!input.incidents && input.incidents.trim() !== '',
+    lessonsLearned: input.eventSummary || null,
+    whatToImprove: input.notes || null,
+    status,
+    completedAt: status === 'COMPLETED' ? new Date() : null,
+    genresWorked: [],
+    genresFailed: [],
+    lightingUsed: [],
+    effectsUsed: [],
+    gamesPlayed: [],
+  };
+
+  const report = await prisma.postEventReport.create({ data: reportData });
 
   return { status: 200, body: { ok: true, report } };
 }

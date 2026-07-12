@@ -8,7 +8,6 @@ import { requireAuth, requirePermission } from '@/lib/auth';
 import { getRequestId } from '@/lib/request-context';
 import { deleteBookingIfAllowed, getBookingDetail, updateBookingDetail } from '@/lib/services/bookingRouteService';
 import type { ManagedBookingStatus } from '@/lib/services/bookingStatusTransitionService';
-import { dispatchAutoTrigger } from '@/lib/services/automationTriggers';
 import { collaboratorLineCostErrorMessage, findCollaboratorLinesWithoutCost } from '@/lib/booking-service-line-validation';
 
 interface Params {
@@ -19,6 +18,7 @@ type DeleteBookingPayload = {
   id: string;
   reference: string;
   status: ManagedBookingStatus;
+  eventDate: Date | string;
   customerId?: string | null;
 };
 
@@ -36,6 +36,7 @@ function isDeleteBookingPayload(value: unknown): value is DeleteBookingPayload {
     typeof candidate.id === 'string' &&
     typeof candidate.reference === 'string' &&
     typeof candidate.status === 'string' &&
+    (candidate.eventDate instanceof Date || typeof candidate.eventDate === 'string') &&
     MANAGED_BOOKING_STATUSES.includes(candidate.status as ManagedBookingStatus)
   );
 }
@@ -137,11 +138,6 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     const result = await updateBookingDetail(params.id, { ...parseResult.data });
     customerIdForLog = result.customerId ?? null;
-
-    // Auto-trigger: booking confirmed → pre-event checklist
-    if (parseResult.data.status === 'CONFIRMED') {
-      dispatchAutoTrigger({ type: 'booking.confirmed', bookingId: params.id }).catch(() => {});
-    }
 
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {

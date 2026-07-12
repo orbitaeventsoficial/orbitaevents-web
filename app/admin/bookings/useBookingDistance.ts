@@ -9,9 +9,10 @@ interface UseBookingDistanceOptions {
   onDistanceResolved: (distanceKm: string) => void;
   /** Peatges automàtics (#1373): Google els dona amb la ruta quan n'hi ha. */
   onTollsResolved?: (tollsEur: string) => void;
+  enabled?: boolean;
 }
 
-export function useBookingDistance({ eventVenue, eventLocation, onDistanceResolved, onTollsResolved }: UseBookingDistanceOptions) {
+export function useBookingDistance({ eventVenue, eventLocation, onDistanceResolved, onTollsResolved, enabled = true }: UseBookingDistanceOptions) {
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
   const lastDistanceDestinationRef = useRef('');
@@ -49,6 +50,7 @@ export function useBookingDistance({ eventVenue, eventLocation, onDistanceResolv
   }, [onDistanceResolved]);
 
   useEffect(() => {
+    if (!enabled) return;
     const destination = [eventVenue.trim(), eventLocation.trim()].filter(Boolean).join(', ');
     if (destination.length < 3) return;
     if (destination === lastDistanceDestinationRef.current) return;
@@ -58,7 +60,7 @@ export function useBookingDistance({ eventVenue, eventLocation, onDistanceResolv
     }, 550);
 
     return () => clearTimeout(timer);
-  }, [calculateDistanceForDestination, eventLocation, eventVenue]);
+  }, [calculateDistanceForDestination, enabled, eventLocation, eventVenue]);
 
   return {
     calculatingDistance,

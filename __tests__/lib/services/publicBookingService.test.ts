@@ -50,6 +50,7 @@ const MOCK_BOOKING_RECORD = {
   eventType: 'BIRTHDAY',
   status: 'PENDING',
   customerId: 'cust-1',
+  clientEmail: 'maria@example.com',
   total: 484, // 400 + IVA 21%
   pack: MOCK_PACK,
   extras: [],
@@ -407,7 +408,12 @@ describe('createPublicBooking', () => {
   it('envia emails de confirmació', async () => {
     await createPublicBooking(BASE_REQUEST);
 
-    expect(mockSendConfirmation).toHaveBeenCalledOnce();
+    expect(mockSendConfirmation).toHaveBeenCalledWith(expect.objectContaining({
+      id: 'booking-1',
+      customerId: 'cust-1',
+      clientEmail: 'maria@example.com',
+      reference: 'OE-2026-ABCD',
+    }));
     expect(mockSendAdminNotification).toHaveBeenCalledOnce();
   });
 

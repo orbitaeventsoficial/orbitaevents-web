@@ -88,7 +88,6 @@ Tot el que ja existeix per a leads i que el laboratori `/studio-lab/leads` pot i
 - `lib/constants/index.ts` — formatters + ServiceSlug + base (~1800L).
 - `lib/constants/admin.ts` — labels de nav, FAB, mòbil, `ADMIN_CHANGE_COUNTER`, paletes de chart/SVG, etc.
 - `lib/constants/leadLoss.ts` — motius de pèrdua canònics.
-- `lib/constants/pricingRules.ts` — regles de preu per data.
 - `lib/constants/automationThresholds.ts` — llindars d'automatització.
 - `lib/constants/notifications.ts`, `customer-crm.ts`, `privacy.ts`, `social.ts`, `googleCalendar.ts`, `services.ts`, `adminManual.ts`, `clientPortalNavigation.ts`.
 - `config/*` — `packs-config.ts`, `site-config.ts`, `portfolio-images.ts`, `client-logos.ts`, `equipment-config.ts`.

@@ -44,6 +44,9 @@ export const DJ_CONTINUATION_HOUR_PRICE = DJ_EXTRA_HOUR_PRICE;
 // proveïdor (animació/bingo de Masquerade). Un sol número per a tot el sistema.
 export const SOUND_TECH_PRICE = 40;
 export const SOUND_TECH_DURATION = '1,5 h';
+export const BINGO_ASSISTANT_GUEST_THRESHOLD = 70;
+export const BINGO_ASSISTANT_LINE_LABEL = `Assistent Bingo Musical (+${BINGO_ASSISTANT_GUEST_THRESHOLD} pax)`;
+export const BINGO_ASSISTANT_LINE_NOTE = `[bingo-assistant-threshold] Requerit a partir de ${BINGO_ASSISTANT_GUEST_THRESHOLD} convidats; omple el cost real si aplica.`;
 export const PARTNER_PRODUCTS_WITH_INCLUDED_SOUND_TECH = [
   'bingo musical',
   'batalla musical',
@@ -65,6 +68,46 @@ export function partnerProductRequiresSoundTech(input: { name?: string | null; c
   return PARTNER_PRODUCTS_WITH_INCLUDED_SOUND_TECH.some((productName) => normalizedName === productName);
 }
 
+export function countProductCrewMembers(crew?: string | null): number {
+  if (!crew) return 1;
+  return crew
+    .split('+')
+    .map((part) => part.trim().toLowerCase())
+    .filter((part) => part && !/equip|decoraci[oó]|material|propi/.test(part))
+    .reduce((total, part) => {
+      const explicit = part.match(/\b(\d+)\b/);
+      return total + (explicit ? Number(explicit[1]) : 1);
+    }, 0) || 1;
+}
+
+function normalizeServiceText(value?: string | null): string {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+export function isAdultBingoMusicalName(value?: string | null): boolean {
+  const normalized = normalizeServiceText(value);
+  return /\bbingo musical\b/.test(normalized)
+    && !/\bkids?\b/.test(normalized)
+    && !normalized.includes('assistent');
+}
+
+export function isBingoAssistantLine(input: { label?: string | null; notes?: string | null }): boolean {
+  const normalizedLabel = normalizeServiceText(input.label);
+  const normalizedNote = normalizeServiceText(input.notes);
+  return normalizedNote.includes('bingo-assistant-threshold')
+    || normalizedLabel === normalizeServiceText(BINGO_ASSISTANT_LINE_LABEL);
+}
+
+export function bingoAssistantRequiredForGuestCount(value?: string | number | null): boolean {
+  const guestCount = typeof value === 'number'
+    ? value
+    : Number(String(value ?? '').replace(',', '.'));
+  return Number.isFinite(guestCount) && guestCount >= BINGO_ASSISTANT_GUEST_THRESHOLD;
+}
+
 /** Preu derivat d'un servei de DJ per a N hores (≥1). Font única de qualsevol preu base. */
 export function djPriceForHours(hours: number): number {
   const h = Math.max(1, Math.round(hours));
@@ -84,7 +127,3 @@ export const ORBITA_SERVICES: OrbitaService[] = [
   { id: 'caps-mobils', kind: 'EQUIPMENT', label: 'Caps mòbils (llum)', defaultPrice: 120, unit: 'unit', optional: true },
   { id: 'operari-extra', kind: 'OTHER', label: 'Operari extra', defaultPrice: 50, unit: 'unit', optional: true },
 ];
-
-export function getOrbitaService(id: string): OrbitaService | undefined {
-  return ORBITA_SERVICES.find((service) => service.id === id);
-}

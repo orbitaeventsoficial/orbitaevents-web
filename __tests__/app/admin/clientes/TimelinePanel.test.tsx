@@ -84,6 +84,63 @@ describe('TimelinePanel', () => {
     expect(screen.getByText('Dossier enviat')).toBeInTheDocument();
     expect(screen.getByText('a anna@test.com · dossier_email_send')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Obrir dossiers/ })).toHaveAttribute('href', '/admin/dossiers');
+    expect(screen.getByRole('link', { name: /Obrir dossiers/ })).not.toHaveAttribute('target');
+  });
+
+  it('obre els documents externs de timeline en pestanya nova segura', () => {
+    render(
+      <TimelinePanel
+        customerId="cust-1"
+        customerName="Anna"
+        insights={insights}
+        timeline={[
+          {
+            id: 'booking:booking-1:invoice:invoice-1:document',
+            type: 'ACTIVITY',
+            at: '2026-04-11T10:00:00.000Z',
+            title: 'Factura disponible (FAC-2026-001)',
+            meta: {
+              documentType: 'INVOICE',
+              pdfUrl: 'https://cdn.test/factura.pdf',
+            },
+            link: { label: 'Obrir PDF factura', href: 'https://cdn.test/factura.pdf' },
+          },
+        ]}
+      />,
+    );
+
+    const link = screen.getByRole('link', { name: /Obrir PDF factura/ });
+    expect(link).toHaveAttribute('href', 'https://cdn.test/factura.pdf');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('obre previews API de documents en pestanya nova segura', () => {
+    render(
+      <TimelinePanel
+        customerId="cust-1"
+        customerName="Anna"
+        insights={insights}
+        timeline={[
+          {
+            id: 'al:dossier-1',
+            type: 'ACTIVITY',
+            at: '2026-04-11T10:00:00.000Z',
+            title: 'Dossier enviat',
+            meta: {
+              documentType: 'DOSSIER',
+              dossierId: 'dos-1',
+            },
+            link: { label: 'Obrir preview dossier', href: '/api/admin/dossiers/dos-1/preview' },
+          },
+        ]}
+      />,
+    );
+
+    const link = screen.getByRole('link', { name: /Obrir preview dossier/ });
+    expect(link).toHaveAttribute('href', '/api/admin/dossiers/dos-1/preview');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('permet aillar documents de comunicacions generiques', () => {

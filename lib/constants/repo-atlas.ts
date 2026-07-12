@@ -97,7 +97,7 @@ export const REPO_ATLAS_FLOW_DEFINITIONS = [
       { label: 'Bolo completat', intent: 'La reserva ja ha passat i pot generar seguiment.', patterns: ['COMPLETED', 'bookingRouteService', 'post-event'] },
       { label: 'Playbook', intent: 'Accions de gracies, ressenya, testimoni i referral.', patterns: ['postEventPlaybook', 'testimonial', 'review', 'referral'] },
       { label: 'Comunicacio', intent: 'Emails, inbox i tracking si el propietari activa enviament.', patterns: ['email', 'inbox', 'tracking', 'send-post-event'] },
-      { label: 'Aprenentatge', intent: 'Reports, surveys i feedback intern.', patterns: ['PostEventReport', 'ClientSurvey', 'ClientFeedback', 'reports'] },
+      { label: 'Aprenentatge', intent: 'Reports, surveys i respostes reals del client.', patterns: ['postEventReport', 'ClientSurvey', 'CustomerTestimonial', 'reports'] },
     ],
   },
 ] as const;
@@ -243,7 +243,7 @@ export const REPO_ATLAS_DOMAIN_DICTIONARY = [
     term: 'Post-event',
     definition: 'Volant de ressenya, testimoni, feedback i referral despres del bolo.',
     useWhen: 'Tancar el cercle comercial i aprofitar clients contents.',
-    sourceOfTruth: ['postEventPlaybookService', 'ClientSurvey', 'ClientFeedback', 'CustomerTestimonial'],
+    sourceOfTruth: ['postEventPlaybookService', 'postEventPendingService', 'postEventDispatchService', 'Booking.postEventEmailSent', 'PostEventReport', 'ClientSurvey', 'CustomerTestimonial'],
     validations: ['post-event tests', 'captura seccio Tanca el cercle'],
   },
   {

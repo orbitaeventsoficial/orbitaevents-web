@@ -20,7 +20,6 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 
 import {
-  computeProductMargin,
   collaboratorProductToAnimacioProduct,
   collaboratorProductToDossierProduct,
   parseDossierCollaboratorProductId,
@@ -55,20 +54,6 @@ describe('stripProviderBrand', () => {
 
   it('deixa intacte el text sense marca', () => {
     expect(stripProviderBrand('Animació en directe per a adults')).toBe('Animació en directe per a adults');
-  });
-});
-
-describe('computeProductMargin', () => {
-  it('calcula profit net i % sobre el cost del col·laborador', () => {
-    const { marginNet, marginPct } = computeProductMargin(200, 240);
-    expect(marginNet).toBe(40);
-    expect(marginPct).toBeCloseTo(20, 1);
-  });
-
-  it('retorna 0% si el cost és 0', () => {
-    const { marginNet, marginPct } = computeProductMargin(0, 100);
-    expect(marginNet).toBe(100);
-    expect(marginPct).toBe(0);
   });
 });
 

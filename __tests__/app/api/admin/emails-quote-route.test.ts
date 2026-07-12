@@ -25,7 +25,10 @@ describe('POST /api/admin/emails/quote', () => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
     mockVerifyCsrf.mockReturnValue(null);
-    mockSendQuote.mockResolvedValue({ status: 200, body: { ok: true } });
+    mockSendQuote.mockResolvedValue({
+      status: 410,
+      body: { ok: false, error: 'legacy disabled', canonicalRoute: '/api/admin/proposals/:id/send' },
+    });
   });
 
   it('rebutja sense auth', async () => {
@@ -39,9 +42,9 @@ describe('POST /api/admin/emails/quote', () => {
     expect(mockSendQuote).not.toHaveBeenCalled();
   });
 
-  it('envia pressupost per email', async () => {
+  it('retorna 410 perquè el flux legacy està desactivat', async () => {
     const res = await POST(makeReq({ leadId: 'l1', to: 'client@test.cat' }));
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(410);
     expect(mockSendQuote).toHaveBeenCalledWith({ leadId: 'l1', to: 'client@test.cat' });
   });
 
@@ -49,14 +52,6 @@ describe('POST /api/admin/emails/quote', () => {
     mockSendQuote.mockResolvedValueOnce({ status: 400, body: { error: 'Missing leadId' } });
     const res = await POST(makeReq({}));
     expect(res.status).toBe(400);
-  });
-
-  it('retorna 400 si missing extras', async () => {
-    mockSendQuote.mockRejectedValueOnce(new Error('Missing extras: Fotografia'));
-    const res = await POST(makeReq({ leadId: 'l1' }));
-    expect(res.status).toBe(400);
-    const body = await res.json();
-    expect(body.error).toContain('Missing extras');
   });
 
   it('retorna 504 si timeout SMTP', async () => {

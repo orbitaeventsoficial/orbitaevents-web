@@ -26,6 +26,8 @@ import { buildWazeUrl, buildEventLogistics } from '@/lib/admin/eventLogistics';
 import LeadLostStatusPrompt from './LeadLostStatusPrompt';
 import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
 import { buildLeadWhatsAppHref } from './leadWhatsApp';
+import { fetchWithCsrf } from '@/lib/csrf';
+import { isAdminTestArtifactFromParts } from '@/lib/admin/testArtifacts';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import { getPaymentBand } from '@/lib/payment-status';
@@ -89,6 +91,16 @@ function weightedLeadValue(lead: LeadData): number {
   const status = lead.realStatus;
   if (!status || !(OPEN_PIPELINE_STATUSES as readonly string[]).includes(status)) return 0;
   return Math.round(lead.value * (LEAD_SCORING_STATUS_PROBABILITY[status] ?? 0));
+}
+
+function isLeadTestArtifact(lead: LeadData): boolean {
+  return isAdminTestArtifactFromParts([
+    lead.name,
+    lead.email,
+    lead.channel,
+    lead.type,
+    lead.product,
+  ]);
 }
 
 /* ── Constants · v847 ───────────────────────────────────────────────────── */
@@ -570,6 +582,9 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
   const [lostSaving, setLostSaving] = useState(false);
   const [dragLeadId, setDragLeadId] = useState<string | null>(null);
   const [dropStage, setDropStage] = useState<Stage | null>(null);
+  const [showTestLeads, setShowTestLeads] = useState(false);
+  const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
+  const [bulkDeletingLeads, setBulkDeletingLeads] = useState(false);
 
   const leadsSignature = leads.map((l) => `${l.id}:${l.stage}`).join('|');
   useEffect(() => { setOptimisticStage({}); setPendingId(null); }, [leadsSignature]);
@@ -577,12 +592,18 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
   const effectiveLeads = useMemo<LeadData[]>(() => (
     leads.map((l) => optimisticStage[l.id] ? { ...l, stage: optimisticStage[l.id] } : l)
   ), [leads, optimisticStage]);
-  const activeLead = pageId ? effectiveLeads.find((l) => l.id === pageId) ?? null : null;
+  const testLeadArtifacts = useMemo(() => effectiveLeads.filter(isLeadTestArtifact), [effectiveLeads]);
+  const visibleLeads = useMemo(
+    () => showTestLeads ? effectiveLeads : effectiveLeads.filter((lead) => !isLeadTestArtifact(lead)),
+    [effectiveLeads, showTestLeads],
+  );
+  const hiddenTestLeads = testLeadArtifacts.length;
+  const activeLead = pageId ? visibleLeads.find((l) => l.id === pageId) ?? null : null;
 
   const visibleMonths = useMemo(() => Array.from({ length: MONTH_WINDOW }, (_, i) => monthStart + i), [monthStart]);
   const byDate = useMemo(() => {
     const m = new Map<string, LeadData[]>();
-    for (const l of effectiveLeads) {
+    for (const l of visibleLeads) {
       if (!l.dateISO) continue;
       const dayLeads = m.get(l.dateISO) ?? [];
       dayLeads.push(l);
@@ -597,7 +618,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       });
     }
     return m;
-  }, [effectiveLeads]);
+  }, [visibleLeads]);
   const months = useMemo<MonthBlock[]>(() => visibleMonths.map((vm) => {
     const { y, m } = toCalMonth(year, vm);
     const weekendSlots: WeekendSlot[] = saturdaysInMonth(y, m).map((sat) => ({
@@ -686,6 +707,49 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
     }
   }
 
+  function toggleLeadSelection(leadId: string) {
+    setSelectedLeadIds((current) => {
+      const next = new Set(current);
+      if (next.has(leadId)) next.delete(leadId);
+      else next.add(leadId);
+      return next;
+    });
+  }
+
+  async function handleBulkDeleteLeads() {
+    const ids = [...selectedLeadIds];
+    if (ids.length === 0 || bulkDeletingLeads) return;
+    const ok = await confirm({
+      title: 'Eliminar entrades',
+      message: `S'eliminaran ${ids.length} entrades seleccionades. Aquesta acció no es pot desfer.`,
+      variant: 'danger',
+      confirmLabel: 'Eliminar seleccionades',
+    });
+    if (!ok) return;
+
+    setBulkDeletingLeads(true);
+    const failed: string[] = [];
+    try {
+      for (const id of ids) {
+        const res = await fetchWithCsrf(`/api/admin/leads/${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          failed.push(data?.error || 'Error eliminant entrada');
+        }
+      }
+      const deleted = ids.length - failed.length;
+      if (deleted > 0) toast.success(`${deleted} entrades eliminades.`);
+      if (failed.length > 0) toast.error(`${failed.length} entrades no s'han pogut eliminar.`);
+      setSelectedLeadIds(new Set());
+      router.refresh();
+    } catch (error) {
+      console.error('[admin/leads] bulk delete', error);
+      toast.error(error instanceof Error ? error.message : 'Error eliminant entrades.');
+    } finally {
+      setBulkDeletingLeads(false);
+    }
+  }
+
   const yearPage = Math.floor((monthStart - 1) / 12);
   const currentYear = year + yearPage;
   const m0 = toCalMonth(year, visibleMonths[0]).m;
@@ -693,7 +757,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
 
   // Focus
   const focusQueue = useMemo(
-    () => effectiveLeads
+    () => visibleLeads
       .filter((l) => l.stage !== 'perdut')
       .slice()
       .sort((a, b) => {
@@ -707,7 +771,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
         }
         return a.dateISO.localeCompare(b.dateISO);
       }),
-    [effectiveLeads],
+    [visibleLeads],
   );
   const [focusId, setFocusId] = useState(() => focusQueue[0]?.id ?? '');
   const focus = focusQueue.find((l) => l.id === focusId) ?? focusQueue[0] ?? null;
@@ -741,6 +805,24 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
         </div>
       </header>
 
+      {hiddenTestLeads > 0 && (
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
+          <span className="ap-badge">
+            {showTestLeads ? `${hiddenTestLeads} proves visibles` : `${hiddenTestLeads} proves ocultes`}
+          </span>
+          <button
+            type="button"
+            className="ap-btn ap-btn--xs"
+            onClick={() => {
+              setSelectedLeadIds(new Set());
+              setShowTestLeads((value) => !value);
+            }}
+          >
+            {showTestLeads ? 'Ocultar proves' : 'Mostrar proves'}
+          </button>
+        </div>
+      )}
+
       {/* ── PEÇA 2: Zona Focus ── */}
       <div className="ap-leads-focus" data-stage={focus?.stage ?? 'nou'}>
         {focus ? (
@@ -772,18 +854,18 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
 
       {/* ── PEÇA 3: Mètriques ── */}
       {(() => {
-        const totalValue  = effectiveLeads.reduce((s, l) => s + l.value, 0);
-        const openValue   = effectiveLeads.filter((l) => l.stage === 'nou' || l.stage === 'contactat').reduce((s, l) => s + l.value, 0);
-        const wonValue    = effectiveLeads.filter((l) => l.stage === 'guanyat').reduce((s, l) => s + l.value, 0);
+        const totalValue  = visibleLeads.reduce((s, l) => s + l.value, 0);
+        const openValue   = visibleLeads.filter((l) => l.stage === 'nou' || l.stage === 'contactat').reduce((s, l) => s + l.value, 0);
+        const wonValue    = visibleLeads.filter((l) => l.stage === 'guanyat').reduce((s, l) => s + l.value, 0);
         // Forecast ponderat: valor × probabilitat de tancament (constant canònica, la mateixa
         // que alimenta buildPipelineForecast al dashboard) dels leads encara oberts.
-        const openForecast = effectiveLeads.reduce((s, l) => s + weightedLeadValue(l), 0);
-        const activeCount = effectiveLeads.filter((l) => l.stage !== 'perdut').length;
+        const openForecast = visibleLeads.reduce((s, l) => s + weightedLeadValue(l), 0);
+        const activeCount = visibleLeads.filter((l) => l.stage !== 'perdut').length;
         return (
           <div className="ap-leads-metrics" aria-label="Resum comercial">
             <div className="ap-leads-metric">
               <span>Entrades</span>
-              <b>{effectiveLeads.length} ({activeCount} actives)</b>
+              <b>{visibleLeads.length} ({activeCount} actives)</b>
             </div>
             <div className="ap-leads-metric">
               <span>Pipeline</span>
@@ -806,7 +888,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       })()}
       {/* ── Safata: leads sense data — fora del scroll, sempre visible ── */}
       {viewMode === 'calendari' && (() => {
-        const noDate = effectiveLeads.filter((l) => !l.dateISO && l.stage !== 'perdut');
+        const noDate = visibleLeads.filter((l) => !l.dateISO && l.stage !== 'perdut');
         if (!noDate.length) return null;
         return (
           <div className="ap-leads-nodate">
@@ -853,7 +935,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
             </div>
 
             {/* ── Empty state global: cap lead a tota la temporada ── */}
-            {effectiveLeads.length === 0 && (
+            {visibleLeads.length === 0 && (
               <div className="ap-leads-calempty" role="status">
                 <span className="ap-leads-calempty-tx">Cap entrada aquesta temporada</span>
                 <span className="ap-leads-calempty-sub">Quan entri un lead apareixerà al cap de setmana corresponent.</span>
@@ -920,7 +1002,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
         {viewMode === 'pipeline' && (
           <div className="ap-leads-pipeline">
             {PIPELINE_STAGES.map((stage) => {
-              const laneLeads = effectiveLeads.filter((l) => l.stage === stage);
+              const laneLeads = visibleLeads.filter((l) => l.stage === stage);
               const laneValue = laneLeads.reduce((sum, l) => sum + l.value, 0);
               const laneForecast = laneLeads.reduce((sum, l) => sum + weightedLeadValue(l), 0);
               return (
@@ -1006,12 +1088,63 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
 
         {/* ── PEÇA 5b: Llista ── */}
         {viewMode === 'llista' && (() => {
-          const sorted = [...effectiveLeads.filter((l) => l.dateISO), ...effectiveLeads.filter((l) => !l.dateISO)].sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+          const sorted = [...visibleLeads.filter((l) => l.dateISO), ...visibleLeads.filter((l) => !l.dateISO)].sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+          const selectable = sorted.filter((l) => l.kind === 'lead' && l.realStatus !== null);
+          const selectableIds = selectable.map((l) => l.id);
+          const allVisibleSelected = selectableIds.length > 0 && selectableIds.every((id) => selectedLeadIds.has(id));
+          const toggleVisibleSelection = () => {
+            setSelectedLeadIds((current) => {
+              const next = new Set(current);
+              if (allVisibleSelected) {
+                for (const id of selectableIds) next.delete(id);
+              } else {
+                for (const id of selectableIds) next.add(id);
+              }
+              return next;
+            });
+          };
           if (!sorted.length) return <p className="ap-leads-placeholder">No hi ha entrades per a la temporada.</p>;
           return (
             <div className="ap-leads-list">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
+                <label className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--t2)]">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    onChange={toggleVisibleSelection}
+                    className="h-4 w-4"
+                    aria-label="Seleccionar entrades visibles"
+                  />
+                  Seleccionar visibles
+                </label>
+                <div className="flex flex-wrap items-center gap-2">
+                  {selectedLeadIds.size > 0 && <span className="ap-badge">{selectedLeadIds.size} seleccionades</span>}
+                  {selectedLeadIds.size > 0 && (
+                    <button type="button" className="ap-btn ap-btn--xs" onClick={() => setSelectedLeadIds(new Set())}>
+                      Netejar
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="ap-btn ap-btn--danger ap-btn--xs"
+                    onClick={handleBulkDeleteLeads}
+                    disabled={selectedLeadIds.size === 0 || bulkDeletingLeads}
+                  >
+                    {bulkDeletingLeads ? 'Eliminant...' : 'Eliminar seleccionades'}
+                  </button>
+                </div>
+              </div>
               <table className="ap-leads-listtbl">
                 <thead><tr>
+                  <th scope="col">
+                    <input
+                      type="checkbox"
+                      checked={allVisibleSelected}
+                      onChange={toggleVisibleSelection}
+                      className="h-4 w-4"
+                      aria-label="Seleccionar entrades visibles"
+                    />
+                  </th>
                   <th scope="col">Data</th>
                   <th scope="col">Bolo</th>
                   <th scope="col">Tipus</th>
@@ -1027,6 +1160,19 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                       <tr key={l.id} className="ap-leads-listrow" data-stage={l.stage}
                         onClick={() => setPageId(l.id)} tabIndex={0}
                         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPageId(l.id); } }}>
+                        <td onClick={(event) => event.stopPropagation()}>
+                          {l.kind === 'lead' && l.realStatus !== null ? (
+                            <input
+                              type="checkbox"
+                              checked={selectedLeadIds.has(l.id)}
+                              onChange={() => toggleLeadSelection(l.id)}
+                              className="h-4 w-4"
+                              aria-label={`Seleccionar entrada ${l.name}`}
+                            />
+                          ) : (
+                            <span className="text-[var(--t3)]">—</span>
+                          )}
+                        </td>
                         <td className="ap-leads-listdate">{l.dateISO ? fullDate(l.dateISO) : <em>sense data</em>}</td>
                         <td className="ap-leads-listname"><span className="ap-leads-dot" data-stage={l.stage} />{pay && <span className="ap-leads-pay" data-pay={pay} />}{l.name}</td>
                         <td>{l.type}</td>

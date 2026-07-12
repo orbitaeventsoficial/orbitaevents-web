@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { TASK_SOURCE } from '@/lib/constants';
+import { buildPendingPostEventEmailBookingWhere } from '@/lib/services/postEventPendingService';
 
 function startOfToday() {
   const now = new Date();
@@ -16,16 +17,10 @@ function startOfDayAfter(days: number) {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate() + days, 0, 0, 0, 0);
 }
 
-function startOfYesterday() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 0, 0, 0, 0);
-}
-
 export async function generateDailyChecklistTasks() {
   const todayStart = startOfToday();
   const todayEnd = endOfToday();
   const weekAheadStart = startOfDayAfter(7);
-  const yesterdayStart = startOfYesterday();
   const retentionStart = startOfDayAfter(-14);
   const now = new Date();
 
@@ -60,11 +55,7 @@ export async function generateDailyChecklistTasks() {
       },
     }),
     prisma.booking.count({
-      where: {
-        status: 'COMPLETED',
-        postEventEmailSent: false,
-        eventDate: { gte: yesterdayStart, lt: todayStart },
-      },
+      where: buildPendingPostEventEmailBookingWhere(now),
     }),
   ]);
 

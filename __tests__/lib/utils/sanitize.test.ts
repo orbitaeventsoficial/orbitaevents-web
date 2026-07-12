@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { escapeHtml, sanitizeEmail, sanitizePhone, truncate } from '@/lib/utils/sanitize';
+import { escapeHtml, sanitizeEmail, truncate } from '@/lib/utils/sanitize';
 
 describe('escapeHtml', () => {
   it('escapa tag script complet', () => {
@@ -40,28 +40,6 @@ describe('sanitizeEmail', () => {
 
   it('aplica les dues operacions alhora', () => {
     expect(sanitizeEmail('  JOAN@EXAMPLE.COM  ')).toBe('joan@example.com');
-  });
-});
-
-describe('sanitizePhone', () => {
-  it('elimina espais', () => {
-    expect(sanitizePhone('612 345 678')).toBe('612345678');
-  });
-
-  it('elimina guions', () => {
-    expect(sanitizePhone('612-345-678')).toBe('612345678');
-  });
-
-  it('conserva el prefix +', () => {
-    expect(sanitizePhone('+34 612 345 678')).toBe('+34612345678');
-  });
-
-  it('elimina parèntesis', () => {
-    expect(sanitizePhone('(612) 345 678')).toBe('612345678');
-  });
-
-  it('retorna string buit per input buit', () => {
-    expect(sanitizePhone('')).toBe('');
   });
 });
 

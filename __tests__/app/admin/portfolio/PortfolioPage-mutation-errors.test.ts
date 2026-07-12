@@ -32,4 +32,15 @@ describe('Portfolio admin mutation errors', () => {
     expect(mediaServiceSource).toContain('buildPortfolioUploadImagePath(slug, fileName)');
     expect(mediaServiceSource).toContain('normalizePortfolioImageBuffer(fileBuffer)');
   });
+
+  it('crea events amb selector de portada existent, no amb URL manual', () => {
+    expect(source).toContain('const [coverOptions, setCoverOptions] = useState<MediaItem[]>([]);');
+    expect(source).toContain("fetchWithCsrf(`/api/admin/portfolio/media?slug=${categorySlug}`");
+    expect(source).toContain("coverOptions.filter((item) => item.mediaType === 'image')");
+    expect(source).toContain("categorySlug: event.target.value, coverImage: ''");
+    expect(source).toContain('Tria una imatge existent');
+    expect(source).toContain('Portada del portfolio, no URL manual de producte.');
+    expect(source).toContain("Els vídeos poden anar a galeria, però la portada pública ha de ser una imatge.");
+    expect(source).not.toContain('placeholder="URL de portada"');
+  });
 });

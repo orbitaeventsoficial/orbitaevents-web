@@ -18,7 +18,8 @@ export type TemplateKey =
   | 'seguiment-pressupost'
   | 'confirmacio-data'
   | 'agraiment-post-event'
-  | 'reactivacio';
+  | 'reactivacio'
+  | 'referral';
 
 export interface TemplateContext {
   name: string;
@@ -229,6 +230,30 @@ const generators: Record<TemplateKey, TemplateGenerator> = {
       body: `Hola ${ctx.first},\n\nFa temps que no coincidim i volíem saludar-te. Sempre ens ha fet il·lusió treballar amb tu.\n\nSi estàs pensant en una nova celebració, ens encantaria tornar-te a acompanyar. Tenim novetats que et poden interessar.\n\nExplica'ns quan vulguis,\nÒrbita Events`,
     };
   },
+
+  'referral': (ctx) => {
+    if (ctx.lang === 'es') {
+      return {
+        key: 'referral',
+        label: 'Referral',
+        icon: '🤝',
+        description: 'Pedir una recomendación trazable a un cliente satisfecho',
+        mode: 'email',
+        subject: `${ctx.first}, ¿nos recomiendas?`,
+        body: `Hola ${ctx.first},\n\nSi conoces a alguien que esté preparando una celebración o evento, nos ayudaría mucho que le hablaras de Òrbita Events.\n\nSi quieres, puedes presentarnos por aquí y nos encargamos de atenderle bien, sin compromiso.\n\nGracias por confiar en nosotros,\nÒrbita Events`,
+      };
+    }
+
+    return {
+      key: 'referral',
+      label: 'Referral',
+      icon: '🤝',
+      description: 'Demanar una recomanació traçable a un client satisfet',
+      mode: 'email',
+      subject: `${ctx.first}, ens recomanes?`,
+      body: `Hola ${ctx.first},\n\nSi coneixes algú que estigui preparant una celebració o event, ens ajudaria molt que li parlis d'Òrbita Events.\n\nSi vols, ens el pots presentar per aquí i nosaltres l'atendrem bé, sense compromís.\n\nGràcies per confiar en nosaltres,\nÒrbita Events`,
+    };
+  },
 };
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -299,6 +324,7 @@ export function generateAllTemplates(context: TemplateContext): SmartTemplate[] 
     'confirmacio-data',
     'agraiment-post-event',
     'reactivacio',
+    'referral',
   ];
 
   return allKeys.map((key) => generators[key](enriched));

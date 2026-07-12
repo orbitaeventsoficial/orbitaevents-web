@@ -11,8 +11,11 @@ import { PORTFOLIO_CATEGORIES, PORTFOLIO_IMAGES } from '@/app/config/portfolio-i
 import {
   PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE,
   PORTFOLIO_MEDIA_IMAGE_MAX_SIZE,
+  PORTFOLIO_EVENT_ORIGIN_LABELS,
+  PORTFOLIO_EVENT_ORIGIN_TYPES,
   PORTFOLIO_MEDIA_UPLOAD_ACCEPT,
   PORTFOLIO_MEDIA_VIDEO_MAX_SIZE,
+  type PortfolioEventOriginType,
 } from '@/lib/constants/portfolio-media';
 
 type PortfolioEvent = {
@@ -29,6 +32,11 @@ type PortfolioEvent = {
   services: string[];
   coverImage: string;
   published: boolean;
+  originType: string;
+  sourceBookingId: string | null;
+  sourceGalleryPhotoId: string | null;
+  sourceTestimonialId: string | null;
+  originLabel: string | null;
   _count?: { media: number };
 };
 
@@ -116,6 +124,14 @@ function buildEventPayload(form: EventFormState) {
       ? form.services.split(',').map((value) => value.trim()).filter(Boolean)
       : [],
   };
+}
+
+function formatPortfolioEventOrigin(eventItem: PortfolioEvent): string | null {
+  const originType = eventItem.originType as PortfolioEventOriginType;
+  if (!originType || originType === PORTFOLIO_EVENT_ORIGIN_TYPES.MANUAL) return null;
+  const label = PORTFOLIO_EVENT_ORIGIN_LABELS[originType] || originType;
+  const value = eventItem.originLabel || eventItem.sourceBookingId || eventItem.sourceGalleryPhotoId || eventItem.sourceTestimonialId;
+  return value ? `${label}: ${value}` : label;
 }
 
 async function readPortfolioMutationError(response: Response, fallback: string) {
@@ -554,12 +570,16 @@ function CategorySection({
                           </div>
                           <div>
                             <label className="mb-1 block text-xs text-[var(--t3)]">Fer portada de</label>
-                            <div className="flex flex-wrap gap-2">
-                              {categoryEvents.length === 0 ? <p className="text-xs text-[var(--t3)]">Crea primer un event.</p> : categoryEvents.map((eventItem) => {
-                                const active = coverRefs.some((coverEvent) => coverEvent.id === eventItem.id);
-                                return <button key={eventItem.id} type="button" disabled={item.isStatic} onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-[var(--line)] text-[var(--t2)] hover:bg-[var(--raised)]'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
-                              })}
-                            </div>
+                            {item.mediaType !== 'image' ? (
+                              <p className="text-xs text-[var(--t3)]">Els vídeos poden anar a galeria, però la portada pública ha de ser una imatge.</p>
+                            ) : (
+                              <div className="flex flex-wrap gap-2">
+                                {categoryEvents.length === 0 ? <p className="text-xs text-[var(--t3)]">Crea primer un event.</p> : categoryEvents.map((eventItem) => {
+                                  const active = coverRefs.some((coverEvent) => coverEvent.id === eventItem.id);
+                                  return <button key={eventItem.id} type="button" disabled={item.isStatic} onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-[var(--line)] text-[var(--t2)] hover:bg-[var(--raised)]'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
+                                })}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -586,6 +606,45 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
   const [error, setError] = useState<string | null>(null);
   const { confirm, dialogProps } = useConfirmDialog();
   const [form, setForm] = useState<EventFormState>(EMPTY_EVENT_FORM);
+  const [coverOptions, setCoverOptions] = useState<MediaItem[]>([]);
+  const [coverOptionsLoading, setCoverOptionsLoading] = useState(false);
+
+  const selectedCategoryName = useMemo(
+    () => PORTFOLIO_CATEGORIES.find((category) => category.slug === form.categorySlug)?.name || form.categorySlug,
+    [form.categorySlug],
+  );
+  const coverImageOptions = useMemo(
+    () => coverOptions.filter((item) => item.mediaType === 'image'),
+    [coverOptions],
+  );
+
+  const loadCoverOptions = useCallback(async (categorySlug: string) => {
+    setCoverOptionsLoading(true);
+    const fallbackItems = buildStaticMediaItems(categorySlug).filter((item) => item.mediaType === 'image');
+    try {
+      const response = await fetchWithCsrf(`/api/admin/portfolio/media?slug=${categorySlug}`, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'han pogut carregar les portades"));
+      }
+      const data = await response.json();
+      const items = Array.isArray(data.data) ? data.data as MediaItem[] : [];
+      const imageItems = items.filter((item) => item.mediaType === 'image');
+      setCoverOptions(imageItems.length > 0 ? imageItems : fallbackItems);
+    } catch (err) {
+      log.error('Error carregant portades de portfolio', err);
+      setCoverOptions(fallbackItems);
+      if (fallbackItems.length === 0) {
+        setError(err instanceof Error ? err.message : "No s'han pogut carregar les portades");
+      }
+    } finally {
+      setCoverOptionsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showForm) return;
+    void loadCoverOptions(form.categorySlug);
+  }, [form.categorySlug, loadCoverOptions, showForm]);
 
   const handleSubmit = useCallback(async () => {
     if (!form.slug || !form.title || !form.coverImage) {
@@ -672,8 +731,31 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
           <div className="grid gap-4 md:grid-cols-2">
             <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value, slug: event.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/g, '') }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Títol de l'event" />
             <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Slug URL" />
-            <select value={form.categorySlug} onChange={(event) => setForm((current) => ({ ...current, categorySlug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]">{PORTFOLIO_CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>
-            <input value={form.coverImage} onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="URL de portada" />
+            <select value={form.categorySlug} onChange={(event) => setForm((current) => ({ ...current, categorySlug: event.target.value, coverImage: '' }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]">{PORTFOLIO_CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>
+            <div>
+              <select
+                value={form.coverImage}
+                onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))}
+                disabled={coverOptionsLoading || coverImageOptions.length === 0}
+                className="w-full ap-card px-3 py-2.5 text-sm text-[var(--t2)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <option value="">
+                  {coverOptionsLoading
+                    ? 'Carregant portades...'
+                    : coverImageOptions.length === 0
+                      ? `Cap imatge disponible a ${selectedCategoryName}`
+                      : 'Tria una imatge existent'}
+                </option>
+                {coverImageOptions.map((item) => (
+                  <option key={item.id} value={item.mediaUrl}>
+                    {item.caption || item.mediaUrl} · {item.isStatic ? 'catàleg públic' : 'media editable'}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 truncate text-xs text-[var(--t3)]">
+                {form.coverImage || 'Portada del portfolio, no URL manual de producte.'}
+              </p>
+            </div>
             <input value={form.subtitle} onChange={(event) => setForm((current) => ({ ...current, subtitle: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Subtítol" />
             <input value={form.venue} onChange={(event) => setForm((current) => ({ ...current, venue: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Venue" />
             <input value={form.location} onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Ubicació" />
@@ -697,6 +779,10 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
                 <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-[var(--t)]">{eventItem.title}</p><span className={`ap-badge ${eventItem.published ? 'ap-badge--success' : ''}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
                 <p className="mt-1 text-xs text-[var(--t3)]">/{eventItem.categorySlug}/{eventItem.slug} · {eventItem._count?.media || 0} elements vinculats</p>
                 <p className="mt-1 text-xs text-[var(--t3)]">Portada: {eventItem.coverImage || 'pendent'}</p>
+                {(() => {
+                  const origin = formatPortfolioEventOrigin(eventItem);
+                  return origin ? <p className="mt-1 text-xs text-[var(--t3)]">Origen: {origin}</p> : null;
+                })()}
               </div>
               <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={() => void togglePublished(eventItem)} className="rounded-xl border border-[var(--line)] px-3 py-2 text-sm text-[var(--t2)] hover:bg-[var(--raised)]">{eventItem.published ? 'Despublicar' : 'Publicar'}</button>
@@ -776,10 +862,6 @@ export default function AdminPortfolioPage() {
     </AdminPage>
   );
 }
-
-
-
-
 
 
 

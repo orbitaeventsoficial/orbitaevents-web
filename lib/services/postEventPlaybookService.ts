@@ -6,7 +6,15 @@
 // següent acció. Part pura + wrapper que carrega des de Prisma.
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
+import {
+  CUSTOMER_ACTIVITY_ACTIONS,
+  SOCIAL_POST_ORIGIN_TYPES,
+} from '@/lib/constants';
+import {
+  POST_EVENT_DAY_MS,
+  POST_EVENT_WORKFLOW,
+  getPostEventWorkflowDates,
+} from '@/lib/constants/postEventWorkflow';
 import { prisma } from '@/lib/prisma';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -81,10 +89,8 @@ export type PlaybookSummary = {
 // HELPERS
 // ───────────────────────────────────────────────────────────────────────────
 
-const DAY_MS = 1000 * 60 * 60 * 24;
-
 function daysBetween(a: Date, b: Date): number {
-  return Math.floor((a.getTime() - b.getTime()) / DAY_MS);
+  return Math.floor((a.getTime() - b.getTime()) / POST_EVENT_DAY_MS);
 }
 
 const ACTION_LABELS: Record<PlaybookActionKey, string> = {
@@ -94,13 +100,8 @@ const ACTION_LABELS: Record<PlaybookActionKey, string> = {
   referral_ask: 'Demanar referral',
 };
 
-// Dies dins dels quals es considera que una acció està encara "a temps"
-const ACTION_DUE_DAYS: Record<PlaybookActionKey, number> = {
-  thank_you: 3,
-  testimonial: 7,
-  social_post: 14,
-  referral_ask: 30,
-};
+// Dies dins dels quals es considera que una acció està encara "a temps".
+const ACTION_DUE_DAYS: Record<PlaybookActionKey, number> = POST_EVENT_WORKFLOW.actionDueDays;
 
 // ───────────────────────────────────────────────────────────────────────────
 // PURE FUNCTION
@@ -264,15 +265,14 @@ function computeStatus(
 // ───────────────────────────────────────────────────────────────────────────
 
 export async function loadPostEventPlaybook(
-  now: Date = new Date(),
-  daysWindow = 90
+  now: Date = new Date()
 ): Promise<PlaybookSummary> {
-  const from = new Date(now.getTime() - daysWindow * DAY_MS);
+  const { catchupFrom } = getPostEventWorkflowDates(now);
 
   const rows = await prisma.booking.findMany({
     where: {
       status: 'COMPLETED',
-      eventDate: { gte: from, lte: now },
+      eventDate: { gte: catchupFrom, lte: now },
     },
     select: {
       id: true,
@@ -286,7 +286,7 @@ export async function loadPostEventPlaybook(
       postEventEmailSentAt: true,
     },
     orderBy: { eventDate: 'desc' },
-    take: 100,
+    take: POST_EVENT_WORKFLOW.playbookTake,
   });
 
   if (rows.length === 0) {
@@ -297,6 +297,7 @@ export async function loadPostEventPlaybook(
     new Set(rows.map((r) => r.customerId).filter((id): id is string => !!id))
   );
   const bookingIds = rows.map((r) => r.id);
+  const bookingIdSet = new Set(bookingIds);
 
   // Testimonis per customer (comparem eventDate)
   const testimonials = customerIds.length > 0
@@ -309,23 +310,27 @@ export async function loadPostEventPlaybook(
   // Social posts per booking
   const socialPosts = await prisma.socialPost.findMany({
     where: {
-      bookingId: { in: bookingIds },
       status: 'PUBLISHED',
+      OR: [
+        { bookingId: { in: bookingIds } },
+        { originType: SOCIAL_POST_ORIGIN_TYPES.BOOKING, originId: { in: bookingIds } },
+      ],
     },
-    select: { bookingId: true },
+    select: { bookingId: true, originId: true },
   });
 
-  // Tasks de tipus referral_ask — usem title/description per detectar
+  // Tasks de tipus referral_ask — sempre vinculades a booking per no tapar altres bolos del mateix client.
   const referralTasks = customerIds.length > 0
     ? await prisma.task.findMany({
         where: {
           customerId: { in: customerIds },
+          status: { not: 'CANCELLED' },
           OR: [
             { title: { contains: 'referral', mode: 'insensitive' } },
             { description: { contains: 'referral', mode: 'insensitive' } },
           ],
         },
-        select: { customerId: true },
+        select: { customerId: true, bookingId: true },
       })
     : [];
 
@@ -339,9 +344,19 @@ export async function loadPostEventPlaybook(
       })
     : [];
 
-  const publishedSocialByBooking = new Set(socialPosts.map((p) => p.bookingId));
-  const referralByCustomer = new Set(referralTasks.map((t) => t.customerId).filter((x): x is string => !!x));
-  const referralByCustomerBooking = new Set(
+  const publishedSocialByBooking = new Set(
+    socialPosts.flatMap((post) => [post.bookingId, post.originId])
+      .filter((id): id is string => !!id && bookingIdSet.has(id))
+  );
+  const referralTaskByCustomerBooking = new Set(
+    referralTasks
+      .map((task) => {
+        if (!task.customerId || !task.bookingId) return null;
+        return `${task.customerId}:${task.bookingId}`;
+      })
+      .filter((key): key is string => !!key)
+  );
+  const referralDecisionByCustomerBooking = new Set(
     recurrenceDecisions
       .filter((activity) => isReferralAskDecision(activity.details))
       .map((activity) => {
@@ -377,7 +392,7 @@ export async function loadPostEventPlaybook(
       if (t.customerId !== r.customerId) return false;
       if (!t.eventDate) return false;
       const delta = Math.abs(t.eventDate.getTime() - r.eventDate.getTime());
-      return delta <= 7 * DAY_MS;
+      return delta <= 7 * POST_EVENT_DAY_MS;
     });
 
     const customerBookingKey = r.customerId ? `${r.customerId}:${r.id}` : null;
@@ -398,8 +413,8 @@ export async function loadPostEventPlaybook(
       hasSocialPostDecision: !!customerBookingKey && socialPostByCustomerBooking.has(customerBookingKey),
       socialPostId: customerBookingKey ? socialPostByCustomerBooking.get(customerBookingKey) ?? null : null,
       hasReferralAskTask: !!r.customerId && (
-        referralByCustomer.has(r.customerId) ||
-        referralByCustomerBooking.has(`${r.customerId}:${r.id}`)
+        referralTaskByCustomerBooking.has(`${r.customerId}:${r.id}`) ||
+        referralDecisionByCustomerBooking.has(`${r.customerId}:${r.id}`)
       ),
     };
   });

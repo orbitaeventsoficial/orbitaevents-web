@@ -5,7 +5,7 @@ import { runCommercialSequences } from '@/lib/services/commercialSequenceService
 import { enforceLeadSla } from '@/lib/services/slaAutomationService';
 import { sendPaymentReminders } from '@/lib/services/paymentReminderService';
 import { scoreLead } from '@/lib/services/commercialScoring';
-import { sendEmail } from '@/lib/email';
+import { sendTrackedStandaloneEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
@@ -216,7 +216,13 @@ export async function runCommercialDailyAutomation() {
 
   const recipient = (await getRecipientsAsString('reports')) || SITE_CONFIG.business.email;
   try {
-    await sendEmail({ to: recipient, subject, html });
+    await sendTrackedStandaloneEmail({
+      templateKey: 'commercial-daily-summary',
+      to: recipient,
+      subject,
+      html,
+      orbita: { kind: 'admin', origin: 'commercial-daily-summary' },
+    });
     summary.notifications.emailSent = true;
   } catch (err) {
     summary.notifications.errors += 1;

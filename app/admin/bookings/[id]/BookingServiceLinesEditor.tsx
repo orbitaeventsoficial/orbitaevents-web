@@ -11,9 +11,10 @@ import type { BookingServiceLineFormInput } from '../booking-form.types';
 interface BookingServiceLinesEditorProps {
   bookingId: string;
   initialLines: BookingServiceLineFormInput[];
+  guestCount?: number | string | null;
 }
 
-export default function BookingServiceLinesEditor({ bookingId, initialLines }: BookingServiceLinesEditorProps) {
+export default function BookingServiceLinesEditor({ bookingId, initialLines, guestCount }: BookingServiceLinesEditorProps) {
   const router = useRouter();
   const toast = useToast();
   const [lines, setLines] = useState<BookingServiceLineFormInput[]>(initialLines);
@@ -63,7 +64,7 @@ export default function BookingServiceLinesEditor({ bookingId, initialLines }: B
 
   return (
     <div>
-      <BookingServiceLinesSection lines={lines} onChange={handleChange} />
+      <BookingServiceLinesSection lines={lines} onChange={handleChange} guestCount={guestCount} />
       <div className="mt-3 flex items-center gap-3">
         <button
           type="button"

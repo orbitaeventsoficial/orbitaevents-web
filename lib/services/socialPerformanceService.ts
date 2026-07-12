@@ -6,8 +6,7 @@
 // Part pura + wrapper Prisma.
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { prisma } from '@/lib/prisma';
-import type { SocialPlatform, SocialContentType, SocialCategory } from '@/lib/constants';
+import type { SocialPlatform } from '@/lib/constants';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -248,41 +247,4 @@ export function generateSocialPerformanceReport(input: SocialPerformanceInput): 
     consistencyScore,
     recommendations,
   };
-}
-
-// ───────────────────────────────────────────────────────────────────────────
-// WRAPPER — Prisma
-// ───────────────────────────────────────────────────────────────────────────
-
-export async function loadSocialPerformanceReport(
-  windowDays = 90,
-  now: Date = new Date(),
-): Promise<SocialPerformanceReport> {
-  const windowStart = new Date(now.getTime() - windowDays * DAY_MS);
-
-  const posts = await prisma.socialPost.findMany({
-    where: {
-      createdAt: { gte: windowStart },
-    },
-    select: {
-      id: true,
-      platforms: true,
-      status: true,
-      contentType: true,
-      category: true,
-      scheduledAt: true,
-      publishedAt: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: 'desc' },
-  });
-
-  return generateSocialPerformanceReport({
-    posts: posts.map((p) => ({
-      ...p,
-      platforms: p.platforms as string[],
-    })),
-    windowDays,
-    now,
-  });
 }

@@ -29,7 +29,7 @@ describe('GET /api/admin/leads/[id]/quote', () => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
     mockVerifyCsrf.mockReturnValue(null);
-    mockHandleLeadQuoteGet.mockResolvedValue(Response.json({ ok: true }));
+    mockHandleLeadQuoteGet.mockResolvedValue(Response.json({ ok: false }, { status: 410 }));
   });
 
   it('rebutja sense auth', async () => {
@@ -39,10 +39,10 @@ describe('GET /api/admin/leads/[id]/quote', () => {
     expect(mockHandleLeadQuoteGet).not.toHaveBeenCalled();
   });
 
-  it('delegua GET sense exigir CSRF', async () => {
+  it('delegua GET sense exigir CSRF i retorna 410 legacy', async () => {
     const { req, params } = makeReq('GET', 'lead-42');
     const res = await GET(req, params);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(410);
     expect(mockVerifyCsrf).not.toHaveBeenCalled();
     expect(mockHandleLeadQuoteGet).toHaveBeenCalledWith(req, 'lead-42');
   });
@@ -53,7 +53,7 @@ describe('POST /api/admin/leads/[id]/quote', () => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
     mockVerifyCsrf.mockReturnValue(null);
-    mockHandleLeadQuotePost.mockResolvedValue(Response.json({ ok: true }));
+    mockHandleLeadQuotePost.mockResolvedValue(Response.json({ ok: false }, { status: 410 }));
   });
 
   it('rebutja sense auth', async () => {
@@ -70,10 +70,10 @@ describe('POST /api/admin/leads/[id]/quote', () => {
     expect(mockHandleLeadQuotePost).not.toHaveBeenCalled();
   });
 
-  it('delegua POST amb CSRF valid', async () => {
+  it('delegua POST amb CSRF valid i retorna 410 legacy', async () => {
     const { req, params } = makeReq('POST', 'lead-42');
     const res = await POST(req, params);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(410);
     expect(mockHandleLeadQuotePost).toHaveBeenCalledWith(req, 'lead-42');
   });
 });

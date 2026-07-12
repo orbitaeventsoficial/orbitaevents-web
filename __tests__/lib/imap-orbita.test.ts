@@ -85,7 +85,7 @@ describe('lib/imap — parseOrbitaMessageId()', () => {
   });
 
   it('detecta tots els kinds permesos', () => {
-    const kinds = ['lead', 'customer', 'booking', 'dossier', 'admin'] as const;
+    const kinds = ['lead', 'customer', 'booking', 'dossier', 'proposal', 'admin'] as const;
     for (const k of kinds) {
       const mid = `<orbita.${k}.testid.aaa.bbb@orbitaevents.com>`;
       expect(parseOrbitaMessageId(mid)).toEqual({ kind: k, id: 'testid' });

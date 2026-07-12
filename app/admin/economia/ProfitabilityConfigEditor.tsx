@@ -5,10 +5,12 @@ import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { formatCurrency } from '@/lib/constants';
 
+type Notice = { type: 'success' | 'error'; text: string };
+
 export default function ProfitabilityConfigEditor({ initial }: { initial: ProfitabilityConfig }) {
   const [form, setForm] = useState<ProfitabilityConfig>(initial);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
 
   function update<K extends keyof ProfitabilityConfig>(key: K, value: ProfitabilityConfig[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -26,7 +28,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
 
   async function save() {
     setSaving(true);
-    setMsg(null);
+    setNotice(null);
     try {
       const res = await fetchWithCsrf('/api/admin/reports/profitability/config', {
         method: 'POST',
@@ -37,9 +39,9 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || 'No s\'ha pogut desar la configuració');
       }
-      setMsg('Configuració desada');
+      setNotice({ type: 'success', text: 'Configuració desada' });
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Error en desar');
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Error en desar' });
     } finally {
       setSaving(false);
     }
@@ -159,7 +161,15 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
             >
               {saving ? 'Desant...' : 'Desar configuració'}
             </button>
-            {msg && <p className="text-sm">{msg}</p>}
+            {notice && (
+              <p
+                role={notice.type === 'error' ? 'alert' : 'status'}
+                aria-live={notice.type === 'error' ? 'assertive' : 'polite'}
+                className={`text-sm ${notice.type === 'error' ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}
+              >
+                {notice.text}
+              </p>
+            )}
           </div>
         </div>
 

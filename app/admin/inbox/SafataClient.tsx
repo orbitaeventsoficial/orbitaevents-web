@@ -6,6 +6,7 @@ import { formatDate, formatDateShort, formatDateTime } from '@/lib/constants';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import { AdminEmptyState } from '../components/AdminPage';
 
 /* ── Tipus ─────────────────────────────────────────────────────────────────── */
@@ -56,7 +57,7 @@ export type SafataEmailSend = {
 type ImapEmailAddr = { name: string; address: string };
 
 type OrbitaLink = {
-  kind: 'lead' | 'customer' | 'booking' | 'dossier' | 'admin';
+  kind: 'lead' | 'customer' | 'booking' | 'dossier' | 'proposal' | 'admin';
   id: string;
   origin?: string;
   source: 'header' | 'reference';
@@ -178,6 +179,9 @@ function buildOrbitaPill(orbita: OrbitaLink): { label: string; href: string | nu
   }
   if (orbita.kind === 'dossier' && orbita.id) {
     return { label: 'Dossier', href: `/admin/dossiers#${orbita.id}`, hint: `Dossier #${orbita.id}${sourceHint}` };
+  }
+  if (orbita.kind === 'proposal' && orbita.id) {
+    return { label: 'Pressupost', href: buildProposalHref(orbita.id), hint: `Pressupost #${orbita.id}${sourceHint}` };
   }
   return { label: 'Admin', href: null, hint: `Origen admin${sourceHint}` };
 }

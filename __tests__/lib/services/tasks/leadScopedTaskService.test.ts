@@ -18,7 +18,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 import {
   createLeadScopedTask,
   deleteLeadScopedTask,
-  findTaskLinkByTaskOrLegacyId,
+  findTaskLinkByTaskId,
   listLeadScopedTasks,
   updateLeadScopedTask,
 } from '@/lib/services/tasks/leadScopedTaskService';
@@ -160,15 +160,14 @@ describe('leadScopedTaskService', () => {
     });
   });
 
-  it('resol link directe o legacy', async () => {
+  it('resol link directe per id', async () => {
     mockPrisma.task.findUnique.mockResolvedValueOnce({ customerId: 'cust-1', leadId: 'lead-1' });
-    const direct = await findTaskLinkByTaskOrLegacyId('task-1');
+    const direct = await findTaskLinkByTaskId('task-1');
     expect(direct).toEqual({ customerId: 'cust-1', leadId: 'lead-1' });
 
     mockPrisma.task.findUnique.mockResolvedValueOnce(null);
-    mockPrisma.task.findFirst.mockResolvedValueOnce({ customerId: 'cust-2', leadId: 'lead-2' });
-    const legacy = await findTaskLinkByTaskOrLegacyId('legacy-1');
-    expect(legacy).toEqual({ customerId: 'cust-2', leadId: 'lead-2' });
+    const missing = await findTaskLinkByTaskId('missing-1');
+    expect(missing).toBeNull();
   });
 
   it('elimina task per id i leadId', async () => {

@@ -20,7 +20,7 @@ interface TriggerContext {
 
 type TriggerResult = { triggered: boolean; action: string; detail?: string };
 
-// ─── Proposal accepted → auto-generate contract ─────────────────────────────
+// ─── Proposal accepted → queue contract generation ──────────────────────────
 
 export async function onProposalAccepted(
   proposalId: string,
@@ -36,12 +36,12 @@ export async function onProposalAccepted(
       return { triggered: false, action: 'generate-contract', detail: 'No booking linked' };
     }
 
-    // Only auto-generate if contract doesn't exist yet
+    // Only queue the contract workflow if it doesn't exist yet.
     if (proposal.contractStatus && proposal.contractStatus !== 'DRAFT') {
       return { triggered: false, action: 'generate-contract', detail: 'Contract already exists' };
     }
 
-    // Mark contract as pending generation
+    // Mark contract as pending generation; the PDF is still created by the Studio.
     await prisma.proposal.update({
       where: { id: proposalId },
       data: {
@@ -50,10 +50,10 @@ export async function onProposalAccepted(
       },
     });
 
-    log.info(`[AutoTrigger] Contracte auto-generat per proposta ${proposalId}`);
-    return { triggered: true, action: 'generate-contract', detail: `Contract DRAFT for proposal ${proposalId}` };
+    log.info(`[AutoTrigger] Contracte pendent de generar per proposta ${proposalId}`);
+    return { triggered: true, action: 'generate-contract', detail: `Contract pending generation for proposal ${proposalId}` };
   } catch (error) {
-    log.error('[AutoTrigger] Error generant contracte:', error);
+    log.error('[AutoTrigger] Error marcant contracte pendent:', error);
     return { triggered: false, action: 'generate-contract', detail: String(error) };
   }
 }
@@ -106,7 +106,12 @@ export async function onLeadCreated(
       return { triggered: true, action: 'welcome-email', detail: 'Queued for manual send (SMTP off)' };
     }
 
-    const sent = await sendLeadWelcomeEmail({ to: lead.email, clientName: lead.name, locale: lead.preferredLocale });
+    const sent = await sendLeadWelcomeEmail({
+      to: lead.email,
+      clientName: lead.name,
+      locale: lead.preferredLocale,
+      leadId: lead.id,
+    });
     if (sent.ok) {
       await prisma.task
         .update({ where: { dedupeKey }, data: { status: 'DONE', description: `Email de benvinguda enviat automàticament a ${lead.email}.` } })

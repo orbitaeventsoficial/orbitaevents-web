@@ -5,6 +5,12 @@ import { COMMERCIAL_SEQUENCE_STEP_COPY } from '@/lib/constants';
 import { deriveLeadResponseState } from '@/lib/services/responseTrackingService';
 import { recordLeadCommercialSequenceStepSent } from '@/lib/services/leadActivityService';
 import { log } from '@/lib/logger';
+import { getAppBaseUrl } from '@/lib/site';
+import {
+  recordEmailSend,
+  updateEmailSendResult,
+  wrapLinksForTracking,
+} from '@/lib/services/emailTrackingService';
 
 export type SequenceRunSummary = {
   generatedAt: string;
@@ -86,6 +92,17 @@ function safePhone(input?: string | null): string | null {
   return normalized || null;
 }
 
+const COMMERCIAL_SEQUENCE_ORBITA_ORIGIN = 'commercial-sequence';
+
+function buildTrackedCommercialSequenceHtml(html: string, trackingToken: string, baseUrl: string): string {
+  const trackedHtml = wrapLinksForTracking(html, trackingToken, baseUrl);
+  const pixel = `<img src="${baseUrl}/api/tracking/open/${trackingToken}" width="1" height="1" alt="" style="display:none" />`;
+  if (/<\/body>/i.test(trackedHtml)) {
+    return trackedHtml.replace(/<\/body>/i, `${pixel}</body>`);
+  }
+  return `${trackedHtml}${pixel}`;
+}
+
 function isReadyForNextStep(
   lead: { createdAt: Date; lastNurturingAt: Date | null; nurturingStep: number },
   nextStepDef: NurturingStepDef,
@@ -129,6 +146,7 @@ async function executeSequenceStepForLead(
   const text = copy.text(firstName);
   const phone = safePhone(lead.phone);
   let channelUsed: 'email' | 'whatsapp' | null = null;
+  let emailSendId: string | null = null;
 
   try {
     if (phone) {
@@ -139,11 +157,38 @@ async function executeSequenceStepForLead(
     }
 
     if (!channelUsed && lead.email) {
-      await sendEmail({
+      const html = `<p>${text}</p>`;
+      const baseUrl = getAppBaseUrl().replace(/\/+$/, '');
+      const orbita = { kind: 'lead' as const, id: lead.id, origin: COMMERCIAL_SEQUENCE_ORBITA_ORIGIN };
+      const trackingRecord = await recordEmailSend({
+        templateKey: templateSlug,
         to: lead.email,
         subject,
-        html: `<p>${text}</p>`,
+        leadId: lead.id,
+        customerId: null,
+        locale,
+        htmlBody: html,
+        orbitaKind: orbita.kind,
+        orbitaId: orbita.id,
+        orbitaOrigin: orbita.origin,
       });
+      const sendResult = await sendEmail({
+        to: lead.email,
+        subject,
+        html: buildTrackedCommercialSequenceHtml(html, trackingRecord.trackingToken, baseUrl),
+        orbita,
+      });
+      await updateEmailSendResult(trackingRecord.id, {
+        smtpAccepted: sendResult.smtp.accepted,
+        smtpRejected: sendResult.smtp.rejected,
+        smtpResponse: sendResult.smtp.response,
+        smtpMessageId: sendResult.smtp.messageId,
+        imapAppendOk: sendResult.imapSent.attempted ? sendResult.imapSent.ok : null,
+        imapSentFolder: sendResult.imapSent.folder,
+        imapSentUid: sendResult.imapSent.uid ?? null,
+        imapError: sendResult.imapSent.error ?? null,
+      }).catch(() => undefined);
+      emailSendId = trackingRecord.id;
       channelUsed = 'email';
     }
 
@@ -172,6 +217,7 @@ async function executeSequenceStepForLead(
       templateSlug,
       locale,
       delayHours: nextStepDef.delayHours,
+      emailSendId,
     });
 
     await prisma.adminLog.create({
@@ -186,6 +232,13 @@ async function executeSequenceStepForLead(
           channel: channelUsed,
           locale,
           manual: options?.manual ?? false,
+          ...(emailSendId ? {
+            emailSendId,
+            emailSnapshot: 'EmailSend.htmlBody',
+            orbitaKind: 'lead',
+            orbitaId: lead.id,
+            orbitaOrigin: COMMERCIAL_SEQUENCE_ORBITA_ORIGIN,
+          } : {}),
         },
       },
     });

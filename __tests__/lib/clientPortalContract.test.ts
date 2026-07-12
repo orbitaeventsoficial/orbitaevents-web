@@ -87,7 +87,7 @@ describe('getClientPortalContractSummary', () => {
     ]);
   });
 
-  it('usa el PDF del pressupost com a fallback si el contracte encara no té PDF propi', () => {
+  it('no usa el PDF del pressupost com a fallback de contracte', () => {
     const result = getClientPortalContractSummary([
       proposal({
         pdfUrl: 'https://cdn.test/quote.pdf',
@@ -97,7 +97,7 @@ describe('getClientPortalContractSummary', () => {
       }),
     ]);
 
-    expect(result?.pdfUrl).toBe('https://cdn.test/quote.pdf');
+    expect(result?.pdfUrl).toBeNull();
     expect(result?.awaitingInlineSignature).toBe(false);
     expect(result?.signatureState).toBe('SIGNED');
   });
@@ -108,6 +108,7 @@ describe('getClientPortalContractSummary', () => {
         pdfUrl: 'https://cdn.test/quote.pdf',
         contractReference: 'CTR-2026-SIGNED',
         contractStatus: 'SIGNED',
+        contractPdfUrl: 'https://cdn.test/signed-contract.pdf',
         contractSignedAt: new Date('2026-05-14T11:00:00Z'),
         contractSignatureBlob: 'data:image/png;base64,abc123',
       }),

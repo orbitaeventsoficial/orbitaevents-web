@@ -65,6 +65,9 @@ export const PRIVACY_REQUEST_ARTICLES: Record<string, string> = {
   AUTOMATED: '22',
 };
 
+/** Tipus de sol·licitud RGPD que generen un export de dades descarregable (ACCESS/PORTABILITY). */
+export const DOWNLOADABLE_PRIVACY_REQUEST_TYPES = new Set(['ACCESS', 'PORTABILITY']);
+
 export function getPrivacyConsentLabel(consentType: string) {
   return PRIVACY_CONSENT_LABELS[consentType] || consentType;
 }

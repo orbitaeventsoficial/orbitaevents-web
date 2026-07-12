@@ -13,8 +13,26 @@ vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
 vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 vi.mock('@/lib/services/proposalAdminService', () => {
   const roundMoney = (value: number) => Math.round(value * 100) / 100;
+  class ProposalCanonicalDispatchError extends Error {
+    public readonly status = 410;
+    public readonly body = {
+      ok: false,
+      error: 'Els camps d’enviament del pressupost només es poden escriure des de /api/admin/proposals/:id/send.',
+      canonicalRoute: '/api/admin/proposals/:id/send',
+    };
+  }
+  class ProposalCanonicalAcceptanceError extends Error {
+    public readonly status = 409;
+    public readonly body = {
+      ok: false,
+      error: 'Només es pot acceptar un pressupost enviat amb PDF arxivat. Envia o repara el pressupost pel flux canònic abans d’acceptar-lo.',
+      canonicalRoute: '/api/admin/proposals/:id/send',
+    };
+  }
   return {
     PROPOSAL_FINANCIAL_FIELDS: ['subtotal', 'discount', 'vatRate', 'vatAmount', 'total'] as const,
+    ProposalCanonicalAcceptanceError,
+    ProposalCanonicalDispatchError,
     getAdminProposalById: mockGetProposal,
     updateAdminProposal: mockUpdateProposal,
     deleteAdminProposal: vi.fn(),
@@ -37,10 +55,11 @@ vi.mock('@/lib/services/automationTriggers', () => ({ dispatchAutoTrigger: mockD
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
 vi.mock('@/lib/request-context', () => ({ getRequestId: () => 'test-req-id' }));
 vi.mock('@prisma/client', () => ({
-  ProposalStatus: { DRAFT: 'DRAFT', SENT: 'SENT', ACCEPTED: 'ACCEPTED', REJECTED: 'REJECTED', EXPIRED: 'EXPIRED' },
+  ProposalStatus: { DRAFT: 'DRAFT', SENT: 'SENT', VIEWED: 'VIEWED', ACCEPTED: 'ACCEPTED', REJECTED: 'REJECTED', EXPIRED: 'EXPIRED' },
 }));
 
 import { GET, PATCH } from '@/app/api/admin/proposals/[id]/route';
+import { ProposalCanonicalAcceptanceError, ProposalCanonicalDispatchError } from '@/lib/services/proposalAdminService';
 
 function makeGetReq(id = 'prop-1') {
   return { req: new NextRequest(`http://localhost/api/admin/proposals/${id}`), params: { params: { id } } };
@@ -97,7 +116,7 @@ describe('PATCH /api/admin/proposals/[id]', () => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
     mockVerifyCsrf.mockReturnValue(null);
-    mockUpdateProposal.mockResolvedValue({ status: 200, body: { proposal: { id: 'prop-1', status: 'SENT' } } });
+    mockUpdateProposal.mockResolvedValue({ status: 200, body: { proposal: { id: 'prop-1', status: 'DRAFT' } } });
     mockDispatchAutoTrigger.mockResolvedValue(undefined);
   });
 
@@ -113,10 +132,10 @@ describe('PATCH /api/admin/proposals/[id]', () => {
   });
 
   it('actualitza pressupost', async () => {
-    const { req, params } = makePatchReq('prop-1', { status: 'SENT' });
+    const { req, params } = makePatchReq('prop-1', { locale: 'ca' });
     const res = await PATCH(req, params);
     expect(res.status).toBe(200);
-    expect(mockUpdateProposal).toHaveBeenCalledWith('prop-1', { status: 'SENT' });
+    expect(mockUpdateProposal).toHaveBeenCalledWith('prop-1', { locale: 'ca' });
   });
 
   it('dispara auto-trigger quan status ACCEPTED', async () => {
@@ -184,7 +203,42 @@ describe('PATCH /api/admin/proposals/[id]', () => {
 
   it('retorna 500 si falla', async () => {
     mockUpdateProposal.mockRejectedValueOnce(new Error('DB'));
-    const { req, params } = makePatchReq('prop-1', { status: 'SENT' });
+    const { req, params } = makePatchReq('prop-1', { locale: 'ca' });
     expect((await PATCH(req, params)).status).toBe(500);
+  });
+
+  it('retorna 410 quan el servei rebutja camps de dispatch fora del carril canònic', async () => {
+    mockUpdateProposal.mockRejectedValueOnce(new ProposalCanonicalDispatchError());
+    const { req, params } = makePatchReq('prop-1', { status: 'SENT' });
+
+    const res = await PATCH(req, params);
+    const body = await res.json();
+
+    expect(res.status).toBe(410);
+    expect(body).toMatchObject({ canonicalRoute: '/api/admin/proposals/:id/send' });
+  });
+
+  it('accepta VIEWED al contracte de ruta però el servei el manté dins el carril canònic', async () => {
+    mockUpdateProposal.mockRejectedValueOnce(new ProposalCanonicalDispatchError());
+    const { req, params } = makePatchReq('prop-1', { status: 'VIEWED' });
+
+    const res = await PATCH(req, params);
+    const body = await res.json();
+
+    expect(res.status).toBe(410);
+    expect(body).toMatchObject({ canonicalRoute: '/api/admin/proposals/:id/send' });
+    expect(mockUpdateProposal).toHaveBeenCalledWith('prop-1', { status: 'VIEWED' });
+  });
+
+  it('retorna 409 i no dispara contracte quan el servei rebutja acceptació no canònica', async () => {
+    mockUpdateProposal.mockRejectedValueOnce(new ProposalCanonicalAcceptanceError());
+    const { req, params } = makePatchReq('prop-1', { status: 'ACCEPTED' });
+
+    const res = await PATCH(req, params);
+    const body = await res.json();
+
+    expect(res.status).toBe(409);
+    expect(body).toMatchObject({ canonicalRoute: '/api/admin/proposals/:id/send' });
+    expect(mockDispatchAutoTrigger).not.toHaveBeenCalled();
   });
 });

@@ -203,13 +203,6 @@ export function drawCanonicalCard(
   doc.roundedRect(x, y, width, height, PDF_DESIGN.cardRadius, PDF_DESIGN.cardRadius, 'FD');
 }
 
-export function drawCanonicalLabel(doc: jsPDFType, text: string, x: number, y: number): void {
-  doc.setTextColor(...COLORS.paperMuted);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(PDF_DESIGN.type.caption);
-  doc.text(text.toUpperCase(), x, y);
-}
-
 // ── Mida de text unificada per a tots els PDFs ─────────────────────────────
 // Cos de text: 8.5pt per a TOT el contingut, sense variació entre documents.
 export const PDF_BODY_SIZE = 8.5;
@@ -249,13 +242,6 @@ export function setStyleCaption(doc: jsPDFType): void {
 // ── Contenidor responsiu ───────────────────────────────────────────────────
 
 // ── Farciment de pàgina ────────────────────────────────────────────────────
-
-/** Delta de gap addicional per repartir l'espai sobrant entre N gaps. */
-export function spacingDelta(currentY: number, gapCount: number): number {
-  if (gapCount <= 0) return 0;
-  const remaining = PDF_FILL_BOTTOM - currentY;
-  return remaining > 8 ? Math.min(remaining / gapCount, 12) : 0;
-}
 
 /**
  * Afegeix un bloc de proposta de valor o contacte per omplir la pàgina fins a PDF_FILL_BOTTOM.

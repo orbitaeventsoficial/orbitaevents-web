@@ -129,6 +129,21 @@ describe('repoElectricAtlasService', () => {
       "  return getTemplate('welcome', 'ca', {});",
       '}',
     ].join('\n'));
+    await writeFixture('lib/services/postEventPlaybookService.ts', [
+      'export function loadPostEventPlaybook() {',
+      '  return [];',
+      '}',
+    ].join('\n'));
+    await writeFixture('lib/services/postEventPendingService.ts', [
+      'export function buildPendingPostEventFeedbackBookingWhere() {',
+      '  return { postEventEmailSent: true };',
+      '}',
+    ].join('\n'));
+    await writeFixture('lib/services/postEventDispatchService.ts', [
+      'export async function sendPostEventEmailForBooking() {',
+      '  return { postEventEmailSent: true };',
+      '}',
+    ].join('\n'));
     await writeFixture('lib/services/emailTemplateService.ts', [
       'export async function getTemplate() {',
       "  return { subject: 'Hola', bodyHtml: '<p>Hola</p>' };",
@@ -156,6 +171,7 @@ describe('repoElectricAtlasService', () => {
     const marginTouchpoint = atlas.touchpoints.find((touchpoint) => touchpoint.id === 'change-margin');
     const leadAutopilotTouchpoint = atlas.touchpoints.find((touchpoint) => touchpoint.id === 'change-lead-autopilot');
     const dossierEntry = atlas.dictionary.find((entry) => entry.id === 'dossier');
+    const postEventEntry = atlas.dictionary.find((entry) => entry.id === 'post-event');
 
     expect(atlas.synthesis.verdict).toContain('CRM/ERP');
     expect(dossierFlow?.filesCount).toBeGreaterThanOrEqual(6);
@@ -164,6 +180,13 @@ describe('repoElectricAtlasService', () => {
     expect(leadAutopilotTouchpoint?.files.some((file) => file.path === 'lib/services/leadWelcomeEmailService.ts')).toBe(true);
     expect(leadAutopilotTouchpoint?.internalCables.some((cable) => cable.from === 'lib/services/automationTriggers.ts' && cable.to === 'lib/services/leadWelcomeEmailService.ts')).toBe(true);
     expect(dossierEntry?.files.some((file) => file.path === 'lib/services/dossierService.ts')).toBe(true);
+    expect(postEventEntry?.sourceOfTruth).toEqual(expect.arrayContaining(['postEventPlaybookService', 'postEventPendingService', 'postEventDispatchService', 'Booking.postEventEmailSent']));
+    expect(postEventEntry?.sourceOfTruth).not.toContain('ClientFeedback');
+    expect(postEventEntry?.files.map((file) => file.path)).toEqual(expect.arrayContaining([
+      'lib/services/postEventDispatchService.ts',
+      'lib/services/postEventPendingService.ts',
+      'lib/services/postEventPlaybookService.ts',
+    ]));
     expect(atlas.internalCables.some((cable) => cable.from === 'app/admin/dossiers/page.tsx' && cable.to === 'lib/services/dossierService.ts')).toBe(true);
     expect(atlas.models.some((model) => model.name === 'Lead' && model.kind === 'model')).toBe(true);
   });

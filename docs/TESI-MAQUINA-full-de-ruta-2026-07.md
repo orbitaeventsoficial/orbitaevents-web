@@ -79,7 +79,7 @@ cada estació i **els nexes** (com passa la informació d'una a l'altra).
 | 5 | **Tancament** | `bookingCreationService` (**copia** `lead.serviceLines`→`booking.serviceLines`), `bookingStripePaymentService`, `bookingBizumService`, `contractService`+`contractPdfService`, `invoiceService` | Lead `WON` → `Booking PENDING`; `onBookingConfirmed` |
 | 6 | **Operativa** | `crewScheduleService`, `capacityConflictService`, `dayCollisionService`, `bookingCapacityService`, `bookingInventoryService`, `repartimentService`, `seasonCalendarService` | Checklist pre-event, assignació d'inventari, col·lisions de dia, repartiment |
 | 7 | **Esdeveniment** | `bookingChecklistService`, `googleCalendarSyncService`, `crewBlock`/`Availability` | Estat `PREPARING→COMPLETED` |
-| 8 | **Post-event** | `postEventPlaybookService`, `postEventDispatchService`, `questionnaireService`, `reviewsSyncService`, `referralsService`, `reactivationService` | Testimoni→portfolio; referral→**nou lead** (volant) |
+| 8 | **Post-event** | `postEventPlaybookService`, `postEventPendingService`, `postEventDispatchService`, `questionnaireService`, `testimonialAdminService`, `reviewsSyncService`, `referralsService`, `reactivationService` | Email post-event + enquesta→testimoni/portfolio; referral→**nou lead** (volant) |
 | ∞ | **Client hub** | `fetchCustomerHub`, `customerSegmentationService`, `customerActivityService`, `customerInsightsService`, `clientPortalAccess` | El client viu per sobre de tot el cicle |
 
 **El nexe més important de tot el sistema** (i el més ben resolt) és el pas 4→5:
@@ -149,7 +149,8 @@ buida de dades** (ningú carrega `MarketingSpend`), així que l'atribució es qu
 
 ### 6. Cervell de post-event — 🟡 CONSTRUÏT, poc automatitzat
 `postEventPlaybookService` (4 accions: agraïment, testimoni, social, referral),
-`postEventDispatchService` (cron), `questionnaireService`+`ClientSurvey`/`ClientFeedback`,
+`postEventPendingService` (cues), `postEventDispatchService` (email + enquesta),
+`questionnaireService`+`ClientSurvey`, `Booking.postEventEmailSent`, `CustomerTestimonial`,
 `reviewsSyncService`, `referralsService`, `weddingCoverage`. **Aquí viu el CAC més barat del
 món —el client content— i és l'estació menys explotada.**
 
@@ -190,9 +191,10 @@ cron `data-retention`. Poc glamurós, ben fet.
   automàticament. Es capta car (SEO/Ads) i no es reactiva barat.
 - **Fuga de marge silenciosa:** no hi ha un *guardarail* al moment de fer el pressupost que
   bloquegi o alerti un bolo per sota de llindar (el motor ho sap *després*, no *abans*).
-- **Fuga de decisió:** la maquinària de CAC real, pricing per data (`datePricingService`,
-  `seasonCalendarService`) i previsió existeix però no alimenta les decisions perquè falten
-  dades d'entrada (marketing spend) o superfície de decisió.
+- **Fuga de decisió:** la maquinària de CAC real, calendari de demanda (`seasonCalendarService`)
+  i previsió existeix però no alimenta les decisions perquè falten dades d'entrada
+  (marketing spend) o superfície de decisió. El recàrrec monetari TA queda retirat pel #1838
+  fins que el propietari defineixi política explícita.
 
 ---
 
@@ -258,9 +260,9 @@ Aquesta és, en termes ESADE, **la millor inversió del roadmap**: converteix co
 - **4.3 CAC real operatiu.** Rutina mensual (o import) per carregar `MarketingSpend` per canal
   → `cacAnalysis` passa d'estimat a real → es veu quin canal (SEO municipi vs Ads) porta
   clients rendibles. Decideix on posar l'euro següent. (Memòria `project-cac-real-pendent`.)
-- **4.4 Pricing per data.** `datePricingService`+`seasonCalendarService` ja existeixen:
-  activar recàrrec/preu dinàmic en dates d'alta demanda (dissabtes de temporada) — el recurs
-  escàs s'ha de preuar com a escàs.
+- **4.4 Pricing per data.** Aparcat pel #1838: cap recàrrec/preu dinàmic automàtic per data
+  fins que el propietari defineixi la política de la temporada vinent. `seasonCalendarService`
+  pot seguir servint com a senyal operatiu de demanda/capacitat, no com a tarifa client.
 
 ### 🌊 Onada 5 — Claredat i consolidació (per al novell) · esforç VARIABLE · impacte SOSTINGUT
 Del diagnòstic anterior, encara vàlid: **una capacitat = un camí**. No campanya d'esborrat

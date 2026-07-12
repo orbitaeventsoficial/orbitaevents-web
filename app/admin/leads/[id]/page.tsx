@@ -9,7 +9,7 @@ import LeadDetailClient from './LeadDetailClient';
 import { getWeatherForEvent } from '@/lib/services/weatherService';
 import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import { DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
-import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
+import { TRAVEL_COST_LINE_MARKER, computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { WxData } from '@/app/admin/components/WxBadge';
@@ -101,6 +101,9 @@ export default async function LeadDetailPage({ params }: Props) {
           paymentMethod: true, invoiceRequired: true, cashAmount: true,
           extraHours: true,
           travelCost: true,
+          distanceKm: true,
+          tollsEur: true,
+          fuelCostPerKm: true,
           pack: {
             select: {
               code: true,
@@ -191,6 +194,18 @@ export default async function LeadDetailPage({ params }: Props) {
       const extrasTotal = (b.extras ?? []).reduce(
         (s, e) => s + Number(e.price || 0) * (e.quantity || 1), 0);
       const visibleServiceLines = (b.serviceLines ?? []).filter((line) => !isTravelCostLine(line));
+      const bookingDistanceKm = b.distanceKm != null ? Number(b.distanceKm) : Number(lead.distanceKm || 0);
+      const bookingTollsEur = b.tollsEur != null ? Number(b.tollsEur) : Number(lead.tollsEur || 0);
+      const bookingTransport = bookingDistanceKm > 0
+        ? computeBoloTransport({
+          roundTripKm: bookingDistanceKm,
+          serviceLines: visibleServiceLines,
+          hasOrbitaPack: Number(b.pack?.price || 0) > 0,
+          tollsEur: bookingTollsEur,
+          vehicleCostPerKm: b.fuelCostPerKm ?? vehicleCostPerKm,
+        })
+        : null;
+      const bookingTravelRevenue = bookingTransport?.clientCharge ?? 0;
       const slRevenue = visibleServiceLines.reduce(
         (s, l) => s + Number(l.revenueAmount || 0) * (l.quantity || 1), 0);
       const slCost = visibleServiceLines.reduce(
@@ -201,7 +216,9 @@ export default async function LeadDetailPage({ params }: Props) {
         extrasTotal,
         extraHours: b.extraHours ?? 0,
         extraHourPrice: b.pack?.extraHourPrice ? Number(b.pack.extraHourPrice) : 0,
-        distanceKm: 0,
+        distanceKm: bookingDistanceKm,
+        vehicleCostPerKm: b.fuelCostPerKm ?? vehicleCostPerKm,
+        travelRevenue: bookingTravelRevenue,
         travelCost: b.travelCost ? Number(b.travelCost) : 0,
         serviceLinesRevenue: slRevenue,
         serviceLinesCost: slCost,
@@ -213,7 +230,7 @@ export default async function LeadDetailPage({ params }: Props) {
         net: summary.netMargin,
         marginPct: summary.marginPct,
         total: summary.total,
-        travelCharge: 0,
+        travelCharge: bookingTravelRevenue,
         travelCost: b.travelCost ? Number(b.travelCost) : 0,
         directCost: summary.directCost,
         acquisitionCost: summary.acquisitionCost,

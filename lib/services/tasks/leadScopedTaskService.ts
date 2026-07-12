@@ -91,18 +91,9 @@ export async function updateLeadScopedTask(taskId: string, leadId: string, input
   return normalizeTaskRecord(task);
 }
 
-export async function findTaskLinkByTaskOrLegacyId(taskOrLegacyId: string) {
-  const directTask = await prisma.task.findUnique({
-    where: { id: taskOrLegacyId },
-    select: { customerId: true, leadId: true },
-  });
-
-  if (directTask) {
-    return directTask;
-  }
-
-  return prisma.task.findFirst({
-    where: { legacyLeadTaskId: taskOrLegacyId },
+export async function findTaskLinkByTaskId(taskId: string) {
+  return prisma.task.findUnique({
+    where: { id: taskId },
     select: { customerId: true, leadId: true },
   });
 }

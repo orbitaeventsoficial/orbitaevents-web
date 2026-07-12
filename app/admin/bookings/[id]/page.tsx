@@ -9,6 +9,7 @@ import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 import { buildEventLogistics } from '@/lib/admin/eventLogistics';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
+import { getDossierHistoryKindLabel, getLeadDocumentHistoryMeta } from '@/lib/admin/commercialDocumentHistory';
 import { notFound } from 'next/navigation';
 import { BookingStatusChanger } from './BookingStatusChanger';
 import CommunicationPanel from './CommunicationPanel';
@@ -17,11 +18,12 @@ import PostEventEmailButton from './PostEventEmailButton';
 import BookingMarginCard from './BookingMarginCard';
 import RepartimentPanel from './RepartimentPanel';
 import { computeBoloTransport, deriveTravelHeadcount, TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
-import { computeBoloRepartiment } from '@/lib/services/repartimentService';
+import { buildBoloRepartimentLines, computeBoloRepartiment } from '@/lib/services/repartimentService';
 import BookingServiceLinesEditor from './BookingServiceLinesEditor';
 import type { BookingServiceLineFormInput } from '../booking-form.types';
 import BookingChecklist from './BookingChecklist';
 import InvoiceSection from './InvoiceSection';
+import DeliveryNoteSection from './DeliveryNoteSection';
 import DocumentFlowSection from './DocumentFlowSection';
 import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
@@ -45,7 +47,7 @@ import { computeBookingEconomicGuard } from '@/app/admin/lib/booking-economic-gu
 import { resolveBookingFinanceRiskAction, resolveBookingMarginRiskAction, type BookingRiskAction } from './booking-risk-action';
 import { getBookingFiscalMode, getBookingPaymentMethodHelp, getBookingPaymentMethodLabel } from '@/lib/constants/booking-payment';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
-import { getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
+import { getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getDeliveryNoteStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { ADMIN_BOOKING_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import type { BookingExtraRow, BookingProposalRow, BookingInvoiceRow, BookingNumericCompat } from './booking-utils';
 import { buildGoogleCalendarUrl, getPackTranslation } from './booking-utils';
@@ -84,6 +86,27 @@ function describeBookingTimelineEntry(entry: CanonicalTimelineEvent): string {
   const channel   = typeof metadata.channel   === 'string' ? metadata.channel   : '';
   const reference = typeof metadata.reference === 'string' ? metadata.reference : '';
   return [flow, channel, reference ? `Ref. ${reference}` : ''].filter(Boolean).join(' · ');
+}
+
+function shouldOpenBookingTimelineLinkInNewTab(href: string): boolean {
+  return /^https?:\/\//i.test(href) || href.startsWith('/api/');
+}
+
+function BookingTimelineLink({ link }: { link: NonNullable<CanonicalTimelineEvent['link']> }) {
+  const opensInNewTab = shouldOpenBookingTimelineLinkInNewTab(link.href);
+  const className = 'mt-1 inline-flex max-w-full text-xs font-extrabold text-[var(--ax-fill-bright)] no-underline hover:underline';
+  if (opensInNewTab) {
+    return (
+      <a href={link.href} target="_blank" rel="noopener noreferrer" className={className}>
+        <span className="truncate">{link.label}</span>
+      </a>
+    );
+  }
+  return (
+    <Link href={link.href} className={className}>
+      <span className="truncate">{link.label}</span>
+    </Link>
+  );
 }
 
 function getMarginStatClass(band: string): string {
@@ -208,9 +231,12 @@ async function getBooking(id: string) {
           select: { id: true, reference: true, status: true, total: true, holdedInvoiceUrl: true, holdedSyncError: true, pdfUrl: true, createdAt: true },
           orderBy: { createdAt: 'desc' },
         },
+        deliveryNotes: {
+          select: { id: true, reference: true, status: true, pdfUrl: true, createdAt: true, deliveredAt: true, signedAt: true, signedBy: true },
+          orderBy: { createdAt: 'desc' },
+        },
         postEventReport: true,
         clientSurvey: true,
-        clientFeedback: true,
       },
     });
     return booking;
@@ -278,7 +304,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const packName = booking.pack?.translations?.find((t: { locale: string; name: string }) => t.locale === 'ca')?.name
     ?? booking.pack?.translations?.[0]?.name ?? booking.pack?.service ?? 'Pack';
   const bookingServiceLines = booking.serviceLines ?? [];
-  const hasDetailedTravelCostLines = bookingServiceLines.some(isTravelCostLine);
+  // Font única (#1929, com al lead): les línies [travel-cost] pròpies d'Òrbita
+  // (collaboratorId null) són una foto congelada de quan es va crear la reserva.
+  // Si la tarifa/distància canvia després, queden desincronitzades del cost viu
+  // que ja usa el Marge. Les línies amb col·laborador real (pagament fet/pactat a
+  // un tercer) es conserven intactes: mai es recalculen soles.
+  const nonTravelServiceLines = bookingServiceLines.filter((line) => !isTravelCostLine(line));
+  const collaboratorTravelCostLines = bookingServiceLines.filter((line) => isTravelCostLine(line) && line.collaboratorId);
+  const hasCollaboratorTravelCostLines = collaboratorTravelCostLines.length > 0;
   const repartimentTravel = typeof bookingCompat.distanceKm === 'number' && bookingCompat.distanceKm > 0
     ? computeBoloTransport({
         roundTripKm: bookingCompat.distanceKm,
@@ -291,29 +324,28 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const storedTravelCost = typeof bookingCompat.travelCost === 'number' && bookingCompat.travelCost > 0
     ? Number(bookingCompat.travelCost.toFixed(2))
     : 0;
-  const repartimentLines = [
-    ...(packPrice > 0 ? [{ label: `Pack · ${packName}`, kind: 'PACK', revenueAmount: packPrice, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
-    ...(extrasTotal > 0 ? [{ label: 'Extres', kind: 'EXTRA', revenueAmount: extrasTotal, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
-    ...(extraHours > 0 && extraHourPrice > 0 ? [{ label: `Hores extra (${extraHours})`, kind: 'EXTRA_HOURS', revenueAmount: extraHours * extraHourPrice, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
-    ...(repartimentTravel && repartimentTravel.clientCharge > 0 ? [{
-      label: 'Transport client',
-      kind: 'OTHER',
-      revenueAmount: repartimentTravel.clientCharge,
-      costAmount: 0,
-      quantity: 1,
-      collaboratorId: null,
-    }] : []),
-    ...bookingServiceLines,
-    ...(!hasDetailedTravelCostLines && storedTravelCost > 0 ? [{
-      label: 'Cost intern transport · Òrbita',
-      kind: 'OTHER',
-      revenueAmount: 0,
-      costAmount: storedTravelCost,
-      quantity: 1,
-      collaboratorId: null,
-      notes: `${TRAVEL_COST_LINE_MARKER} booking.travelCost fallback`,
-    }] : []),
-  ];
+  const liveTravelCostLines = !hasCollaboratorTravelCostLines && storedTravelCost > 0
+    ? [{
+        label: 'Cost intern transport · Òrbita',
+        kind: 'OTHER',
+        revenueAmount: 0,
+        costAmount: storedTravelCost,
+        quantity: 1,
+        collaboratorId: null,
+        notes: `${TRAVEL_COST_LINE_MARKER} booking.travelCost (font única)`,
+      }]
+    : [];
+  const repartimentLines = buildBoloRepartimentLines({
+    serviceLines: [
+      ...(packPrice > 0 ? [{ label: `Pack · ${packName}`, kind: 'PACK', revenueAmount: packPrice, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
+      ...(extrasTotal > 0 ? [{ label: 'Extres', kind: 'EXTRA', revenueAmount: extrasTotal, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
+      ...(extraHours > 0 && extraHourPrice > 0 ? [{ label: `Hores extra (${extraHours})`, kind: 'EXTRA_HOURS', revenueAmount: extraHours * extraHourPrice, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
+      ...nonTravelServiceLines,
+      ...collaboratorTravelCostLines,
+    ],
+    travelCharge: repartimentTravel?.clientCharge ?? 0,
+    travelCostLines: liveTravelCostLines,
+  });
   const repartiment = computeBoloRepartiment(repartimentLines);
   const repartimentNames: Record<string, string> = {};
   for (const l of bookingServiceLines) {
@@ -366,6 +398,26 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const fiscalMode      = getBookingFiscalMode(booking.invoiceRequired);
   const paymentMethodLabel = getBookingPaymentMethodLabel(booking.paymentMethod);
   const paymentMethodHelp  = getBookingPaymentMethodHelp(booking.paymentMethod);
+  const postEventSurveyStatus = booking.clientSurvey
+    ? `NPS: ${booking.clientSurvey.npsScore}`
+    : booking.postEventEmailSent
+      ? 'Email enviat; pendent de resposta'
+      : "S'enviarà amb l'email post-event";
+  const postEventEmailStatus = booking.postEventEmailSent
+    ? booking.postEventEmailSentAt
+      ? `Enviat ${formatDateSimple(booking.postEventEmailSentAt)}`
+      : 'Enviat'
+    : "Pendent d'enviar";
+  const internalPostEventStatusLabel = internalPostEventStatus === 'COMPLETO'
+    ? 'Tancament complet'
+    : internalPostEventStatus === 'EN_PROGRESO'
+      ? 'Tancament en curs'
+      : 'Tancament pendent';
+  const internalPostEventStatusClass = internalPostEventStatus === 'COMPLETO'
+    ? 'border-[var(--ax-success-border)] bg-[var(--ax-success-bg)]'
+    : internalPostEventStatus === 'EN_PROGRESO'
+      ? 'border-[var(--ax-warning-border)] bg-[var(--ax-warning-bg)]'
+      : 'border-[var(--o-admin-line)] bg-[var(--ax-fill-1)]';
   const financeRiskAction = resolveBookingFinanceRiskAction({
     outstandingAmount: economicGuard.outstandingAmount,
     outstandingBand: economicGuard.outstandingBand,
@@ -419,9 +471,19 @@ export default async function BookingDetailPage({ params }: PageProps) {
       href: inv.holdedInvoiceUrl || inv.pdfUrl || null,
       targetBlank: Boolean(inv.holdedInvoiceUrl || inv.pdfUrl),
     })),
+    ...booking.deliveryNotes.map((deliveryNote) => ({
+      id: `delivery-note-${deliveryNote.id}`,
+      kindLabel: 'Albarà',
+      title: deliveryNote.reference,
+      reference: deliveryNote.reference,
+      statusLabel: getDeliveryNoteStatusLabel(deliveryNote.status),
+      createdAt: deliveryNote.createdAt,
+      href: deliveryNote.pdfUrl || null,
+      targetBlank: Boolean(deliveryNote.pdfUrl),
+    })),
     ...(booking.lead?.dossiers || []).map((d) => ({
       id: `dossier-${d.id}`,
-      kindLabel: d.mode === 'quote' ? 'Pressupost dossier' : 'Dossier',
+      kindLabel: getDossierHistoryKindLabel(d.mode),
       title: d.nom,
       statusLabel: d.sentAt ? 'enviat' : 'esborrany',
       createdAt: d.createdAt,
@@ -429,15 +491,18 @@ export default async function BookingDetailPage({ params }: PageProps) {
       href: buildDossierCompositePdfHref(d.id),
       targetBlank: true,
     })),
-    ...(booking.lead?.documents || []).map((doc) => ({
-      id: `lead-document-${doc.id}`,
-      kindLabel: doc.type === 'QUOTE' ? 'Pressupost antic' : doc.type === 'CONTRACT' ? 'Contracte antic' : 'Document',
-      title: doc.title,
-      statusLabel: doc.type,
-      createdAt: doc.createdAt,
-      href: doc.fileUrl,
-      targetBlank: true,
-    })),
+    ...(booking.lead?.documents || []).map((doc) => {
+      const meta = getLeadDocumentHistoryMeta(doc.type, doc.fileUrl);
+      return {
+        id: `lead-document-${doc.id}`,
+        kindLabel: meta.kindLabel,
+        title: doc.title,
+        statusLabel: meta.statusLabel,
+        createdAt: doc.createdAt,
+        href: meta.href,
+        targetBlank: meta.targetBlank,
+      };
+    }),
   ];
 
   const chipBase = 'inline-flex h-8 items-center whitespace-nowrap rounded-full border px-3 text-sm font-semibold';
@@ -588,7 +653,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
               </div>
             )}
             <div className="mt-2.5 flex flex-wrap gap-2">
-              <PostEventEmailButton bookingId={booking.id} />
               {customer && (
                 <Link href={buildCustomerHubHref(customer.id)} className="ap-btn ap-btn--secondary ap-btn--xs">Fitxa client 360</Link>
               )}
@@ -596,7 +660,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <details className="group relative" {...helpAttrs(ADMIN_BOOKING_HELP.detail.moreActions)}>
                 <summary className="ap-btn ap-btn--xs cursor-pointer list-none select-none">Més accions ▾</summary>
                 <div className="absolute right-0 top-[calc(100%+0.25rem)] z-20 min-w-[12.5rem] rounded-[var(--o-r-lg)] border border-[var(--o-admin-line-2)] bg-[var(--raised)] py-1 shadow-[var(--o-shadow-lg)]">
-                  <Link href={`/admin/post-event/reports/new?bookingId=${booking.id}`} className="block px-3.5 py-2 text-xs text-[var(--t2)] no-underline transition-colors hover:bg-[var(--ax-fill-2)] hover:text-[var(--t)]">Crear informe intern</Link>
                   <a href={googleCalendarUrl} target="_blank" rel="noopener noreferrer" className="block px-3.5 py-2 text-xs text-[var(--t2)] no-underline transition-colors hover:bg-[var(--ax-fill-2)] hover:text-[var(--t)]">Afegir a Google Calendar</a>
                   <Link href="/admin/settings/integrations" className="block px-3.5 py-2 text-xs text-[var(--t2)] no-underline transition-colors hover:bg-[var(--ax-fill-2)] hover:text-[var(--t)]">Sincronitzar mòbil/ICS</Link>
                 </div>
@@ -798,6 +861,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
         <Panel title="Serveis i productes (fora de pack)">
           <BookingServiceLinesEditor
             bookingId={booking.id}
+            guestCount={booking.guestCount}
             initialLines={(booking.serviceLines ?? []).map((line: { collaboratorId?: string | null; kind: string; label: string; revenueAmount?: number | null; costAmount?: number | null; quantity?: number | null; notes?: string | null }) => ({
               collaboratorId: line.collaboratorId ?? undefined,
               kind: line.kind as BookingServiceLineFormInput['kind'],
@@ -822,6 +886,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <DocumentFlowSection
             proposals={(booking.proposals as BookingProposalRow[]).map((p) => ({
               id: p.id, reference: p.reference, status: p.status, pdfUrl: p.pdfUrl,
+              href: buildProposalHref(p.id),
               contractStatus: p.contractStatus, contractReference: p.contractReference,
               contractPdfUrl: p.contractPdfUrl,
               contractSignedAt: p.contractSignedAt?.toISOString() || null,
@@ -829,7 +894,26 @@ export default async function BookingDetailPage({ params }: PageProps) {
               contractSignatureUa: p.contractSignatureUa, contractSignatureBlob: p.contractSignatureBlob,
             }))}
             invoices={(booking.invoices as BookingInvoiceRow[]).map((inv) => ({
-              id: inv.id, reference: inv.reference, status: inv.status, holdedInvoiceUrl: inv.holdedInvoiceUrl,
+              id: inv.id, reference: inv.reference, status: inv.status, holdedInvoiceUrl: inv.holdedInvoiceUrl, pdfUrl: inv.pdfUrl,
+            }))}
+            deliveryNotes={booking.deliveryNotes.map((deliveryNote) => ({
+              id: deliveryNote.id,
+              reference: deliveryNote.reference,
+              status: deliveryNote.status,
+              pdfUrl: deliveryNote.pdfUrl,
+            }))}
+          />
+          <DeliveryNoteSection
+            bookingId={booking.id}
+            deliveryNotes={booking.deliveryNotes.map((deliveryNote) => ({
+              id: deliveryNote.id,
+              reference: deliveryNote.reference,
+              status: deliveryNote.status,
+              deliveredAt: deliveryNote.deliveredAt?.toISOString() || null,
+              signedAt: deliveryNote.signedAt?.toISOString() || null,
+              signedBy: deliveryNote.signedBy,
+              pdfUrl: deliveryNote.pdfUrl,
+              createdAt: deliveryNote.createdAt.toISOString(),
             }))}
           />
           <InvoiceSection
@@ -838,7 +922,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             leadHref={booking.lead ? buildLeadWorkspaceHref(booking.lead.id) : null}
             invoices={(booking.invoices as BookingInvoiceRow[]).map((inv) => ({
               id: inv.id, reference: inv.reference, status: inv.status,
-              total: Number(inv.total), holdedInvoiceUrl: inv.holdedInvoiceUrl,
+              total: Number(inv.total), holdedInvoiceUrl: inv.holdedInvoiceUrl, pdfUrl: inv.pdfUrl,
               holdedSyncError: inv.holdedSyncError, createdAt: inv.createdAt.toISOString(),
             }))}
           />
@@ -887,8 +971,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
                       <div className="min-w-0">
                         <p className="m-0 mb-0.5 flex items-center gap-1 font-mono text-xs font-extrabold uppercase tracking-[0.08em] text-[var(--t3)]"><span>{getBookingTimelineSourceLabel(entry.source)}</span><span>·</span><span>{getBookingTimelineKindLabel(entry.kind)}</span></p>
                         <p className="m-0 text-xs font-extrabold leading-tight text-[var(--t)]">{entry.title}</p>
-                        {description && <p className="hidden">{description}</p>}
-                        {entry.link && <Link href={entry.link.href} className="hidden">{entry.link.label}</Link>}
+                        {description && <p className="m-0 mt-1 line-clamp-2 text-xs leading-snug text-[var(--t2)]">{description}</p>}
+                        {entry.link && <BookingTimelineLink link={entry.link} />}
                       </div>
                       <div className="max-w-full text-left text-xs leading-tight text-[var(--t3)] sm:max-w-[18rem] sm:whitespace-nowrap sm:text-right">
                         <p className="m-0">{formatDateTimeFull(new Date(entry.occurredAt))}</p>
@@ -915,22 +999,38 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
         {/* ── Post-event ── */}
         {booking.status === 'COMPLETED' && (
-          <Panel title="Post-event">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              <div className={`rounded-[var(--o-r-lg)] border px-3.5 py-3 ${booking.postEventReport ? 'border-[var(--ax-success-border)] bg-[var(--ax-success-bg)]' : 'border-[var(--o-admin-line)] bg-[var(--ax-fill-1)]'}`}>
-                <p className="m-0 mb-1 text-sm font-semibold text-[var(--t)]">Informe Intern</p>
-                <p className="m-0 text-xs text-[var(--t3)]">{booking.postEventReport ? 'Completat' : 'Pendent de completar'}</p>
+          <>
+            <SecDivider id="sec-post-event">Post-event</SecDivider>
+            <Panel title="Post-event">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <div className={`rounded-[var(--o-r-lg)] border px-3.5 py-3 ${internalPostEventStatusClass}`}>
+                  <p className="m-0 mb-1 text-sm font-semibold text-[var(--t)]">Tancament intern</p>
+                  <p className="m-0 text-xs text-[var(--t3)]">{internalPostEventStatusLabel}</p>
+                </div>
+                <div className={`rounded-[var(--o-r-lg)] border px-3.5 py-3 ${booking.postEventReport ? 'border-[var(--ax-success-border)] bg-[var(--ax-success-bg)]' : 'border-[var(--o-admin-line)] bg-[var(--ax-fill-1)]'}`}>
+                  <p className="m-0 mb-1 text-sm font-semibold text-[var(--t)]">Informe Intern</p>
+                  <p className="m-0 text-xs text-[var(--t3)]">{booking.postEventReport ? 'Completat' : 'Pendent de completar'}</p>
+                </div>
+                <div className={`rounded-[var(--o-r-lg)] border px-3.5 py-3 ${booking.clientSurvey ? 'border-[var(--ax-success-border)] bg-[var(--ax-success-bg)]' : 'border-[var(--o-admin-line)] bg-[var(--ax-fill-1)]'}`}>
+                  <p className="m-0 mb-1 text-sm font-semibold text-[var(--t)]">Enquesta Client</p>
+                  <p className="m-0 text-xs text-[var(--t3)]">{postEventSurveyStatus}</p>
+                </div>
+                <div className={`rounded-[var(--o-r-lg)] border px-3.5 py-3 ${booking.postEventEmailSent ? 'border-[var(--ax-success-border)] bg-[var(--ax-success-bg)]' : 'border-[var(--o-admin-line)] bg-[var(--ax-fill-1)]'}`}>
+                  <p className="m-0 mb-1 text-sm font-semibold text-[var(--t)]">Email post-event</p>
+                  <p className="m-0 text-xs text-[var(--t3)]">{postEventEmailStatus}</p>
+                </div>
               </div>
-              <div className={`rounded-[var(--o-r-lg)] border px-3.5 py-3 ${booking.clientSurvey ? 'border-[var(--ax-success-border)] bg-[var(--ax-success-bg)]' : 'border-[var(--o-admin-line)] bg-[var(--ax-fill-1)]'}`}>
-                <p className="m-0 mb-1 text-sm font-semibold text-[var(--t)]">Enquesta Client</p>
-                <p className="m-0 text-xs text-[var(--t3)]">{booking.clientSurvey ? `NPS: ${booking.clientSurvey.npsScore}` : 'Pendent de rebre'}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <PostEventEmailButton bookingId={booking.id} initiallySent={booking.postEventEmailSent} />
+                <Link href={`/admin/post-event/reports/new?bookingId=${booking.id}`} className="ap-btn ap-btn--secondary ap-btn--xs">
+                  Crear informe intern
+                </Link>
+                <Link href="/admin/post-event/playbook" className="ap-btn ap-btn--secondary ap-btn--xs">
+                  Obrir playbook
+                </Link>
               </div>
-              <div className={`rounded-[var(--o-r-lg)] border px-3.5 py-3 ${booking.clientFeedback ? 'border-[var(--ax-success-border)] bg-[var(--ax-success-bg)]' : 'border-[var(--o-admin-line)] bg-[var(--ax-fill-1)]'}`}>
-                <p className="m-0 mb-1 text-sm font-semibold text-[var(--t)]">Feedback Enviat</p>
-                <p className="m-0 text-xs text-[var(--t3)]">{booking.clientFeedback ? `Codi: ${booking.clientFeedback.discountCode}` : "Pendent d'enviar"}</p>
-              </div>
-            </div>
-          </Panel>
+            </Panel>
+          </>
         )}
 
         <CommunicationPanel

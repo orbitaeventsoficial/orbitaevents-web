@@ -3,28 +3,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { cn, safeParseInt } from '@/lib/utils';
+import { safeParseInt } from '@/lib/utils';
 
 describe('Utils', () => {
-  describe('cn (classNames merger)', () => {
-    it('should merge class names', () => {
-      expect(cn('foo', 'bar')).toBe('foo bar');
-    });
-
-    it('should handle conditional classes', () => {
-      expect(cn('base', true && 'included', false && 'excluded')).toBe('base included');
-    });
-
-    it('should handle undefined and null', () => {
-      expect(cn('base', undefined, null, 'end')).toBe('base end');
-    });
-
-    it('should merge tailwind classes correctly', () => {
-      expect(cn('p-4', 'p-2')).toBe('p-2');
-      expect(cn('text-red-500', 'text-blue-500')).toBe('text-blue-500');
-    });
-  });
-
   describe('safeParseInt', () => {
     it('should parse valid integers', () => {
       expect(safeParseInt('42')).toBe(42);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { getAdminPackById, updateAdminPack } from '@/lib/services/packAdminService';
 
@@ -10,6 +10,8 @@ export async function PATCH(
 ) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const permissionError = requirePermission(request, 'mutate');
+  if (permissionError) return permissionError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;
 
@@ -30,6 +32,8 @@ export async function GET(
 ) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const permissionError = requirePermission(request, 'read');
+  if (permissionError) return permissionError;
 
   try {
     const { id } = await params;

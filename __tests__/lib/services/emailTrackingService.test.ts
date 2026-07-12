@@ -125,9 +125,11 @@ describe('computeTemplatePerformance', () => {
   it('uses known labels for template keys', () => {
     const sends = [
       makeSend({ id: 's1', templateKey: 'reactivacio' }),
+      makeSend({ id: 's2', templateKey: 'public-contact-client-confirmation' }),
     ];
     const result = computeTemplatePerformance(sends, []);
-    expect(result[0].label).toBe('Reactivació');
+    expect(result.find((row) => row.templateKey === 'reactivacio')?.label).toBe('Reactivació');
+    expect(result.find((row) => row.templateKey === 'public-contact-client-confirmation')?.label).toBe('Contacte web: confirmació client');
   });
 
   it('sorts by totalSent descending', () => {

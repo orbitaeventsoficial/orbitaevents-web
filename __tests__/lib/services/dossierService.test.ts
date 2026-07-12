@@ -7,6 +7,10 @@ const {
   mockGetDossierCollaboratorProductsByIds,
   mockCollaboratorProductToAnimacioProduct,
   mockLegacyDossierCollaboratorProductIdFor,
+  mockRecordEmailSend,
+  mockUpdateEmailSendResult,
+  mockWrapLinksForTracking,
+  mockGetAppBaseUrl,
 } = vi.hoisted(() => ({
   mockPrisma: {
     dossier: {
@@ -30,11 +34,21 @@ const {
   mockGetDossierCollaboratorProductsByIds: vi.fn(),
   mockCollaboratorProductToAnimacioProduct: vi.fn(),
   mockLegacyDossierCollaboratorProductIdFor: vi.fn(),
+  mockRecordEmailSend: vi.fn(),
+  mockUpdateEmailSendResult: vi.fn(),
+  mockWrapLinksForTracking: vi.fn(),
+  mockGetAppBaseUrl: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
+vi.mock('@/lib/site', () => ({ getAppBaseUrl: mockGetAppBaseUrl }));
 vi.mock('@/lib/utils/dossier-html-builder', () => ({ buildDossierHtml: mockBuildHtml }));
+vi.mock('@/lib/services/emailTrackingService', () => ({
+  recordEmailSend: mockRecordEmailSend,
+  updateEmailSendResult: mockUpdateEmailSendResult,
+  wrapLinksForTracking: mockWrapLinksForTracking,
+}));
 vi.mock('@/lib/services/collaboratorProductService', () => ({
   getDossierCollaboratorProductsByIds: mockGetDossierCollaboratorProductsByIds,
   collaboratorProductToAnimacioProduct: mockCollaboratorProductToAnimacioProduct,
@@ -79,7 +93,6 @@ vi.mock('@/lib/constants/dossier-copy', () => ({
       travelBreakdownPeople: '',
       travelBreakdownTolls: '',
       travelBreakdownMeals: '',
-      seasonDetail: '',
       vatNote: '',
     },
     cta: { label: '' },
@@ -89,7 +102,6 @@ vi.mock('@/lib/constants/dossier-copy', () => ({
 
 import {
   createDossier,
-  getDossiersByLead,
   getDossierById,
   getAllDossiers,
   getDossierLeadInitialData,
@@ -99,13 +111,31 @@ import {
   purgeDossier,
   getDeletedDossiers,
   purgeExpiredDossiers,
-  deleteDossier,
   sendDossierByEmail,
 } from '@/lib/services/dossierService';
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockBuildHtml.mockReturnValue('<html>dossier</html>');
+  mockGetAppBaseUrl.mockReturnValue('https://app.test');
+  mockRecordEmailSend.mockResolvedValue({ id: 'email-send-1', trackingToken: 'tracking-1' });
+  mockUpdateEmailSendResult.mockResolvedValue(undefined);
+  mockWrapLinksForTracking.mockImplementation((html: string, trackingToken: string, baseUrl: string) => `${html}<a href="${baseUrl}/tracked/${trackingToken}"></a>`);
+  mockSendEmail.mockResolvedValue({
+    smtp: {
+      accepted: ['joan@example.com'],
+      rejected: [],
+      response: '250 OK',
+      messageId: 'smtp-message-1',
+    },
+    imapSent: {
+      attempted: true,
+      ok: true,
+      folder: 'Sent',
+      uid: 7,
+      error: null,
+    },
+  });
   mockGetDossierCollaboratorProductsByIds.mockResolvedValue([]);
   mockCollaboratorProductToAnimacioProduct.mockImplementation((product: unknown) => product);
   mockLegacyDossierCollaboratorProductIdFor.mockImplementation((product: { nom?: string }) => {
@@ -158,17 +188,15 @@ describe('createDossier', () => {
     expect(result).toEqual(mockDossier);
   });
 
-  it('usa null per camps opcionals buits', async () => {
-    mockPrisma.dossier.create.mockResolvedValue({ ...mockDossier, leadId: null });
-    await createDossier({ nom: 'Test', productIds: [] });
-    expect(mockPrisma.dossier.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({ leadId: null, empresa: null }),
-    });
+  it('rebutja crear un dossier sense lead canònic', async () => {
+    await expect(createDossier({ nom: 'Test', productIds: [] })).rejects.toThrow('leadId');
+    expect(mockPrisma.dossier.create).not.toHaveBeenCalled();
   });
 
   it('desa la foto immutable del dossier quan arriba lineSnapshot', async () => {
     mockPrisma.dossier.create.mockResolvedValue(mockDossier);
     await createDossier({
+      leadId: 'lead-1',
       nom: 'Joan Pla',
       productIds: ['collab:bingo'],
       lineSnapshot: {
@@ -234,18 +262,6 @@ describe('getDossierLeadInitialData', () => {
   });
 });
 
-describe('getDossiersByLead', () => {
-  it('retorna dossiers ordenats per data', async () => {
-    mockPrisma.dossier.findMany.mockResolvedValue([mockDossier]);
-    const result = await getDossiersByLead('lead-1');
-    expect(mockPrisma.dossier.findMany).toHaveBeenCalledWith({
-      where: { leadId: 'lead-1' },
-      orderBy: { createdAt: 'desc' },
-    });
-    expect(result).toHaveLength(1);
-  });
-});
-
 describe('getDossierById', () => {
   it('retorna el dossier pel seu id', async () => {
     mockPrisma.dossier.findUnique.mockResolvedValue(mockDossier);
@@ -279,7 +295,6 @@ describe('buildDossierHtmlForDossier', () => {
         travelKm: 123,
         travelTollsEur: 4.5,
         travelLocation: 'Snapshot City',
-        eventDate: '2026-07-17',
       },
     });
 
@@ -303,7 +318,6 @@ describe('buildDossierHtmlForDossier', () => {
         travelKm: 123,
         travelTollsEur: 4.5,
         location: 'Snapshot City',
-        eventDate: '2026-07-17',
       }),
     );
     expect(result?.dataSource).toBe('snapshot');
@@ -367,14 +381,6 @@ describe('purgeExpiredDossiers', () => {
   });
 });
 
-describe('deleteDossier (deprecated)', () => {
-  it('crida softDeleteDossier internament', async () => {
-    mockPrisma.$executeRaw.mockResolvedValue(1);
-    await deleteDossier('dos-1');
-    expect(mockPrisma.$executeRaw).toHaveBeenCalled();
-  });
-});
-
 describe('sendDossierByEmail', () => {
   it('retorna error si el dossier no existeix', async () => {
     mockPrisma.dossier.findUnique.mockResolvedValue(null);
@@ -391,7 +397,6 @@ describe('sendDossierByEmail', () => {
 
   it('envia email i actualitza sentAt', async () => {
     mockPrisma.dossier.findUnique.mockResolvedValue(mockDossier);
-    mockSendEmail.mockResolvedValue(undefined);
     mockPrisma.dossier.update.mockResolvedValue({ ...mockDossier, sentAt: new Date() });
 
     const result = await sendDossierByEmail('dos-1');
@@ -400,11 +405,44 @@ describe('sendDossierByEmail', () => {
       expect.objectContaining({
         to: 'joan@example.com',
         subject: expect.stringContaining('Joan Pla'),
+        html: expect.stringContaining('/api/tracking/open/tracking-1'),
       }),
     );
+    expect(mockRecordEmailSend).toHaveBeenCalledWith(expect.objectContaining({
+      templateKey: 'dossier',
+      to: 'joan@example.com',
+      leadId: 'lead-1',
+      customerId: null,
+      locale: 'ca-ES',
+      htmlBody: '<html>dossier</html>',
+      orbitaKind: 'lead',
+      orbitaId: 'lead-1',
+      orbitaOrigin: 'dossier-dos-1',
+    }));
+    expect(mockWrapLinksForTracking).toHaveBeenCalledWith('<html>dossier</html>', 'tracking-1', 'https://app.test');
+    expect(mockUpdateEmailSendResult).toHaveBeenCalledWith('email-send-1', expect.objectContaining({
+      smtpAccepted: ['joan@example.com'],
+      smtpRejected: [],
+      smtpMessageId: 'smtp-message-1',
+      imapAppendOk: true,
+      imapSentFolder: 'Sent',
+      imapSentUid: 7,
+    }));
     expect(mockPrisma.dossier.update).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: 'dos-1' } }),
     );
+  });
+
+  it('no envia ni marca sentAt si no pot crear el snapshot EmailSend', async () => {
+    mockPrisma.dossier.findUnique.mockResolvedValue(mockDossier);
+    mockRecordEmailSend.mockRejectedValueOnce(new Error('Tracking down'));
+
+    const result = await sendDossierByEmail('dos-1');
+
+    expect(result).toEqual({ ok: false, error: 'Tracking down' });
+    expect(mockSendEmail).not.toHaveBeenCalled();
+    expect(mockPrisma.dossier.update).not.toHaveBeenCalled();
+    expect(mockPrisma.adminLog.create).not.toHaveBeenCalled();
   });
 
   it('registra traça documental amb origen client/lead en enviar dossier', async () => {
@@ -427,7 +465,6 @@ describe('sendDossierByEmail', () => {
       customerId: 'cust-1',
       customer: { name: 'Client Joan' },
     });
-    mockSendEmail.mockResolvedValue(undefined);
     mockPrisma.dossier.update.mockResolvedValue(mockDossier);
 
     const result = await sendDossierByEmail('dos-1');
@@ -448,6 +485,8 @@ describe('sendDossierByEmail', () => {
           customerId: 'cust-1',
           customerName: 'Client Joan',
           to: 'joan@example.com',
+          emailSendId: 'email-send-1',
+          emailSnapshot: 'EmailSend.htmlBody',
           productCount: 1,
         }),
       }),
@@ -468,7 +507,6 @@ describe('sendDossierByEmail', () => {
       ...mockDossier,
       productIds: ['bingo-musical'],
     });
-    mockSendEmail.mockResolvedValue(undefined);
     mockPrisma.dossier.update.mockResolvedValue(mockDossier);
 
     await sendDossierByEmail('dos-1');
@@ -497,7 +535,6 @@ describe('sendDossierByEmail', () => {
         travelLocation: 'Snapshot City',
       },
     });
-    mockSendEmail.mockResolvedValue(undefined);
     mockPrisma.dossier.update.mockResolvedValue(mockDossier);
 
     await sendDossierByEmail('dos-1');
@@ -543,7 +580,6 @@ describe('sendDossierByEmail', () => {
         customerId: null,
         customer: null,
       });
-    mockSendEmail.mockResolvedValue(undefined);
     mockPrisma.dossier.update.mockResolvedValue(mockDossier);
 
     await sendDossierByEmail('dos-1');
@@ -563,7 +599,6 @@ describe('sendDossierByEmail', () => {
       productIds: ['bingo-musical'],
     });
     mockPrisma.lead.findUnique.mockResolvedValue({ distanceKm: 422, eventLocation: "l'Aldosa" });
-    mockSendEmail.mockResolvedValue(undefined);
     mockPrisma.dossier.update.mockResolvedValue(mockDossier);
 
     await sendDossierByEmail('dos-1');

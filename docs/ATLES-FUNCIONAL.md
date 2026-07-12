@@ -130,10 +130,6 @@ a un, seguint el **flux vertical** de cada un (front→back→BD), no pàgina a 
 - `computeSimpleMarginPct` — Calcula el marge % simplificat (sense CAC) per a llistes/dashboards. Substitueix calculate
 - `computeCollaboratorNetMargin` — Calcula el marge NET d'una reserva amb col·laborador. Descompta la comissió del col·labora
 
-### `datePricingService.ts` (2)
-- `findApplicableRule` — Selecciona la regla amb multiplicador més alt; tie-break per priority.
-- `applyDatePricing`
-
 ### `fuelReferenceService.ts` (4)
 - `refreshFuelReferenceNow`
 - `runFuelDailyRefresh`
@@ -670,27 +666,21 @@ a un, seguint el **flux vertical** de cada un (front→back→BD), no pàgina a 
 - `updateAdminBlogPost`
 - `deleteAdminBlogPost`
 
-### `galleryService.ts` (11)
+### `galleryService.ts` (10)
 - `addGalleryPhoto` — Afegir foto a la galeria d'un booking
 - `listGalleryPhotos` — Llistar fotos d'un booking
 - `listPortalPhotos` — Llistar fotos per al portal client (només isPortal)
 - `listPortfolioPhotos` — Llistar fotos per al portfolio públic (tots els bookings)
 - `updateGalleryPhoto` — Actualitzar foto (caption, flags, ordre)
 - `deleteGalleryPhoto` — Eliminar foto
-- `getGallerySummary` — Obtenir resum de galeria per un booking
 - `createGalleryShareToken`
 - `revokeGalleryShareToken`
 - `getGalleryByShareToken`
 - `getGalleryShareInfo`
 
-### `heroVideoService.ts` (7)
+### `heroVideoService.ts` (2)
 - `listHeroMedia` — ── Read ──────────────────────────────────────────────────────────────────
 - `listActiveHeroMedia`
-- `addHeroMedia` — ── Add media (upload or URL) ─────────────────────────────────────────────
-- `removeHeroMedia` — ── Remove ────────────────────────────────────────────────────────────────
-- `toggleHeroMedia` — ── Toggle active ─────────────────────────────────────────────────────────
-- `reorderHeroMedia` — ── Reorder ───────────────────────────────────────────────────────────────
-- `updateHeroMediaLabel` — ── Update label ──────────────────────────────────────────────────────────
 
 ### `imageManagerProcessing.ts` (1)
 - `processImageManagerUpload`
@@ -706,15 +696,13 @@ a un, seguint el **flux vertical** de cada un (front→back→BD), no pàgina a 
 - `saveImageManagerModifications`
 - `reorderImageManagerAssets` — --------------------------------------------------------------------------- Reorder (PATCH
 
-### `portfolioEventService.ts` (8)
+### `portfolioEventService.ts` (6)
 - `createPortfolioEvent` — Crear un event de portfolio
+- `ensurePortfolioEventFromPostEventReport`
 - `listPortfolioEvents` — Llistar events d'una categoria (publicats per defecte)
 - `getPortfolioEvent` — Obtenir un event per slug (amb media)
 - `updatePortfolioEvent` — Actualitzar un event
 - `deletePortfolioEvent` — Eliminar un event (media queda amb eventId=null)
-- `linkMediaToEvent` — Vincular media existent a un event
-- `unlinkMediaFromEvent` — Desvincular media d'un event
-- `getPortfolioEventCounts` — Comptar events per categoria
 
 ### `portfolioImageService.ts` (4)
 - `slugifyPortfolioAssetName`
@@ -722,12 +710,11 @@ a un, seguint el **flux vertical** de cada un (front→back→BD), no pàgina a 
 - `buildPortfolioUploadImagePath`
 - `buildBookingGalleryImagePath`
 
-### `portfolioMediaService.ts` (7)
+### `portfolioMediaService.ts` (6)
 - `isValidSlug`
 - `detectMediaType`
 - `addPortfolioMedia`
 - `listPortfolioMedia`
-- `getPortfolioMediaCounts`
 - `updatePortfolioMedia`
 - `deletePortfolioMedia`
 
@@ -1249,4 +1236,3 @@ a un, seguint el **flux vertical** de cada un (front→back→BD), no pàgina a 
 
 ### `weddingCoverage.ts` (1)
 - `getWeddingCoverageZones`
-

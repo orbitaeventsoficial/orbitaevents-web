@@ -358,7 +358,6 @@ Sèrie de talls per drenar tots els `MÉS ENDAVANT` factuals del Master Checklis
 | #746 | Codi+tests | §6.17 Inventari/Packs | `/admin/inventory` fa emergir cost pendent, equip valuós sense ús, vida útil tensada i cobertura de packs al `OwnerControlStrip`. 1 test nou (4/4 verds). |
 
 **Backlog accionable restant del §6** (no convertibles a FET autònomament):
-- §6.2 — Eliminar `legacyLeadTaskId` quan no hi hagi dades amb aquest camp (requereix BD producció).
 - §6.4 — Configurabilitat de llindars d'automatització (requereix dades reals d'execució).
 - §6.7 — Planificació avançada de bookings (requereix fricció operativa real).
 - §6.17 — Refinaments inventari+packs (drenats parcialment amb #746; obrir de nou quan apareguin més friccions reals).
@@ -397,7 +396,6 @@ Sèrie de talls per drenar tots els `MÉS ENDAVANT` factuals del Master Checklis
 | A1 | **Insights narratius** — fins a 5 insights prioritzats en català al dashboard | `dashboardInsightsService.ts` | ✅ |
 | A5 | **Timeline unificat** — email+WhatsApp+trucades+notes en un fil, icones per canal | `TimelinePanel.tsx` | ✅ |
 | A6 | **Auto-triggers** — proposal→contracte, lead→welcome, booking→checklist | `automationTriggers.ts` | ✅ |
-
 
 
 

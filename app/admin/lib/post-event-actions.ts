@@ -22,11 +22,11 @@ type PostEventActionItem = Pick<
 export function buildPostEventNextActionHref(item: Pick<PlaybookItem, 'bookingId' | 'customerId' | 'nextAction'>): string {
   switch (item.nextAction?.key) {
     case 'thank_you':
-      return `${buildBookingHref(item.bookingId)}#sec-client`;
+      return `${buildBookingHref(item.bookingId)}#sec-post-event`;
     case 'testimonial':
       return item.customerId
         ? buildCustomerWorkspaceTabHref(item.customerId, 'comms')
-        : `${buildBookingHref(item.bookingId)}#sec-client`;
+        : `${buildBookingHref(item.bookingId)}#sec-post-event`;
     case 'social_post':
       return buildSocialWorkspaceHref();
     case 'referral_ask':

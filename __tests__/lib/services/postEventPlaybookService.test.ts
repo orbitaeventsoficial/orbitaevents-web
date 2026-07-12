@@ -3,6 +3,7 @@ import {
   buildPostEventPlaybook,
   type PlaybookBookingInput,
 } from '@/lib/services/postEventPlaybookService';
+import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
 
 const NOW = new Date('2026-04-10T12:00:00.000Z');
 
@@ -67,6 +68,22 @@ describe('buildPostEventPlaybook', () => {
     const result = buildPostEventPlaybook({ bookings: [booking], now: NOW });
     const thankYou = result.items[0].actions.find((a) => a.key === 'thank_you')!;
     expect(thankYou.status).toBe('OVERDUE');
+  });
+
+  it('uses the canonical post-event startDueDays for thank_you status', () => {
+    expect(POST_EVENT_WORKFLOW.actionDueDays.thank_you).toBe(POST_EVENT_WORKFLOW.startDueDays);
+
+    const dueToday = buildPostEventPlaybook({
+      bookings: [makeBooking({ eventDate: daysAgo(POST_EVENT_WORKFLOW.startDueDays) })],
+      now: NOW,
+    });
+    const overdueTomorrow = buildPostEventPlaybook({
+      bookings: [makeBooking({ eventDate: daysAgo(POST_EVENT_WORKFLOW.startDueDays + 1) })],
+      now: NOW,
+    });
+
+    expect(dueToday.items[0].actions.find((a) => a.key === 'thank_you')?.status).toBe('PENDING');
+    expect(overdueTomorrow.items[0].actions.find((a) => a.key === 'thank_you')?.status).toBe('OVERDUE');
   });
 
   it('marks social_post as PENDING until 14 days past event', () => {

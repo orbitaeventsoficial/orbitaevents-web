@@ -34,6 +34,7 @@ import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getFinanceAlertsSummary } from '@/lib/services/financeAlertsService';
 import { computePackPricingHealth, getPackPricingModelConfigEditable } from '@/lib/services/packPricingHealth';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
+import { ADMIN_POST_EVENT_CRON_STATUS_PREFIX } from '@/lib/constants/admin';
 
 function queueInventoryCounts(...values: number[]) {
   values.forEach((value) => mockPrisma.inventoryItem.count.mockResolvedValueOnce(value));
@@ -52,7 +53,7 @@ describe('adminHealthService', () => {
     vi.clearAllMocks();
 
     mockPrisma.setting.findMany.mockResolvedValue([
-      { key: 'emails.cron.lastRun', value: new Date().toISOString() },
+      { key: `${ADMIN_POST_EVENT_CRON_STATUS_PREFIX}.lastRun`, value: new Date().toISOString() },
       { key: 'automation.commercial.lastRun', value: new Date().toISOString() },
     ]);
     queueInventoryCounts(0, 0, 0, 0);
@@ -136,7 +137,7 @@ describe('adminHealthService', () => {
     const now = new Date();
 
     mockPrisma.setting.findMany.mockResolvedValue([
-      { key: 'emails.cron.lastRun', value: '2026-01-01T00:00:00.000Z' },
+      { key: `${ADMIN_POST_EVENT_CRON_STATUS_PREFIX}.lastRun`, value: '2026-01-01T00:00:00.000Z' },
       { key: 'automation.commercial.lastRun', value: '2026-01-01T00:00:00.000Z' },
       { key: 'alerts.finance.autofixFailureCount', value: '2' },
       { key: 'alerts.system.autofixFailureCount', value: '1' },
@@ -325,7 +326,7 @@ describe('adminHealthService', () => {
 
   it('saneja comptadors autofix de settings abans de crear incidències', async () => {
     mockPrisma.setting.findMany.mockResolvedValue([
-      { key: 'emails.cron.lastRun', value: new Date().toISOString() },
+      { key: `${ADMIN_POST_EVENT_CRON_STATUS_PREFIX}.lastRun`, value: new Date().toISOString() },
       { key: 'automation.commercial.lastRun', value: new Date().toISOString() },
       { key: 'alerts.finance.autofixFailureCount', value: '2.9' },
       { key: 'alerts.system.autofixFailureCount', value: 'no-num' },

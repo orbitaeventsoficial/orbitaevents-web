@@ -6,6 +6,7 @@ import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
 import { listPendingPostEventBookings, sendPostEventEmailForBooking, type PostEventDispatchResult } from '@/lib/services/postEventDispatchService';
+import { ADMIN_POST_EVENT_CRON_STATUS_PREFIX } from '@/lib/constants/admin';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
     };
 
     await saveCronRunStatus({
-      prefix: 'emails.cron',
+      prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX,
       status: 'ok',
       summary,
       timestamp: now.toISOString(),
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     log.error('Error en cron post-event:', error);
     await saveCronRunStatus({
-      prefix: 'emails.cron',
+      prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX,
       status: 'error',
       message: error instanceof Error ? error.message : 'Unknown error',
       timestamp: now.toISOString(),

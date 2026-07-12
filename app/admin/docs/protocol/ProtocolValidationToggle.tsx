@@ -17,13 +17,17 @@ export default function ProtocolValidationToggle({
 }: ProtocolValidationToggleProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [isSaving, setIsSaving] = useState(false);
   const [note, setNote] = useState(validation?.notes ?? '');
   const [error, setError] = useState<string | null>(null);
 
   const isValidated = Boolean(validation);
+  const isBusy = isSaving || isPending;
 
   const handleValidate = async () => {
+    if (isBusy) return;
     setError(null);
+    setIsSaving(true);
     try {
       const res = await fetchWithCsrf('/api/admin/protocol/validations', {
         method: 'POST',
@@ -40,11 +44,15 @@ export default function ProtocolValidationToggle({
       startTransition(() => router.refresh());
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Error validant el canvi');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleRemove = async () => {
+    if (isBusy) return;
     setError(null);
+    setIsSaving(true);
     try {
       const res = await fetchWithCsrf('/api/admin/protocol/validations', {
         method: 'DELETE',
@@ -58,11 +66,16 @@ export default function ProtocolValidationToggle({
       startTransition(() => router.refresh());
     } catch (removeError) {
       setError(removeError instanceof Error ? removeError.message : 'Error desfent la validació');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   return (
-    <section className={`mt-3 ap-card p-3 ${isValidated ? 'admin-tone-border-success admin-tone-bg-success' : ''}`}>
+    <section
+      aria-busy={isBusy}
+      className={`mt-3 ap-card p-3 ${isValidated ? 'admin-tone-border-success admin-tone-bg-success' : ''}`}
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Validació humana</p>
@@ -77,10 +90,10 @@ export default function ProtocolValidationToggle({
         <button
           type="button"
           onClick={isValidated ? handleRemove : handleValidate}
-          disabled={isPending}
+          disabled={isBusy}
           className={isValidated ? 'ap-btn-secondary text-xs' : 'ap-btn ap-btn--primary text-xs'}
         >
-          {isPending ? 'Guardant...' : isValidated ? 'Desfer validació' : 'Marcar validació humana'}
+          {isBusy ? 'Guardant...' : isValidated ? 'Desfer validació' : 'Marcar validació humana'}
         </button>
       </div>
 
@@ -100,7 +113,12 @@ export default function ProtocolValidationToggle({
         <p className="mt-2 text-xs opacity-70">Nota registrada: {validation.notes}</p>
       ) : null}
       {error ? (
-        <p className="mt-2 rounded-xl border admin-tone-border-danger px-3 py-2 text-xs admin-tone-text-danger">{error}</p>
+        <p
+          role="alert"
+          className="mt-2 rounded-xl border admin-tone-border-danger px-3 py-2 text-xs admin-tone-text-danger"
+        >
+          {error}
+        </p>
       ) : null}
     </section>
   );

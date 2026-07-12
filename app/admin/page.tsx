@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { AdminPage, AdminSection, AdminKpiRow, AdminKpi } from './components/AdminPage';
 import { Button } from './lib/dashboard-widgets';
 import { buildPostEventNextActionHref } from './lib/post-event-actions';
-import { projectAdminTodayActions, projectNextEventEconomicTodayAction, projectPostEventTodayAction } from './lib/today-actions';
+import { projectAdminTodayActions, projectContractWorkflowTodayAction, projectDossierDraftTodayAction, projectNextEventEconomicTodayAction, projectPostEventTodayAction, projectProposalBookingConversionTodayAction, projectProposalDraftTodayAction } from './lib/today-actions';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { fetchDashboardData } from './lib/dashboard-data';
@@ -19,9 +19,13 @@ import { formatCurrency, formatDate, formatWeekdayDateShort, getEventLabel } fro
 import { loadDailyBrief } from '@/lib/services/dailyBriefService';
 import { loadCapacityConflicts } from '@/lib/services/capacityConflictService';
 import { loadDayCollisions } from '@/lib/services/dayCollisionService';
+import { loadContractWorkflowSuggestions } from '@/lib/services/contractWorkflowSuggestionService';
+import { loadDossierDraftSuggestions } from '@/lib/services/dossierDraftSuggestionService';
 import { loadTopLeadsToWork } from '@/lib/services/leadPriorityService';
 import { loadNextBestActions } from '@/lib/services/nextBestActionService';
 import { loadPostEventPlaybook } from '@/lib/services/postEventPlaybookService';
+import { loadProposalBookingConversionSuggestions } from '@/lib/services/proposalBookingConversionSuggestionService';
+import { loadProposalDraftSuggestions } from '@/lib/services/proposalDraftSuggestionService';
 import { getPaymentBand, getPaymentLabel } from '@/lib/payment-status';
 
 export const dynamic = 'force-dynamic';
@@ -52,13 +56,17 @@ const PLAYBOOK_TONE: Record<'ALTA' | 'MITJANA' | 'BAIXA' | 'DONE', string> = {
 export default async function AdminTodayPage() {
   const now = new Date();
   const capacityPromise = loadCapacityConflicts(now);
-  const [d, brief, capacity, topLeads, playbook, dayCollisions, nba] = await Promise.all([
+  const [d, brief, capacity, topLeads, playbook, dayCollisions, dossierDraftSuggestions, contractWorkflowSuggestions, proposalDraftSuggestions, proposalBookingSuggestions, nba] = await Promise.all([
     fetchDashboardData(),
     loadDailyBrief(now),
     capacityPromise,
     loadTopLeadsToWork(5),
     loadPostEventPlaybook(),
     loadDayCollisions(),
+    loadDossierDraftSuggestions(3, now),
+    loadContractWorkflowSuggestions(3, now),
+    loadProposalDraftSuggestions(3, now),
+    loadProposalBookingConversionSuggestions(3, now),
     capacityPromise.then((report) => loadNextBestActions(now, { capacity: report })),
   ]);
 
@@ -95,6 +103,10 @@ export default async function AdminTodayPage() {
     .filter((action): action is NonNullable<typeof action> => Boolean(action));
   const supplementalTodayActions = [
     ...economicTodayActions,
+    ...proposalBookingSuggestions.map(projectProposalBookingConversionTodayAction),
+    ...contractWorkflowSuggestions.map(projectContractWorkflowTodayAction),
+    ...proposalDraftSuggestions.map(projectProposalDraftTodayAction),
+    ...dossierDraftSuggestions.map(projectDossierDraftTodayAction),
     ...postEventTodayActions,
   ];
   const actions = projectAdminTodayActions(nba.actions, brief.actions, 3, supplementalTodayActions);

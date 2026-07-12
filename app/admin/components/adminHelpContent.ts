@@ -71,8 +71,8 @@ export const ADMIN_SHARED_HELP = {
     desc: 'Et porta al tauler comercial per revisar consultes i oportunitats en curs.',
   },
   runPostEvent: {
-    title: 'Executar post-event',
-    desc: 'Llança manualment el flux automàtic de correus post-esdeveniment si no vols esperar el cron programat.',
+    title: 'Revisar post-event',
+    desc: 'Obre el hub post-event perquè vegis emails pendents, informes i retorn abans d’enviar cap correu real.',
   },
   runAll: {
     title: 'Executar-ho tot',
@@ -152,7 +152,7 @@ export const ADMIN_DASHBOARD_HELP = {
   revenueGoal: { title: "Objectiu mensual d'ingressos", desc: 'Resumeix quant has facturat aquest mes respecte de l\'objectiu configurat. T\'ajuda a veure si vas per sota, en línia o per sobre del ritme previst.' },
   pilot: { title: "Pilot automàtic d'avui", desc: 'És una ruta guiada per a un usuari novell: primer entrades, després tasques, post-esdeveniment i finalment reserves. Pots saltar passos si ja saps què toca.' },
   startStep2: { title: 'Comença pel pas 2', desc: 'Et porta directament a tasques si ja has resolt les entrades i vols avançar feina operativa.' },
-  startStep3: { title: 'Comença pel pas 3', desc: 'Et porta a correus automàtics si vols tancar la part post-esdeveniment sense seguir l\'ordre complet.' },
+  startStep3: { title: 'Comença pel pas 3', desc: 'Et porta al hub post-event perquè vegis email, informe i retorn abans d\'enviar correus reals.' },
   checklist: { title: "Checklist d'avui", desc: 'Concentra les tasques diàries obertes i el progrés del dia. Serveix per no perdre el fil operatiu.' },
   commandCenter: { title: 'Centre de comandament', desc: 'Permet moure estats clau de leads i reserves sense entrar a cada fitxa. És per operativa ràpida des del dashboard.' },
   executionRadar: { title: "Radar d'execució", desc: 'Resumeix en semàfors on hi ha urgència real: leads aturats, oportunitats calentes i pressupostos en curs.' },

@@ -47,23 +47,23 @@ function resolveHealthTone(marginPct: number, targetMarginPct: number): {
     return {
       tone: 'green',
       label: 'Sa',
-      badgeClass: '',
-      dotClass: '',
+      badgeClass: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+      dotClass: 'admin-tone-bg-success',
     };
   }
   if (marginPct >= warnMargin) {
     return {
       tone: 'amber',
       label: 'Vigilar',
-      badgeClass: '',
-      dotClass: '',
+      badgeClass: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+      dotClass: 'admin-tone-bg-warning',
     };
   }
   return {
     tone: 'red',
     label: 'Crític',
-    badgeClass: '',
-    dotClass: '',
+    badgeClass: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
+    dotClass: 'admin-tone-bg-danger',
   };
 }
 
@@ -452,4 +452,3 @@ export default async function CatalogPage({
     </AdminPage>
   );
 }
-

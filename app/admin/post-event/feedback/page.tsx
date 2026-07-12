@@ -3,26 +3,24 @@ import { formatDateSimple } from '@/lib/constants';
 import { getTranslatedPackName } from '@/lib/pack-name';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
-import { buildCustomerComposeHref } from '@/lib/admin/customerWorkspaceHref';
-import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import PostEventEmailButton from '../../components/PostEventEmailButton';
+import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
+import { buildPendingPostEventFeedbackBookingWhere } from '@/lib/services/postEventPendingService';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Feedback post-esdeveniment | Òrbita Admin',
+  title: 'Seguiment post-esdeveniment | Òrbita Admin',
 };
 
 
 
 async function getCompletedBookings() {
   return prisma.booking.findMany({
-    where: {
-      status: 'COMPLETED',
-      eventDate: { lt: new Date() },
-    },
+    where: buildPendingPostEventFeedbackBookingWhere(),
     orderBy: { eventDate: 'desc' },
-    take: 50,
+    take: POST_EVENT_WORKFLOW.pendingTake,
     include: {
       pack: { include: { translations: true } },
       lead: { select: { preferredLocale: true } },
@@ -36,14 +34,14 @@ export default async function FeedbackPage() {
 
   return (
     <AdminPage
-      title="Feedback al Client"
-      subtitle="Envia agraïments i incentius als clients després de l'event"
+      title="Agraïment al Client"
+      subtitle="Envia agraïments, reviews i incentius als clients després de l'event"
       back={{ href: '/admin/post-event', label: 'Post-Event' }}
     >
 
       {/* Info Card */}
       <div className="border rounded-xl p-6">
-        <h3 className="font-semibold mb-2">💡 Què incloure al feedback?</h3>
+        <h3 className="font-semibold mb-2">💡 Què incloure al seguiment?</h3>
         <ul className="text-sm space-y-1">
           <li>• 💌 Missatge personalitzat d&apos;agraïment</li>
           <li>• 📸 Foto icònica de l&apos;event (si disponible)</li>
@@ -90,18 +88,9 @@ export default async function FeedbackPage() {
                     </p>
                   </div>
                   <div className="flex gap-2">
+                    <PostEventEmailButton bookingId={booking.id} initiallySent={booking.postEventEmailSent} />
                     <Link
-                      href={booking.customerId
-                        ? buildCustomerComposeHref(booking.customerId, 'post-event')
-                        : booking.leadId
-                          ? buildLeadComposeHref(booking.leadId, 'post-event')
-                          : '/admin/inbox/compose'}
-                      className="ap-btn ap-btn--primary px-4 py-2 text-sm"
-                    >
-                      ✉️ Envia correu
-                    </Link>
-                    <Link
-                      href={buildBookingHref(booking.id)}
+                      href={buildBookingHref(booking.id, 'sec-post-event')}
                       className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
                     >
                       Veure
@@ -116,11 +105,6 @@ export default async function FeedbackPage() {
     </AdminPage>
   );
 }
-
-
-
-
-
 
 
 

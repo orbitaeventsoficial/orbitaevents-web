@@ -18,7 +18,12 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.booking.findUnique.mockResolvedValue(null);
   mockPrisma.postEventReport.findUnique.mockResolvedValue(null);
-  mockPrisma.postEventReport.create.mockResolvedValue({ id: 'per-1' });
+  mockPrisma.postEventReport.create.mockResolvedValue({
+    id: 'per-1',
+    soundQuality: null,
+    maxDancefloor: null,
+    hadIncidents: false,
+  });
 });
 
 describe('createAdminPostEventReport', () => {
@@ -52,7 +57,7 @@ describe('createAdminPostEventReport', () => {
   });
 
   it('crea informe amb dades', async () => {
-    mockPrisma.booking.findUnique.mockResolvedValue({ id: 'b1', status: 'COMPLETED' });
+    mockPrisma.booking.findUnique.mockResolvedValue({ id: 'b1', reference: 'OE-1', status: 'COMPLETED', customerId: null, lead: null });
 
     const result = await createAdminPostEventReport({
       bookingId: 'b1',

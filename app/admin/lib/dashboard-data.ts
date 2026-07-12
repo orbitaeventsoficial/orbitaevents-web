@@ -11,7 +11,7 @@ import {
 } from './next-event-economics';
 import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
-import { formatCurrency, formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS, TASK_SOURCE } from '@/lib/constants';
+import { formatCurrency, formatDateSimple, EVENT_TYPE_CHART_COLORS, TASK_SOURCE } from '@/lib/constants';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { bookingOutstandingAmount } from '@/lib/payment-status';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
@@ -20,6 +20,11 @@ import { getAdminHealthSnapshot, type AdminHealthSnapshot } from '@/lib/services
 import { fetchRecentCanonicalEvents, type CanonicalTimelineEvent } from '@/lib/services/timelineQueryService';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildPendingPostEventEmailBookingWhere } from '@/lib/services/postEventPendingService';
+import {
+  getAdminPostEventCronSettingKeys,
+  readAdminPostEventCronSetting,
+} from '@/lib/constants/admin';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -215,7 +220,6 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const seriesStart = new Date(now);
   seriesStart.setDate(now.getDate() - 30);
   seriesStart.setHours(0, 0, 0, 0);
-  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
   const ga4Status = getGa4ConfigStatus();
   const imapConfigured = isImapConfigured();
   const sentryConfigured = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN);
@@ -267,8 +271,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery('admin:dashboard:leads:won', () => prisma.lead.count({ where: { status: 'WON' } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery(`admin:dashboard:leads:series:${seriesStart.toISOString().slice(0, 10)}`, () => prisma.lead.findMany({ where: { createdAt: { gte: seriesStart } }, select: { createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery(`admin:dashboard:bookings:series:${seriesStart.toISOString().slice(0, 10)}`, () => prisma.booking.findMany({ where: { eventDate: { gte: seriesStart } }, select: { eventDate: true, status: true, total: true } }), CacheTTL.SHORT).catch(() => []),
-    cachedQuery(`admin:dashboard:post-event:pending:${dayKey}`, () => prisma.booking.count({ where: { status: 'COMPLETED', eventDate: { lte: twoDaysAgo }, postEventEmailSent: false, clientEmail: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } } } }), CacheTTL.SHORT).catch(() => 0),
-    cachedQuery('admin:dashboard:cron:settings', () => prisma.setting.findMany({ where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage', 'automation.commercial.lastRun', 'automation.commercial.lastStatus'] } } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery(`admin:dashboard:post-event:pending:${dayKey}`, () => prisma.booking.count({ where: buildPendingPostEventEmailBookingWhere(now) }), CacheTTL.SHORT).catch(() => 0),
+    cachedQuery('admin:dashboard:cron:settings', () => prisma.setting.findMany({ where: { key: { in: [...getAdminPostEventCronSettingKeys(), 'automation.commercial.lastRun', 'automation.commercial.lastStatus'] } } }), CacheTTL.SHORT).catch(() => []),
     (isBuildPrerenderPhase() ? Promise.resolve(false) : prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false)),
     cachedQuery('admin:dashboard:timeline:leads', () => prisma.lead.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:timeline:bookings', () => prisma.booking.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, clientName: true, reference: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
@@ -484,7 +488,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     { label: 'SMTP', status: smtpConfigured ? 'OK' : 'PENDENT' },
     { label: 'IMAP', status: imapConfigured ? 'OK' : 'PENDENT' },
     { label: 'GA4', status: ga4Status.ready ? 'OK' : 'PENDENT' },
-    { label: 'Cron', status: cronMap['emails.cron.lastStatus'] || '—' },
+    { label: 'Cron', status: readAdminPostEventCronSetting(cronMap, 'lastStatus') || '—' },
     { label: 'Auto', status: cronMap['automation.commercial.lastStatus'] || '—' },
   ];
 
@@ -510,7 +514,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     ...(ga4Status.ready && !ga4 ? [{ type: 'warning', title: 'GA4 sense dades', description: 'No podem carregar mètriques. Revisa permisos o quota.', href: '/admin/analytics', action: 'Revisar' }] : []),
     ...(ga4?.realtimeFallback ? [{ type: 'warning', title: 'Realtime parcial', description: 'Algunes mètriques realtime no estan disponibles.', href: '/admin/analytics', action: 'Veure' }] : []),
     ...(!imapConfigured ? [{ type: 'info', title: 'IMAP no configurat', description: 'L\'inbox encara no està connectat.', href: '/admin/inbox/settings', action: 'Configurar' }] : []),
-    ...(postEventPending > 0 ? [{ type: 'warning', title: 'Emails post-event pendents', description: `${postEventPending} esdeveniments sense correu enviat.`, href: '/admin/emails', action: 'Gestionar' }] : []),
+    ...(postEventPending > 0 ? [{ type: 'warning', title: 'Emails post-event pendents', description: `${postEventPending} esdeveniments sense correu enviat.`, href: '/admin/post-event', action: 'Gestionar' }] : []),
     ...((inventoryMaintenance + inventoryBroken) > 0 ? [{ type: 'warning', title: 'Equip requereix atenció', description: `${inventoryMaintenance} en manteniment${inventoryBroken > 0 ? `, ${inventoryBroken} avariat` : ''}.`, href: '/admin/inventory', action: 'Revisar' }] : []),
   ];
 

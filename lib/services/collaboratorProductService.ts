@@ -79,13 +79,6 @@ export function legacyDossierCollaboratorProductIdFor(product: Pick<DossierColla
   return LEGACY_COLLABORATOR_ALIAS_BY_NAME.get(product.nom.trim().toLowerCase()) ?? null;
 }
 
-/** Profit net (€) i markup d'un producte. % calculat sobre el cost del col·laborador. */
-export function computeProductMargin(costPrice: number, sellPrice: number) {
-  const marginNet = sellPrice - costPrice;
-  const marginPct = costPrice > 0 ? (marginNet / costPrice) * 100 : 0;
-  return { marginNet, marginPct };
-}
-
 function clean(value?: string | null): string | null {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;

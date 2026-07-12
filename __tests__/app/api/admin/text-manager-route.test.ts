@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const {
   mockRequireAuth,
   mockRequirePermission,
+  mockGetAdminRole,
   mockVerifyCsrf,
   mockGetTextManagerPayload,
   mockRunTextManagerAction,
@@ -11,6 +12,7 @@ const {
 } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
   mockRequirePermission: vi.fn(),
+  mockGetAdminRole: vi.fn(),
   mockVerifyCsrf: vi.fn(),
   mockGetTextManagerPayload: vi.fn(),
   mockRunTextManagerAction: vi.fn(),
@@ -18,6 +20,7 @@ const {
 }));
 
 vi.mock('@/lib/auth', () => ({
+  getAdminRole: mockGetAdminRole,
   requireAuth: mockRequireAuth,
   requirePermission: mockRequirePermission,
 }));
@@ -44,6 +47,7 @@ describe('/api/admin/text-manager', () => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
+    mockGetAdminRole.mockReturnValue('OWNER');
     mockVerifyCsrf.mockReturnValue(null);
     mockGetTextManagerPayload.mockResolvedValue({ ok: true, namespaces: ['common'] });
     mockRunTextManagerAction.mockResolvedValue({ ok: true, action: 'sync' });
@@ -60,6 +64,19 @@ describe('/api/admin/text-manager', () => {
     expect(mockVerifyCsrf).not.toHaveBeenCalled();
     expect(mockGetTextManagerPayload).toHaveBeenCalledTimes(1);
     await expect(res.json()).resolves.toEqual({ ok: true, namespaces: ['common'] });
+  });
+
+  it('rebutja rol viewer en lectura abans de carregar textos', async () => {
+    mockGetAdminRole.mockReturnValueOnce('VIEWER');
+
+    const res = await GET(new NextRequest('http://localhost/api/admin/text-manager'));
+
+    expect(res.status).toBe(403);
+    expect(mockGetTextManagerPayload).not.toHaveBeenCalled();
+    await expect(res.json()).resolves.toEqual({
+      ok: false,
+      error: 'No tens permisos per llegir Textos PRO',
+    });
   });
 
   it('rebutja auth abans de permís i CSRF en PUT', async () => {

@@ -10,13 +10,12 @@
  * - Política de retenció
  */
 
-import { PRIVACY_CONSENT_STATUS_VALUES, type PrivacyConsentStatus } from '@/lib/constants/privacy';
+import { DOWNLOADABLE_PRIVACY_REQUEST_TYPES, PRIVACY_CONSENT_STATUS_VALUES, type PrivacyConsentStatus } from '@/lib/constants/privacy';
 import { prisma } from '@/lib/prisma';
 import { createHash, randomBytes } from 'crypto';
 import type {
   ConsentType,
   DataRequestType,
-  DataResponseType,
   LegalDocumentType,
   PrivacyAction,
   Prisma,
@@ -209,39 +208,6 @@ export async function listConsents(opts: {
   return { items, total };
 }
 
-/**
- * Obtenir consentiments actius d'un client
- */
-export async function getActiveConsents(customerId: string) {
-  return prisma.consentRecord.findMany({
-    where: {
-      customerId,
-      granted: true,
-      revokedAt: null,
-    },
-    orderBy: { createdAt: 'desc' },
-  });
-}
-
-/**
- * Verificar si un client té un consentiment actiu
- */
-export async function hasActiveConsent(
-  customerIdOrEmail: string,
-  consentType: ConsentType
-): Promise<boolean> {
-  const consent = await prisma.consentRecord.findFirst({
-    where: {
-      OR: [{ customerId: customerIdOrEmail }, { email: customerIdOrEmail }],
-      consentType,
-      granted: true,
-      revokedAt: null,
-    },
-  });
-
-  return !!consent;
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
 // GESTIÓ DE SOL·LICITUDS DE DRETS (ARCO)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -318,82 +284,30 @@ export async function verifyDataRequest(token: string) {
 }
 
 /**
- * Processar una sol·licitud de drets
+ * Dades exportades d'una sol·licitud ARCO completada (ACCESS/PORTABILITY), per descàrrega
+ * pública via el mateix verificationToken que ja identifica la sol·licitud.
  */
-export async function processDataRequest(
-  requestId: string,
-  processedBy: string,
-  responseType: DataResponseType,
-  responseNotes?: string
-) {
+export async function getDownloadableDataRequestExport(token: string) {
   const request = await prisma.dataRequest.findUnique({
-    where: { id: requestId },
+    where: { verificationToken: token },
+    select: {
+      id: true,
+      status: true,
+      requestType: true,
+      responseData: true,
+    },
   });
 
-  if (!request) {
-    throw new Error('Sol·licitud no trobada');
+  if (
+    !request ||
+    request.status !== 'COMPLETED' ||
+    !DOWNLOADABLE_PRIVACY_REQUEST_TYPES.has(request.requestType) ||
+    request.responseData == null
+  ) {
+    return null;
   }
 
-  let responseData: Record<string, unknown> | null = null;
-
-  // Segons el tipus de sol·licitud, executar l'acció corresponent
-  switch (request.requestType) {
-    case 'ACCESS':
-      if (request.customerId) {
-        responseData = await exportCustomerData(request.customerId);
-      }
-      break;
-
-    case 'ERASURE':
-      if (request.customerId) {
-        await anonymizeCustomerData(request.customerId, requestId);
-      }
-      break;
-
-    case 'PORTABILITY':
-      if (request.customerId) {
-        responseData = await exportCustomerData(request.customerId, true);
-      }
-      break;
-  }
-
-  const updated = await prisma.dataRequest.update({
-    where: { id: requestId },
-    data: {
-      status: 'COMPLETED',
-      processedAt: new Date(),
-      processedBy,
-      responseType,
-      responseNotes,
-      responseData: responseData as Prisma.InputJsonValue,
-      responseSentAt: new Date(),
-    },
-  });
-
-  return updated;
-}
-
-/**
- * Obtenir sol·licituds pendents
- */
-export async function getPendingDataRequests() {
-  return prisma.dataRequest.findMany({
-    where: {
-      status: {
-        in: ['PENDING', 'VERIFIED', 'IN_PROGRESS'],
-      },
-    },
-    orderBy: { legalDeadline: 'asc' },
-    include: {
-      customer: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-    },
-  });
+  return { id: request.id, data: request.responseData };
 }
 
 /**
@@ -651,37 +565,6 @@ export async function logPrivacyAction(input: AuditLogInput) {
   });
 }
 
-/**
- * Obtenir historial d'auditoria d'una entitat
- */
-export async function getAuditHistory(entityType: string, entityId: string) {
-  return prisma.privacyAuditLog.findMany({
-    where: { entityType, entityId },
-    orderBy: { createdAt: 'desc' },
-  });
-}
-
-/**
- * Obtenir resum d'auditoria per un període
- */
-export async function getAuditSummary(startDate: Date, endDate: Date) {
-  const logs = await prisma.privacyAuditLog.groupBy({
-    by: ['action'],
-    where: {
-      createdAt: {
-        gte: startDate,
-        lte: endDate,
-      },
-    },
-    _count: true,
-  });
-
-  return logs.map((log) => ({
-    action: log.action,
-    count: log._count,
-  }));
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
 // DOCUMENTS LEGALS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -703,17 +586,6 @@ export async function getActiveLegalDocument(
     },
     orderBy: { effectiveFrom: 'desc' },
   });
-}
-
-/**
- * Obtenir versió actual d'un document legal
- */
-export async function getCurrentLegalVersion(
-  type: LegalDocumentType,
-  locale: string
-): Promise<string | null> {
-  const doc = await getActiveLegalDocument(type, locale);
-  return doc?.version || null;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -833,42 +705,6 @@ export async function getPrivacyStats() {
   };
 }
 
-/**
- * Verificar compliment RGPD d'un client
- */
-export async function checkGdprCompliance(customerId: string) {
-  const customer = await prisma.customer.findUnique({
-    where: { id: customerId },
-    include: {
-      consentRecords: {
-        where: { granted: true, revokedAt: null },
-      },
-    },
-  });
-
-  if (!customer) {
-    throw new Error('Client no trobat');
-  }
-
-  const hasGdprConsent = customer.consentRecords.some(
-    (c) => c.consentType === 'GDPR_BASIC'
-  );
-
-  const hasMarketingConsent = customer.consentRecords.some(
-    (c) =>
-      c.consentType === 'MARKETING_EMAIL' ||
-      c.consentType === 'MARKETING_SMS' ||
-      c.consentType === 'MARKETING_WHATSAPP'
-  );
-
-  return {
-    customerId,
-    hasGdprConsent,
-    hasMarketingConsent,
-    consents: customer.consentRecords.map((c) => c.consentType),
-    isCompliant: hasGdprConsent,
-  };
-}
 
 export async function fetchCustomerPrivacyData(customerId: string) {
   const [consents, requests] = await Promise.all([

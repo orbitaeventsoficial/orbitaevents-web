@@ -38,21 +38,35 @@ function formatSummary(summary: Record<string, unknown> | null): string[] {
   });
 }
 
+function readCronLoadError(payload: unknown, fallback: string): string {
+  if (payload && typeof payload === 'object') {
+    const record = payload as Record<string, unknown>;
+    if (typeof record.error === 'string' && record.error.trim()) return record.error;
+    if (typeof record.message === 'string' && record.message.trim()) return record.message;
+  }
+
+  return fallback;
+}
+
 export default function CronsClient() {
   const toast = useToast();
   const [crons, setCrons] = useState<CronInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const fetchCrons = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch('/api/admin/crons');
-      if (!res.ok) throw new Error('Error carregant crons');
       const data = await res.json();
-      setCrons(data.crons || []);
+      if (!res.ok || !data?.ok) throw new Error(readCronLoadError(data, 'Error carregant crons'));
+      setCrons(Array.isArray(data.crons) ? data.crons : []);
     } catch (err) {
       console.error('Error carregant llista de crons', err);
-      toast.error(err instanceof Error ? err.message : 'Error');
+      const message = err instanceof Error ? err.message : 'Error carregant crons';
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -67,6 +81,22 @@ export default function CronsClient() {
       <div className="flex items-center gap-2 text-sm" role="status">
         <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
         Carregant estat dels crons...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div role="alert" className="ap-card admin-tone-border-danger admin-tone-bg-danger p-4">
+        <div className="font-semibold">No s'ha pogut carregar l'estat dels crons.</div>
+        <p className="mt-1 text-sm text-[var(--t2)]">{error}</p>
+        <button
+          type="button"
+          onClick={() => { setLoading(true); fetchCrons(); }}
+          className="ap-btn ap-btn--secondary mt-3"
+        >
+          Reintentar
+        </button>
       </div>
     );
   }

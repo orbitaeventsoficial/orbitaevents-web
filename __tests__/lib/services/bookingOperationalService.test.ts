@@ -46,7 +46,6 @@ function makeBookingInput(overrides: Record<string, unknown> = {}) {
     postEventEmailSent: null as boolean | null,
     clientSurvey: null,
     postEventReport: null,
-    clientFeedback: null as { sentAt: Date | null } | null,
     inventory: [] as Array<{
       itemId: string;
       quantity: number | null;
@@ -222,11 +221,11 @@ describe('getBookingOperationalSnapshot', () => {
 
   // ─── internalPostEventStatus ──────────────────────────────────────
 
-  it('internalPostEventStatus = COMPLETO si informe completat + feedback.sentAt', async () => {
+  it('internalPostEventStatus = COMPLETO si informe completat + reviewSubmittedAt', async () => {
     const result = await getBookingOperationalSnapshot(
       makeBookingInput({
         postEventReport: { id: 'r1', status: 'COMPLETED' },
-        clientFeedback: { sentAt: new Date() },
+        reviewSubmittedAt: new Date(),
       }),
     );
     expect(result.internalPostEventStatus).toBe('COMPLETO');
@@ -259,11 +258,18 @@ describe('getBookingOperationalSnapshot', () => {
     expect(result.internalPostEventStatus).toBe('EN_PROGRESO');
   });
 
-  it('internalPostEventStatus = EN_PROGRESO si només feedback.sentAt', async () => {
+  it('internalPostEventStatus = EN_PROGRESO si email post-event enviat sense resposta', async () => {
+    const result = await getBookingOperationalSnapshot(
+      makeBookingInput({ postEventEmailSent: true }),
+    );
+    expect(result.internalPostEventStatus).toBe('EN_PROGRESO');
+  });
+
+  it('internalPostEventStatus ignora ClientFeedback com a font de progrés', async () => {
     const result = await getBookingOperationalSnapshot(
       makeBookingInput({ clientFeedback: { sentAt: new Date() } }),
     );
-    expect(result.internalPostEventStatus).toBe('EN_PROGRESO');
+    expect(result.internalPostEventStatus).toBe('PENDIENTE');
   });
 
   // ─── customer context ─────────────────────────────────────────────

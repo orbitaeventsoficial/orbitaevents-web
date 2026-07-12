@@ -1,7 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Hoisted mocks ───────────────────────────────────────────────────────
-const { mockPrisma, mockGenerateContractPDF, mockSendEmail, mockUploadFile } = vi.hoisted(() => ({
+const {
+  mockPrisma,
+  mockGenerateContractPDF,
+  mockSendEmail,
+  mockUploadFile,
+  mockRecordEmailSend,
+  mockUpdateEmailSendResult,
+  mockWrapLinksForTracking,
+  mockGetAppBaseUrl,
+} = vi.hoisted(() => ({
   mockPrisma: {
     proposal: {
       findUniqueOrThrow: vi.fn(),
@@ -14,6 +23,10 @@ const { mockPrisma, mockGenerateContractPDF, mockSendEmail, mockUploadFile } = v
   mockGenerateContractPDF: vi.fn(),
   mockSendEmail: vi.fn(),
   mockUploadFile: vi.fn(),
+  mockRecordEmailSend: vi.fn(),
+  mockUpdateEmailSendResult: vi.fn(),
+  mockWrapLinksForTracking: vi.fn(),
+  mockGetAppBaseUrl: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -22,6 +35,12 @@ vi.mock('@/lib/pdf-utils', () => ({
 }));
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
 vi.mock('@/lib/storage', () => ({ uploadFile: mockUploadFile }));
+vi.mock('@/lib/site', () => ({ getAppBaseUrl: mockGetAppBaseUrl }));
+vi.mock('@/lib/services/emailTrackingService', () => ({
+  recordEmailSend: mockRecordEmailSend,
+  updateEmailSendResult: mockUpdateEmailSendResult,
+  wrapLinksForTracking: mockWrapLinksForTracking,
+}));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: {
@@ -67,6 +86,9 @@ function makeProposal(overrides = {}) {
     contractReference: null,
     contractStatus: null,
     contractPdfUrl: null,
+    contractPdfKey: null,
+    customerId: 'cust-1',
+    bookingId: 'booking-1',
     depositAmount: null,
     depositDueDate: null,
     finalPaymentDue: null,
@@ -182,11 +204,29 @@ beforeEach(() => {
   mockPrisma.leadDocument.create.mockResolvedValue({});
   mockPrisma.adminLog.create.mockResolvedValue({});
   mockGenerateContractPDF.mockResolvedValue(fakePdfDoc);
-  mockSendEmail.mockResolvedValue(undefined);
-  mockUploadFile.mockResolvedValue({
-    path: 'contracts/prop-1/CTR-2026-AB12-signed.pdf',
-    publicUrl: '/api/uploads/contracts/prop-1/CTR-2026-AB12-signed.pdf',
+  mockSendEmail.mockResolvedValue({
+    smtp: {
+      accepted: ['joan@example.com'],
+      rejected: [],
+      response: '250 OK',
+      messageId: 'smtp-contract-1',
+    },
+    imapSent: {
+      attempted: true,
+      ok: true,
+      folder: 'Sent',
+      uid: 12,
+      error: null,
+    },
   });
+  mockUploadFile.mockImplementation(async (path: string) => ({
+    path,
+    publicUrl: `/api/uploads/${path}`,
+  }));
+  mockRecordEmailSend.mockResolvedValue({ id: 'email-send-contract-1', trackingToken: 'contract-token-1' });
+  mockUpdateEmailSendResult.mockResolvedValue(undefined);
+  mockWrapLinksForTracking.mockImplementation((html: string, token: string, baseUrl: string) => `${html}<a href="${baseUrl}/tracked/${token}"></a>`);
+  mockGetAppBaseUrl.mockReturnValue('https://app.test');
 });
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -427,10 +467,28 @@ describe('sendContract', () => {
 
     await sendContract('prop-1');
 
+    expect(mockRecordEmailSend).toHaveBeenCalledWith(expect.objectContaining({
+      templateKey: 'contract',
+      to: 'joan@example.com',
+      subject: expect.stringContaining('CTR-2026-AB12'),
+      leadId: 'lead-1',
+      customerId: 'cust-1',
+      locale: 'ca',
+      htmlBody: expect.stringContaining("T'enviem el contracte"),
+      orbitaKind: 'lead',
+      orbitaId: 'lead-1',
+      orbitaOrigin: 'admin-contract-send',
+    }));
+    expect(mockUploadFile).toHaveBeenCalledWith(
+      'contracts/prop-1/CTR-2026-AB12.pdf',
+      expect.any(Buffer),
+    );
     expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'joan@example.com',
         subject: expect.stringContaining('CTR-2026-AB12'),
+        html: expect.stringContaining('/api/tracking/open/contract-token-1'),
+        orbita: { kind: 'lead', id: 'lead-1', origin: 'admin-contract-send' },
         attachments: expect.arrayContaining([
           expect.objectContaining({
             filename: 'contracte-CTR-2026-AB12.pdf',
@@ -439,6 +497,14 @@ describe('sendContract', () => {
         ]),
       })
     );
+    expect(mockUpdateEmailSendResult).toHaveBeenCalledWith('email-send-contract-1', expect.objectContaining({
+      smtpAccepted: ['joan@example.com'],
+      smtpRejected: [],
+      smtpMessageId: 'smtp-contract-1',
+      imapAppendOk: true,
+      imapSentFolder: 'Sent',
+      imapSentUid: 12,
+    }));
   });
 
   it('error si no hi ha contracte generat', async () => {
@@ -476,6 +542,11 @@ describe('sendContract', () => {
       (c: Array<{ data: { contractStatus?: string } }>) => c[0].data.contractStatus === 'SENT'
     );
     expect(sentUpdate).toBeDefined();
+    expect(sentUpdate?.[0].data).toEqual(expect.objectContaining({
+      contractStatus: 'SENT',
+      contractPdfUrl: '/api/uploads/contracts/prop-1/CTR-2026-AB12.pdf',
+      contractPdfKey: 'contracts/prop-1/CTR-2026-AB12.pdf',
+    }));
   });
 
   it('registra leadActivity shared i crea leadDocument si hi ha leadId', async () => {
@@ -499,6 +570,11 @@ describe('sendContract', () => {
       to: 'joan@example.com',
     });
     expect(mockPrisma.leadDocument.create).toHaveBeenCalled();
+    expect(mockPrisma.leadDocument.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        fileUrl: '/api/uploads/contracts/prop-1/CTR-2026-AB12.pdf',
+      }),
+    });
   });
 
   it('registra traça adminLog quan envia contracte', async () => {
@@ -524,8 +600,38 @@ describe('sendContract', () => {
           source: 'admin_contract_send',
           reference: 'CTR-2026-AB12',
           to: 'joan@example.com',
+          emailSendId: 'email-send-contract-1',
+          emailSnapshot: 'EmailSend.htmlBody',
+          contractPdfUrl: '/api/uploads/contracts/prop-1/CTR-2026-AB12.pdf',
+          contractPdfKey: 'contracts/prop-1/CTR-2026-AB12.pdf',
         }),
       }),
+    });
+  });
+
+  it('no envia ni marca SENT si no pot crear el snapshot EmailSend', async () => {
+    mockPrisma.proposal.findUniqueOrThrow
+      .mockResolvedValueOnce(makeProposal({
+        contractReference: 'CTR-2026-AB12',
+        contractStatus: 'DRAFT',
+      }))
+      .mockResolvedValueOnce(makeProposal({
+        contractReference: 'CTR-2026-AB12',
+        contractStatus: 'DRAFT',
+      }));
+    mockRecordEmailSend.mockRejectedValueOnce(new Error('Tracking down'));
+
+    await expect(sendContract('prop-1')).rejects.toThrow('Tracking down');
+
+    expect(mockUploadFile).not.toHaveBeenCalled();
+    expect(mockSendEmail).not.toHaveBeenCalled();
+    expect(mockPrisma.proposal.update).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ contractStatus: 'SENT' }),
+      }),
+    );
+    expect(mockPrisma.adminLog.create).not.toHaveBeenCalledWith({
+      data: expect.objectContaining({ action: 'DOCUMENT_CONTRACT_SENT' }),
     });
   });
 

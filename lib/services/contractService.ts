@@ -7,7 +7,6 @@
 
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
-import { SITE_CONFIG } from '@/app/config/site-config';
 import { EMAIL_CONTACT } from '@/lib/constants/email';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { generateContractPDF, type ContractPdfData } from '@/lib/pdf-utils';
@@ -16,6 +15,8 @@ import { log } from '@/lib/logger';
 import { recordLeadContractCancelled, recordLeadContractSent, recordLeadContractSigned } from '@/lib/services/leadActivityService';
 import { DOCUMENT_ADMIN_LOG_ACTIONS, recordDocumentAdminLog } from '@/lib/services/documentAuditTrailService';
 import { uploadFile } from '@/lib/storage';
+import { getAppBaseUrl } from '@/lib/site';
+import { recordEmailSend, updateEmailSendResult, wrapLinksForTracking } from '@/lib/services/emailTrackingService';
 
 export async function getCompanyConfig() {
   const settings = await prisma.setting.findMany({
@@ -44,6 +45,18 @@ type ContractTrace = {
   total: number;
   locale: string;
 };
+
+const CONTRACT_EMAIL_TEMPLATE_KEY = 'contract';
+
+function safeContractFileSegment(value: string): string {
+  return value.replace(/[^A-Za-z0-9_-]/g, '-');
+}
+
+function buildTrackedContractEmailHtml(html: string, trackingToken: string): string {
+  const baseUrl = getAppBaseUrl().replace(/\/+$/, '');
+  const trackedHtml = wrapLinksForTracking(html, trackingToken, baseUrl);
+  return `${trackedHtml}<img src="${baseUrl}/api/tracking/open/${trackingToken}" width="1" height="1" alt="" style="display:none" />`;
+}
 
 export type ContractLineSnapshot = {
   name: string;
@@ -651,18 +664,52 @@ export async function sendContract(proposalId: string): Promise<void> {
     en: `<p>Hello ${proposal.customer.name},</p><p>Please find attached the service agreement for your event. Please review it and confirm everything is correct.</p><p>Once you agree, you can proceed with the deposit payment to confirm the booking.</p><p>If you have any questions, don't hesitate to reach out.</p><p>Thank you for choosing Òrbita Events!</p>`,
   };
 
-  await sendEmail({
+  const bodyHtml = bodies[locale];
+  const customerId = proposal.customerId || proposal.customer.id;
+  const orbita = proposal.leadId
+    ? { kind: 'lead' as const, id: proposal.leadId, origin: 'admin-contract-send' }
+    : { kind: 'customer' as const, id: customerId, origin: 'admin-contract-send' };
+  const trackingRecord = await recordEmailSend({
+    templateKey: CONTRACT_EMAIL_TEMPLATE_KEY,
     to: proposal.customer.email,
     subject: subjects[locale],
-    html: bodies[locale],
-    attachments: [{ filename: `contracte-${proposal.contractReference}.pdf`, content: pdfBuffer, contentType: 'application/pdf' }],
+    leadId: proposal.leadId,
+    customerId,
+    locale,
+    htmlBody: bodyHtml,
+    orbitaKind: orbita.kind,
+    orbitaId: orbita.id,
+    orbitaOrigin: orbita.origin,
   });
+  const contractPdfKey = `contracts/${proposalId}/${safeContractFileSegment(rendered.contractReference)}.pdf`;
+  const uploaded = await uploadFile(contractPdfKey, pdfBuffer);
+  const trackedHtml = buildTrackedContractEmailHtml(bodyHtml, trackingRecord.trackingToken);
+  const sendResult = await sendEmail({
+    to: proposal.customer.email,
+    subject: subjects[locale],
+    html: trackedHtml,
+    attachments: [{ filename: `contracte-${proposal.contractReference}.pdf`, content: pdfBuffer, contentType: 'application/pdf' }],
+    orbita,
+  });
+
+  await updateEmailSendResult(trackingRecord.id, {
+    smtpAccepted: sendResult.smtp.accepted,
+    smtpRejected: sendResult.smtp.rejected,
+    smtpResponse: sendResult.smtp.response,
+    smtpMessageId: sendResult.smtp.messageId,
+    imapAppendOk: sendResult.imapSent.attempted ? sendResult.imapSent.ok : null,
+    imapSentFolder: sendResult.imapSent.folder,
+    imapSentUid: sendResult.imapSent.uid ?? null,
+    imapError: sendResult.imapSent.error ?? null,
+  }).catch(() => undefined);
 
   await prisma.proposal.update({
     where: { id: proposalId },
     data: {
       contractStatus: 'SENT',
       contractSentAt: new Date(),
+      contractPdfUrl: uploaded.publicUrl,
+      contractPdfKey: uploaded.path,
       snapshot: toPrismaJson(rendered.proposalSnapshot),
     },
   });
@@ -679,12 +726,16 @@ export async function sendContract(proposalId: string): Promise<void> {
       contractStatus: 'SENT',
       proposalId: proposal.id,
       proposalReference: proposal.reference,
-      customerId: proposal.customerId,
+      customerId,
       leadId: proposal.leadId,
       bookingId: proposal.bookingId,
       total: proposal.total,
       locale: proposal.locale,
       to: proposal.customer.email,
+      emailSendId: trackingRecord.id,
+      emailSnapshot: 'EmailSend.htmlBody',
+      contractPdfUrl: uploaded.publicUrl,
+      contractPdfKey: uploaded.path,
     },
   });
 
@@ -701,7 +752,7 @@ export async function sendContract(proposalId: string): Promise<void> {
         type: 'CONTRACT',
         source: 'AUTO',
         title: `Contracte ${proposal.contractReference}`,
-        fileUrl: proposal.contractPdfUrl || '',
+        fileUrl: uploaded.publicUrl,
       },
     });
   }
@@ -711,7 +762,7 @@ export async function sendContract(proposalId: string): Promise<void> {
 
 export async function generateSignedContractPdf(proposalId: string): Promise<{ contractPdfUrl: string; contractPdfKey: string }> {
   const { contractReference, pdfBuffer, trace, proposalSnapshot } = await renderContractPDF(proposalId);
-  const safeReference = contractReference.replace(/[^A-Za-z0-9_-]/g, '-');
+  const safeReference = safeContractFileSegment(contractReference);
   const contractPdfKey = `contracts/${proposalId}/${safeReference}-signed.pdf`;
   const uploaded = await uploadFile(contractPdfKey, pdfBuffer);
 

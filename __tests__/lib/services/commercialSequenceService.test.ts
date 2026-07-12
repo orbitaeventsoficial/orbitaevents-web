@@ -5,6 +5,10 @@ const {
   mockSendEmail,
   mockSendWhatsAppText,
   mockRecordLeadCommercialSequenceStepSent,
+  mockGetAppBaseUrl,
+  mockRecordEmailSend,
+  mockUpdateEmailSendResult,
+  mockWrapLinksForTracking,
 } = vi.hoisted(() => ({
   mockPrisma: {
     lead: {
@@ -17,6 +21,10 @@ const {
   mockSendEmail: vi.fn(),
   mockSendWhatsAppText: vi.fn(),
   mockRecordLeadCommercialSequenceStepSent: vi.fn(),
+  mockGetAppBaseUrl: vi.fn(),
+  mockRecordEmailSend: vi.fn(),
+  mockUpdateEmailSendResult: vi.fn(),
+  mockWrapLinksForTracking: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -26,6 +34,12 @@ vi.mock('@/lib/services/leadActivityService', () => ({
   recordLeadCommercialSequenceStepSent: mockRecordLeadCommercialSequenceStepSent,
 }));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
+vi.mock('@/lib/site', () => ({ getAppBaseUrl: mockGetAppBaseUrl }));
+vi.mock('@/lib/services/emailTrackingService', () => ({
+  recordEmailSend: mockRecordEmailSend,
+  updateEmailSendResult: mockUpdateEmailSendResult,
+  wrapLinksForTracking: mockWrapLinksForTracking,
+}));
 
 import { runCommercialSequences, runCommercialSequenceForLead, DEFAULT_NURTURING_CADENCE } from '@/lib/services/commercialSequenceService';
 
@@ -52,7 +66,16 @@ describe('runCommercialSequences', () => {
     mockPrisma.lead.findUnique.mockResolvedValue(null);
     mockPrisma.lead.update.mockResolvedValue({});
     mockPrisma.adminLog.create.mockResolvedValue({});
-    mockSendEmail.mockResolvedValue(undefined);
+    mockGetAppBaseUrl.mockReturnValue('https://test.orbita.events/');
+    mockRecordEmailSend.mockResolvedValue({ id: 'email-send-sequence-1', trackingToken: 'sequence-token-1' });
+    mockUpdateEmailSendResult.mockResolvedValue(undefined);
+    mockWrapLinksForTracking.mockImplementation((html: string, token: string) => `${html}<a href="/tracked/${token}">tracked</a>`);
+    mockSendEmail.mockResolvedValue({
+      ok: true,
+      smtp: { accepted: ['joan@example.com'], rejected: [], response: '250 OK', messageId: '<sequence@test>' },
+      imapSent: { attempted: true, ok: true, folder: 'Sent', uid: 51 },
+      orbitaMessageId: '<orbita.lead.lead-1.a.b@orbitaevents.com>',
+    });
     mockSendWhatsAppText.mockResolvedValue({ ok: false }); // WhatsApp off per defecte
     mockRecordLeadCommercialSequenceStepSent.mockResolvedValue({});
   });
@@ -78,8 +101,32 @@ describe('runCommercialSequences', () => {
       expect.objectContaining({
         to: 'joan@example.com',
         subject: expect.stringContaining('sol·licitud'), // ca locale
+        html: expect.stringContaining('/api/tracking/open/sequence-token-1'),
+        orbita: { kind: 'lead', id: 'lead-1', origin: 'commercial-sequence' },
       }),
     );
+    expect(mockRecordEmailSend).toHaveBeenCalledWith(expect.objectContaining({
+      templateKey: 'follow-up-1',
+      to: 'joan@example.com',
+      subject: expect.stringContaining('sol·licitud'),
+      leadId: 'lead-1',
+      customerId: null,
+      locale: 'ca',
+      htmlBody: expect.stringContaining('<p>'),
+      orbitaKind: 'lead',
+      orbitaId: 'lead-1',
+      orbitaOrigin: 'commercial-sequence',
+    }));
+    expect(mockUpdateEmailSendResult).toHaveBeenCalledWith('email-send-sequence-1', expect.objectContaining({
+      smtpAccepted: ['joan@example.com'],
+      smtpRejected: [],
+      smtpResponse: '250 OK',
+      smtpMessageId: '<sequence@test>',
+      imapAppendOk: true,
+      imapSentFolder: 'Sent',
+      imapSentUid: 51,
+      imapError: null,
+    }));
   });
 
   it('salta lead si no ha passat prou temps (pas 1 < 24h)', async () => {
@@ -112,6 +159,7 @@ describe('runCommercialSequences', () => {
     expect(result.sentWhatsapp).toBe(1);
     expect(result.sentEmail).toBe(0);
     expect(mockSendEmail).not.toHaveBeenCalled();
+    expect(mockRecordEmailSend).not.toHaveBeenCalled();
   });
 
   it('salta si no té ni email ni telèfon', async () => {
@@ -193,6 +241,7 @@ describe('runCommercialSequences', () => {
       templateSlug: 'follow-up-1',
       locale: 'ca',
       delayHours: 24,
+      emailSendId: 'email-send-sequence-1',
     });
   });
 
@@ -237,6 +286,19 @@ describe('runCommercialSequences', () => {
     expect(result.executed).toBe(0);
   });
 
+  it('no actualitza lead ni registra activitat si falla EmailSend', async () => {
+    mockRecordEmailSend.mockRejectedValueOnce(new Error('tracking KO'));
+    mockPrisma.lead.findMany.mockResolvedValue([makeLead()]);
+
+    const result = await runCommercialSequences();
+
+    expect(result.errors).toBe(1);
+    expect(result.executed).toBe(0);
+    expect(mockSendEmail).not.toHaveBeenCalled();
+    expect(mockPrisma.lead.update).not.toHaveBeenCalled();
+    expect(mockRecordLeadCommercialSequenceStepSent).not.toHaveBeenCalled();
+  });
+
   it('processa múltiples leads independentment', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([
       makeLead({ id: 'l1' }),
@@ -279,7 +341,16 @@ describe('runCommercialSequenceForLead', () => {
     mockPrisma.lead.findUnique.mockResolvedValue(makeLead({ activities: [] }));
     mockPrisma.lead.update.mockResolvedValue({});
     mockPrisma.adminLog.create.mockResolvedValue({});
-    mockSendEmail.mockResolvedValue(undefined);
+    mockGetAppBaseUrl.mockReturnValue('https://test.orbita.events/');
+    mockRecordEmailSend.mockResolvedValue({ id: 'email-send-sequence-1', trackingToken: 'sequence-token-1' });
+    mockUpdateEmailSendResult.mockResolvedValue(undefined);
+    mockWrapLinksForTracking.mockImplementation((html: string, token: string) => `${html}<a href="/tracked/${token}">tracked</a>`);
+    mockSendEmail.mockResolvedValue({
+      ok: true,
+      smtp: { accepted: ['joan@example.com'], rejected: [], response: '250 OK', messageId: '<sequence@test>' },
+      imapSent: { attempted: true, ok: true, folder: 'Sent', uid: 51 },
+      orbitaMessageId: '<orbita.lead.lead-1.a.b@orbitaevents.com>',
+    });
     mockSendWhatsAppText.mockResolvedValue({ ok: false });
     mockRecordLeadCommercialSequenceStepSent.mockResolvedValue({});
   });

@@ -166,7 +166,10 @@ export default async function AnalyticsPage() {
     pageViews: pctDelta(ga4.totals.pageViews, ga4.previousTotals.pageViews) ?? 0,
     events: pctDelta(ga4.totals.eventCount, ga4.previousTotals.eventCount) ?? 0,
   } : null;
-  const ga4SeriesMax = ga4 ? Math.max(1, ...ga4.timeseries.map((row) => Math.max(row.sessions, row.activeUsers))) : 1;
+  const ga4TrendActiveDays = ga4 ? ga4.timeseries.filter((row) => row.sessions > 0 || row.activeUsers > 0).length : 0;
+  const ga4TrendPeakSessions = ga4 ? Math.max(0, ...ga4.timeseries.map((row) => row.sessions)) : 0;
+  const ga4TrendPeakUsers = ga4 ? Math.max(0, ...ga4.timeseries.map((row) => row.activeUsers)) : 0;
+  const hasGa4TrendData = ga4TrendActiveDays > 0;
   const adsCost = (googleAds?.totals.costMicros || 0) / 1_000_000;
   const adsPrevCost = (googleAds?.previousTotals.costMicros || 0) / 1_000_000;
   const adsCurrency = googleAds?.currencyCode || 'EUR';
@@ -237,24 +240,47 @@ export default async function AnalyticsPage() {
           </div>
         )}
 
-        {ga4 && ga4.timeseries.length > 0 && (
+        {ga4 && (
           <div className="mt-4 ap-card rounded-2xl p-4">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-sm font-semibold">Tendència 30 dies</p>
-              <p className="text-xs admin-tone-text-neutral">Sessions · Usuaris</p>
+              <p className="text-xs admin-tone-text-neutral">30 dies · Activitat GA4</p>
             </div>
-            <div className="flex h-28 items-end gap-1">
-              {ga4.timeseries.map((row) => {
-                const sessionsH = Math.max(3, Math.round((row.sessions / ga4SeriesMax) * 100));
-                const usersH = Math.max(3, Math.round((row.activeUsers / ga4SeriesMax) * 100));
-                return (
-                  <div key={row.date} className="flex flex-1 items-end gap-[2px]">
-                    <div className="w-1.5 rounded-sm admin-tone-bg-info" style={{ height: `${sessionsH}%` }} />
-                    <div className="w-1.5 rounded-sm admin-tone-bg-warning" style={{ height: `${usersH}%` }} />
+            {hasGa4TrendData ? (
+              <>
+                <div className="mb-3 grid gap-2 sm:grid-cols-3">
+                  <div className="rounded-xl border px-3 py-2 admin-tone-border-neutral admin-tone-bg-neutral">
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide admin-tone-text-neutral">Dies actius</p>
+                    <p className="mt-1 text-lg font-semibold">{ga4TrendActiveDays}</p>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="rounded-xl border px-3 py-2 admin-tone-border-success admin-tone-bg-success">
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide admin-tone-text-neutral">Pic sessions</p>
+                    <p className="mt-1 text-lg font-semibold admin-tone-text-success">{ga4TrendPeakSessions}</p>
+                  </div>
+                  <div className="rounded-xl border px-3 py-2 admin-tone-border-warning admin-tone-bg-warning">
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide admin-tone-text-neutral">Pic usuaris</p>
+                    <p className="mt-1 text-lg font-semibold admin-tone-text-warning">{ga4TrendPeakUsers}</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex h-3 gap-1" aria-label="Dies amb activitat GA4">
+                  {ga4.timeseries.map((row) => {
+                    const active = row.sessions > 0 || row.activeUsers > 0;
+                    return (
+                      <span
+                        key={row.date}
+                        className={`min-w-[3px] flex-1 rounded-sm ${active ? 'admin-tone-bg-success' : 'admin-tone-bg-neutral'}`}
+                        aria-label={`${row.date}: ${row.sessions} sessions, ${row.activeUsers} usuaris`}
+                      />
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="flex min-h-20 flex-col items-center justify-center rounded-xl border border-dashed px-4 py-6 text-center admin-tone-border-neutral admin-tone-bg-neutral" role="status">
+                <p className="text-sm font-semibold">Sense tendència útil encara</p>
+                <p className="mt-1 max-w-md text-xs admin-tone-text-neutral">GA4 està connectat, però aquests 30 dies no tenen sessions ni usuaris suficients per dibuixar una evolució llegible.</p>
+              </div>
+            )}
           </div>
         )}
 

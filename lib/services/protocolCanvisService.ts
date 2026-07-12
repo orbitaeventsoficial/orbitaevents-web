@@ -102,11 +102,3 @@ export function parseProtocolSections(rawMarkdown: string): ProtocolSectionMeta[
     return { ...entry.meta, body };
   });
 }
-
-export function indexProtocolSectionsById(sections: ProtocolSectionMeta[]): Map<string, ProtocolSectionMeta> {
-  const index = new Map<string, ProtocolSectionMeta>();
-  for (const section of sections) {
-    index.set(section.id, section);
-  }
-  return index;
-}

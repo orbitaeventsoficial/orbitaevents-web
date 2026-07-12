@@ -21,6 +21,7 @@ import {
   buildTravelMealAllowanceLines,
   calculateTravelCostBreakdown,
   computeBoloTransport,
+  deriveTravelHeadcount,
 } from '@/lib/services/travelLaborCost';
 import { useToast } from '../components/ToastProvider';
 import { AdminPage, AdminSection } from '../components/AdminPage';
@@ -40,6 +41,59 @@ import { useBookingPricing } from './useBookingPricing';
 import { clearFormAutosaveDraft, useFormAutosave } from '@/lib/hooks/useFormAutosave';
 import type { BookingExtra, BookingFormData, BookingSelectedExtras, BookingPartnerOption } from './booking-form.types';
 import { OPERATOR_EXTRA_ID, bookingAutosaveKey } from './booking-form.types';
+import { fetchWithCsrf } from '@/lib/csrf';
+import { log } from '@/lib/logger';
+
+type ProposalBookingPrefill = {
+  ok?: boolean;
+  proposal?: {
+    id: string;
+    customerId?: string | null;
+    leadId?: string | null;
+    total?: number | null;
+    vatRate?: number | null;
+    booking?: { id: string } | null;
+    customer?: { name?: string | null; email?: string | null; phone?: string | null } | null;
+    lead?: {
+      name?: string | null;
+      email?: string | null;
+      phone?: string | null;
+      eventDate?: string | null;
+      eventStartTime?: string | null;
+      eventEndTime?: string | null;
+      eventLocation?: string | null;
+      eventAddress?: string | null;
+      distanceKm?: number | null;
+      tollsEur?: number | null;
+      guestCount?: number | null;
+    } | null;
+    snapshot?: {
+      customer?: { name?: unknown; email?: unknown; phone?: unknown };
+      event?: { date?: unknown; schedule?: unknown; location?: unknown; guests?: unknown };
+      pricing?: { travelKm?: unknown; travelTollsEur?: unknown };
+    } | null;
+  };
+};
+
+function moneyInputValue(value?: number | null): string {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return '';
+  return Number.isInteger(value) ? String(value) : value.toFixed(2);
+}
+
+function stringValue(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function numberStringValue(value: unknown): string {
+  return typeof value === 'number' && Number.isFinite(value) ? String(value) : '';
+}
+
+function splitSchedule(schedule: unknown): { start: string; end: string } {
+  const raw = stringValue(schedule);
+  if (!raw) return { start: '', end: '' };
+  const [start = '', end = ''] = raw.split('-').map((part) => part.trim());
+  return { start, end };
+}
 
 // Opcions del desplegable de partners agrupades: Favorits primer, Altres després.
 // Així els típics (Masquerade) queden a dalt i els de material (Tronios, DJ Mania)
@@ -67,8 +121,13 @@ function renderPartnerOptions(partners: BookingPartnerOption[]) {
 export default function NewBookingForm() {
   const toast = useToast();
   const searchParams = useSearchParams();
-  const leadId = searchParams?.get('leadId') ?? null;
-  const customerId = searchParams?.get('customerId') ?? null;
+  const proposalId = searchParams?.get('proposalId') ?? null;
+  const queryLeadId = searchParams?.get('leadId') ?? null;
+  const queryCustomerId = searchParams?.get('customerId') ?? null;
+  const [proposalLeadId, setProposalLeadId] = useState<string | null>(null);
+  const [proposalCustomerId, setProposalCustomerId] = useState<string | null>(null);
+  const leadId = queryLeadId || proposalLeadId;
+  const customerId = queryCustomerId || proposalCustomerId;
   const dateParam = searchParams?.get('date') ?? null;
   const forceLeadPrefill = searchParams?.get('prefill') === 'lead';
   // Si la reserva ve d'un lead, el back natural és la fitxa del lead (Agenda).
@@ -81,7 +140,7 @@ export default function NewBookingForm() {
   const backLabel = customerId ? 'Client' : leadId ? 'Lead' : 'Agenda';
   const crumbContext = customerId ? 'Client' : 'Agenda';
 
-  const { form, setForm, packs, extras, loading, leadData, leadServiceLines, leadRouteCostLines, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill });
+  const { form, setForm, packs, extras, loading, leadData, leadServiceLines, leadRouteCostLines, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, customerId, dateParam, forceLeadPrefill });
   // Autosave de l'esborrany de reserva (hora, lloc, tot). Només actiu un cop
   // carregat el prefill del lead, perquè no machaqui ni el sobreescrigui.
   const autosaveKey = bookingAutosaveKey(leadId, customerId);
@@ -122,6 +181,61 @@ export default function NewBookingForm() {
   const fiscalMode = getBookingFiscalMode(invoiceRequired);
   const [showPack, setShowPack] = useState(false);
   useEffect(() => { if (form.packId) setShowPack(true); }, [form.packId]);
+  useEffect(() => {
+    if (!proposalId) {
+      setProposalLeadId(null);
+      setProposalCustomerId(null);
+      return;
+    }
+
+    let cancelled = false;
+    async function loadProposalPrefill() {
+      try {
+        const res = await fetchWithCsrf(`/api/admin/proposals/${proposalId}`);
+        const payload = await res.json().catch(() => null) as ProposalBookingPrefill | null;
+        const proposal = payload?.proposal;
+        if (!res.ok || !payload?.ok || !proposal || cancelled) return;
+
+        setProposalLeadId(proposal.leadId || null);
+        setProposalCustomerId(proposal.customerId || null);
+        const totalValue = moneyInputValue(proposal.total);
+        if (totalValue) setManualTotalPrice((prev) => prev || totalValue);
+        if (typeof proposal.vatRate === 'number') setInvoiceRequired(proposal.vatRate > 0);
+
+        const snapshotCustomer = proposal.snapshot?.customer;
+        const snapshotEvent = proposal.snapshot?.event;
+        const snapshotPricing = proposal.snapshot?.pricing;
+        const schedule = splitSchedule(snapshotEvent?.schedule);
+        const lead = proposal.lead;
+        const proposalCustomer = proposal.customer;
+
+        setForm((prev) => ({
+          ...prev,
+          clientName: prev.clientName || lead?.name || proposalCustomer?.name || stringValue(snapshotCustomer?.name),
+          clientEmail: prev.clientEmail || lead?.email || proposalCustomer?.email || stringValue(snapshotCustomer?.email),
+          clientPhone: prev.clientPhone || lead?.phone || proposalCustomer?.phone || stringValue(snapshotCustomer?.phone),
+          eventDate: lead?.eventDate ? lead.eventDate.slice(0, 10) : (stringValue(snapshotEvent?.date).slice(0, 10) || prev.eventDate),
+          eventStartTime: lead?.eventStartTime || schedule.start || prev.eventStartTime,
+          eventEndTime: lead?.eventEndTime || schedule.end || prev.eventEndTime,
+          eventLocation: lead?.eventLocation || stringValue(snapshotEvent?.location) || prev.eventLocation,
+          eventVenue: lead?.eventAddress || prev.eventVenue,
+          guestCount: numberStringValue(lead?.guestCount) || numberStringValue(snapshotEvent?.guests) || prev.guestCount,
+          distanceKm: numberStringValue(lead?.distanceKm) || numberStringValue(snapshotPricing?.travelKm) || prev.distanceKm,
+          tollsEur: numberStringValue(lead?.tollsEur) || numberStringValue(snapshotPricing?.travelTollsEur) || prev.tollsEur,
+        }));
+      } catch (error) {
+        log.warn('[NewBooking] No s’ha pogut carregar el prefill del pressupost', {
+          error: error instanceof Error ? error.message : String(error),
+          proposalId,
+        });
+      }
+    }
+
+    void loadProposalPrefill();
+    return () => {
+      cancelled = true;
+    };
+  }, [proposalId, setForm]);
   const [sourceCollaboratorId, setSourceCollaboratorId] = useState('');
   const [billedCollaboratorId, setBilledCollaboratorId] = useState('');
   const [showSourceBilling, setShowSourceBilling] = useState(false);
@@ -172,13 +286,7 @@ export default function NewBookingForm() {
     : { label: 'Òrbita' };
   const selectedPackForTravel = packs.find((pack) => pack.id === form.packId) || null;
   const derivedTravelHeadcount = useMemo(() => {
-    const packHeadcount = selectedPackForTravel ? 1 : 0;
-    const linesHeadcount = serviceLines.reduce((sum, line) => {
-      if (typeof line.travelHeadcount === 'number') return sum + Math.max(0, line.travelHeadcount) * (line.quantity || 1);
-      if (line.kind === 'SOUND_TECH') return sum + (line.quantity || 1);
-      return sum;
-    }, 0);
-    return packHeadcount + linesHeadcount;
+    return deriveTravelHeadcount(serviceLines, Boolean(selectedPackForTravel));
   }, [selectedPackForTravel, serviceLines]);
   const travelHeadcount = travelHeadcountOverride
     ? Math.max(0, Math.floor(Number(travelHeadcountOverride) || 0))
@@ -281,6 +389,7 @@ export default function NewBookingForm() {
     onSuccess: clearBookingDraft,
     form,
     selectedExtras,
+    proposalId,
     leadId,
     leadData,
     customerId,
@@ -404,6 +513,7 @@ export default function NewBookingForm() {
           <BookingServiceLinesSection
             lines={serviceLines}
             onChange={setServiceLines}
+            guestCount={form.guestCount}
             packs={packs}
             selectedPackId={form.packId}
             onPackSelect={(packId) => { updateField('packId', packId); setCustomPackPrice(''); }}

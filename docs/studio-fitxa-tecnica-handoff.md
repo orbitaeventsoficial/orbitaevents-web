@@ -119,8 +119,8 @@ node .dbg-studio.cjs     # captures a .codex-captures/studio-*.png
 `packs-config.ts` (packs i features), `site-config.ts` (WhatsApp, contacte, social),
 `portfolio-images.ts`, `client-logos.ts`, `equipment-config.ts`.
 
-### 2.5 Constants de domini — `lib/constants/` (17)
-`index.ts` (~1800L: formats, locale, helpers), `services.ts` (ServiceSlug), `pricingRules.ts`,
+### 2.5 Constants de domini — `lib/constants/`
+`index.ts` (~1800L: formats, locale, helpers), `services.ts` (ServiceSlug),
 `automationThresholds.ts`, `leadLoss.ts`, `notifications.ts`, `privacy.ts`, `customer-crm.ts`,
 `hero-media.ts`, `portfolio-media.ts`, `public-service-media.ts`, `halloween-atmosphere.ts`,
 `clientPortalNavigation.ts`, `googleCalendar.ts`, `social.ts`, `admin.ts`, `adminManual.ts`.

@@ -98,16 +98,16 @@ function deriveReviewFlowStatus(booking: {
 }
 
 function deriveInternalPostEventStatus(booking: {
+  postEventEmailSent: boolean | null;
+  reviewSubmittedAt: Date | null;
   postEventReport: { status?: string | null } | null;
   clientSurvey: unknown;
-  clientFeedback: { sentAt: Date | null } | null;
 }): InternalPostEventStatus {
   const hasReport = !!booking.postEventReport;
   const hasCompletedReport = booking.postEventReport?.status === 'COMPLETED';
-  const hasClientResponse = !!booking.clientSurvey;
-  const hasFeedback = !!booking.clientFeedback?.sentAt;
-  if (hasCompletedReport && (hasFeedback || hasClientResponse)) return 'COMPLETO';
-  if (hasReport || hasFeedback) return 'EN_PROGRESO';
+  const hasClientResponse = !!booking.clientSurvey || !!booking.reviewSubmittedAt;
+  if (hasCompletedReport && hasClientResponse) return 'COMPLETO';
+  if (hasReport || booking.postEventEmailSent) return 'EN_PROGRESO';
   return 'PENDIENTE';
 }
 
@@ -194,7 +194,6 @@ export async function getBookingOperationalSnapshot(booking: {
   postEventEmailSent: boolean | null;
   clientSurvey: unknown;
   postEventReport: { status?: string | null } | null;
-  clientFeedback: { sentAt: Date | null } | null;
   inventory: Array<{
     itemId: string;
     quantity: number | null;

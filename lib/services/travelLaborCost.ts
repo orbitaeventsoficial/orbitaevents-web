@@ -1,14 +1,15 @@
-import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, calculateTravelCost, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, calculateTravelCost, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { isBingoAssistantLine } from '@/lib/constants/orbita-services';
 
 // Tarifa del temps de carretera (decisió del propietari #1363): tothom a 15 €/h, tant qui
-// condueix com qui va de passatger. La gent consumeix HORES (no km). Filosofia del propietari
-// (#1386): el transport és COST NEUTRE — ni marge ni pèrdua. El client paga el que costa i
-// prou; el benefici d'Òrbita viu al PRODUCTE (DJ propi, revenda), no al volant.
+// condueix com qui va de passatger. La gent consumeix HORES (no km). El temps, les dietes i
+// els peatges es repercuteixen a cost; la part vehicle aplica un mínim comercial d'un tram
+// quan hi ha km facturables però el cost real seria microscòpic.
 export const TRAVEL_DRIVER_HOURLY_RATE = 15;
 export const TRAVEL_PASSENGER_HOURLY_RATE = 15;
 // Dieta de desplaçament (#1386, decisió del propietari): en rutes llargues (que obliguen a
 // menjar fora / cremen el dia), cada PERSONA que viatja cobra una dieta d'àpat. És cost real
-// repercutit al client (break-even, no marge): cobreix el treballador —o tu— quan el bolo és
+// repercutit al client: cobreix el treballador —o tu— quan el bolo és
 // lluny. Els bolos locals (ruta per sota del llindar) NO en tenen. Monocapa: es canvia AQUÍ i
 // val a totes les superfícies (lead, reserva, portal, PDFs).
 export const TRAVEL_MEAL_ALLOWANCE_PER_PERSON = 30;
@@ -193,10 +194,35 @@ export function buildTravelMealAllowanceLines(
 export interface TravelHeadcountLineLike {
   kind?: string | null;
   label?: string | null;
+  notes?: string | null;
   revenueAmount?: number | null;
   costAmount?: number | null;
   collaboratorId?: string | null;
   quantity?: number | null;
+  travelHeadcount?: number | null;
+}
+
+export const TRAVEL_HEADCOUNT_NOTE_PREFIX = '[travel-headcount:';
+const TRAVEL_HEADCOUNT_NOTE_RE = /\[travel-headcount:(\d+)\]/;
+
+function sanitizeTravelHeadcount(value?: number | null): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
+  return Math.floor(value);
+}
+
+export function travelHeadcountFromLine(line: TravelHeadcountLineLike): number | null {
+  const explicit = sanitizeTravelHeadcount(line.travelHeadcount);
+  if (explicit != null) return explicit;
+  const match = line.notes?.match(TRAVEL_HEADCOUNT_NOTE_RE);
+  if (!match) return null;
+  return sanitizeTravelHeadcount(Number(match[1]));
+}
+
+export function withTravelHeadcountNote(notes?: string | null, travelHeadcount?: number | null): string | null {
+  const explicit = sanitizeTravelHeadcount(travelHeadcount);
+  if (explicit == null) return (notes || '').trim() || null;
+  const cleaned = (notes || '').replace(TRAVEL_HEADCOUNT_NOTE_RE, '').replace(/\s{2,}/g, ' ').trim();
+  return `${cleaned ? `${cleaned} ` : ''}${TRAVEL_HEADCOUNT_NOTE_PREFIX}${explicit}]`;
 }
 
 /**
@@ -223,6 +249,7 @@ export function deriveTravelHeadcount(
   for (const l of lines) {
     const qty = Math.max(1, Math.floor(l.quantity || 1));
     const kind = l.kind;
+    const explicitHeadcount = travelHeadcountFromLine(l);
     if (kind === 'DJ') {
       meTravels = true; // el DJ d'Òrbita ets tu
     } else if (kind === 'SOUND_TECH') {
@@ -231,18 +258,20 @@ export function deriveTravelHeadcount(
         if ((l.costAmount ?? 0) < 0) meTravels = true; // el tècnic del bingo el fas tu
         else others += 1;                               // el tècnic el fa Masquerade
       } else {
-        others += qty; // tècnic de so extra = persona separada
+        others += explicitHeadcount != null ? explicitHeadcount * qty : qty; // tècnic de so extra = persona separada
       }
     } else if (kind === 'PROVIDER_SERVICE' && l.collaboratorId) {
-      others += qty; // animador presencial de Masquerade
+      others += explicitHeadcount != null ? explicitHeadcount * qty : qty; // animadors presencials del proveïdor
+    } else if (isBingoAssistantLine(l)) {
+      others += explicitHeadcount != null ? explicitHeadcount * qty : qty; // assistent operatiu del Bingo (+70 pax)
     }
   }
   return others + (meTravels ? 1 : 0);
 }
 
 /**
- * Marge del transport al client (#1369). BREAK-EVEN = 1 (el client paga exactament el
- * cost). Aquesta és l'ÚNICA palanca per fer que el desplaçament deixi marge: posar-la a
+ * Marge del transport al client (#1369). 1 = sense marge percentual addicional sobre
+ * la política base. Aquesta és l'ÚNICA palanca per fer que el desplaçament deixi marge: posar-la a
  * 1.15 = +15%, etc. Es canvia AQUÍ i s'aplica a TOTES les superfícies (monocapa).
  */
 export const CLIENT_TRAVEL_MARGIN = 1;
@@ -255,6 +284,7 @@ export interface BoloTransportResult {
   chargeableHours: number;
   cost: number;         // cost real total (cotxe + temps tripulació@15 + dieta + peatges)
   clientCharge: number; // el que paga el client (cotxe amb franquícia + tripulació + dieta + peatges)
+  vehicleClientCharge: number; // part vehicle que veu el client, amb mínim comercial si hi ha km facturables
   mealAllowance: number; // dieta de desplaçament (30 €/persona en rutes llargues; 0 si local)
   breakdown: TravelCostBreakdown;
 }
@@ -295,17 +325,22 @@ export function computeBoloTransport(input: {
   // Vehicle (#1742): km totals - 50 km inclosos = km facturables. La mateixa base governa
   // el que veu el client i el que cobra qui posa el cotxe.
   // Dieta de desplaçament (#1386/#1742): en rutes llargues (km > llindar) cada PERSONA que
-  // viatja cobra una dieta d'àpat. Cost real repercutit al client (break-even): entra igual al
-  // cost i al càrrec → NO mou el marge, cobreix el treballador quan el bolo és lluny. Els bolos
+  // viatja cobra una dieta d'àpat. Entra igual al cost i al càrrec → NO mou el marge,
+  // cobreix el treballador quan el bolo és lluny. Els bolos
   // locals (sota el llindar) no en tenen. Font única del headcount = persones físiques.
   const mealAllowance = km > TRAVEL_LONG_ROUTE_KM
     ? round2(TRAVEL_MEAL_ALLOWANCE_PER_PERSON * headcount)
     : 0;
   const totalCost = km <= 0 ? round2(tolls + mealAllowance) : round2(breakdown.totalCost + mealAllowance);
   // El client paga: vehicle facturable + persones (1a hora inclosa) + dieta si >150 km + peatges.
+  // Si hi ha km facturables però el cost real del vehicle és microscòpic (p.ex. 56 km totals),
+  // s'aplica el mínim comercial d'un tram perquè no apareguin càrrecs absurds d'1-2 €.
+  const vehicleClientCharge = breakdown.vehicleCost > 0
+    ? round2(Math.max(breakdown.vehicleCost, TRAVEL_BLOCK_EUR))
+    : 0;
   const clientCharge = km <= 0
     ? round2((tolls + mealAllowance) * CLIENT_TRAVEL_MARGIN)
-    : round2((breakdown.vehicleCost + breakdown.peopleCost + mealAllowance + tolls) * CLIENT_TRAVEL_MARGIN);
+    : round2((vehicleClientCharge + breakdown.peopleCost + mealAllowance + tolls) * CLIENT_TRAVEL_MARGIN);
   return {
     roundTripKm: km,
     headcount,
@@ -314,6 +349,7 @@ export function computeBoloTransport(input: {
     chargeableHours: breakdown.chargeableHours,
     cost: totalCost,
     clientCharge,
+    vehicleClientCharge,
     mealAllowance,
     breakdown,
   };

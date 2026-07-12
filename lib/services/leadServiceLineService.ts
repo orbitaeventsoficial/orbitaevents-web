@@ -1,8 +1,15 @@
 import { prisma } from '@/lib/prisma';
 import { updateBookingDetail } from '@/lib/services/bookingRouteService';
-import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
+import { TRAVEL_COST_LINE_MARKER, withTravelHeadcountNote } from '@/lib/services/travelLaborCost';
 import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
 import { SOUND_RENTAL } from '@/lib/constants/inventory';
+import {
+  BINGO_ASSISTANT_LINE_LABEL,
+  BINGO_ASSISTANT_LINE_NOTE,
+  bingoAssistantRequiredForGuestCount,
+  isAdultBingoMusicalName,
+  isBingoAssistantLine,
+} from '@/lib/constants/orbita-services';
 import type { BookingServiceLineKind } from '@prisma/client';
 
 const VALID_KINDS: readonly BookingServiceLineKind[] = ['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER'];
@@ -17,6 +24,7 @@ export type LeadServiceLineInput = {
   hours?: number | null;
   notes?: string | null;
   partyType?: string | null;
+  travelHeadcount?: number | null;
 };
 
 function normalizeKind(value?: string | null): BookingServiceLineKind {
@@ -41,6 +49,51 @@ function isIncludedSoundRentalLine(line: { collaboratorId?: string | null; notes
     line.notes?.includes(SOUND_RENTAL.notesMarker) ||
     (line.collaboratorId === SOUND_RENTAL.collaboratorId && /so|altaveu|speaker/.test(normalizedLabel)),
   );
+}
+
+function hasAdultBingoLine(lines: LeadServiceLineInput[]): boolean {
+  return lines.some((line) => (
+    normalizeKind(line.kind) === 'PROVIDER_SERVICE'
+    && isAdultBingoMusicalName(line.label)
+  ));
+}
+
+function isAutoBingoAssistantLine(line: LeadServiceLineInput): boolean {
+  return Boolean(
+    isBingoAssistantLine(line)
+    && line.notes?.includes('bingo-assistant-threshold')
+    && (line.revenueAmount ?? 0) === 0
+    && (line.costAmount == null || line.costAmount === 0)
+  );
+}
+
+export function syncLeadBingoAssistantForGuests(
+  lines: LeadServiceLineInput[],
+  guestCount?: number | null,
+): LeadServiceLineInput[] {
+  const required = bingoAssistantRequiredForGuestCount(guestCount) && hasAdultBingoLine(lines);
+  const hasAssistant = lines.some(isBingoAssistantLine);
+
+  if (required && !hasAssistant) {
+    return [
+      ...lines,
+      {
+        kind: 'OTHER',
+        label: BINGO_ASSISTANT_LINE_LABEL,
+        revenueAmount: 0,
+        costAmount: null,
+        quantity: 1,
+        notes: BINGO_ASSISTANT_LINE_NOTE,
+      },
+    ];
+  }
+
+  if (!required && hasAssistant) {
+    const next = lines.filter((line) => !isAutoBingoAssistantLine(line));
+    return next.length === lines.length ? lines : next;
+  }
+
+  return lines;
 }
 
 /**
@@ -110,7 +163,7 @@ export async function replaceLeadServiceLines(
 ) {
   const lead = await prisma.lead.findUnique({
     where: { id: leadId },
-    select: { id: true, booking: { select: { id: true } } },
+    select: { id: true, guestCount: true, booking: { select: { id: true } } },
   });
   if (!lead) return { status: 404, body: { error: 'Lead no trobat' } };
 
@@ -129,7 +182,12 @@ export async function replaceLeadServiceLines(
     await prisma.lead.update({ where: { id: leadId }, data: { tollsEur: tolls } });
   }
 
-  const clean = (Array.isArray(inputLines) ? inputLines : [])
+  const sourceLines = syncLeadBingoAssistantForGuests(
+    Array.isArray(inputLines) ? inputLines : [],
+    lead.guestCount,
+  );
+
+  const clean = sourceLines
     .filter((l) => (l.label?.trim() || '') !== '' || (l.revenueAmount ?? 0) > 0)
     .map((l, idx) => {
       const kind = normalizeKind(l.kind);
@@ -142,7 +200,7 @@ export async function replaceLeadServiceLines(
       costAmount: sanitizeServiceLineCostAmount({ kind, label: l.label, costAmount: l.costAmount }),
       quantity: sanitizeQuantity(l.quantity),
       hours: sanitizeHours(l.hours),
-      notes: l.notes?.trim() || null,
+      notes: withTravelHeadcountNote(l.notes, l.travelHeadcount),
       partyType: l.partyType?.trim() || null,
       sortOrder: idx,
     });

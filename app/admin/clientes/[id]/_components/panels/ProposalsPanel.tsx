@@ -12,6 +12,7 @@ import { AdminSection, AdminEmptyState } from '@/app/admin/components/AdminPage'
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildCustomerHubHref, buildCustomerProposalHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { isSentLikeProposalStatus } from '@/lib/proposals/status';
 
 const STATUS_PILL = 'inline-flex items-center rounded-full border border-current px-2 py-0.5 text-xs font-semibold leading-tight';
 
@@ -65,6 +66,15 @@ function buildProposalOriginLinks(proposal: ProposalDTO, fallbackCustomerId: str
   ].filter((link): link is ProposalOriginLink => Boolean(link));
 }
 
+function hasCanonicalSentProposalArtifact(proposal: ProposalDTO): boolean {
+  return Boolean(proposal.sentAt && proposal.pdfUrl?.trim() && proposal.pdfKey?.trim());
+}
+
+function getCanonicalSentProposalPdfHref(proposal: ProposalDTO): string | null {
+  if (!hasCanonicalSentProposalArtifact(proposal)) return null;
+  return proposal.pdfUrl?.trim() || null;
+}
+
 export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -94,7 +104,7 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
   }, [router]);
 
   const drafts = data.proposals.filter((proposal) => proposal.status === 'DRAFT');
-  const sent = data.proposals.filter((proposal) => proposal.status === 'SENT' || proposal.status === 'VIEWED');
+  const sent = data.proposals.filter((proposal) => isSentLikeProposalStatus(proposal.status));
   const closed = data.proposals.filter((proposal) => proposal.status === 'ACCEPTED' || proposal.status === 'REJECTED' || proposal.status === 'EXPIRED');
   const customerProposalHref = buildCustomerProposalHref(data.customer.id);
 
@@ -140,20 +150,26 @@ function ProposalCard({ proposal, busyId, isConfirming, onConfirm, onCancelConfi
   const style = getProposalStatusDisplay(proposal.status);
   const isBusy = busyId?.includes(proposal.id) || false;
   const canSend = proposal.status === 'DRAFT';
-  const canMarkAccepted = proposal.status === 'SENT' || proposal.status === 'VIEWED';
-  const canMarkExpired = proposal.status === 'SENT' || proposal.status === 'VIEWED';
+  const isSentLike = isSentLikeProposalStatus(proposal.status);
+  const canRepairSentArtifact = isSentLikeProposalStatus(proposal.status) && !hasCanonicalSentProposalArtifact(proposal);
+  const canMarkAccepted = isSentLike && hasCanonicalSentProposalArtifact(proposal);
+  const canMarkExpired = isSentLike;
+  const canMarkRejected = isSentLike;
+  const proposalPdfHref = getCanonicalSentProposalPdfHref(proposal);
   const [contractBusy, setContractBusy] = useState(false);
   const [contractError, setContractError] = useState<string | null>(null);
   const contractStatus = proposal.contractStatus;
   const contractRef = proposal.contractReference;
   const contractStyle = contractStatus ? getContractStatusDisplay(contractStatus) : null;
-  const canGenerateContract = proposal.status === 'ACCEPTED' && !contractStatus;
-  const canSendContract = contractStatus === 'DRAFT';
+  const canGenerateContract = proposal.status === 'ACCEPTED' && (!contractStatus || (contractStatus === 'DRAFT' && !contractRef));
+  const canSendContract = contractStatus === 'DRAFT' && Boolean(contractRef);
   const canMarkSigned = contractStatus === 'SENT';
   const documentSnapshotBadges = buildDocumentSnapshotBadges(proposal);
   const proposalHref = buildCustomerProposalHref(customerId, proposal.id);
   const hasSignedContract = contractStatus === 'SIGNED' || Boolean(proposal.contractSignedAt);
-  const signedContractHref = proposal.contractPdfUrl || proposalHref;
+  const contractPdfHref = proposal.contractPdfUrl?.trim() || null;
+  const signedContractHref = contractPdfHref || proposalHref;
+  const pendingContractPdfHref = contractPdfHref && !hasSignedContract ? contractPdfHref : null;
   const originLinks = buildProposalOriginLinks(proposal, customerId);
 
   const generateContract = async () => { setContractBusy(true); setContractError(null); try { const res = await fetchWithCsrf(`/api/admin/proposals/${proposal.id}/contract`, { method: 'POST', headers: { 'Content-Type': 'application/json' } }); if (!res.ok) { const payload = await res.json().catch(() => ({})); throw new Error(payload?.error || 'Error generant contracte'); } const blob = await res.blob(); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `contracte-${res.headers.get('X-Contract-Reference') || proposal.reference}.pdf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 10000); router.refresh(); } catch (err) { setContractError(err instanceof Error ? err.message : 'Error'); } finally { setContractBusy(false); } };
@@ -203,7 +219,13 @@ function ProposalCard({ proposal, busyId, isConfirming, onConfirm, onCancelConfi
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Link href={proposalHref} className="ap-btn ap-btn--xs">✏️ Editar</Link>
+        {proposalPdfHref && (
+          <a href={proposalPdfHref} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--xs">
+            📄 PDF enviat
+          </a>
+        )}
         {canSend && !isConfirming && <button type="button" onClick={onConfirm} disabled={isBusy} className="ap-btn ap-btn--xs">📤 Enviar</button>}
+        {canRepairSentArtifact && <button type="button" onClick={onSend} disabled={isBusy} className="ap-btn ap-btn--xs">{isBusy ? '...' : '📄 Reparar PDF'}</button>}
         {canSend && isConfirming && (
           <div className="flex flex-wrap items-center gap-1.5 rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] px-2 py-1.5 text-xs text-[var(--t2)]">
             <span>Confirmes l&apos;enviament?</span>
@@ -213,7 +235,7 @@ function ProposalCard({ proposal, busyId, isConfirming, onConfirm, onCancelConfi
         )}
         {canMarkAccepted && <button type="button" onClick={() => onUpdateStatus('ACCEPTED')} disabled={isBusy} className="ap-btn ap-btn--xs">{busyId === `status-${proposal.id}-ACCEPTED` ? '...' : '✅ Acceptat'}</button>}
         {canMarkExpired && <button type="button" onClick={() => onUpdateStatus('EXPIRED')} disabled={isBusy} className="ap-btn ap-btn--xs">{busyId === `status-${proposal.id}-EXPIRED` ? '...' : '⏰ Caducat'}</button>}
-        {proposal.status === 'SENT' && <button type="button" onClick={() => onUpdateStatus('REJECTED')} disabled={isBusy} className="ap-btn ap-btn--xs">{busyId === `status-${proposal.id}-REJECTED` ? '...' : '❌ Rebutjat'}</button>}
+        {canMarkRejected && <button type="button" onClick={() => onUpdateStatus('REJECTED')} disabled={isBusy} className="ap-btn ap-btn--xs">{busyId === `status-${proposal.id}-REJECTED` ? '...' : '❌ Rebutjat'}</button>}
       </div>
       {proposal.status === 'ACCEPTED' && (
         <div className="mt-3 border-t border-[var(--o-admin-line)] pt-3" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.proposals.contract)}>
@@ -221,6 +243,7 @@ function ProposalCard({ proposal, busyId, isConfirming, onConfirm, onCancelConfi
             {contractStatus && contractRef && contractStyle && <span className="inline-flex flex-wrap items-center gap-2 text-xs text-[var(--t2)]">📄 Contracte {contractRef}<span className={`${STATUS_PILL} ${contractStyle.bg} ${contractStyle.text} ${contractStyle.border}`}>{contractStyle.label}</span></span>}
             {canGenerateContract && <button type="button" onClick={generateContract} disabled={contractBusy} className="ap-btn ap-btn--primary ap-btn--xs">{contractBusy ? '...' : '📄 Generar contracte'}</button>}
             {canSendContract && <button type="button" onClick={sendContractEmail} disabled={contractBusy} className="ap-btn ap-btn--xs">📧 Enviar contracte</button>}
+            {pendingContractPdfHref && <a href={pendingContractPdfHref} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--xs">📄 PDF contracte</a>}
             {canMarkSigned && <button type="button" onClick={() => updateContractStatus('SIGNED')} disabled={contractBusy} className="ap-btn ap-btn--xs">✍️ Marcar signat</button>}
             {contractStatus && contractStatus !== 'CANCELLED' && contractStatus !== 'SIGNED' && <button type="button" onClick={() => updateContractStatus('CANCELLED')} disabled={contractBusy} className="ap-btn ap-btn--xs">🚫 Cancel·lar</button>}
           </div>
@@ -231,7 +254,7 @@ function ProposalCard({ proposal, busyId, isConfirming, onConfirm, onCancelConfi
               <Link
                 href={signedContractHref}
                 target={proposal.contractPdfUrl ? '_blank' : undefined}
-                rel={proposal.contractPdfUrl ? 'noreferrer' : undefined}
+                rel={proposal.contractPdfUrl ? 'noopener noreferrer' : undefined}
                 className="font-semibold text-[var(--gold)] no-underline hover:text-[var(--gold-bright)]"
               >
                 {proposal.contractPdfUrl ? 'Obrir PDF signat' : 'Obrir contracte'} →

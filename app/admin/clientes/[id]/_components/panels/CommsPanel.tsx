@@ -11,6 +11,7 @@ import { AdminSection } from '@/app/admin/components/AdminPage';
 import { buildCustomerCommercialRiskLink, buildCustomerNextActionLink } from '@/lib/customer-hub/nextActionLink';
 import {
   buildCustomerComposeHref,
+  buildCustomerProposalHref,
   buildCustomerTaskCreateHref,
   buildCustomerWorkspaceTabHref,
 } from '@/lib/admin/customerWorkspaceHref';
@@ -148,7 +149,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
             <Link href={buildCustomerComposeHref(data.customer.id, 'primer-contacte')} className="ap-btn ap-btn--xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Plantilla 1r contacte'))}>
               Plantilla 1r contacte
             </Link>
-            <Link href={buildCustomerComposeHref(data.customer.id, 'enviament-pressupost')} className="ap-btn ap-btn--xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Envia pressupost'))}>
+            <Link href={buildCustomerProposalHref(data.customer.id)} className="ap-btn ap-btn--xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Envia pressupost'))}>
               Envia pressupost
             </Link>
             <Link href={buildCustomerComposeHref(data.customer.id, 'recordatori')} className="ap-btn ap-btn--xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Recordatori'))}>

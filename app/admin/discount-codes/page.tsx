@@ -151,9 +151,9 @@ export default function DiscountCodesPage() {
   const toggleActive = async (id: string, active: boolean) => {
     try {
       const res = await fetchWithCsrf('/api/admin/discount-codes', {
-        method: 'POST',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ _action: 'toggle', id, isActive: !active }),
+        body: JSON.stringify({ id, isActive: !active }),
       });
 
       if (!res.ok) {
@@ -174,24 +174,29 @@ export default function DiscountCodesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
-      </div>
+      <AdminPage title="Codis de descompte" subtitle="Gestiona codis promocionals per a reserves" className="max-w-5xl">
+        <div className="ap-card flex items-center gap-3 p-6" role="status" aria-live="polite">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--line)] border-t-transparent" aria-hidden="true" />
+          <span>Carregant codis de descompte...</span>
+        </div>
+      </AdminPage>
     );
   }
 
   if (error && !codes.length) {
     return (
       <AdminPage title="Codis de descompte" subtitle="Gestiona codis promocionals per a reserves" className="max-w-5xl">
-        <AdminEmptyState
-          icon="⚠️"
-          title={error}
-          action={
-            <button type="button" onClick={() => { setLoading(true); loadCodes(); }} className="ap-btn ap-btn--primary">
-              Reintentar
-            </button>
-          }
-        />
+        <div role="alert" aria-live="assertive">
+          <AdminEmptyState
+            icon="⚠️"
+            title={error}
+            action={
+              <button type="button" onClick={() => { setLoading(true); loadCodes(); }} className="ap-btn ap-btn--primary">
+                Reintentar
+              </button>
+            }
+          />
+        </div>
       </AdminPage>
     );
   }
@@ -233,12 +238,12 @@ export default function DiscountCodesPage() {
       )}
 
       {success && (
-        <div className="ap-card p-4">
+        <div className="ap-inline-alert ap-inline-alert--success" role="status" aria-live="polite">
           <p className="text-sm">{success}</p>
         </div>
       )}
       {formError && (
-        <div className="ap-card p-4">
+        <div className="ap-inline-alert ap-inline-alert--danger" role="alert" aria-live="assertive">
           <p className="text-sm">{formError}</p>
         </div>
       )}
@@ -266,6 +271,7 @@ export default function DiscountCodesPage() {
                 <button
                   type="button"
                   onClick={() => updateField('type', 'PERCENTAGE')}
+                  aria-pressed={form.type === 'PERCENTAGE'}
                   className={`ap-tab flex-1 ${form.type === 'PERCENTAGE' ? 'ap-tab--active' : 'ap-tab--idle'}`}
                 >
                   Percentatge %
@@ -273,6 +279,7 @@ export default function DiscountCodesPage() {
                 <button
                   type="button"
                   onClick={() => updateField('type', 'FIXED_AMOUNT')}
+                  aria-pressed={form.type === 'FIXED_AMOUNT'}
                   className={`ap-tab flex-1 ${form.type === 'FIXED_AMOUNT' ? 'ap-tab--active' : 'ap-tab--idle'}`}
                 >
                   Import fix
@@ -281,7 +288,7 @@ export default function DiscountCodesPage() {
             </div>
             <div>
               <label htmlFor="dc-value" className="text-xs">
-                Valor * {form.type === 'PERCENTAGE' ? '(%)' : '(â‚¬)'}
+                Valor * {form.type === 'PERCENTAGE' ? '(%)' : '(€)'}
               </label>
               <input
                 id="dc-value"
@@ -318,7 +325,7 @@ export default function DiscountCodesPage() {
               />
             </div>
             <div>
-              <label htmlFor="dc-min-order" className="text-xs">Comanda mínima (â‚¬)</label>
+              <label htmlFor="dc-min-order" className="text-xs">Comanda mínima (€)</label>
               <input
                 id="dc-min-order"
                 type="number"
@@ -360,6 +367,7 @@ export default function DiscountCodesPage() {
               type="button"
               onClick={handleCreate}
               disabled={submitting || !form.code || !form.value || !form.validUntil}
+              aria-busy={submitting}
               className="ap-btn ap-btn--primary disabled:opacity-50"
             >
               {submitting ? 'Creant...' : 'Crear codi'}
@@ -391,7 +399,7 @@ export default function DiscountCodesPage() {
                 </div>
                 <div className="text-right shrink-0">
                   <span className="font-bold text-lg">
-                    {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}
+                    {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}
                   </span>
                   <span className={`block mt-0.5 rounded-full px-2 py-0.5 text-xs font-medium text-center ${
                     active ? 'admin-tone-soft-success' : 'bg-[var(--raised)] text-[var(--t3)]'
@@ -454,7 +462,7 @@ export default function DiscountCodesPage() {
                       {c.description && <p className="text-xs mt-0.5">{c.description}</p>}
                     </td>
                     <td className="px-4 py-3">{c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}</td>
-                    <td className="px-4 py-3 font-semibold">{c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}</td>
+                    <td className="px-4 py-3 font-semibold">{c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}</td>
                     <td className={`px-4 py-3 ${expired ? 'admin-tone-text-danger' : 'text-[var(--t2)]'}`}>
                       {formatDateSimple(c.validUntil)}
                       {expired && <span className="block text-xs">Caducat</span>}
@@ -504,4 +512,3 @@ export default function DiscountCodesPage() {
     </AdminPage>
   );
 }
-

@@ -12,7 +12,12 @@ import WeatherWidget from '../components/WeatherWidget';
 import { ADMIN_DASHBOARD_HELP, helpAttrs } from '../components/adminHelpContent';
 import { getGreeting, RadialProgress, MetricCard, Card, Button, MonthlyBarChart, DonutChart, MiniLineChart } from '../lib/dashboard-widgets';
 import { LEAD_STATUS_OPTIONS, BOOKING_STATUS_OPTIONS } from '@/lib/constants';
-import { ADMIN_DASHBOARD_PILOT_STEPS, ADMIN_DASHBOARD_INSIGHT_COLORS, ADMIN_CHART_SERIES_COLORS } from '@/lib/constants/admin';
+import {
+  ADMIN_CHART_SERIES_COLORS,
+  ADMIN_DASHBOARD_INSIGHT_COLORS,
+  ADMIN_DASHBOARD_PILOT_STEPS,
+  readAdminPostEventCronSetting,
+} from '@/lib/constants/admin';
 import { loadDailyBrief } from '@/lib/services/dailyBriefService';
 import DailyBriefPanel from '../components/DailyBriefPanel';
 import { loadOperationalPulse } from '@/lib/services/operationalPulseService';
@@ -69,6 +74,7 @@ export default async function AdminDashboard() {
     inventoryMaintenance: d.inventoryMaintenance,
     inventoryBroken: d.inventoryBroken,
   });
+  const postEventCronLastRun = readAdminPostEventCronSetting(d.cronMap, 'lastRun');
 
   const pilotDynamic: Record<string, { description: string; tone: string }> = {
     leads: {
@@ -407,7 +413,7 @@ export default async function AdminDashboard() {
       >
         <div className="flex flex-wrap gap-2 mb-2.5">
           <Link href="/admin/tasks" className="ap-badge ap-badge--warning no-underline" {...helpAttrs(ADMIN_DASHBOARD_HELP.startStep2)}>Comença per pas 2</Link>
-          <Link href="/admin/emails" className="ap-badge ap-badge--danger no-underline" {...helpAttrs(ADMIN_DASHBOARD_HELP.startStep3)}>Comença per pas 3</Link>
+          <Link href="/admin/post-event" className="ap-badge ap-badge--danger no-underline" {...helpAttrs(ADMIN_DASHBOARD_HELP.startStep3)}>Comença per pas 3</Link>
         </div>
         <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
           {pilotToday.map((item) => {
@@ -676,7 +682,7 @@ export default async function AdminDashboard() {
           )}
           <div className="mt-4 flex items-center justify-between gap-3">
             <p className="text-xs text-[var(--t3)]">
-              Últim cron: {d.cronMap['emails.cron.lastRun'] ? formatDateTimeFull(d.cronMap['emails.cron.lastRun']) : 'Mai'}
+              Últim cron: {postEventCronLastRun ? formatDateTimeFull(postEventCronLastRun) : 'Mai'}
             </p>
             <Link href="/admin/salut" className="text-xs text-[var(--t3)] underline hover:text-[var(--gold)]" {...helpAttrs(ADMIN_DASHBOARD_HELP.openHealth)}>Obrir Salut</Link>
           </div>

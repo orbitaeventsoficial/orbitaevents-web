@@ -4,11 +4,15 @@
  * POST - Crear nou codi
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
-import { createAdminDiscountCode, listAdminDiscountCodes } from '@/lib/services/discountCodeAdminService';
+import {
+  createAdminDiscountCode,
+  listAdminDiscountCodes,
+  setAdminDiscountCodeActive,
+} from '@/lib/services/discountCodeAdminService';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,9 +30,16 @@ const createSchema = z.object({
   sourceType: z.string().optional(),
 });
 
+const activeSchema = z.object({
+  id: z.string().min(1),
+  isActive: z.boolean(),
+});
+
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'read');
+  if (permissionError) return permissionError;
 
   try {
     const result = await listAdminDiscountCodes();
@@ -45,6 +56,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
 
@@ -65,6 +78,36 @@ export async function POST(req: NextRequest) {
     log.error('Error creant codi de descompte:', error);
     return NextResponse.json(
       { error: 'Error creant codi' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
+  try {
+    const body = await req.json();
+    const parsed = activeSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Dades invàlides', details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+
+    const result = await setAdminDiscountCodeActive(parsed.data);
+    return NextResponse.json(result.body, { status: result.status });
+  } catch (error) {
+    log.error('Error canviant estat del codi de descompte:', error);
+    return NextResponse.json(
+      { error: 'Error canviant estat del codi' },
       { status: 500 }
     );
   }

@@ -15,21 +15,15 @@ import { log } from '@/lib/logger';
  */
 type EventCategory = 
   | 'Contact'
-  | 'Pack Selection'
   | 'Engagement'
   | 'Navigation'
-  | 'Video'
-  | 'Calculator'
   | 'CTA';
 
 type EventName = 
   | 'generate_lead'
   | 'contact_whatsapp'
   | 'contact_phone'
-  | 'select_pack'
   | 'scroll'
-  | 'view_video_testimonial'
-  | 'calculate_price'
   | 'click_cta'
   | 'page_view';
 
@@ -167,35 +161,6 @@ export const trackPhoneClick = (source: string = 'generic'): void => {
 };
 
 /**
- * TRACKEAR SELECCIÓN DE PACK
- * OBLIGATORIO: packId real → precio 100% actualizado
- */
-export const trackPackSelection = (data: {
-  packId: PackId;
-  packType: 'boda' | 'empresa' | 'fiesta' | 'discomovil';
-}): void => {
-  const pack = getPackById(data.packId);
-  if (!pack) {
-    return;
-  }
-
-  const price = pack.priceValue;
-
-  trackEvent({
-    eventName: 'select_pack',
-    eventCategory: 'Pack Selection',
-    eventLabel: pack.name,
-    value: price,
-    additionalParams: {
-      pack_id: data.packId,
-      pack_type: data.packType,
-      pack_name: pack.name,
-      price: price,
-    },
-  });
-};
-
-/**
  * TRACKEAR SCROLL DEPTH (profundidad de scroll)
  */
 export const trackScrollDepth = (percentage: number): void => {
@@ -206,47 +171,6 @@ export const trackScrollDepth = (percentage: number): void => {
     value: percentage,
     additionalParams: {
       scroll_depth: percentage,
-    },
-  });
-};
-
-/**
- * TRACKEAR VISUALIZACIÓN DE VIDEO TESTIMONIAL
- */
-export const trackVideoView = (videoTitle: string): void => {
-  trackEvent({
-    eventName: 'view_video_testimonial',
-    eventCategory: 'Video',
-    eventLabel: videoTitle,
-    additionalParams: {
-      video_title: videoTitle,
-    },
-  });
-};
-
-/**
- * TRACKEAR USO DE CALCULADORA
- */
-export const trackCalculatorUse = (data: {
-  eventType: string;
-  calculatedPrice: number;
-  duration: number;
-  guests: number;
-  packId?: PackId;
-}): void => {
-  const { eventType, calculatedPrice, duration, guests, packId } = data;
-
-  trackEvent({
-    eventName: 'calculate_price',
-    eventCategory: 'Calculator',
-    eventLabel: eventType,
-    value: calculatedPrice,
-    additionalParams: {
-      event_type: eventType,
-      calculated_price: calculatedPrice,
-      duration_hours: duration,
-      guest_count: guests,
-      ...(packId && { pack_id: packId }),
     },
   });
 };
@@ -287,13 +211,6 @@ export const trackPageView = (pagePath: string, pageTitle: string): void => {
       page_title: pageTitle,
     });
   }
-};
-
-/**
- * INICIALIZAR ANALYTICS (llamar en layout o _app)
- */
-export const initAnalytics = (): void => {
-  // Initialize analytics (empty for now - scripts are loaded in layout)
 };
 
 /**

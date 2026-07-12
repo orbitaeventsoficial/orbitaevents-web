@@ -105,8 +105,8 @@ export async function listAdminCollaborators() {
   }));
 
   const allProducts = collaborators.flatMap((collaborator) => collaborator.products || []);
-  const catalogValue = allProducts
-    .filter((product) => product.isActive)
+  const activeProducts = allProducts.filter((product) => product.isActive);
+  const catalogValue = activeProducts
     .reduce((sum, product) => sum + (product.sellPrice || 0), 0);
   const totalSourcedLeads = collaborators.reduce((sum, collaborator) => sum + (collaborator._count?.sourcedLeads || 0), 0);
   const totalSourcedBookings = collaborators.reduce((sum, collaborator) => sum + (collaborator._count?.sourcedBookings || 0), 0);
@@ -116,7 +116,7 @@ export async function listAdminCollaborators() {
     kpis: {
       total: collaborators.length,
       active: collaborators.filter((collaborator) => collaborator.isActive).length,
-      totalProducts: allProducts.length,
+      totalProducts: activeProducts.length,
       catalogValue: roundMoney(catalogValue),
       totalSourcedLeads,
       totalSourcedBookings,

@@ -11,7 +11,15 @@ import RecentEmailsTable from './RecentEmailsTable';
 import ManualActionsPanel from './ManualActionsPanel';
 import InboxPanel from './InboxPanel';
 import SendPostEventButton from './SendPostEventButton';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { readRecentEmailActivitySummary, type RecentEmailActivity } from '@/lib/services/customerActivityService';
+import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
+import { buildPendingPostEventEmailBookingWhere } from '@/lib/services/postEventPendingService';
+import { listPendingPostEventBookings } from '@/lib/services/postEventDispatchService';
+import {
+  getAdminPostEventCronSettingKeys,
+  readAdminPostEventCronSetting,
+} from '@/lib/constants/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,8 +43,6 @@ async function getEmailStats() {
       return fallback;
     }
   };
-
-  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
 
   const [
     leadsWithEmail,
@@ -62,12 +68,7 @@ async function getEmailStats() {
     ),
     safe('postEventPending', 0, () =>
       prisma.booking.count({
-        where: {
-          status: 'COMPLETED',
-          eventDate: { lte: twoDaysAgo },
-          postEventEmailSent: false,
-          clientEmail: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
-        },
+        where: buildPendingPostEventEmailBookingWhere(now),
       })
     ),
     safe('testimonials', 0, () =>
@@ -97,7 +98,7 @@ async function getEmailStats() {
     ),
     safe('cronSettings', [] as Awaited<ReturnType<typeof prisma.setting.findMany>>, () =>
       prisma.setting.findMany({
-        where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage'] } },
+        where: { key: { in: getAdminPostEventCronSettingKeys() } },
       })
     ),
   ]);
@@ -116,41 +117,18 @@ async function getEmailStats() {
     recentActivity: emailActivitySummary.recentActivity,
     recentEmailActions: emailActivitySummary.recentEmailActions,
     recentTestimonials: emailActivitySummary.recentTestimonials,
-    cronLastRun: cronMap['emails.cron.lastRun'] || null,
-    cronLastStatus: cronMap['emails.cron.lastStatus'] || null,
-    cronLastMessage: cronMap['emails.cron.lastMessage'] || null,
-    cronLastSummary: cronMap['emails.cron.lastSummary'] || null,
+    cronLastRun: readAdminPostEventCronSetting(cronMap, 'lastRun'),
+    cronLastStatus: readAdminPostEventCronSetting(cronMap, 'lastStatus'),
+    cronLastMessage: readAdminPostEventCronSetting(cronMap, 'lastMessage'),
+    cronLastSummary: readAdminPostEventCronSetting(cronMap, 'lastSummary'),
     hasQueryErrors,
   };
 }
 
 async function getPendingPostEventBookings() {
   const now = new Date();
-  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
   try {
-    return await prisma.booking.findMany({
-      where: {
-        status: 'COMPLETED',
-        eventDate: {
-          gte: sevenDaysAgo,
-          lte: twoDaysAgo,
-        },
-        postEventEmailSent: false,
-        clientEmail: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
-      },
-      select: {
-        id: true,
-        reference: true,
-        clientName: true,
-        clientEmail: true,
-        eventDate: true,
-        pack: { select: { translations: true } },
-      },
-      orderBy: { eventDate: 'desc' },
-      take: 20,
-    });
+    return await listPendingPostEventBookings(now);
   } catch (error) {
     log.error('[admin/emails] Query failed: pendingPostEventBookings', error as Error);
     return [];
@@ -229,7 +207,7 @@ export default async function EmailsAdminPage() {
                   ⏳ Emails Post-Event Pendents
                 </h2>
                 <p className="text-xs mt-1">
-                  Events completats fa 1-7 dies sense email enviat
+                  Events completats fa {POST_EVENT_WORKFLOW.emailDueDays}+ dies dins els darrers {POST_EVENT_WORKFLOW.catchupWindowDays} dies sense email enviat
                 </p>
               </div>
               <span className="w-fit text-sm font-bold px-3 py-1 rounded-full">
@@ -253,7 +231,13 @@ export default async function EmailsAdminPage() {
                         Event: {formatDateSimple(booking.eventDate)} · Ref: {booking.reference}
                       </p>
                     </div>
-                    <div className="sm:shrink-0">
+                    <div className="flex flex-wrap items-start gap-2 sm:shrink-0 sm:justify-end">
+                      <Link
+                        href={buildBookingHref(booking.id, 'sec-post-event')}
+                        className="ap-btn ap-btn--secondary ap-btn--xs"
+                      >
+                        Obrir post-event
+                      </Link>
                       <SendPostEventButton bookingId={booking.id} />
                     </div>
                   </div>
@@ -304,6 +288,3 @@ export default async function EmailsAdminPage() {
     </AdminPage>
   );
 }
-
-
-

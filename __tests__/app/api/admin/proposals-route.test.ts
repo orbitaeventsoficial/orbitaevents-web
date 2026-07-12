@@ -12,7 +12,16 @@ vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
 vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 vi.mock('@/lib/services/proposalAdminService', () => {
   const roundMoney = (value: number) => Math.round(value * 100) / 100;
+  class ProposalCanonicalDispatchError extends Error {
+    public readonly status = 410;
+    public readonly body = {
+      ok: false,
+      error: 'Els camps d’enviament del pressupost només es poden escriure des de /api/admin/proposals/:id/send.',
+      canonicalRoute: '/api/admin/proposals/:id/send',
+    };
+  }
   return {
+    ProposalCanonicalDispatchError,
     createAdminProposal: mockCreateProposal,
     listAdminProposals: mockListProposals,
     getProposalFinancialConsistencyIssues: (data: { subtotal: number; discount: number; vatRate: number; vatAmount: number; total: number }) => {
@@ -33,10 +42,11 @@ vi.mock('@/lib/services/proposalAdminService', () => {
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
 vi.mock('@/lib/request-context', () => ({ getRequestId: () => 'test-req-id' }));
 vi.mock('@prisma/client', () => ({
-  ProposalStatus: { DRAFT: 'DRAFT', SENT: 'SENT', ACCEPTED: 'ACCEPTED', REJECTED: 'REJECTED', EXPIRED: 'EXPIRED' },
+  ProposalStatus: { DRAFT: 'DRAFT', SENT: 'SENT', VIEWED: 'VIEWED', ACCEPTED: 'ACCEPTED', REJECTED: 'REJECTED', EXPIRED: 'EXPIRED' },
 }));
 
 import { POST } from '@/app/api/admin/proposals/route';
+import { ProposalCanonicalDispatchError } from '@/lib/services/proposalAdminService';
 
 function makePostReq(body: Record<string, unknown>) {
   return new NextRequest('http://localhost/api/admin/proposals', {
@@ -88,5 +98,24 @@ describe('POST /api/admin/proposals', () => {
 
     expect(res.status).toBe(400);
     expect(mockCreateProposal).not.toHaveBeenCalled();
+  });
+
+  it('retorna 410 quan el servei rebutja crear-la com a enviada fora del dispatch canònic', async () => {
+    mockCreateProposal.mockRejectedValueOnce(new ProposalCanonicalDispatchError());
+    const res = await POST(makePostReq({ ...basePayload, status: 'SENT' }));
+    const body = await res.json();
+
+    expect(res.status).toBe(410);
+    expect(body).toMatchObject({ canonicalRoute: '/api/admin/proposals/:id/send' });
+  });
+
+  it('accepta VIEWED al contracte de ruta però el servei el manté dins el carril canònic', async () => {
+    mockCreateProposal.mockRejectedValueOnce(new ProposalCanonicalDispatchError());
+    const res = await POST(makePostReq({ ...basePayload, status: 'VIEWED' }));
+    const body = await res.json();
+
+    expect(res.status).toBe(410);
+    expect(body).toMatchObject({ canonicalRoute: '/api/admin/proposals/:id/send' });
+    expect(mockCreateProposal).toHaveBeenCalledWith({ ...basePayload, status: 'VIEWED' });
   });
 });

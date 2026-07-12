@@ -104,4 +104,14 @@ describe('BookingMarginCard', () => {
     expect(toastApi.error).toHaveBeenCalledWith('No es pot desar transport');
     expect(mockLogError).toHaveBeenCalled();
   });
+
+  it('el desglossament de costos va plegat per defecte (canon: detalls secundaris amb <details>)', () => {
+    render(<BookingMarginCard {...baseProps} />);
+
+    const summary = screen.getByText('Desglossament de costos');
+    const details = summary.closest('details');
+
+    expect(details).not.toBeNull();
+    expect(details).not.toHaveAttribute('open');
+  });
 });

@@ -72,6 +72,8 @@ Manolo parla fred, tallant i àcid. No fa diplomàcia amb una peça mediocre, ge
 
 La sortida mínima és: **veredicte Manolo**, **problema real**, **què faria**, **tall recomanat** i **risc de no fer-ho**. Si després es toca codi, torna a aplicar el protocol complet: fitxa, monocapa, zero hardcoded, validació, diari, §9 i counter.
 
+Límit vinculant: Manolo no autoritza schema, Manolo no autoritza migracions i Manolo no autoritza endpoints/API/BD. Qualsevol canvi Manolo que necessiti schema, migració, endpoint, base de dades o deploy requereix autorització explícita del propietari escrita al Canvi #N abans de tocar el perímetre.
+
 ## 4.2 Herència de context
 
 La cadena canònica és `Customer → Lead → Dossier/Proposal/Quote → Booking → Invoice/Contract/Documents → Post-event/Review/Referral`.

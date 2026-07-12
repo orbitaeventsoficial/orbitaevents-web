@@ -60,7 +60,6 @@ import {
   detectMediaType,
   addPortfolioMedia,
   listPortfolioMedia,
-  getPortfolioMediaCounts,
   updatePortfolioMedia,
   deletePortfolioMedia,
 } from '@/lib/services/portfolioMediaService';
@@ -347,47 +346,6 @@ describe('listPortfolioMedia', () => {
       where: { slug: 'alquiler-equipo' },
       include: { event: { select: { id: true, title: true, slug: true } } },
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
-    });
-  });
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
-// getPortfolioMediaCounts
-// ═══════════════════════════════════════════════════════════════════════════
-
-describe('getPortfolioMediaCounts', () => {
-  it('retorna un mapa slug → count amb les dades de groupBy', async () => {
-    mockPrisma.portfolioMedia.groupBy.mockResolvedValue([
-      { slug: 'bodas', _count: { id: 12 } },
-      { slug: 'discomovil', _count: { id: 5 } },
-      { slug: 'fiestas-infantiles', _count: { id: 8 } },
-    ]);
-
-    const result = await getPortfolioMediaCounts();
-
-    expect(result).toEqual({
-      bodas: 12,
-      discomovil: 5,
-      'fiestas-infantiles': 8,
-    });
-  });
-
-  it('retorna un objecte buit si no hi ha cap media', async () => {
-    mockPrisma.portfolioMedia.groupBy.mockResolvedValue([]);
-
-    const result = await getPortfolioMediaCounts();
-
-    expect(result).toEqual({});
-  });
-
-  it('crida groupBy amb els paràmetres correctes', async () => {
-    mockPrisma.portfolioMedia.groupBy.mockResolvedValue([]);
-
-    await getPortfolioMediaCounts();
-
-    expect(mockPrisma.portfolioMedia.groupBy).toHaveBeenCalledWith({
-      by: ['slug'],
-      _count: { id: true },
     });
   });
 });

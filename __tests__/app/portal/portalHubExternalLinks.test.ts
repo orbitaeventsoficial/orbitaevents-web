@@ -13,7 +13,7 @@ describe('client portal hub external links', () => {
     expect(CLIENT_PORTAL_MESSAGES.ca.opensInNewTab).toBe('s\'obre en una pestanya nova');
     expect(CLIENT_PORTAL_MESSAGES.es.opensInNewTab).toBe('se abre en una pestaña nueva');
     expect(CLIENT_PORTAL_MESSAGES.en.opensInNewTab).toBe('opens in a new tab');
-    expect(targetBlankCount).toBe(4);
+    expect(targetBlankCount).toBe(5);
     expect(newTabNoteCount).toBe(targetBlankCount);
   });
 });

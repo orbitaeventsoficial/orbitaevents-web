@@ -1,25 +1,4962 @@
-## 2026-07-09 — Documents comercials: IVA seleccionable i recàrrec de temporada visible (Canvi #1837, codex)
+## 2026-07-12 — Manolo: Master Atlas reconeix portfolio post-event (Canvi #1997, codex)
 
 ### Context
-El propietari detecta que el `+ IVA` no es pot seleccionar al Studio de pressupostos i que el recàrrec d'alta temporada no apareix al dossier ni al resum Manolo del lead.
+El Master Atlas encara marcava `Portfolio/testimoni des de bolo completat` com a `PENDENT`, però el codi viu ja ofereix el pas segur: `/admin/post-event/reports` mostra `Crear portfolio` en informes `COMPLETED`, el botó crida `/api/admin/post-event/portfolio-event` amb CSRF/auth i `ensurePortfolioEventFromPostEventReport()` crea o reutilitza un `PortfolioEvent` en draft només si hi ha informe completat i foto de galeria marcada com portfolio.
+
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a Master Atlas, test, roadmap, counter i registres, sense schema, API nova, BD write, migracions, crons, enviaments ni publicacions reals.
 
 ### Canvi
-- `/admin/presupuestos`: selector `Factura / IVA` amb opció d'aplicar IVA o deixar-lo sense IVA aplicat. El càlcul alimenta preview, PDF, proposta desada i contracte amb `taxableBase`, `vatRate`, `vatAmount` i total final coherents.
-- Quote PDF: quan hi ha IVA mostra base imposable i IVA desglossat; quan no n'hi ha, manté el bloc compacte i ho diu explícitament.
-- `/admin/leads/[id]`: el recàrrec de data usa `applyDatePricing` sobre els serveis del bolo i suma al `Total client`, però no entra al repartiment ni al cost del col·laborador.
-- Dossiers: el snapshot congela `eventDate`; el builder HTML mostra el recàrrec de temporada al bloc de proposta quan la data l'aplica, amb copy via `messages/*.json`.
-- Lead Manolo: fora la validació persistent de pacte partner; el bloc queda com a `Cost col·laborador` i els botons de dossier/preview passen pel flux canònic.
+- `lib/constants/master-atlas.ts`: el mòdul `post-event` incorpora `/admin/portfolio`, `portfolioEventService` i `PortfolioEvent` com a peces de font viva del loop comercial post-event.
+- `lib/constants/master-atlas.ts`: afegeix l'operació `Crear draft de portfolio des d informe completat`, el risc de publicar portfolio sense media/revisió i la regla segura `Portfolio sempre draft fins revisió`.
+- `lib/constants/master-atlas.ts`: el next move `Portfolio/testimoni des de bolo completat` passa a `FET` amb referència a #1997.
+- `__tests__/lib/services/masterAtlasService.test.ts`: blinda que el Master Atlas exposi servei, API, botó UI i estat `FET` per al portfolio post-event.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #1997 i explicita que el report completat ja pot crear/reutilitzar `PortfolioEvent` DRAFT amb media marcada.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API runtime nova, cron ni migracions.
 
 ### Validació
-- Validació tècnica: tests focals OK (82/82); `npx tsc --noEmit --pretty false` OK; `pnpm build` OK.
-- Validació funcional: lead de juliol amb serveis 240 aplica `Recàrrec alta temporada` +15% i total client 276 sense tocar el cost col·laborador; dossier amb serveis 490 mostra línia de recàrrec de temporada; pressupost pot alternar IVA/sense IVA.
-- Validació humana/UX: impostos i temporada deixen de ser càlculs amagats; el client veu el criteri comercial abans de tancar pressupost i el partner no queda implicat en un recàrrec que és tarifa d'Òrbita.
+- Validació tècnica: focused Vitest OK (`masterAtlasService` + `portfolioEventService` + `post-event portfolio API` + `EnsurePortfolioEventButton`, 42 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #1997 fora del protocol llarg i bloc `Canvi #1997` del protocol verificat sense trailing whitespace.
+- Validació funcional: `/admin/docs/master-atlas` ja no presenta `Portfolio/testimoni des de bolo completat` com a pendent quan `/admin/post-event/reports` ja permet crear o obrir el draft de portfolio des del report completat.
+- Validació humana/UX: un agent o operador veu el loop correcte: informe completat, media marcada, draft intern de portfolio, revisió humana a `/admin/portfolio` i cap publicació automàtica.
 
 ### Tancament
-- `ADMIN_CHANGE_COUNTER` = 1837.
+- `ADMIN_CHANGE_COUNTER` = 1997.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
+
+## 2026-07-12 — Manolo: Master Atlas reconeix esborrany social post-event (Canvi #1996, codex)
+
+### Context
+El Master Atlas encara marcava `Auto-esborrany post-event amb revisió` com a `PENDENT`, però el codi viu ja ho tenia: `postEventRecurrenceDecisionService` crea o reutilitza un `SocialPost` en `DRAFT`, retorna el workspace `/admin/social?postId=...`, deixa la traça `DRAFT_NOT_PUBLISHED` i `socialPostReviewGuard`/`socialPostService` bloquegen publicar o programar post-event pendent de revisió. La font viva de l'admin, per tant, estava per darrere del sistema real.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a Master Atlas, test, roadmap, counter i registres, sense schema, API nova, BD write, migracions, crons, enviaments ni publicacions reals.
+
+### Canvi
+- `lib/constants/master-atlas.ts`: el mòdul `post-event` incorpora `postEventRecurrenceDecisionService`, `socialPostReviewGuard` i `SocialPost` com a peces de font viva de l'esborrany social revisable.
+- `lib/constants/master-atlas.ts`: afegeix l'operació `Crear esborrany social revisable`, el risc de publicar sense revisió i la validació específica de recurrence/social review gate.
+- `lib/constants/master-atlas.ts`: el next move `Auto-esborrany post-event amb revisió` passa a `FET` amb referència a #1996.
+- `__tests__/lib/services/masterAtlasService.test.ts`: blinda que el Master Atlas exposi la cadena d'esborrany social i no torni a deixar-la pendent.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #1996 i explicita que el Master Atlas ja veu l'esborrany social revisable com a fet.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`masterAtlasService` + `postEventRecurrenceDecisionService` + `socialPostService`, 51 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #1996 fora del protocol llarg i bloc `Canvi #1996` del protocol verificat sense trailing whitespace.
+- Validació funcional: `/admin/docs/master-atlas` ja no presenta l'auto-esborrany social post-event com a pendent quan el playbook i els guards ja el tenen implementat.
+- Validació humana/UX: un agent o operador que entri pel Master Atlas veu la seqüència real: lectura interna, esborrany DRAFT, revisió humana i només després publicació.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1996.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: portal post-event sense claus legacy feedback (Canvi #1995, codex)
+
+### Context
+Després d'alinear fitxa, portal, timeline, atles, tesi, roadmap i snapshot tècnic amb `Booking.postEventEmailSent`, el portal client encara conservava noms interns antics (`feedbackSent` i `pendingClose`) per pintar el mateix estat públic d'email post-event. La copy visible ja era correcta, però el contracte intern mantenia el vocabulari de feedback legacy i podia tornar a confondre la font operativa.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a nomenclatura interna del portal, tests, roadmap, counter i registres, sense schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `lib/clientPortalMessages.ts`: substitueix les claus internes `feedbackSent`/`pendingClose` per `postEventEmailSent`/`postEventEmailPending` als tres locales, mantenint exactament el mateix text públic.
+- `app/[locale]/portal/[token]/page.tsx`: el resum de timeline i el bloc post-event consumeixen les noves claus d'email post-event canònic.
+- `__tests__/app/portal/portalPostEventEmailSource.test.ts`: renombra el test focalitzat del portal i blinda que el bloc post-event ja no contingui `t.feedbackSent` ni `t.pendingClose`.
+- `__tests__/lib/clientPortalMessages.test.ts`: afegeix cobertura perquè el diccionari del portal exposi les claus d'email post-event i no les legacy.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #1995 i explicita que el portal ja no conserva claus internes de feedback legacy per aquest estat.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`portalPostEventEmailSource` + `clientPortalMessages`, 14 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #1995.
+- Validació funcional: el portal client continua mostrant el mateix estat públic d'email post-event enviat/pendent, però el contracte intern ja no parla de feedback legacy.
+- Validació humana/UX: un agent que llegeixi la superfície del portal veu email post-event com a font canònica, no un nom intern heretat de `ClientFeedback`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1995.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: snapshot lead sense ClientFeedback post-event (Canvi #1994, codex)
+
+### Context
+Després de treure `ClientFeedback` de la fitxa, portal, estat intern, atles, Master Atlas, tesi i roadmap, quedava una dependència residual al snapshot tècnic de lead: `leadSnapshotService` encara seleccionava `booking.clientFeedback` i exportava `stats.postEvent.hasClientFeedback`. Encara que fos una traça tècnica, tornava a posar `ClientFeedback` dins la lectura post-event i podia reobrir la confusió.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a snapshot tècnic, test, roadmap, counter i registres, sense schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `lib/services/leadSnapshotService.ts`: elimina `clientFeedback` del contracte d'entrada del snapshot i deixa de publicar `hasClientFeedback` dins `stats.postEvent`.
+- `lib/services/leadSnapshotService.ts`: el `select` Prisma de `processLeadTechnicalSnapshot()` ja no carrega `clientFeedback`; el snapshot post-event queda en email canònic, informe, enquesta i review/testimoni.
+- `__tests__/lib/services/leadSnapshotService.test.ts`: actualitza el cas de booking post-event i blinda que `hasClientFeedback` no surti al JSON ni al `select`.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #1994 i explicita que el snapshot tècnic ja no exporta `ClientFeedback`.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`leadSnapshotService`, 11 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #1994.
+- Validació funcional: el snapshot tècnic ja no pot presentar `ClientFeedback` com a senyal post-event.
+- Validació humana/UX: un agent o operador que llegeixi el JSON de lead veu la cadena canònica actual, no el model antic de feedback.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1994.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: roadmap incorpora tesi post-event #1992 (Canvi #1993, codex)
+
+### Context
+El #1992 havia corregit la tesi viva de la màquina perquè el cervell post-event ja no aparegui amb `ClientFeedback`, però el comandament Manolo-Zenit encara deixava la fila `Post-event i recurrencia` a #1991. Això podia fer que el roadmap semblés al dia mentre ignorava la correcció estratègica de la tesi.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a roadmap documental, counter i registres, sense codi runtime, schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: la fila `Post-event i recurrencia` incorpora #1992 i #1993.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el resum executiu afegeix que la tesi viva ja queda incorporada al comandament amb `Booking.postEventEmailSent`, `ClientSurvey` i `CustomerTestimonial`, no `ClientFeedback`.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el detall post-event afegeix bullets #1992 i #1993 perquè el salt documental quedi reconstruïble.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat codi runtime, backend, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #1993.
+- Validació funcional: el roadmap Manolo-Zenit ja veu la mateixa correcció estratègica que la tesi #1992.
+- Validació humana/UX: el següent agent pot triar el front post-event sense llegir un comandament que amagui la tesi viva actualitzada.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1993.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: tesi post-event sense ClientFeedback com a cervell (Canvi #1992, codex)
+
+### Context
+Després dels talls #1989-#1991, l'atles elèctric, el Master Atlas i el roadmap Manolo ja havien deixat clar que `ClientFeedback` no governa l'estat post-event. Quedava, però, una peça estratègica viva: `docs/TESI-MAQUINA-full-de-ruta-2026-07.md` encara descrivia el cervell post-event amb la parella `ClientSurvey/ClientFeedback`, i podia tornar a sembrar la lectura equivocada que el feedback antic és la font operativa.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a tesi documental, counter i registres, sense codi runtime, schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `docs/TESI-MAQUINA-full-de-ruta-2026-07.md`: l'estació `Post-event` passa a llistar `postEventPlaybookService`, `postEventPendingService`, `postEventDispatchService`, `questionnaireService`, `testimonialAdminService`, `reviewsSyncService`, `referralsService` i `reactivationService`.
+- `docs/TESI-MAQUINA-full-de-ruta-2026-07.md`: el cervell post-event explicita la cadena canònica `postEventPendingService` + `postEventDispatchService` + `questionnaireService`/`ClientSurvey` + `Booking.postEventEmailSent` + `CustomerTestimonial`, sense presentar `ClientFeedback` com a cervell ni estat.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat codi runtime, backend, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: cerca focalitzada OK (`ClientFeedback` absent de `docs/TESI-MAQUINA-full-de-ruta-2026-07.md`); `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #1992.
+- Validació funcional: la tesi viva de la màquina ja descriu el post-event amb la mateixa font de veritat que Atles, Master Atlas i el hub.
+- Validació humana/UX: el següent agent no rep una estratègia contradictòria que torni a fer servir `ClientFeedback` com a cervell post-event.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1992.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: roadmap post-event sincronitzat fins #1990 (Canvi #1991, codex)
+
+### Context
+El protocol viu ja tenia tancats #1988-#1990 i el detall del roadmap Manolo ja havia incorporat #1985-#1987, però la fila executiva `Post-event i recurrencia` de `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` encara s'aturava a #1984. Això feia que el full de comandament Manolo quedés per darrere del protocol en una zona que el següent agent consulta per triar el proper tall.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a roadmap documental, counter i registres, sense codi runtime, schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: la fila `Post-event i recurrencia` incorpora #1985-#1991 i resumeix QuickActions, subpantalles `#sec-post-event`, Atles i Master Atlas.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: afegits bullets #1988, #1989, #1990 i #1991 al detall post-event perquè la seqüència no salti de #1987 al protocol viu.
+
+### Validació
+- Validació tècnica: `pnpm run qa:zenit-roadmap` OK abans del registre final; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK; `git diff --check` OK sobre el perímetre #1991.
+- Validació funcional: el full Manolo-Zenit ja presenta el front post-event alineat amb els canvis reals fins al Master Atlas #1990.
+- Validació humana/UX: el següent agent no llegeix un comandament post-event endarrerit que amagui QuickActions, Atles i Master Atlas.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1991.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: Master Atlas post-event alineat (Canvi #1990, codex)
+
+### Context
+Després del #1989, l'atles elèctric ja no presentava `ClientFeedback` com a font de veritat del post-event, però el Master Atlas encara descrivia el mòdul `Post-event i volant` sense la cua canònica `postEventPendingService`, sense el dispatch que escriu l'email i sense el flag `Booking.postEventEmailSent`. També faltava la subruta real `/admin/post-event/feedback`.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a catàleg canònic, test i registres, sense schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `lib/constants/master-atlas.ts`: el mòdul `post-event` incorpora `/admin/post-event/feedback`, `postEventPendingService`, `postEventDispatchService`, `postEventReportAdminService`, `testimonialAdminService`, `Booking.postEventEmailSent` i `CustomerTestimonial`.
+- `lib/constants/master-atlas.ts`: l'operació passa a dir `Enviar email post-event amb enquesta` i el risc explicita no mirar `ClientFeedback` com a estat del post-event.
+- `__tests__/lib/services/masterAtlasService.test.ts`: blinda que el Master Atlas exposi cues, dispatch, flag canònic, subruta feedback i fitxers detectats.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`masterAtlasService`, 7 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK; `git diff --check` OK sobre el perímetre #1990.
+- Validació funcional: `/admin/docs/master` queda alimentat per un mòdul Post-event que veu la mateixa cadena canònica que el hub i l'atles elèctric.
+- Validació humana/UX: qui entra pel Master Atlas ja veu que l'enquesta viatja dins l'email post-event i que `ClientFeedback` no és estat operatiu.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1990.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: atles post-event sense ClientFeedback com a font (Canvi #1989, codex)
+
+### Context
+Després dels talls #1977-#1981, `ClientFeedback` ja no governa l'estat d'email ni el tancament intern del post-event. Tot i això, el glossari canònic de l'atles elèctric encara el mostrava com a `sourceOfTruth` del domini `Post-event`, i podia reobrir la confusió quan un agent consulta `/admin/docs/electric-atlas` abans de tocar aquest òrgan.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a catàleg canònic, test i registres, sense schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `lib/constants/repo-atlas.ts`: el flux `post-event-wheel` deixa de llistar `ClientFeedback` a la fase d'aprenentatge i passa a parlar de reports, surveys i respostes reals del client.
+- `lib/constants/repo-atlas.ts`: el glossari `Post-event` substitueix `ClientFeedback` per la cadena canònica `postEventPlaybookService`, `postEventPendingService`, `postEventDispatchService`, `Booking.postEventEmailSent`, `PostEventReport`, `ClientSurvey` i `CustomerTestimonial`.
+- `__tests__/lib/services/repoElectricAtlasService.test.ts`: blinda que la sortida que consumeix l'atles elèctric ja no exposi `ClientFeedback` com a font de veritat post-event.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`repoElectricAtlasService`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK; `git diff --check` OK sobre el perímetre #1989.
+- Validació funcional: `/admin/docs/electric-atlas` queda alimentat per un glossari que apunta al flag canònic d'email, cues i artefactes reals, no a `ClientFeedback`.
+- Validació humana/UX: un agent o operador que consulti l'atles ja no rep el missatge equivocat que `ClientFeedback` governa el post-event.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1989.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: QuickActions entra pel hub post-event (Canvi #1988, codex)
+
+### Context
+Després del #1987, el playbook i les subpantalles post-event ja aterren al bloc `#sec-post-event`, però `QuickActions` del dashboard encara podia disparar `/api/admin/emails/run-cron` des d'un lateral. Encara que el flux manual d'Emails manté confirmació, aquesta entrada saltava el hub on l'operador veu emails pendents, informes i retorn abans d'enviar res real.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a UI/copy/test i no autoritza schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/admin/components/QuickActions.tsx`: l'acció post-event deixa de ser un botó que crida `/api/admin/emails/run-cron` i passa a ser un enllaç `Revisar post-event` cap a `/admin/post-event`.
+- `app/admin/components/adminHelpContent.ts`: el copy d'ajuda explica que primer s'obre el hub per revisar emails pendents, informes i retorn abans d'enviar cap correu real.
+- `__tests__/app/admin/post-event-manual-confirmation.test.tsx`: blinda que QuickActions entra pel hub sense cridar `fetchWithCsrf`; el panell manual d'Emails continua exigint segon clic per executar el cron.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`post-event-manual-confirmation`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK; `git diff --check` OK sobre el perímetre #1988 amb avís CRLF a `adminHelpContent.ts`.
+- Validació funcional: el dashboard ja no pot executar el cron post-event com a acció lateral; l'operador entra pel hub abans de qualsevol enviament real.
+- Validació humana/UX: el CTA diu `Revisar post-event`, no `Enviar`, i reforça que el primer pas és entendre l'estat complet.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1988.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: testimoni sense client torna a reserva post-event (Canvi #1987, codex)
+
+### Context
+Després del #1986, les subpantalles post-event ja obren la reserva al bloc `#sec-post-event`, però el helper del playbook encara tenia una branca residual: si l'acció següent era `testimonial` i no existia `customerId`, el fallback aterrava a `#sec-client`. Això deixava el testimoni fora del mateix bloc on es governa el post-event.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a helper d'href i test, sense schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/admin/lib/post-event-actions.ts`: el fallback de `testimonial` sense `customerId` obre `buildBookingHref(item.bookingId)#sec-post-event`.
+- `__tests__/app/admin/post-event-actions.test.ts`: cobreix el href directe i l'acció preparada quan falta `customerId`.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`post-event-actions`, 12 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1987.
+- Validació funcional: el playbook no envia l'operador a `#sec-client` quan l'acció pendent continua sent post-event.
+- Validació humana/UX: si falta client canònic, la reserva continua sent el workspace de tancament del bolo.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1987.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: subpantalles post-event aterren a reserva post-event (Canvi #1986, codex)
+
+### Context
+Després del #1985, Emails ja obliga doble confirmació i dona sortida al bloc `#sec-post-event`. En revisar les subpantalles del mateix òrgan, `feedback`, `reports`, `surveys` i el link de client del `playbook` encara obrien la reserva genèrica, obligant l'operador a recordar on viu el tancament post-event.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a hrefs/imports UI i test, sense schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/admin/post-event/feedback/page.tsx`: importa el component compartit `PostEventEmailButton` i el link `Veure` obre `buildBookingHref(booking.id, 'sec-post-event')`.
+- `app/admin/post-event/reports/page.tsx`: `Veure detalls` obre `buildBookingHref(report.bookingId, 'sec-post-event')`.
+- `app/admin/post-event/surveys/page.tsx`: `Veure detalls` obre `buildBookingHref(survey.bookingId, 'sec-post-event')`.
+- `app/admin/post-event/playbook/page.tsx`: el nom del client obre `buildBookingHref(item.bookingId, 'sec-post-event')`.
+- `__tests__/app/admin/post-event/post-event-booking-anchors.test.ts`: blinda els quatre anchors i que Feedback no torni al wrapper de bookings.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`post-event-booking-anchors`, 4 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1986.
+- Validació funcional: qualsevol llistat post-event que obre una reserva aterra al bloc on viuen email, informe, enquesta i retorn operatiu.
+- Validació humana/UX: l'operador no ha de recordar manualment on és el panell post-event dins una reserva llarga.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1986.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: Emails post-event sense enviament d'un clic (Canvi #1985, codex)
+
+### Context
+Després del #1984, el pilot canònic ja apuntava a `/admin/post-event`, però la lectura lateral ha trobat dues costures obertes: el badge manual `Comença per pas 3` de `/admin/control` encara saltava hardcoded a `/admin/emails`, i la llista de pendents d'Emails tenia un botó individual capaç d'enviar un email post-event real amb un sol clic.
+
+- Autorització explícita propietari: `go` sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a UI/costura/test i no autoritza schema, API, BD write, migracions, crons ni enviaments reals des de terminal.
+
+### Canvi
+- `app/admin/components/PostEventEmailButton.tsx`: component canònic compartit per enviar email post-event amb doble confirmació.
+- `app/admin/bookings/[id]/PostEventEmailButton.tsx` i `app/admin/emails/SendPostEventButton.tsx`: wrappers cap al component canònic, eliminant la reimplementació insegura d'Emails.
+- `app/admin/emails/page.tsx`: cada reserva pendent mostra `Obrir post-event` cap a `buildBookingHref(booking.id, 'sec-post-event')` abans del botó d'enviament.
+- `app/admin/control/page.tsx` i `app/admin/components/adminHelpContent.ts`: el badge manual `Comença per pas 3` entra pel hub `/admin/post-event` i el copy explica que allà es revisen email, informe i retorn abans d'enviar correus reals.
+- `__tests__/app/admin/emails-post-event-costura.test.tsx`: blinda doble clic, reutilització canònica, enllaç a reserva i entrada del Control pel hub.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`emails-post-event-costura`, 4 tests; `PostEventEmailButton`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1985.
+- Validació funcional: Emails ja no té un botó individual d'un clic i la fila pot tornar al bloc de reserva on es governa el post-event.
+- Validació humana/UX: l'operador veu context i una confirmació explícita abans de disparar cap email real.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1985.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: pilot control post-event entra pel hub (Canvi #1984, codex)
+
+### Context
+Després del #1983, el dashboard ja entra a `/admin/post-event`, però el pilot operatiu de `/admin/control` encara heretava `ADMIN_DASHBOARD_PILOT_STEPS.postevent.href = /admin/emails`. Era el mateix salt lateral vell: anar directament a enviament sense passar pel hub que mostra email, informe i enquesta.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a constant de navegació/test i no autoritza schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `lib/constants/admin.ts`: `ADMIN_DASHBOARD_PILOT_STEPS` fa que `postevent` apunti a `/admin/post-event`.
+- `__tests__/lib/constants/adminDashboardPilotSteps.test.ts`: test nou que blinda que el pilot no torni a `/admin/emails`.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`adminDashboardPilotSteps`, 1 test); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1984.
+- Validació funcional: Control, Dashboard i Brief entren pel mateix hub post-event.
+- Validació humana/UX: el propietari veu el context abans de clicar cap a l'enviament real.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1984.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: dashboard post-event entra pel hub (Canvi #1983, codex)
+
+### Context
+Després del #1982, `/admin/post-event` ja mostra `Emails pendents` amb CTA segur cap a `/admin/emails`. El dashboard, però, continuava enviant l'alerta `Emails post-event pendents` directament a `/admin/emails`, saltant-se l'òrgan post-event que ara concentra el diagnòstic.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a href/costura UI i test, sense schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/admin/lib/dashboard-data.ts`: l'alerta `Emails post-event pendents` apunta a `/admin/post-event`.
+- `__tests__/app/admin/dashboard-post-event-alert.test.ts`: test nou que blinda que el dashboard entra pel hub i no per la subpantalla d'emails.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`dashboard-post-event-alert`, 1 test); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1983.
+- Validació funcional: el dashboard i el daily brief entren pel mateix òrgan post-event abans de baixar a Emails.
+- Validació humana/UX: l'operador veu primer el context complet del tancament i després decideix enviar des de la pantalla segura.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1983.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: hub post-event mostra emails pendents (Canvi #1982, codex)
+
+### Context
+`zenit:db:audit` continua trobant dues reserves completades sense post-event arrencat. El hub `/admin/post-event` era el lloc natural per veure aquest KO, però només mostrava informes i enquestes; els emails pendents quedaven amagats a `/admin/emails`. Això partia l'òrgan post-event i feia menys evident la primera acció.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a lectura server/UI/test i no autoritza schema, API, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/admin/post-event/page.tsx`: el hub consumeix `buildPendingPostEventEmailBookingWhere(now)` i mostra el KPI `Emails pendents`.
+- El KPI filtra artefactes de prova amb el mateix detector que informes/enquestes i ofereix CTA segur a `/admin/emails`, on l'enviament real exigeix confirmació.
+- `__tests__/app/admin/post-event/page-test-artifact-filter.test.ts`: cobertura nova del KPI i de la font canònica.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`post-event page-test-artifact-filter`, `postEventPendingService`, 9 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1982.
+- Validació funcional: `/admin/post-event` ja mostra el mateix KO que detecta l'auditoria BD, sense duplicar la query ni enviar res.
+- Validació humana/UX: l'operador veu que el primer pas pendent és l'email i salta a la pantalla segura d'enviament.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1982.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: poda ClientFeedback del detall de reserva (Canvi #1981, codex)
+
+### Context
+Després del #1977-#1980, `ClientFeedback` ja no governa cap estat d'email o tancament post-event, però el detall de reserva encara el carregava tant a la fitxa server com al servei de ruta admin. Era una dependència residual que mantenia viva la idea falsa que el detall de reserva necessita `ClientFeedback` per explicar el post-event.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a reducció de lectura/payload admin i tests, sense schema, API pública, BD write, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/admin/bookings/[id]/page.tsx`: retirada la inclusió `clientFeedback: true` del query de detall.
+- `lib/services/bookingRouteService.ts`: retirada la inclusió `clientFeedback: true` de `getBookingDetail()`.
+- `__tests__/app/admin/bookings/BookingDetailPostEventButtonState.test.ts`: blinda que la fitxa no torni a carregar `ClientFeedback` per l'estat post-event.
+- `__tests__/lib/services/bookingRouteService.test.ts`: blinda que el servei de detall de reserva no inclogui `clientFeedback`.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`BookingDetailPostEventButtonState`, `bookingRouteService`, 33 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1981.
+- Validació funcional: el detall de reserva ja no arrossega un model que no és font d'estat post-event.
+- Validació humana/UX: la fitxa conserva el tancament intern visible sense dependre d'una dada que podia confondre email, feedback i descompte.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1981.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: timeline del portal post-event canònica (Canvi #1980, codex)
+
+### Context
+El portal client ja mostrava l'estat del bloc post-event amb `Booking.postEventEmailSent`, però el resum de timeline encara decidia el post-event amb `booking.postEventReport ? Informe completat : En progrés`. Això podia dir al client que el post-event estava en curs quan l'email post-event encara era pendent.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a UI/i18n/test i no autoritza schema, API, BD, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/[locale]/portal/[token]/page.tsx`: el resum de timeline calcula `portalPostEventTimelineStatus` amb tres estats: informe completat, email post-event enviat o email post-event pendent.
+- `lib/clientPortalMessages.ts`: retirada la key genèrica `postEventProgress` perquè no quedi una etiqueta vella que amagui si l'email s'ha enviat.
+- `__tests__/app/portal/portalPostEventFeedbackSource.test.ts`: cobertura nova que blinda el resum de timeline contra tornar al ternari `postEventReport ? done : progress`.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`portalPostEventFeedbackSource`, `clientPortalMessages`, 13 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1980.
+- Validació funcional: el portal client ja no pot marcar post-event com a "en progrés" només perquè no hi ha informe intern; l'estat visible passa per l'email post-event canònic.
+- Validació humana/UX: el client veu una lectura concreta i accionable: informe completat, email enviat o email pendent.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1980.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: estat intern post-event sense ClientFeedback (Canvi #1979, codex)
+
+### Context
+Després d'alinear fitxa i portal amb `Booking.postEventEmailSent`, la cerca transversal ha trobat que `bookingOperationalService` encara feia servir `ClientFeedback.sentAt` per decidir si el tancament intern post-event estava en progrés o complet. `ClientFeedback` és legítim per codis/descompte i artefactes de feedback, però no pot governar l'estat d'arrencada ni de finalització del post-event.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a servei/UI/test i no autoritza schema, API, BD, migracions, crons ni enviaments reals.
+
+### Canvi
+- `lib/services/bookingOperationalService.ts`: `internalPostEventStatus` passa a dependre d'informe, `Booking.postEventEmailSent` i resposta real del client (`ClientSurvey` o `reviewSubmittedAt`), no de `ClientFeedback.sentAt`.
+- `app/admin/bookings/[id]/page.tsx`: la fitxa mostra una targeta `Tancament intern` dins el bloc post-event, perquè el canvi de servei sigui visible i operatiu a l'admin.
+- `__tests__/lib/services/bookingOperationalService.test.ts`: cobertura nova que blinda que `ClientFeedback` no compta com a progrés post-event.
+- `__tests__/app/admin/bookings/BookingDetailPostEventButtonState.test.ts`: cobertura que blinda la targeta visible de tancament intern.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`bookingOperationalService`, `BookingDetailPostEventButtonState`, `PostEventEmailButton`, 35 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1979.
+- Validació funcional: l'estat intern ja no pot avançar o completar-se només perquè existeixi un `ClientFeedback.sentAt`; l'arrencada la marca l'email canònic i el tancament exigeix informe + resposta real.
+- Validació humana/UX: l'operador veu el tancament intern com una peça pròpia dins post-event, separada d'email, informe i enquesta.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1979.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: portal post-event amb font canònica (Canvi #1978, codex)
+
+### Context
+El portal client mostrava l'estat del tancament post-event amb `booking.clientFeedback`, però el dispatch canònic de l'email escriu `Booking.postEventEmailSent/postEventEmailSentAt`. Després del #1977, l'admin ja mirava la font correcta; faltava que la superfície pública del client no pogués explicar una altra realitat.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a lectura/UI/i18n/test i no autoritza schema, API, BD, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/[locale]/portal/[token]/page.tsx`: el bloc post-event del portal passa a mostrar l'estat segons `booking.postEventEmailSent`.
+- `lib/clientPortalMessages.ts`: el copy públic ca/es/en diu explícitament `email post-event enviat/pendent`, no un feedback genèric.
+- `lib/services/clientPortalAccess.ts`: el portal deixa de carregar `clientFeedback` només per decidir aquest estat.
+- `__tests__/app/portal/portalPostEventFeedbackSource.test.ts`, `__tests__/lib/services/clientPortalAccess.test.ts` i `__tests__/lib/clientPortalMessages.test.ts`: cobertura ajustada perquè el portal consumeixi la font canònica i no reintrodueixi `clientFeedback`.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`portalPostEventFeedbackSource`, `clientPortalAccess`, `clientPortalMessages`, 34 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1978.
+- Validació funcional: el portal client ja no pot divergir de l'admin/dispatch marcant post-event segons `ClientFeedback` quan la veritat és `Booking.postEventEmailSent`.
+- Validació humana/UX: el client veu una frase concreta d'email post-event pendent/enviat, no una etiqueta ambigua de feedback.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1978.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: email post-event amb font canònica a la fitxa (Canvi #1977, codex)
+
+### Context
+La targeta post-event de la fitxa de reserva deia `Feedback Enviat` i marcava l'estat amb `booking.clientFeedback`, però el dispatch canònic `sendPostEventEmailForBooking()` escriu `Booking.postEventEmailSent/postEventEmailSentAt`. Això podia fer que la fitxa continués mostrant pendent encara que l'email post-event ja hagués sortit correctament.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a UI/test i no autoritza schema, API, BD, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/admin/bookings/[id]/page.tsx`: la targeta passa a dir `Email post-event` i consumeix `booking.postEventEmailSent/postEventEmailSentAt`.
+- `ClientFeedback` deixa de governar si l'email post-event està enviat; pot continuar existint com a dada de codi/descompte, però no és la font d'estat de l'email.
+- `__tests__/app/admin/bookings/BookingDetailPostEventButtonState.test.ts`: cobertura nova que blinda la font canònica de l'estat.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`BookingDetailPostEventButtonState` + `PostEventEmailButton`, 6 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1977.
+- Validació funcional: la fitxa ja no pot contradir el dispatch post-event mostrant pendent per mirar `ClientFeedback` quan la font real és `Booking.postEventEmailSent`.
+- Validació humana/UX: l'operador veu l'estat exacte de l'email post-event al mateix bloc que l'acció d'enviament.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1977.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: enquesta post-event sense falsa acció separada (Canvi #1976, codex)
+
+### Context
+Després del #1975, el playbook ja aterra al bloc `Post-event` de la reserva. Revisant el mateix bloc, la targeta `Enquesta Client` deia només `Pendent de rebre`, cosa que podia fer pensar que faltava una acció amagada o una pantalla separada per enviar l'enquesta. La revisió del codi confirma que `ClientSurvey` només existeix quan el client respon; l'enquesta es demana dins l'email post-event canònic.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a copy/estat UI i no autoritza schema, API, BD, migracions, crons ni enviaments reals.
+
+### Canvi
+- `app/admin/bookings/[id]/page.tsx`: la fitxa deriva `postEventSurveyStatus` des de `booking.clientSurvey` i `booking.postEventEmailSent`.
+- Si hi ha resposta, mostra `NPS`; si l'email ja s'ha enviat, mostra `Email enviat; pendent de resposta`; si encara no, mostra que s'enviarà amb l'email post-event.
+- `__tests__/app/admin/bookings/BookingDetailPostEventButtonState.test.ts`: blinda que la fitxa expliqui aquesta dependència canònica.
+- No s'ha enviat cap email real, no s'ha creat cap enquesta, no s'ha fet cap write de BD i no s'ha tocat backend, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`BookingDetailPostEventButtonState` + `PostEventEmailButton`, 5 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1976.
+- Validació funcional: la fitxa ja no insinua una acció d'enquesta separada; la resposta pendent queda lligada a l'email post-event canònic.
+- Validació humana/UX: l'operador sap si encara ha d'enviar l'email o només esperar resposta.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1976.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: playbook post-event aterra al bloc post-event de la reserva (Canvi #1975, codex)
+
+### Context
+La recuperació de protocol després del tall de sessió ha revalidat que `ADMIN_CHANGE_COUNTER` era `1974` i que el #1974 ja estava tancat per Claude. `pnpm run zenit:db:audit` continua trobant `completedBookingsPostEventNotStarted=2` (`OE-2026-004`, `OE-2026-005`). El playbook post-event ja marcava `Email d'agraïment` com a següent acció, però el CTA obria `#sec-client` i el bloc `#sec-post-event` només mostrava estat.
+
+- Autorització explícita propietari: `has petat` + `protocol de treball` activen la recuperació sota el protocol viu; aquest tall queda acotat a UI/costura post-event i no autoritza schema, API, BD, migracions, crons ni enviaments reals.
+
+### Canvi
+- `thank_you` del playbook obre ara `#sec-post-event` de la reserva.
+- La fitxa de reserva mou les accions `PostEventEmailButton`, `Crear informe intern` i `Obrir playbook` dins el panell `Post-event` de reserves completades.
+- Es retira el botó d'email post-event del panell genèric de client per no barrejar tancament de bolo amb contacte normal.
+- No s'ha enviat cap email real, no s'ha escrit BD i no s'ha tocat backend, cron, schema ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`post-event-actions`, `BookingDetailPostEventButtonState`, `PostEventEmailButton`, 14 tests); TypeScript OK; `git diff --check` OK sobre perímetre #1975; `qa:protocol`, `qa:zenit-roadmap` i `qa:manolo-boundary` OK.
+- Validació funcional: `zenit:db:audit` OK read-only; el finding de 2 reserves sense post-event arrencat segueix viu perquè el tall només corregeix la costura UI i no fa cap mutació.
+- Validació humana/UX: el playbook deixa d'enviar l'operador a dades de client i l'aterratge és el bloc post-event, amb estat i accions al mateix lloc.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1975.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: eliminat Task.legacyLeadTaskId amb migració (Canvi #1974, claude)
+
+### Context
+`legacyLeadTaskId` era un camp temporal creat a la migració `20260410140000_drop_lead_task_model` (Canvi #67, 2026-04-10) com a pont de compatibilitat: quan el model `LeadTask` es va eliminar del schema i tot va migrar a `Task`, aquest camp permetia que enllaços antics cap a un `LeadTask.id` ja desaparegut es poguessin resoldre igualment via `findTaskLinkByTaskOrLegacyId()`. El `MÉS ENDAVANT` del protocol (§6.2) deia explícitament: "eliminar `legacyLeadTaskId` quan ja no hi hagi dades amb aquest camp". L'auditoria Zenit de Codex (#1929) ja havia confirmat `legacyLeadTaskLinks=0` sobre BD real.
+
+- Autorització explícita propietari: **"toca legacyLeadTaskId amb migració"** — ordre directa per executar el schema + migració, en resposta a l'informe d'estat on vaig assenyalar que aquest era l'únic `MÉS ENDAVANT` amb dades a punt però bloquejat per requerir autorització d'schema.
+
+### Verificació prèvia (no donar per bo l'informe extern sense revalidar)
+Abans de tocar schema, vaig consultar la BD de producció (Railway) directament, sense confiar només en l'auditoria de Codex: `SELECT COUNT(*) FROM tasks WHERE "legacyLeadTaskId" IS NOT NULL` → **0 de 81 tasks reals**. Confirmat de forma independent.
+
+### Canvi
+- `prisma/schema.prisma`: eliminat `legacyLeadTaskId String? @unique` del model `Task`.
+- `prisma/migrations/20260711143000_drop_task_legacy_lead_task_id/migration.sql` (nova): `DROP INDEX IF EXISTS "tasks_legacyLeadTaskId_key"` + `ALTER TABLE "tasks" DROP COLUMN IF EXISTS "legacyLeadTaskId"`.
+- Migració **aplicada a Railway** amb `npx prisma migrate deploy` i verificada (`prisma migrate status` → "Database schema is up to date!"; columna confirmada absent per consulta directa a `information_schema.columns`; `tasks` continua íntegra amb 81 files).
+- `lib/services/tasks/leadScopedTaskService.ts`: `findTaskLinkByTaskOrLegacyId()` simplificat i renombrat a `findTaskLinkByTaskId()` — ja no hi ha branca de fallback legacy, només `prisma.task.findUnique({ where: { id } })`.
+- `lib/customer-hub/data.ts`: `resolveCustomerHubCustomerId()` actualitzat a la nova crida `findTaskLinkByTaskId()`.
+- `scripts/zenit-db-audit.mjs`: eliminada la consulta `prisma.task.findMany({ where: { legacyLeadTaskId: { not: null } } })` i el finding `legacyLeadTaskLinks` sencer (query, destructure, output, missatge d'acció) — el camp ja no existeix, l'auditoria ja no té sentit.
+- `scripts/check-zenit-tooling.mjs`: guard actualitzat — ja no exigeix `legacyLeadTaskLinks`/`legacyLeadTaskFieldAudited`/`prisma.task.findMany` a l'script d'auditoria.
+- Tests actualitzats: `__tests__/scripts/check-zenit-tooling.test.ts` (fixture + eliminat el test que exigia cobertura de `legacyLeadTaskId`), `__tests__/lib/services/tasks/leadScopedTaskService.test.ts`, `__tests__/lib/customer-hub/data.test.ts`.
+- `docs/estat-admin.md`: retirada la línia de backlog §6.2 sobre `legacyLeadTaskId`, ja resolta.
+
+### Validació
+- Validació tècnica: `npx prisma generate` OK (calia matar processos node prèviament per un lock EPERM del DLL del query engine, procediment ja validat en sessions anteriors); `npx tsc --noEmit --pretty false` OK; `npx vitest run` sobre els 3 fitxers de test afectats OK (45/45); `pnpm run validate:core` OK sencer (exit 0).
+- Validació de migració: `npx prisma migrate status` abans → 1 migració pendent (la meva); `npx prisma migrate deploy` aplicada correctament; `npx prisma migrate status` després → "Database schema is up to date!"; consulta directa confirma 0 columnes `legacy*` a `tasks` i 81 tasks intactes (cap pèrdua de dades).
+- Nota de coordinació: `pnpm test:run` (suite completa, fora de `validate:core`) mostra 5 tests fallant en 3 fitxers (`TestimonialForm.test.tsx`, `useBookingPricing.test.ts`, `PresupuestoPdfStudio-customer-search.test.ts`) sense cap relació amb `Task`/`legacyLeadTaskId`/customer-hub — pertanyen a una pila de fitxers ja modificats al working tree abans d'aquest tall (`app/admin/presupuestos/**`, `lib/services/*`), fora del meu perímetre. No tocats.
+- Validació funcional: `resolveCustomerHubCustomerId()` continua resolent tasks per id directe; ja no hi ha cap camí de codi que depengui d'un camp inexistent.
+- Validació humana/UX: cap efecte visible — el camp no s'exposava enlloc de la UI; el `MÉS ENDAVANT` de §6.2 queda tancat de veritat (schema + dades + codi + auditoria), no només documentat.
+
+### Tancament
+Counter -> 1974.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: botó individual post-event amb doble confirmació (Canvi #1973, codex)
+
+### Context
+Després del #1972, Home i Emails ja exigien dos clics abans de disparar l'enviament manual de post-event. La fitxa individual de reserva encara conservava el botó `PostEventEmailButton` com a acció d'un sol clic, tot i que també pot enviar un email real a un client.
+
+### Canvi
+- `app/admin/bookings/[id]/PostEventEmailButton.tsx`: el primer clic només arma la confirmació i mostra un avís visible; el segon clic confirma l'enviament real.
+- `__tests__/app/admin/bookings/PostEventEmailButton.test.tsx`: cobertura ajustada perquè comprovi que el primer clic no crida `fetchWithCsrf`, mostra l'avís i només el segon clic intenta l'enviament.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron ni schema.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és UI de seguretat operativa sense comunicacions externes ni mutacions de dades.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`PostEventEmailButton`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1973.
+- Validació funcional: la fitxa de reserva ja no pot enviar un email post-event individual amb un clic accidental.
+- Validació humana/UX: el botó explicita "Confirmar enviament" i mostra que s'enviarà un email real al client abans de permetre l'acció.
+
+### Tancament
+Counter -> 1973.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: enviament post-event manual amb doble confirmació (Canvi #1972, codex)
+
+### Context
+Després del #1971, manual i automàtic ja comparteixen una sola identitat de cron. Però la superfície d'operador encara tenia un risc de producte: `Executar post-event` era un botó d'un sol clic a Home i a Emails, tot i que pot enviar emails reals a clients pendents.
+
+### Canvi
+- `app/admin/components/QuickActions.tsx`: el primer clic arma l'acció i mostra avís; només el segon clic confirma l'enviament real.
+- `app/admin/emails/ManualActionsPanel.tsx`: el botó passa de "executar cron" genèric a "preparar/confirmar enviament" amb copy explícit d'emails reals.
+- `app/admin/components/adminHelpContent.ts`: ajuda contextual actualitzada perquè expliqui la confirmació de segon clic.
+- `__tests__/app/admin/post-event-manual-confirmation.test.tsx`: cobertura nova que comprova que el primer clic no crida `/api/admin/emails/run-cron` i el segon sí.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD i no s'ha tocat backend d'enviament, cron ni schema.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és UI de seguretat operativa sense comunicacions externes ni mutacions de dades.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`post-event-manual-confirmation`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1972.
+- Validació funcional: un operador ja no pot disparar l'enviament post-event manual amb un clic accidental.
+- Validació humana/UX: la pantalla diu clarament que són emails reals i exigeix confirmació immediata.
+
+### Tancament
+Counter -> 1972.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: cron post-event amb una sola identitat operativa (Canvi #1971, codex)
+
+### Context
+`zenit:db:audit` queda net en documents/PDF/propostes i artefactes de prova, però continua assenyalant 2 reserves `COMPLETED` amb post-event no arrencat (`OE-2026-004`, `OE-2026-005`). Revisant el flux abans d'enviar res real, apareixia una segona font de veritat: el cron automàtic `/api/cron/post-event` escrivia l'estat a `automation.postEvent`, mentre l'execució manual des d'Emails/Home escrivia a `emails.cron`; diverses pantalles llegien una o l'altra.
+
+### Canvi
+- `lib/constants/admin.ts`: nova font única `ADMIN_POST_EVENT_CRON_STATUS_PREFIX = 'automation.postEvent'`, helper de claus de settings i lectura amb fallback legacy `emails.cron`.
+- `/api/cron/post-event` i `/api/admin/emails/run-cron`: tots dos desen l'estat del mateix procés sota el prefix canònic.
+- `/admin/emails`, `/admin/control`, `/admin/settings/integrations`, `fetchDashboardData()`, Salut i `scripts/autofix-system-health.ts`: llegeixen el mateix estat canònic i només fan fallback a la clau legacy per historial vell.
+- No s'ha enviat cap email real, no s'ha fet cap write de BD de client i no s'ha tocat el servei d'enviament post-event.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall només canonitza estat de cron/API ja existent, sense schema, migracions, BD write ni comunicacions externes.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`emails-run-cron-route`, `post-event-route`, `adminCronPrefixes`, `adminHealthService`, 20 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run qa:api-cron-auth` OK; `git diff --check` OK sobre el perímetre #1971.
+- Validació funcional: l'estat de post-event deixa de bifurcar-se entre "cron de correus" i "automatització post-event"; el backlog real continua visible sense disparar comunicacions externes durant l'auditoria.
+- Validació humana/UX: Emails, Home, Salut, Integracions i Crons passen a parlar del mateix procés.
+
+### Tancament
+Counter -> 1971.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: últimes 3 files òrfenes de l'inventari eliminades i validades (Canvi #1970, claude)
+
+### Context
+Codex ja havia sincronitzat el mapa a `docs/audit/inventari-funcions-orfenes.md` (Canvi #1969, "sincronització documental") marcant `computeProductMargin`, `computeSupportableTravelKm` i `getDossiersByLead` com a `MATAT` perquè va trobar-les ja eliminades al meu working tree, però explícitament sense executar la validació tècnica ("Validació tècnica: pendent d'executar en aquest tall"). Aquest Canvi tanca la part que faltava: la investigació, l'eliminació real i la validació completa d'aquestes tres funcions, que jo ja havia dut a terme en paral·lel i de forma independent.
+
+Revalidació pròpia confirma 0 consumidors reals fora del propi fitxer + test per a les tres:
+- `collaboratorProductService.ts::computeProductMargin` — mai importada des de cap pantalla de marge de producte.
+- `costEngine.ts::computeSupportableTravelKm` — funció pura sense cap crida interna dins el propi cervell de cost, ni cap consumidor extern.
+- `dossierService.ts::getDossiersByLead` — mai cridada; els dossiers per lead es consulten per altres vies actuals.
+
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada de tres exports sense consumidor de producció i no modifica schema, API ni BD.
+
+### Canvi
+- `lib/services/collaboratorProductService.ts`: eliminat `computeProductMargin`.
+- `lib/services/costEngine.ts`: eliminat `computeSupportableTravelKm` (verificat: no és cridada per `computeBookingFinancialSummary` ni cap altra funció del cervell de cost).
+- `lib/services/dossierService.ts`: eliminat `getDossiersByLead`.
+- Tests corresponents actualitzats: `__tests__/lib/services/collaboratorProductService.test.ts`, `__tests__/lib/services/costEngine.test.ts` (també retirat l'import `DEFAULT_VEHICLE_COST_PER_KM` que havia quedat sense ús) i `__tests__/lib/services/dossierService.test.ts`.
+- No s'han tocat `computeBookingFinancialSummary`, cap pantalla de marge de producte, cap llistat de dossiers ni schema/BD.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `npx vitest run` sobre els 3 fitxers de test afectats OK (108/108 tests); `pnpm run validate:core` OK sencer (exit 0, tots els guards `qa:*` inclosos).
+- Validació funcional: cerca residual confirma que cap dels 3 símbols queda referenciat fora de la documentació de l'inventari; `computeBookingFinancialSummary` (el cervell de cost real) continua intacte i no depenia de `computeSupportableTravelKm`.
+- Validació humana/UX: l'inventari de 79 files òrfenes queda tancat del tot (0 files ⬜ pendents), amb la part de codi validada tècnicament i no només documentada.
+
+### Tancament
+Counter -> 1970.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: sendPrivacyRequestCompletedEmail recuperat i connectat de veritat (Canvi #1964, claude)
+
+### Context
+Codex va eliminar `sendPrivacyRequestCompletedEmail` de `lib/email.ts` al Canvi #1953 (clúster testimonials/privacy) sense veure la instrucció explícita del propietari, donada minuts abans en un altre context, de conservar aquesta funció. El propietari, avisat del conflicte, va resoldre: **"recupera i connecta sendPrivacyRequestCompletedEmail de veritat"** — no només restaurar-la, sinó connectar-la de debò al flux real.
+
+Investigant `processPrivacyRequestById` (`lib/services/privacyRequestAdminService.ts`) es confirma un bug real preexistent: la funció ja marcava `responseSentAt: new Date()` en aprovar una sol·licitud RGPD, simulant que s'havia enviat una notificació que en realitat mai s'enviava — cap codi de dispatch d'email existia en aquest flux. A més, el paràmetre `downloadUrl` que la funció original de correu esperava no tenia cap mecanisme real de descàrrega darrere.
+
+- Autorització explícita propietari: "recupera i connecta sendPrivacyRequestCompletedEmail de veritat" (instrucció directa, després del conflicte amb el Canvi #1953 de Codex).
+
+### Canvi
+- `lib/email.ts`: reconstruït `sendPrivacyRequestCompletedEmail()` amb l'idioma modern (`sendTrackedStandaloneEmail` + `orbita: { kind: 'admin', ... }`), igual que la seva germana `sendPrivacyVerificationEmail`. Suporta `result: 'approved' | 'rejected'`, notes i `downloadUrl` opcional.
+- `app/api/privacy/download/route.ts` (NOU): ruta pública sense auth (mateix patró que `/api/privacy/verify`) que serveix l'export JSON d'una sol·licitud ACCESS/PORTABILITY completada, reutilitzant el `verificationToken` ja existent de `DataRequest` com a únic mecanisme d'autenticació — sense inventar token nou.
+- `lib/services/privacyService.ts`: nova funció `getDownloadableDataRequestExport(token)` — la ruta ja no importa `@/lib/prisma` directament (exigit per `qa:prisma-in-routes`).
+- `lib/constants/privacy.ts`: nova constant `DOWNLOADABLE_PRIVACY_REQUEST_TYPES` (font única del catàleg `ACCESS`/`PORTABILITY`, prèviament duplicat local a dos fitxers — exigit per `arch:layer:check`).
+- `lib/services/privacyRequestAdminService.ts`: `processPrivacyRequestById()` ara envia realment l'email en aprovar (amb `downloadUrl` quan aplica) i en rebutjar, cada crida embolicada en `try/catch` amb `log.error` — un fallo d'enviament no trenca la resposta 200 de l'acció admin.
+- No s'ha tocat schema, migracions ni cap endpoint fora de la nova ruta pública read-only.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK (net al meu perímetre; l'únic error trobat era de `protocolCanvisService.test.ts`, fitxer de Codex en curs pel seu propi Canvi #1963, no tocat per mi); `npx vitest run __tests__/app/api/privacy-download-route.test.ts __tests__/lib/services/privacyRequestAdminService.test.ts __tests__/lib/services/privacyService.test.ts` OK (57/57 tests, 3 fitxers nous/ampliats); `pnpm run validate:core` OK sencer (669 tests unitaris + tots els guards `qa:*`, incloent `arch:layer:check` i `qa:prisma-in-routes` verds després de la consolidació de la constant i el servei).
+- Validació funcional: aprovar una sol·licitud ACCESS/PORTABILITY genera `downloadUrl` cap a `/api/privacy/download?token=...`; aprovar ERASURE/RECTIFICATION/OBJECTION/RESTRICTION no genera `downloadUrl`; rebutjar envia email de rebuig amb `notes`; el locale de l'email prioritza `customer.preferredLocale` quan hi ha vincle.
+- Validació humana/UX: el titular d'una sol·licitud RGPD ara rep de veritat la notificació de resolució (abans `responseSentAt` era un camp fantasma) i, si aplica, un enllaç funcional per descarregar les seves dades.
+
+### Tancament
+Counter -> 1964.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: inventari d'òrfenes sense pendents oberts (Canvi #1969, codex)
+
+### Context
+Després dels talls #1951–#1968, l'inventari d'òrfenes encara mostrava tres files ⬜: `computeProductMargin`, `computeSupportableTravelKm` i `getDossiersByLead`. La revalidació actual mostra que aquests símbols ja no existeixen al codi actual fora de la pròpia taula d'inventari. Són entrades stale del mapa, no feina runtime pendent d'aquest tall.
+
+### Canvi
+- `docs/audit/inventari-funcions-orfenes.md`: files #9, #12 i #20 marcades com a `MATAT #1969`.
+- `docs/audit/inventari-funcions-orfenes.md`: peu actualitzat per indicar que no queden files ⬜ pendents.
+- No s'han tocat `collaboratorProductService.ts`, `costEngine.ts`, `dossierService.ts` ni els seus tests; hi ha canvis previs al worktree i aquest tall només sincronitza el mapa.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una sincronització documental i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: pendent d'executar en aquest tall: cerca residual, focused Vitest de serveis afectats, TypeScript, `qa:protocol`, `qa:zenit-roadmap`, `qa:manolo-boundary` i `git diff --check`.
+- Validació funcional: el mapa Manolo ja no presenta decisions REFER/MATAR obertes dins aquest inventari.
+- Validació humana/UX: el full de ruta d'òrfenes deixa de semblar una cua infinita i passa a tenir estat tancat i auditable.
+
+### Tancament
+Counter -> 1969.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: handleAdminAuth confirmat viu, fals positiu de l'inventari (Canvi #1968, codex)
+
+### Context
+L'inventari d'òrfenes marcava `admin-auth.ts` → `handleAdminAuth` com a pendent. La revalidació ampla mostra que és fals positiu: `middleware.ts` a l'arrel del repo importa i crida `handleAdminAuth` per `/admin`, `/api/admin` i previews Studio. El detector original no cobria aquest consumidor d'arrel.
+
+### Canvi
+- `docs/audit/inventari-funcions-orfenes.md`: fila #1 marcada com a `VIU #1968`.
+- No s'han tocat `lib/middleware/admin-auth.ts`, `middleware.ts`, auth, CSRF, schema, BD ni rutes.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una sincronització documental i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca ampla confirma `middleware.ts` com a consumidor real; focused Vitest OK (`middleware.test.ts`, `admin-auth.test.ts`, 31 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1968.
+- Validació funcional: el middleware continua protegint `/admin`, `/api/admin` i previews Studio amb `handleAdminAuth`.
+- Validació humana/UX: Manolo evita eliminar una peça crítica d'accés admin i deixa constància que el fals positiu venia del perímetre del scanner.
+
+### Tancament
+Counter -> 1968.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: pricing-intelligence paral·lel eliminat, pricing viu intacte (Canvi #1967, codex)
+
+### Context
+L'inventari d'òrfenes mantenia quatre exports de `pricing-intelligence.ts`: `computeCollaboratorCost`, `computeFullBookingCost`, `getHourlyColor` i `getPriceDeviationAlert`. La revalidació actual mostra 0 consumidors reals fora dels tests. `/admin/pricing` consumeix les constants i helpers vius del mateix fitxer (`SERVICE_HOURLY_RATES`, `MARGIN_TONES`, `EQUIPMENT_AMORTIZATION`, `getMarginColor`, `resolveServicePricingKey`, `getEquipmentCostPerHour`).
+
+### Canvi
+- `lib/constants/pricing-intelligence.ts`: eliminats els quatre exports morts i el motor de cost/marge paral·lel associat.
+- `__tests__/lib/constants/pricing-intelligence.test.ts`: retirades les proves que mantenien vius aquests exports; es conserven proves de resolució de tarifa i amortització.
+- `docs/audit/inventari-funcions-orfenes.md`: files #58, #59, #60 i #61 marcades com a `MATAT #1967`.
+- No s'han tocat `/admin/pricing`, `packPricingHealth`, economia, configurador, schema, BD ni UI.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'exports sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca residual sense `computeCollaboratorCost`/`computeFullBookingCost`/`getHourlyColor`/`getPriceDeviationAlert` fora de docs; focused Vitest OK (`pricing-intelligence.test.ts`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1967.
+- Validació funcional: tarifes, tons de marge, amortització i helper `getMarginColor` continuen disponibles per `/admin/pricing`.
+- Validació humana/UX: Manolo elimina un segon motor de cost/marge no connectat i deixa `costEngine.ts` com a cervell viu per al cost del bolo.
+
+### Tancament
+Counter -> 1967.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: loadSocialPerformanceReport eliminat, motor social pur intacte (Canvi #1966, codex)
+
+### Context
+L'inventari d'òrfenes mantenia `socialPerformanceService.ts` → `loadSocialPerformanceReport` com a pendent. La revalidació actual mostra 0 consumidors reals fora de l'inventari. El producte viu de Social usa `/admin/social`, `socialPostService`, `socialIdeasService` i `socialContentPulseService`; aquest últim consumeix `computeConsistencyScore` del mateix motor pur.
+
+### Canvi
+- `lib/services/socialPerformanceService.ts`: eliminat `loadSocialPerformanceReport` i l'import Prisma associat.
+- `docs/audit/inventari-funcions-orfenes.md`: fila #77 marcada com a `MATAT #1966`.
+- No s'han tocat `/admin/social`, `socialContentPulseService`, social posts, calendari, schema, BD ni UI.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'un export sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca residual sense `loadSocialPerformanceReport` fora de docs; focused Vitest OK (`socialPerformanceService.test.ts`, 19 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1966.
+- Validació funcional: `computePlatformMetrics`, `computeConsistencyScore`, `generateRecommendations` i `generateSocialPerformanceReport` continuen intactes.
+- Validació humana/UX: Manolo separa el motor social real d'un wrapper de càrrega que cap pantalla ni servei consumia.
+
+### Tancament
+Counter -> 1966.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: publicServiceMedia residual tancat, hero/gallery intactes (Canvi #1965, codex)
+
+### Context
+L'inventari d'òrfenes mantenia dues entrades de `publicServiceMediaService`: `getPublicServicePortfolioSlug` i `listPublicMobileServiceCardImages`. La revalidació actual mostra que `getPublicServicePortfolioSlug` ja no existeix al codi actual i que `listPublicMobileServiceCardImages` només el consumia el test. Les pàgines públiques consumeixen `getPublicServiceHeroImage` i `getPublicServiceGalleryImages`.
+
+### Canvi
+- `lib/services/publicServiceMediaService.ts`: eliminat `listPublicMobileServiceCardImages` i la cache/resolver associats.
+- `__tests__/lib/services/publicServiceMediaService.test.ts`: retirades les proves que mantenien viu aquest export.
+- `docs/audit/inventari-funcions-orfenes.md`: fila #74 marcada com a entrada stale `MATAT #1965` i fila #75 marcada com a `MATAT #1965`.
+- No s'han tocat pàgines públiques, image-manager, galeries/portfolio, constants de media, schema, BD ni assets.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'un export sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca residual sense `getPublicServicePortfolioSlug`/`listPublicMobileServiceCardImages`/resolver/cache de cards fora de docs; focused Vitest OK (`publicServiceMediaService.test.ts`, 9 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1965.
+- Validació funcional: `getPublicServiceHeroImage` i `getPublicServiceGalleryImages` continuen intactes i consumits per les pàgines públiques.
+- Validació humana/UX: Manolo deixa d'assenyalar un helper inexistent i elimina una cua de cards mòbils que cap pantalla real feia servir.
+
+### Tancament
+Counter -> 1965.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: indexProtocolSectionsById eliminat, parser protocol viu intacte (Canvi #1963, codex)
+
+### Context
+L'inventari d'òrfenes mantenia `protocolCanvisService.ts` → `indexProtocolSectionsById` com a pendent. La revalidació actual mostra que només el consumia el test. La pàgina `/admin/docs/protocol` consumeix `parseProtocolSections` directament, i l'indexador viu de canvis continua sent `indexProtocolCanvisByNumber`.
+
+### Canvi
+- `lib/services/protocolCanvisService.ts`: eliminat `indexProtocolSectionsById`.
+- `__tests__/lib/services/protocolCanvisService.test.ts`: retirada la prova que mantenia viu aquest indexador.
+- `docs/audit/inventari-funcions-orfenes.md`: fila #73 marcada com a `MATAT #1963`.
+- No s'han tocat `app/admin/docs/protocol/page.tsx`, docs de protocol existents, schema, BD ni UI admin.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'un export sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca residual sense `indexProtocolSectionsById` fora de docs; focused Vitest OK (`protocolCanvisService.test.ts`, 13 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1963.
+- Validació funcional: `parseProtocolSections`, `parseProtocolCanvis` i `indexProtocolCanvisByNumber` continuen intactes.
+- Validació humana/UX: Manolo elimina un lookup de seccions que cap pantalla feia servir i manté el parser real que alimenta la lectura del protocol.
+
+### Tancament
+Counter -> 1963.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: helpers href de lead orfes eliminats, navegació viva intacta (Canvi #1962, codex)
+
+### Context
+L'inventari d'òrfenes mantenia tres helpers de navegació de lead com a pendents: `buildLeadCustomerContinuityTarget`, `buildLeadPaymentsHref` i `buildLeadTaskHref`. La revalidació actual mostra que només els sostenien tests. Els helpers vius (`buildLeadWorkspaceHref`, `buildLeadCustomerHref`, `buildLeadComposeHref`, `buildLeadBookingPrefillHref`) continuen consumits per admin, customer hub, calendari, inbox, tasks i bookings.
+
+### Canvi
+- `lib/admin/leadCustomerHref.ts`: eliminat `buildLeadCustomerContinuityTarget`.
+- `lib/admin/leadWorkspaceHref.ts`: eliminats `buildLeadPaymentsHref` i `buildLeadTaskHref`, junt amb imports que només alimentaven aquests helpers.
+- `__tests__/lib/admin/leadCustomerHref.test.ts` i `__tests__/lib/admin/leadWorkspaceHref.test.ts`: retirades proves que mantenien vius els helpers morts i conservades les proves dels helpers vius.
+- `docs/audit/inventari-funcions-orfenes.md`: files #37, #38 i #39 marcades com a `MATAT #1962`.
+- No s'han tocat pantalles admin, calendari, customer hub, inbox, tasks, bookings, schema ni BD.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'exports sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca residual sense `buildLeadCustomerContinuityTarget`/`buildLeadPaymentsHref`/`buildLeadTaskHref` fora de docs; focused Vitest OK (`leadCustomerHref.test.ts`, `leadWorkspaceHref.test.ts`, 7 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1962.
+- Validació funcional: els helpers base de lead/customer continuen intactes i són els que consumeixen les pantalles.
+- Validació humana/UX: Manolo elimina tres promeses de navegació que cap pantalla executava i deixa documentat quin contracte href continua sent real.
+
+### Tancament
+Counter -> 1962.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: getOrbitaService eliminat, ORBITA_SERVICES queda font viva (Canvi #1961, codex)
+
+### Context
+L'inventari d'òrfenes mantenia `orbita-services.ts` → `getOrbitaService` com a pendent. La revalidació actual mostra 0 consumidors reals fora de l'inventari. Les pantalles i serveis vius consumeixen `ORBITA_SERVICES` directament o construeixen el seu map local quan els cal.
+
+### Canvi
+- `lib/constants/orbita-services.ts`: eliminat `getOrbitaService`.
+- `docs/audit/inventari-funcions-orfenes.md`: fila #49 marcada com a `MATAT #1961`.
+- No s'han tocat preus DJ/tècnic, `ORBITA_SERVICES`, BookingServiceLinesSection, admin packs, dossiers, `app/config/packs-config.ts`, schema ni BD.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'un export sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca residual sense `getOrbitaService` fora de docs; focused Vitest OK (`orbita-services.test.ts`, 11 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1961.
+- Validació funcional: `ORBITA_SERVICES`, constants DJ/tècnic i helpers de composició d'equip continuen intactes.
+- Validació humana/UX: Manolo conserva la font única de serveis propis i elimina només un camí de lookup que cap pantalla feia servir.
+
+### Tancament
+Counter -> 1961.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: getOpenAPIJSON eliminat, /api/docs queda canònic (Canvi #1960, codex)
+
+### Context
+L'inventari d'òrfenes mantenia `openapi.ts` → `getOpenAPIJSON` com a pendent. La revalidació actual mostra que només el consumia el test. La via viva d'OpenAPI és `openAPISchema`, servit directament per `app/api/docs/route.ts`.
+
+### Canvi
+- `lib/api/openapi.ts`: eliminat `getOpenAPIJSON`.
+- `__tests__/lib/api/openapi.test.ts`: retirades les proves del wrapper i conservades les proves de `openAPISchema`.
+- `docs/audit/inventari-funcions-orfenes.md`: fila #48 marcada com a `MATAT #1960`.
+- No s'han tocat `/api/docs`, cap ruta API, schema ni BD.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'un export sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca residual sense `getOpenAPIJSON` fora de docs; focused Vitest OK (`openapi.test.ts`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1960.
+- Validació funcional: `/api/docs` continua consumint `openAPISchema` directament; el contracte OpenAPI viu no canvia.
+- Validació humana/UX: Manolo deixa de presentar una sortida JSON paral·lela que cap eina feia servir i manté una sola via pública de documentació API.
+
+### Tancament
+Counter -> 1960.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: getAdminLeadPackOptions eliminat, packs-config queda font viva (Canvi #1959, codex)
+
+### Context
+L'inventari d'òrfenes mantenia `admin.ts` → `getAdminLeadPackOptions` com a pendent. La revalidació actual mostra 0 consumidors reals fora de l'inventari. Els fluxos vius de packs continuen llegint `app/config/packs-config.ts` directament o a través dels serveis de packs existents.
+
+### Canvi
+- `lib/constants/admin.ts`: eliminat `getAdminLeadPackOptions` i l'import `getAllPacks` que només alimentava aquest helper.
+- `docs/audit/inventari-funcions-orfenes.md`: fila #2 marcada com a `MATAT #1959`.
+- No s'han tocat `app/config/packs-config.ts`, admin packs, configurador públic, packs DB, Studio, schema ni BD.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'un export sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca residual sense `getAdminLeadPackOptions` fora de docs; `lib/constants/admin.ts` ja no importa `getAllPacks`; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1959.
+- Validació funcional: els consumidors vius de packs continuen fora d'aquest helper i TypeScript confirma que cap import queda penjat.
+- Validació humana/UX: el mapa Manolo deixa de suggerir un selector admin de packs que cap pantalla operativa feia servir.
+
+### Tancament
+Counter -> 1959.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: clear caches IMAP globals eliminats, invalidació viva intacta (Canvi #1958, codex)
+
+### Context
+L'inventari d'òrfenes mantenia `imap.ts` → `clearFetchEmailCache` i `clearSpecialFoldersCache` com a pendents. La revalidació actual mostra 0 consumidors reals fora de l'inventari. La cache viva d'emails continua encapsulada a `fetchEmailByUid` i s'invalida per mutació amb `invalidateFetchEmailCache`; les carpetes especials es refresquen amb el paràmetre `forceRefresh` de `discoverSpecialFolders`.
+
+### Canvi
+- `lib/imap.ts`: eliminats els exports globals `clearFetchEmailCache` i `clearSpecialFoldersCache`.
+- `docs/audit/inventari-funcions-orfenes.md`: files #34 i #35 marcades com a `MATAT #1958`.
+- No s'han tocat rutes inbox, drafts/sent retry, connexió IMAP, scripts append, UI admin, schema ni BD.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'exports sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: cerca residual sense `clearFetchEmailCache`/`clearSpecialFoldersCache` fora de docs; focused Vitest OK (`imap-cache-invalidation.test.ts`, 5 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1958.
+- Validació funcional: la cache d'emails continua encapsulada a `fetchEmailByUid`, les mutacions IMAP continuen invalidant amb `invalidateFetchEmailCache` i les carpetes especials continuen tenint refresc explícit amb `discoverSpecialFolders(forceRefresh)`.
+- Validació humana/UX: Manolo elimina dos botons interns inexistents del full de ruta i deixa una única lectura operativa de com es refresca la safata IMAP.
+
+### Tancament
+Counter -> 1958.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: getDefaultHomeMeta tancat com a entrada stale (Canvi #1957, codex)
+
+### Context
+L'inventari d'òrfenes encara marcava `home-meta.ts` → `getDefaultHomeMeta` com a pendent. La revalidació actual mostra que aquest export ja no existeix a `lib/home-meta.ts`. La via viva de metadata de home és `getHomeMeta`/`getHomeKeywords`, consumida per `app/layout.tsx` i `app/[locale]/layout.tsx`.
+
+### Canvi
+- `docs/audit/inventari-funcions-orfenes.md`: fila #33 marcada com a `MATAT #1957`.
+- No s'ha tocat `lib/home-meta.ts`, layouts públics, messages ni SEO runtime.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1957; cerca activa confirma que `getDefaultHomeMeta` no existeix fora de l'inventari i que `getHomeMeta`/`getHomeKeywords` són la via viva.
+- Validació funcional: no hi ha canvi runtime; els layouts públics continuen consumint helpers vius de metadata.
+- Validació humana/UX: el mapa Manolo deixa de presentar una funció inexistent com a decisió pendent.
+
+### Tancament
+Counter -> 1957.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: INVENTORY_IMAGE_USER_AGENT confirmat viu (Canvi #1956, codex)
+
+### Context
+L'inventari d'òrfenes marcava `INVENTORY_IMAGE_USER_AGENT` com a pendent REFER/MATAR. La revalidació actual mostra que era un fals positiu: el fitxer real és `lib/inventory-image-constants.ts` i la constant és consumida per `scripts/localize-inventory-images.ts` per descarregar imatges externes amb `User-Agent` identificatiu. El mateix mòdul de constants també alimenta `inventoryAdminService`.
+
+### Canvi
+- `docs/audit/inventari-funcions-orfenes.md`: fila #36 marcada com a `VIU #1956`.
+- No s'ha tocat runtime, servei d'inventari, scripts de localització/backfill, BD, uploads ni constants d'imatge.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una sincronització documental i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1956; cerca activa confirma consumidors reals de `INVENTORY_IMAGE_USER_AGENT`.
+- Validació funcional: no hi ha canvi runtime; la constant continua disponible per al script de localització d'imatges d'inventari i el mapa deixa de suggerir una poda falsa.
+- Validació humana/UX: Manolo evita una eliminació que hauria trencat una eina de manteniment d'imatges i redueix soroll al full de ruta d'òrfenes.
+
+### Tancament
+Counter -> 1956.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: shouldEnforceCsrf eliminat, CSRF viu intacte (Canvi #1955, codex)
+
+### Context
+`csrf.ts` mantenia `shouldEnforceCsrf` com a export pendent a l'inventari. La revalidació mostra 0 consumidors reals fora del test. La protecció viva no passa per aquesta funció: els handlers mutadors criden `verifyCsrf`, el client usa `fetchWithCsrf`, i els scripts/guards CSRF auditen cobertura.
+
+### Canvi
+- `lib/csrf.ts`: eliminat `shouldEnforceCsrf`.
+- `__tests__/lib/csrf.test.ts`: retirades les proves que mantenien viu aquest export sense consumidor.
+- `docs/audit/inventari-funcions-orfenes.md`: fila #13 marcada com a MATAT #1955.
+- No s'han tocat `verifyCsrf`, `fetchWithCsrf`, tokens/cookies, handlers admin, middleware admin, scripts CSRF ni allowlists.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'un export sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`csrf.test.ts`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1955; cerca exacta sense `shouldEnforceCsrf` fora de docs.
+- Validació funcional: `verifyCsrf`, `fetchWithCsrf`, token/cookie i els guards CSRF continuen intactes; només desapareix una política paral·lela no consumida.
+- Validació humana/UX: el mapa Manolo deixa de suggerir una segona font de decisió CSRF que el producte no feia servir.
+
+### Tancament
+Counter -> 1955.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: deriveFlowStatus antic eliminat, timeline canònica conservada (Canvi #1954, codex)
+
+### Context
+L'inventari d'òrfenes encara marcava `communicationStatusService.ts` → `deriveFlowStatus` com a pendent, mentre el resum de clúster deia que era viu. La revalidació actual mostra que `deriveFlowStatus` només tenia consumidor al test. El producte real usa `deriveFlowStatusFromTimeline` a economia i booking operational, sobre timeline canònica.
+
+### Canvi
+- `lib/services/communicationStatusService.ts`: eliminat `deriveFlowStatus`, el tipus intern `AdminLogLike` i el parser de details associat.
+- `__tests__/lib/services/communicationStatusService.test.ts`: eliminades les proves que mantenien viu el wrapper antic; es mantenen les proves de `deriveFlowStatusFromTimeline` i `buildRecentCommRowsFromTimeline`.
+- `docs/audit/inventari-funcions-orfenes.md`: fila #10 marcada com a MATAT #1954 i resum de clúster corregit perquè la via viva sigui `deriveFlowStatusFromTimeline`.
+- No s'han tocat `timelineQueryService`, `bookingOperationalService`, economia, schema ni BD.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada d'un export sense consumidor de producció i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`communicationStatusService.test.ts`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1954; cerca exacta sense `deriveFlowStatus` antic fora de docs.
+- Validació funcional: economia i booking operational continuen consumint `deriveFlowStatusFromTimeline`; no queda un segon camí AdminLog directe per calcular estat de comunicació.
+- Validació humana/UX: el mapa Manolo deixa de presentar com a pendent una funció que només existia al test i reforça la timeline canònica com a lectura única.
+
+### Tancament
+Counter -> 1954.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: últim clúster de funcions òrfenes tancat — analytics.ts + email.ts testimonials (Canvi #1952, claude)
+
+### Context
+Últim clúster de `funcions-orfenes.md`: Grup A (`initAnalytics`, `trackCalculatorUse`, `trackPackSelection`, `trackVideoView` a `app/lib/analytics.ts`) i Grup B (`sendTestimonialAdminNotification`, `sendTestimonialReceivedEmail`, `sendTestimonialsReminderEmail` a `lib/email.ts`). `sendPrivacyRequestCompletedEmail` (RGPD) queda explícitament fora — decisió del propietari de no tocar-lo sense connectar-lo primer.
+
+- Autorització explícita propietari: "sí, elimina Grup A i Grup B, deixa sendPrivacyRequestCompletedEmail".
+
+### Canvi
+- **Grup A**: ja estava eliminat (part de la pila de canvis pendents de committejar anterior a aquesta sessió); verificat amb `git diff` i test de regressió existent (`__tests__/app/lib/analytics.test.ts`) que ho confirma explícitament.
+- **Grup B**: `lib/email.ts` — `sendTestimonialAdminNotification`, `sendTestimonialsReminderEmail`, `sendTestimonialReceivedEmail` eliminades. Incident durant l'edició: el bloc esborrat inicialment s'enduia també `PublicBookingRequestEmailCopy` (tipus) i `PUBLIC_BOOKING_REQUEST_EMAIL_COPY` (constant), que vivien enmig sense relació amb testimonis — detectat immediatament per `tsc` i restaurat íntegre abans de continuar. `sendTestimonialApprovedEmail` (viu, en ús real) i `sendPrivacyRequestCompletedEmail` (deixat explícitament) intactes.
+- Tests nets a `__tests__/lib/email-send-booking-confirmation.test.ts` (bloc `sendTestimonialReceivedEmail` + import).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK (revalidat després de restaurar el bloc afectat per error); vitest OK (9 tests directes + 2 de `buildPublicBookingRequestEmail` com a prova addicional que la restauració és correcta); `pnpm run validate:core` OK complet.
+- Validació funcional: 0 usos reals trencats; email de sol·licitud de reserva pública (`buildPublicBookingRequestEmail`) verificat intacte amb el seu propi test.
+- Validació humana/UX: sense superfície visible.
+
+### ⚠️ Conflicte detectat amb l'agent Codex — RESOLT
+Codex ha tancat el seu propi Canvi #1951 eliminant el **Grup B de `normalize.ts`** (`formatPhone`, `isValidPhone`, `isValidDni`, `getInstagramUrl`, `isValidInstagram`, `generatePersonalizedCode` + `generateDiscountCode`) — el mateix bloc que el propietari em va dir explícitament de **deixar viu** ("elimina el Grup A, deixa el Grup B") al Canvi #1944. Codex no tenia visibilitat d'aquesta instrucció (viu en una conversa diferent) i ha actuat sota el seu propi criteri general d'autonomia. Verificat amb grep: el Grup B ja no existeix a `lib/utils/normalize.ts`.
+
+**Resolució explícita del propietari (mateix dia)**: "confirma la decisió de Codex, deixa'l com està". El Canvi #1951 queda confirmat i tancat sense reversió. No calen més accions sobre `normalize.ts`.
+
+### Tancament
+Counter -> 1952. **9/9 clústers de `funcions-orfenes.md` revisats** (comptant el Grup B de normalize.ts com a tancat per Codex, malgrat el conflicte d'instrucció anotat a dalt).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: email testimonials/privacy canonitzat (Canvi #1953, codex)
+
+### Context
+El clúster `email.ts` de l'inventari marcava quatre exports com a pendents: `sendPrivacyRequestCompletedEmail`, `sendTestimonialAdminNotification`, `sendTestimonialReceivedEmail` i `sendTestimonialsReminderEmail`. La revalidació actual confirma que només `sendPrivacyRequestCompletedEmail` continuava exportat, sense consumidor real fora del test; els tres exports antics de testimonials ja no existeixen al codi actual.
+
+També s'ha detectat una incoherència de producte: el botó manual d'admin “Recordatori de testimonis” mostrava “Recordatori enviat”, però la ruta `/api/admin/emails/testimonials-reminder` només retornava un recompte de pendents i no enviava cap email.
+
+### Canvi
+- `lib/email.ts`: eliminat `sendPrivacyRequestCompletedEmail`; es conserva `sendPrivacyVerificationEmail` com a via viva de RGPD i `sendTestimonialApprovedEmail` com a via viva de testimonial aprovat.
+- `lib/services/testimonialAdminService.ts`: afegida `listPendingTestimonialsForReminder`, font única per preparar el resum de testimonis pendents.
+- `app/api/admin/emails/testimonials-reminder/route.ts`: ara envia un email real i traçat via `sendTrackedStandaloneEmail` quan hi ha pendents, amb `templateKey: testimonials-reminder`, i retorna `sent: true`; si no hi ha pendents retorna `sent: false`.
+- `app/admin/emails/ManualActionsPanel.tsx`: el missatge “Recordatori enviat” depèn de `sent`, no només del recompte.
+- Tests actualitzats per no mantenir viu l'export RGPD mort i per cobrir el recorregut real del recordatori.
+- `docs/audit/inventari-funcions-orfenes.md`: clúster email testimonials/privacy marcat com a tancat #1953.
+- No s'han tocat plantilles BD generals (`testimonial_received`, `testimonial_reminder`), inbox, proposal/booking emails, tracking ni `app/admin/tasks/**`.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall modifica una ruta admin existent perquè compleixi el que prometia i no toca schema ni BD.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`emails-testimonials-reminder-route.test.ts`, `testimonialAdminService.test.ts`, `email-send-booking-confirmation.test.ts`; 26 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1953; cerca residual sense exports antics fora de docs.
+- Validació funcional: el botó manual de recordatori ja no fingeix un enviament; si hi ha pendents envia via `sendTrackedStandaloneEmail` i si no n'hi ha retorna `sent: false` sense SMTP.
+- Validació humana/UX: la pantalla admin diferencia acció real d'estat buit i el mapa Manolo deixa de presentar helpers d'email morts com a capacitat pendent.
+
+### Tancament
+Counter -> 1953.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: Grup B de normalize.ts eliminat, nucli de normalització conservat (Canvi #1951, codex)
+
+### Context
+Claude havia separat correctament `normalize.ts` en dos blocs: Grup A (`compareCustomers`, `normalizeCustomerData`) ja mort perquè duplicava `deduplicationService.ts`, i Grup B (`formatPhone`, `isValidPhone`, `isValidDni`, `getInstagramUrl`, `isValidInstagram`, `generatePersonalizedCode`) pendent de REFER/MATAR.
+
+La revalidació actual confirma que el nucli viu de `normalize.ts` sí té consumidors reals (`normalizeEmail`, `normalizePhone`, `normalizeName`, `normalizeInstagram`, `normalizeDni`) en deduplicació, linking client/lead/booking i camps normalitzats. El Grup B, en canvi, només vivia al fitxer i al seu test. També s'ha detectat `generateDiscountCode`, germà no inventariat del mateix bloc de descomptes, igualment sense consumidor fora del test.
+
+### Canvi
+- `lib/utils/normalize.ts`: eliminats `formatPhone`, `isValidPhone`, `isValidDni`, `getInstagramUrl`, `isValidInstagram`, `generatePersonalizedCode` i `generateDiscountCode`.
+- `__tests__/lib/utils/normalize.test.ts`: netejades les proves que mantenien vius aquests exports sense consumidor.
+- `docs/audit/inventari-funcions-orfenes.md`: clúster `normalize.ts` marcat com a MATAT #1951 per al Grup B, deixant explícit quins normalitzadors continuen vius.
+- No s'han tocat schema, rutes, formularis admin, `deduplicationService` ni serveis de descompte; no s'ha connectat validació a cegues.
+- Autorització explícita propietari: el propietari ha donat permís general per executar talls Manolo sense preguntes; aquest tall és una poda acotada i no modifica schema, API ni BD.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`normalize.test.ts`, 34 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1951.
+- Validació funcional: els consumidors reals de normalització continuen apuntant al nucli conservat; no queda cap import dels exports eliminats des de `normalize.ts`.
+- Validació humana/UX: el mapa Manolo deixa de presentar validacions sense contracte com a feina oberta i evita connectar helpers a formularis a cegues.
+
+### Tancament
+Counter -> 1951.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: exports antics de tracking públic eliminats (Canvi #1950, codex)
+
+### Context
+El clúster `analytics.ts` de l'inventari marcava `initAnalytics`, `trackCalculatorUse`, `trackPackSelection` i `trackVideoView` com a pendents REFER/MATAR. La revalidació actual mostra que el fitxer real és `app/lib/analytics.ts` i que el tracking viu ja passa per `trackEvent`, `trackLead`, CTAs, WhatsApp, `trackPageView`, `trackPublicServiceEvent`, WebVitals, CookieConsent/ConsentScripts i informes GA4.
+
+Les quatre funcions del clúster no tenien cap consumidor fora del mateix fitxer; reconnectar-les hauria duplicat tracking en comptes de canonitzar-lo.
+
+### Canvi
+- `app/lib/analytics.ts`: eliminats `initAnalytics`, `trackCalculatorUse`, `trackPackSelection` i `trackVideoView`.
+- Tipus interns `EventCategory` i `EventName` netejats perquè no conservin categories/events sense camí viu (`Pack Selection`, `Video`, `Calculator`, `select_pack`, `view_video_testimonial`, `calculate_price`).
+- `__tests__/app/lib/analytics.test.ts`: regressió perquè aquests exports antics no es reintrodueixin i `trackPublicServiceEvent` continuï com a via viva.
+- `docs/audit/inventari-funcions-orfenes.md`: clúster `analytics.ts` marcat com a MATAT #1950, mantenint explícit el tracking canònic viu.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`analytics.test.ts`, `trackPublicServiceEvent.test.ts`; 6 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1950; cerca activa sense exports antics a `app/lib/components/scripts`.
+- Validació funcional: el tracking públic existent no canvia de contracte; només desapareixen exports sense consumidor.
+- Validació humana/UX: menys fals pendent al mapa Manolo; no es perd cap captura o mètrica operativa que estigués connectada.
+
+### Tancament
+Counter -> 1950.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: inventari i atles sincronitzats amb òrfenes ja tancades (Canvi #1949, codex)
+
+### Context
+Després del #1948 de Claude, el codi i els tests ja no exportaven `getGallerySummary`, `linkMediaToEvent`, `unlinkMediaFromEvent`, `getPortfolioEventCounts` ni `getPortfolioMediaCounts`. Però `docs/audit/inventari-funcions-orfenes.md` i `docs/ATLES-FUNCIONAL.md` encara els presentaven com a pendents o com a API viva.
+
+La mateixa incoherència afectava clústers ja tancats al diari/protocol: RGPD parcial #1934, utils/cost #1938, resta #1941, hero #1942 i `customerSegmentationService` #1946.
+
+### Canvi
+- `docs/audit/inventari-funcions-orfenes.md`: marca com a tancades les files demostrades pels canvis #1934, #1938, #1941, #1942, #1944, #1946 i #1948; separa explícitament funcions vives (`recordConsent`, `executeRetentionPolicies`, `drawCanonicalCard`) de funcions mortes.
+- `docs/ATLES-FUNCIONAL.md`: actualitza el mapa de media/portfolio perquè reflecteixi els exports actuals (`galleryService` 10, `heroVideoService` 2, `portfolioEventService` 6 amb `ensurePortfolioEventFromPostEventReport`, `portfolioMediaService` 6).
+- No s'ha tocat codi runtime, tests, BD, schema, cleaners ni `app/admin/tasks/**`.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `git diff --check` OK sobre el perímetre #1949; cerca activa fora de `docs/**` sense `getGallerySummary|linkMediaToEvent|unlinkMediaFromEvent|getPortfolioEventCounts|getPortfolioMediaCounts`.
+- Validació funcional: el mapa viu ja no pot reobrir com a feina pendent funcions que el codi actual no exporta.
+- Validació humana/UX: Manolo queda amb una sola font documental més fiable per continuar la tanda principal pendent (`analytics.ts` tracking i `email.ts` testimonials) sense repetir feina morta; les files ⬜ soltes continuen requerint decisió individual.
+
+### Tancament
+Counter -> 1949.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: clúster portfolioEventService/media/gallery eliminat — mai connectat, sense migració ni duplicat (Canvi #1948, claude)
+
+### Context
+Continuant `funcions-orfenes.md` un a un: clúster de gestió de media de portfolio (`linkMediaToEvent`, `unlinkMediaFromEvent`, `getPortfolioEventCounts`, `getPortfolioMediaCounts`, `getGallerySummary`). Revalidat: els fitxers on viuen (`portfolioEventService.ts`, `portfolioMediaService.ts`, `galleryService.ts`) són plens de funcions vives (CRUD complet, en ús real per `/api/admin/portfolio/events` i pàgines públiques). Aquestes 5 concretes són mortes: `linkMediaToEvent`/`unlinkMediaFromEvent` no tenen cap UI ni ruta que les cridi (`updatePortfolioEvent`, la funció real, no gestiona vincles individuals); les 3 funcions de comptador/resum alimentarien un dashboard mai construït (mateix patró que `customerSegmentationService`, #1946).
+
+- Autorització explícita propietari: troballa presentada + confirmació explícita "sí, elimina-les".
+
+### Canvi
+- `lib/services/portfolioEventService.ts`: `linkMediaToEvent`, `unlinkMediaFromEvent`, `getPortfolioEventCounts` eliminades.
+- `lib/services/portfolioMediaService.ts`: `getPortfolioMediaCounts` eliminada.
+- `lib/services/galleryService.ts`: `getGallerySummary` eliminada.
+- Tests corresponents nets a 3 fitxers (`portfolioEventService.test.ts`, `portfolioMediaService.test.ts`, `galleryService.test.ts`).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; vitest OK (102 tests: 35+42+25... total combinat dels 3 fitxers); `pnpm run validate:core` OK complet (`qa:manolo-boundary` també verd, Codex ja havia arreglat el fals positiu del #1945).
+- Validació funcional: 0 usos reals trencats; CRUD de portfolio events/media/gallery intacte.
+- Validació humana/UX: sense superfície visible.
+
+### Tancament
+Counter -> 1948. 8/9 clústers de `funcions-orfenes.md` tancats. Queda només: analytics.ts (tracking) + email.ts testimonials.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo E2E: cues post-event del hub/reports/feedback amb finestra canònica (Canvi #1947, codex)
+
+### Context
+Després del #1940 i #1943, la finestra post-event ja governava emails, dashboard, brief, checklist, automació, auditoria i playbook. Però tres superfícies encara feien lectura pròpia de bookings completats: `/admin/post-event`, `/admin/post-event/reports` i `/admin/post-event/feedback`.
+
+El risc era subtil però real: el playbook i l'auditoria podien dir una cosa, mentre el hub/reports/feedback en mostraven una altra per tenir `COMPLETED`, `postEventReport: null`, `clientSurvey: null`, `eventDate < now` i `take: 5/50` locals.
+
+### Canvi
+- `postEventPendingService` afegeix builders canònics per feedback pendent, informe pendent i enquesta pendent, tots dins la finestra de `postEventWorkflow`.
+- `/admin/post-event` consumeix `buildPendingPostEventReportBookingWhere()` i `buildPendingPostEventSurveyBookingWhere()` amb `POST_EVENT_WORKFLOW.pendingTake`.
+- `/admin/post-event/reports` consumeix `buildPendingPostEventReportBookingWhere()` amb `POST_EVENT_WORKFLOW.pendingTake`.
+- `/admin/post-event/feedback` consumeix `buildPendingPostEventFeedbackBookingWhere()` amb `POST_EVENT_WORKFLOW.pendingTake`.
+- `qa:zenit-tooling` blinda que aquestes pàgines no tornin a hardcodejar `take: 5/50`, `eventDate < new Date()` o wheres locals de `postEventReport/clientSurvey`.
+- Renumerat de #1946 a #1947 perquè Claude ha tancat #1946 en paral·lel amb `customerSegmentationService`.
+
+### Validació
+- Validació tècnica: `node --check scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (`postEventPendingService`, `check-zenit-tooling`, tests post-event admin; 44 tests); `pnpm run qa:zenit-tooling` OK; cerca residual de cues locals a les tres pàgines buida; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK.
+- Validació funcional: les tres cues operatives post-event ja comparteixen la mateixa finestra/límit que emails, playbook i auditoria; no hi ha enviament real ni mutació de dades.
+- Validació humana/UX: l'operador no veu una reserva fora de política en una pantalla i amagada en una altra. El hub, reports i feedback ja parlen la mateixa llengua operativa.
+
+### Tancament
+Counter -> 1947.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: clúster customerSegmentationService eliminat — decisió MATAR sense dashboard (Canvi #1946, claude)
+
+### Context
+Continuant `funcions-orfenes.md` un a un: clúster `customerSegmentationService` (`querySegment`, `getLifecycleDistribution`, `getTopTags`, `getHealthDistribution`). Revalidant-lo es confirma que el backend (health score, lifecycle, tags) està completament viu i escrivint (`recalculateAllCustomers` via cron, `addCustomerTags`/`removeCustomerTags`/`setCustomerTags`, `updateCustomerPreferences`) i les dades ja es mostren per client individual (`/admin/clientes`, fitxa, reactivació, referrals). Només faltava la vista AGREGADA (dashboard de segmentació) que aquestes 4 funcions haurien alimentat — mai construïda.
+
+- Autorització explícita propietari: presentada l'opció REFER (construir dashboard nou) vs MATAR; resposta explícita "mata-les de moment, sense dashboard".
+
+### Canvi
+- `lib/services/customerSegmentationService.ts`: `querySegment`, `getLifecycleDistribution`, `getTopTags`, `getHealthDistribution` + interfície `SegmentFilter` eliminades. `computeHealthScore`, `computeLifecycleStage`, `addCustomerTags`, `removeCustomerTags`, `setCustomerTags`, `updateCustomerPreferences`, `recalculateAllCustomers` (tot el backend d'escriptura, en ús real) intactes.
+- `__tests__/lib/services/customerSegmentationService.test.ts`: bloc "Segment queries" (4 `describe`) eliminat, import net.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; vitest OK (30 tests); `pnpm run validate:core` OK al meu perímetre (`qa:zenit-tooling` OK, `git diff --check` net).
+- Validació funcional: 0 usos reals trencats; backend de segmentació (cron + rutes de tags/preferències) intacte.
+- Validació humana/UX: sense superfície visible — no hi havia dashboard que mostrar.
+- Nota de coordinació: `pnpm run validate:core` marca `qa:manolo-boundary` FAIL sobre l'entrada #1945 de Codex (fals positiu: la regex detecta "BD" dins "sense BD" a la seva pròpia validació). No és del meu perímetre, no l'he tocat.
+
+### Tancament
+Counter -> 1946. 7/9 clústers de `funcions-orfenes.md` revisats. Queden: portfolioEventService/media, analytics.ts, email.ts testimonials.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: inventari d'òrfenes sincronitzat amb Grup A normalize mort (Canvi #1945, codex)
+
+### Context
+Claude ha tancat el #1944 eliminant `compareCustomers` i `normalizeCustomerData` de `lib/utils/normalize.ts` perquè duplicaven el sistema real de deduplicació (`deduplicationService.ts`). El codi, els tests, el diari, el protocol i `agent-sync` ja ho deien; però `docs/audit/inventari-funcions-orfenes.md` encara barrejava el Grup A mort amb el Grup B viu i mostrava totes les funcions com a pendents.
+
+Això és una incoherència documental amb risc real: una IA futura podria llegir l'inventari vell i tornar a tractar `compareCustomers`/`normalizeCustomerData` com a feina oberta.
+
+### Canvi
+- `docs/audit/inventari-funcions-orfenes.md`: el clúster `normalize.ts` queda separat en Grup A mort #1944 i Grup B viu (`formatPhone`, `isValidPhone`, `isValidDni`, `getInstagramUrl`, `isValidInstagram`, `generatePersonalizedCode`).
+- Les files de `compareCustomers` i `normalizeCustomerData` ja no queden amb decisió buida: marquen `MATAT #1944` i expliquen que duplicaven `deduplicationService.ts`.
+- No s'ha tocat codi de producte ni cap capa persistent; només mapa viu, protocol i comptador.
+
+### Validació
+- Validació tècnica: `rg` confirma que els residus actius del Grup A són documentals/històrics i que `lib/utils/normalize.ts` només conserva el Grup B; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK sobre el perímetre #1945.
+- Validació funcional: cap superfície visible i cap consumidor runtime afectat.
+- Validació humana/UX: el full de ruta ja no ven una funció morta com a pendent i conserva la decisió correcta: Grup B no es mata a cegues.
+
+### Tancament
+Counter -> 1945. Tall documental de sincronització; el carril d'eliminació d'òrfenes continua sent de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: Grup A de normalize.ts eliminat — duplicat de deduplicationService (Canvi #1944, claude)
+
+### Context
+Continuant `funcions-orfenes.md` un a un: clúster `normalize.ts` (mogut a `lib/utils/normalize.ts`) dividit en dos grups. Grup A (`compareCustomers`, `normalizeCustomerData`) resulta ser una segona implementació de "detectar si dos clients són la mateixa persona", paral·lela a `deduplicationService.ts` (`findDuplicates`+`calculateSimilarity`, la que realment s'usa en producció). Mai es va connectar — exactament el patró de dues fonts de veritat que s'està eliminant arreu.
+
+- Autorització explícita propietari: "elimina el Grup A, deixa el Grup B" (Grup B —`formatPhone`, `isValidPhone`, `isValidDni`, `getInstagramUrl`, `isValidInstagram`, `generatePersonalizedCode`— es queda: no duplica res, però tampoc té resposta clara REFER/MATAR).
+
+### Canvi
+- `lib/utils/normalize.ts`: `normalizeCustomerData`, `compareCustomers` + tipus `CustomerData`/`NormalizedCustomerData` eliminats (0 usos externs, cap tipus usat fora del fitxer).
+- `__tests__/lib/utils/normalize.test.ts`: bloc `describe('compareCustomers')` (usava `normalizeCustomerData` com a helper intern) eliminat; import net; capçalera del fitxer actualitzada.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; vitest OK (51 tests); `pnpm run validate:core` OK complet.
+- Validació funcional: 0 usos reals trencats; `deduplicationService.ts` (el sistema real de deduplicació) intacte.
+- Validació humana/UX: sense superfície visible.
+
+### Tancament
+Counter -> 1944. 6/9 clústers de `funcions-orfenes.md` revisats (5 tancats + Grup B de normalize.ts deixat explícitament viu per decisió del propietari). Queden: customerSegmentationService, portfolioEventService/media, analytics.ts, email.ts testimonials.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo E2E: playbook post-event consumeix la finestra canònica (Canvi #1943, codex)
+
+### Context
+Després del #1940, la finestra post-event ja era única per emails pendents, dashboard, brief, checklist, automació i `zenit:db:audit`. Faltava una peça operativa important: `/admin/post-event/playbook` encara carregava bookings amb `daysWindow=90`, `take=100` i `thank_you=3` locals dins `postEventPlaybookService`. Això tornava a crear una segona norma amagada just al lloc on l'operador ha d'arrencar el volant post-event dels bookings completats.
+
+No s'ha enviat cap email real, no s'ha escrit a BD, no s'ha tocat schema i no s'ha entrat a `app/admin/tasks/**`.
+
+### Canvi
+- `lib/constants/postEventWorkflow.json` amplia la font única amb `playbookTake=100` i `actionDueDays` (`thank_you=3`, `testimonial=7`, `social_post=14`, `referral_ask=30`).
+- `lib/constants/postEventWorkflow.ts` exposa aquests valors al costat de `emailDueDays`, `startDueDays`, `catchupWindowDays`, `pendingTake` i `automationTake`.
+- `postEventPlaybookService` consumeix `getPostEventWorkflowDates(now)`, `POST_EVENT_DAY_MS`, `POST_EVENT_WORKFLOW.playbookTake` i `POST_EVENT_WORKFLOW.actionDueDays`; desapareixen el `DAY_MS` local, el `daysWindow=90`, el `take=100` i el `thank_you: 3` duplicats.
+- `/admin/post-event/playbook` mostra el copy de finestra amb `POST_EVENT_WORKFLOW.catchupWindowDays` en comptes de hardcodejar "90 dies".
+- `qa:zenit-tooling` ara també vigila que el playbook i el seu copy no tornin a duplicar la norma post-event.
+
+### Validació
+- Validació tècnica: `node --check scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (`postEventPlaybookService`, `postEventPlaybookLoader`, `postEventPlaybookLoadService`, `check-zenit-tooling`; 60 tests); `node scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1943>` OK; `pnpm run validate:core` OK complet (75 fitxers de tests de scripts / 665 tests; `qa:admin-canon` conserva 2 P3 coneguts i cap P1).
+- Validació funcional: `pnpm run zenit:db:audit` OK read-only; el report continua amb `completedBookingsPostEventNotStarted=2` (`OE-2026-004`, `OE-2026-005`) i sense divergències documentals ni artefactes de prova. El canvi no resol aquests dos casos automàticament: garanteix que el playbook que els ha de recuperar comparteixi la mateixa finestra canònica.
+- Validació humana/UX: el hub de playbook ja no diu ni calcula una finestra pròpia; l'operador veu la mateixa política de catch-up que auditen els scripts i que alimenten emails/dashboard/brief/checklist.
+
+### Tancament
+Counter -> 1943.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: clúster heroVideoService tancat — migració ja feta, no feature pendent (Canvi #1942, claude)
+
+### Context
+Continuant `funcions-orfenes.md` un a un: clúster `heroVideoService` (gestió del hero), marcat pel juny com a "possible feature demanada orfe" (dubte REFER/MATAR). Revalidant-lo es troba la resposta definitiva: `app/admin/settings/hero/page.tsx` és una pàgina pont que diu explícitament "Aquest bloc ja no es gestiona amb un sistema separat. El hero de la home ara forma part del gestor d'imatges unificat" (placement `home.hero.slides` via `/admin/image-manager`). No és una feature pendent de connectar — és una migració ja tancada.
+
+- Autorització explícita propietari: troballa presentada + confirmació explícita "sí, elimina-les".
+
+### Canvi
+- `lib/services/heroVideoService.ts`: `addHeroMedia`, `removeHeroMedia`, `toggleHeroMedia`, `reorderHeroMedia`, `updateHeroMediaLabel` eliminades, junt amb el helper privat `saveHeroMedia` (només les usava a elles) i la importació `@/lib/storage` (`uploadFile`/`deleteFile`/`getPublicUrl`/`fileExists`, ja no usada). `listHeroMedia`/`listActiveHeroMedia` es mantenen (lectura, en ús real).
+- `__tests__/lib/services/heroVideoService.test.ts` net: 5 `describe` blocks + mock de `@/lib/storage` eliminats.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; vitest OK (5 tests); `pnpm run validate:core` OK complet.
+- Validació funcional: 0 usos reals trencats; la lectura del hero (`listActiveHeroMedia`, consumida per `app/api/hero-media/route.ts`) intacta.
+- Validació humana/UX: sense superfície visible.
+
+### Tancament
+Counter -> 1942 (Codex continua a #1940, treballant; sense col·lisió). 5/9 clústers de `funcions-orfenes.md` tancats. Queden: normalize.ts, customerSegmentationService, portfolioEventService/media, analytics.ts, email.ts testimonials.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: clúster "resta" de funcions òrfenes tancat (Canvi #1941, claude)
+
+### Context
+Continuant `docs/audit/inventari-funcions-orfenes.md` clúster a clúster: el clúster "resta" (funcions variades sense agrupació temàtica) revalidat amb grep abans de tocar. Dues funcions ja NO eren òrfenes (el document de juny s'equivocava): `drawCanonicalCard` (en ús real a `deliveryNotePdfService.ts`) i `deriveFlowStatus` (en ús real a `app/admin/economia/page.tsx` i `bookingOperationalService.ts`).
+
+- Autorització explícita propietari: troballa presentada amb revalidació + confirmació explícita "sí, elimina-les".
+
+### Canvi
+Eliminades (0 usos reals fora del fitxer i tests):
+- `lib/pdf-header.ts`: `drawCanonicalLabel`, `spacingDelta` (`drawCanonicalCard` es manté, en ús real).
+- `lib/services/executiveReportService.ts`: `exportExecutiveReportCsv` + helpers `csvEscape`/`csvRow` (només els usava aquesta funció).
+- `lib/services/deduplicationService.ts`: `mergeCustomers` + tipus `MergeResult` (`calculateSimilarity` i `findDuplicates` es mantenen).
+- `lib/services/dossierService.ts`: `deleteDossier` (`@deprecated Usar softDeleteDossier`, substituïda fa temps).
+- Tests corresponents nets a 3 fitxers (`deduplicationService.test.ts`, `dossierService.test.ts`, `executiveReportService.test.ts`).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; vitest dels 3 fitxers OK (42 tests); `pnpm run validate:core` OK complet.
+- Validació funcional: 0 usos reals trencats; `drawCanonicalCard`/`deriveFlowStatus` (revalidades vives) intactes.
+- Validació humana/UX: sense superfície visible.
+- Nota de coordinació: `pnpm run validate:core` falla ara mateix a `qa:service-coverage` per `lib/services/postEventPendingService.ts`, fitxer nou de Codex creat en directe dins el seu `#1940` (`treballant`) — no tocat, no relacionat amb aquest perímetre.
+
+### Tancament
+Counter -> 1941 (Codex ha reservat `#1940` en directe; salto per no col·lidir). 4 clústers de `funcions-orfenes.md` tancats (RGPD #1934, computeCollaboratorNetMargin+utils #1938, resta #1941). Queden: heroVideoService, normalize.ts, customerSegmentationService, portfolioEventService/media, analytics.ts, email.ts testimonials — tots marcats "possible feature demanada orfe", necessiten decisió REFER/MATAR del propietari, no eliminació automàtica.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo E2E: finestra canònica de catch-up post-event (Canvi #1940, codex)
+
+### Context
+`zenit:db:audit` continuava detectant `completedBookingsPostEventNotStarted=2` (`OE-2026-004`, `OE-2026-005`). La causa no era un únic botó: el procés post-event tenia finestres diferents segons el lloc. El dispatch automàtic només mirava una finestra curta, `/admin/emails` en tenia una altra, dashboard/brief/checklist/automation feien queries pròpies, i l'auditoria mirava 90 dies. Si una reserva `COMPLETED` saltava la finestra curta, podia quedar fora del carril visible que l'havia de recuperar.
+
+No s'ha enviat cap email real i no s'ha fet cap escriptura manual a BD. El tall només canonitza la lectura i el criteri de pendent.
+
+### Canvi
+- Nou `lib/constants/postEventWorkflow.json`: font única per `emailDueDays=2`, `startDueDays=3`, `catchupWindowDays=90`, `pendingTake=50` i `automationTake=20`.
+- Nou `lib/constants/postEventWorkflow.ts`: exposa `POST_EVENT_WORKFLOW` i `getPostEventWorkflowDates()`.
+- Nou `lib/services/postEventPendingService.ts`: construeix les dues queries canòniques de post-event pendent: email pendent i booking completat sense post-event arrencat.
+- `postEventDispatchService`, `/admin/emails`, dashboard, `dailyBriefService`, `dailyChecklist` i `taskAutomationService` passen a consumir la mateixa query canònica en comptes de finestres locals.
+- `zenit-db-audit` llegeix el JSON de workflow i exposa `postEventWorkflowConfigPath`, `postEventEmailDueDays`, `postEventStartDueDays` i finestra de 90 dies al `schemaProbe`.
+- `qa:zenit-tooling` blinda que l'auditoria no torni a hardcodejar `90` o `3` dies fora del JSON canònic.
+- Afegit `__tests__/lib/services/postEventPendingService.test.ts` perquè el servei nou tingui cobertura directa i `qa:service-coverage` no quedi vermell.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (`postEventPendingService`, `postEventDispatchService`, `dailyChecklist`, `dailyBriefService`, `taskAutomationService`, `check-zenit-tooling`; 103 tests); `pnpm run qa:service-coverage` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-tooling` OK.
+- Validació final: `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1940>` OK; `pnpm run validate:core` OK complet (75 fitxers de tests de scripts / 663 tests; `qa:admin-canon` conserva 2 P3 coneguts i cap P1).
+- Validació funcional: `pnpm run zenit:db:audit` OK read-only; el `schemaProbe` apunta a `lib/constants/postEventWorkflow.json` i continua trobant exactament `completedBookingsPostEventNotStarted=2`: `OE-2026-004` Alejandro García i `OE-2026-005` Carlos Lucas Fernandez.
+- Validació humana/UX: un bolo completat no desapareix del procés només perquè el cron o l'operador han fallat la finestra curta; el catch-up el manté visible als punts de comandament fins que algú l'arrenca pel playbook/hub, sense enviament automàtic cec.
+
+### Tancament
+Counter es manté a 1942 perquè Claude ha tancat #1941 i #1942 en paral·lel mentre #1940 estava reservat; aquest canvi omple el número sense rebaixar el counter global.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo QA: qa:patches tolera fitxers efímers (Canvi #1939, codex)
+
+### Context
+Després del tall documental #1937, `validate:core` ja passava `tsc` i els guards Zenit, però va caure a `qa:patches` amb `ENOENT` llegint `app\admin\covtmp\[id]\page.tsx`. La ruta era temporal: un test de cobertura de smoke-detail crea `app/admin/covtmp/[id]` i l'elimina; el guard havia recollit el fitxer abans que desaparegués i després intentava llegir-lo.
+
+Col·lisió resolta: Claude ha tancat #1938 en paral·lel, així que aquest tall queda renumerat a #1939 sense tocar el seu canvi.
+
+### Canvi
+- `scripts/check-patches.mjs` comprova que el fitxer encara existeix abans de llegir-lo i captura només `ENOENT` dins `scanFile()`, retornant cap finding per aquest cas efímer.
+- Qualsevol altre error de lectura es torna a llençar; no s'amaga cap fallada real del guard.
+- `__tests__/scripts/check-patches.test.ts` afegeix una regressió que simula un fitxer recollit però desaparegut en lectura i exigeix que el guard acabi verd.
+
+### Validació
+- Validació tècnica: `node --check scripts\check-patches.mjs` OK; `npx vitest run __tests__/scripts/check-patches.test.ts` OK (25 tests); `pnpm run qa:patches` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació final: `pnpm run validate:core` OK complet (75 fitxers de tests de scripts / 660 tests); `qa:admin-canon` manté 2 P3 coneguts i cap P1.
+- Validació funcional: `qa:patches` ja no cau per fitxers efímers desapareguts entre recollida i lectura, però conserva detectors reals.
+- Validació humana/UX: sense superfície visible; evita que Manolo/Zenit s'aturi per soroll de QA en comptes d'una regressió real.
+
+### Tancament
+Counter -> 1939.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: 2 funcions òrfenes més eliminades (computeCollaboratorNetMargin + utils llegades) (Canvi #1938, claude)
+
+### Context
+Continuant `docs/audit/inventari-funcions-orfenes.md` clúster a clúster: dos clústers més ja explícitament recomanats 🔴 MATAR pel juny, revalidats amb grep abans de tocar (alguns fitxers ja s'havien mogut de lloc des d'aleshores: `lib/sanitize.ts`→`lib/utils/sanitize.ts`, `lib/pluralize.ts`→`lib/utils/pluralize.ts`, `lib/timeline.ts`→`lib/customer-hub/timeline.ts`).
+
+- Autorització explícita propietari: troballa presentada amb revalidació + confirmació explícita "sí, elimina-les".
+
+### Canvi
+- `lib/services/costEngine.ts`: `computeCollaboratorNetMargin` + interfície `CollaboratorCostInput` eliminades (òrfena des del #1196, comissions retirades).
+- `lib/utils.ts`: `cn` eliminada (`safeParseInt` es manté).
+- `lib/env.ts`: `getEnv` eliminada (`env`, `isImapConfigured`, `isSmtpConfigured` es mantenen; import `getSiteUrl` retirat per no-ús).
+- `lib/auth.ts`: `getClientIP`, `getUserAgent` eliminades.
+- `lib/utils/sanitize.ts`: `sanitizePhone` eliminada (`escapeHtml`, `sanitizeEmail`, `truncate` es mantenen).
+- `lib/utils/pluralize.ts`: `pluralizeWithCount` eliminada (`pluralize` es manté, en ús real).
+- `lib/customer-hub/timeline.ts`: `buildTimeline` eliminada; `buildCustomerBusinessTimelineEvents`/`buildCustomerActivityTimelineEvents` es mantenen (en ús real a `fetchCustomerHub.ts`).
+- Tests corresponents netejats a 8 fitxers (`auth.test.ts`, `customer-hub/timeline.test.ts` —helper local que reprodueix la fusió per conservar cobertura de les 2 funcions vives—, `env.test.ts`, `sanitize.test.ts` ×2, `services/costEngine.test.ts`, `utils.test.ts`, `utils/pluralize.test.ts`).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `npx vitest run` dels 8 fitxers de test tocats OK (120 tests); `pnpm run validate:core` OK complet.
+- Validació funcional: cap consumidor real trencat — totes les funcions eliminades tenien 0 usos fora del seu propi fitxer i tests.
+- Validació humana/UX: sense superfície visible.
+
+### Tancament
+Counter -> 1938 (Codex ha reservat `#1937` en directe — coherència EmailSend/PDF Proposal; salto per no col·lidir). 3 clústers de `funcions-orfenes.md` tancats (RGPD #1934, aquest #1938). Queden: heroVideoService, normalize.ts, customerSegmentationService, portfolioEventService/media, analytics.ts, email.ts testimonials, "resta" (drawCanonicalCard, deriveFlowStatus, exportExecutiveReportCsv, mergeCustomers, deleteDossier).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo E2E: coherència EmailSend/PDF de Proposal (Canvi #1937, codex)
+
+### Context
+El front de pressupostos ja tenia dues peces blindades: email com a entitat `proposal` (#1933) i `quoteSnapshot` canònic en cada proposta enviada (#1936). Faltava comprovar la baula que més s'assembla al bug real del client: que l'`EmailSend` registrat no contingui un link o referència que divergeixi del `Proposal` concret.
+
+### Canvi
+- `scripts/zenit-db-audit.mjs` afegeix `proposalEmailDocumentMismatches`: per cada `EmailSend` `proposal-send` amb `orbitaKind=proposal`, comprova que `orbitaId` apunti a un `Proposal` existent, que el subject contingui `Proposal.reference` i que `htmlBody` contingui el `Proposal.pdfUrl` (també comparant la variant path de URLs absolutes).
+- El report no exposa el HTML complet; només mostra motius compactes, longitud del cos i camps documentals rellevants.
+- `schemaProbe` exposa `proposalEmailDocumentLinkAudited='EmailSend.htmlBody -> Proposal.pdfUrl'`.
+- `scripts/check-zenit-tooling.mjs` i el seu test exigeixen el finding i el probe.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; `node scripts\check-zenit-tooling.mjs` OK; `npx vitest run __tests__/scripts/check-zenit-tooling.test.ts` OK (18 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-tooling` OK.
+- Validació funcional: `pnpm run zenit:db:audit` OK amb `proposalEmailDocumentMismatches=0`, `sentLikeProposalsMissingQuoteSnapshot=0`, `proposalEmailTraceMismatches=0`, `sentLikeProposalsIncompleteDispatch=0` i `adminTestArtifact*=0`.
+- Validació humana/UX: sense nova pantalla; reforça que el client obri el mateix PDF que el `Proposal` canònic, no un link o document paral·lel.
+- Finding viu no resolt en aquest tall: `completedBookingsPostEventNotStarted=2`.
+
+### Tancament
+Counter -> 1937.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo E2E: auditoria quoteSnapshot canònic de Proposal enviat (Canvi #1936, codex)
+
+### Context
+Després de #1933, l'email de pressupost ja queda identificat com a `orbitaKind=proposal`, però el bug real reportat pel propietari exigeix una prova encara més dura: que el document enviat sigui reconstruïble com el mateix pressupost que s'ha previsualitzat/desat. El servei canònic ja congela `snapshot.quoteSnapshot.trace.safety='QUOTE_SNAPSHOT_V1'`; faltava que l'auditoria ho vigilés.
+
+### Canvi
+- `scripts/zenit-db-audit.mjs` afegeix `sentLikeProposalsMissingQuoteSnapshot`: revisa `Proposal` `SENT|VIEWED` amb PDF/enviament aparentment complet i marca qualsevol cas sense `quoteSnapshot` canònic o amb divergència a `documentType`, `proposalId`, `reference`, `trace.safety` o `pricing.total`.
+- El report exposa `proposalQuoteSnapshotSafetyAudited='QUOTE_SNAPSHOT_V1'` i el help inclou el nou risc documental.
+- `scripts/check-zenit-tooling.mjs` i el seu test exigeixen el finding, el probe i la marca `QUOTE_SNAPSHOT_V1`.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; `node scripts\check-zenit-tooling.mjs` OK; `npx vitest run __tests__/scripts/check-zenit-tooling.test.ts` OK (17 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-tooling` OK.
+- Validació funcional: `pnpm run zenit:db:audit` OK amb `sentLikeProposalsMissingQuoteSnapshot=0`, `proposalEmailTraceMismatches=0`, `sentLikeProposalsIncompleteDispatch=0` i tots els `adminTestArtifact*` a 0 després de la purga #1935.
+- Validació humana/UX: sense nova pantalla; la millora és de confiança operativa, perquè el document que surt cap al client queda auditable com el mateix pressupost congelat.
+- Finding viu no resolt en aquest tall: `completedBookingsPostEventNotStarted=2`.
+
+### Tancament
+Counter -> 1936.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: purga dels 14 leads de prova "Zenit Whatsapp" + cleaner passa a font única de marcadors (Canvi #1935, claude)
+
+### Context
+Handoff de Codex tancat a #1930: `zenit:db:audit` ja exposava `adminTestArtifactLeads=14` (leads `"Zenit Whatsapp"` amb email `@example.test`, `source=WHATSAPP`, `customerId=null`) usant `lib/constants/adminTestArtifacts.json` com a font única de marcadors. Acord propietari: Codex audita, Claude elimina.
+
+- Autorització explícita propietari: acord "Codex audita, Claude elimina" confirmat directament ("codex audita i tu elimines").
+
+### Canvi
+- `scripts/zenit-clean-e2e-fixtures.mjs` deixa el seu propi `NAME_PREFIX = 'ZENIT E2E'` hardcoded (segona font de criteri) i passa a llegir `lib/constants/adminTestArtifacts.json` directament, reimplementant `adminTestArtifactWhere()` amb la mateixa lògica que `zenit-db-audit.mjs`. Una sola font de criteri de "què és fixture de prova".
+- `scripts/check-zenit-tooling.mjs` i el seu test actualitzats per exigir el patró nou.
+- Dry-run (14 leads, coincident exacte amb l'auditoria) i `--apply` real: 14 leads eliminats.
+
+### Validació
+- Validació tècnica: `node --check` OK; `node scripts/check-zenit-tooling.mjs` OK; `npx vitest run __tests__/scripts/check-zenit-tooling.test.ts` OK (16 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK complet.
+- Validació funcional: `pnpm run zenit:db:audit` post-purga confirma tots els `adminTestArtifact*` a 0.
+- Validació humana/UX: sense superfície visible.
+
+### Tancament
+Counter -> 1935. Handoff Codex→Claude #1930 tancat en cercle complet.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: 8 funcions RGPD òrfenes eliminades, revalidades a mà (Canvi #1934, claude)
+
+### Context
+Continuant la neteja "arreu" de `docs/audit/inventari-funcions-orfenes.md`, es revalida el clúster **privacyService (RGPD)** (10 funcions marcades com a òrfenes al juny) amb grep real abans de tocar-lo, atesa la sensibilitat legal. El document de juny s'equivocava parcialment: `recordConsent` és consumit realment per `app/api/contact/route.ts` (formulari públic) i `executeRetentionPolicies` per `app/api/cron/data-retention/route.ts` (cron actiu) — cap de les dues és òrfena. Les altres 8 sí ho són de veritat, i estan substituïdes per un servei més nou (`privacyRequestAdminService.ts`/`privacyRequestListService.ts` + `listConsents`/`listPrivacyAuditLogs`/`getPrivacyStats` del mateix `privacyService.ts`) que ja alimenta `/api/admin/privacy/*` de veritat — no hi ha cap forat de compliment, és el mateix patró de "dues fonts de veritat" que ja s'ha corregit al repartiment de reserves (#1931).
+
+- Autorització explícita propietari: presentada la troballa revalidada (què és òrfena de veritat i per què no hi ha risc legal) i confirmació explícita "sí, elimina-les".
+
+### Canvi
+Eliminades de `lib/services/privacyService.ts` (0 usos reals fora del fitxer, cap crida interna des de les funcions que es conserven): `getActiveConsents`, `hasActiveConsent`, `processDataRequest`, `getPendingDataRequests`, `getAuditHistory`, `getAuditSummary`, `getCurrentLegalVersion`, `checkGdprCompliance`. Tipus `DataResponseType` retirat de la importació (només l'usava `processDataRequest`).
+Netejats també els seus blocs de test corresponents a `__tests__/lib/services/privacyService.test.ts` (imports + `describe` blocks).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `npx vitest run __tests__/lib/services/privacyService.test.ts` OK (36 tests); `pnpm run validate:core` OK complet.
+- Validació funcional: cap ruta ni cron trencat — `recordConsent`/`executeRetentionPolicies` (les úniques amb ús real del clúster original) es conserven intactes; les 8 eliminades no tenien cap crida interna des de codi que es manté.
+- Validació humana/UX: sense superfície visible — carril mort, mai renderitzat.
+
+### Tancament
+Counter -> 1934 (Codex ha reservat `#1933` en directe — identitat documental de Proposal, exactament el bug que el propietari va reportar ahir; salto per no col·lidir). Primer clúster de `funcions-orfenes.md` tancat amb decisió explícita del propietari; queden la resta (heroVideoService, customerSegmentationService, portfolioEventService, analytics, email testimonials, utils llegades) pendents de repassar un a un.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo E2E: identitat documental de Proposal al canal email (Canvi #1933, codex)
+
+### Context
+El propietari va reportar el risc més greu del front Documents: una pantalla pot semblar coherent, però el client pot rebre un document diferent o no reconstruïble com el mateix pressupost. Després dels talls #1911-#1919, `Proposal` ja exigia `pdfUrl/pdfKey/sentAt` i `quoteSnapshot`, però el canal email encara identificava el missatge com `lead` o `customer`, no com `proposal`. Això feia més feble la prova "aquest email és aquest pressupost".
+
+### Canvi
+- `lib/imap.ts` incorpora `proposal` com a `OrbitaEntityKind`, inclòs el parser de `Message-ID`.
+- `sendAdminProposal()` manté `leadId/customerId` per activitat comercial, però `recordEmailSend()` i `sendEmail()` passen a usar `orbitaKind='proposal'` i `orbitaId=proposalId`.
+- L'`adminLog` de `DOCUMENT_PROPOSAL_SENT` desa també `emailOrbitaKind/emailOrbitaId`.
+- La Safata sap pintar i obrir fils `proposal` com a `Pressupost`, i el redactor preserva context `orbita=proposal` en respostes o esborranys si arriba d'un fil de pressupost.
+- `zenit:db:audit` afegeix `proposalEmailTraceMismatches`: emails `proposal-send` sense `orbitaKind=proposal` o sense `orbitaId`.
+- `qa:zenit-tooling` blinda aquest finding i els probes `proposalEmailTemplateKeyAudited/proposalEmailOrbitaKindAudited`.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; `node scripts\check-zenit-tooling.mjs` OK; Vitest enfocat OK (4 fitxers / 73 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK.
+- Validació funcional: `pnpm run zenit:db:audit` OK amb `proposalEmailTraceMismatches.count=0`, `sentLikeProposalsIncompleteDispatch.count=0` i els carrils legacy de pressupost a 0.
+- Validació humana/UX: el correu que rep el client ja no queda només penjat d'un lead/client; queda identificat com el pressupost concret que ha congelat snapshot i PDF.
+
+### Tancament
+Counter es manté a 1934 perquè Claude ha tancat #1934 en paral·lel mentre aquest #1933 estava reservat. Aquest tall omple el número reservat sense baixar el counter global.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: auditoria d'artefactes de prova Zenit (Canvi #1930, codex)
+
+### Context
+El propietari ha fixat el repartiment operatiu: Codex audita i Claude elimina. Després de la neteja `ZENIT E2E` del #1921, quedava un risc real: la detecció UI de proves ja reconeixia també `ZENIT WhatsApp/Mail/Config/Admin`, `zenit.e2e` i `@example.test`, però l'auditoria global de BD no ho mostrava com a handoff repetible.
+
+- Autorització explícita propietari: "una sola veritat", "una sola font", "blindar blindar i blindar" i "tu audites i claude elimina".
+
+### Canvi
+- Nou `lib/constants/adminTestArtifacts.json`: font única dels marcadors de prova (`@example.test`, `zenit e2e`, `zenit.e2e`, `zenit whatsapp`, `zenit mail`, `zenit config`, `zenit admin`).
+- `lib/constants/adminTestArtifacts.ts` deixa de tenir la llista hardcoded i consumeix el JSON compartit.
+- `scripts/zenit-db-audit.mjs` afegeix findings read-only `adminTestArtifactCustomers`, `adminTestArtifactLeads`, `adminTestArtifactBookings`, `adminTestArtifactDossiers`, `adminTestArtifactProposals`, `adminTestArtifactEmailSends`, `adminTestArtifactLeadDocuments`, `adminTestArtifactLeadNotes` i `adminTestArtifactLeadActivities`.
+- `schemaProbe` exposa la ruta i els marcadors auditats perquè el report deixi clar quina font governa el criteri.
+- `scripts/check-zenit-tooling.mjs` blinda que l'auditoria no perdi aquests findings i que el JSON no perdi cap marcador Manolo.
+- `__tests__/scripts/check-zenit-tooling.test.ts` passa a 15 tests amb regressió específica d'artefactes de prova Zenit i de la font única de marcadors.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; `node scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts` OK (1 fitxer / 15 tests).
+- Validació funcional: `pnpm run zenit:db:audit` OK; troba `adminTestArtifactLeads.count=14` i la resta `adminTestArtifact*` principal/documental a 0. Els 14 són leads `Zenit Whatsapp` amb emails `zenit.e2e...@example.test`.
+- Validació humana/UX: Claude ja té un handoff verificable amb IDs/samples; Codex no ha fet cap eliminació física, migració ni `--apply`.
+
+### Tancament
+Counter es manté a 1932 perquè Claude ja ha tancat #1931 i #1932 mentre #1930 estava reservat per Codex. Aquest tall omple formalment el #1930 sense rebaixar el counter global.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: neteja de codi mort revalidada (Canvi #1932, claude)
+
+### Context
+El propietari demana repetir la feina "arreu": localitzar coses velles i eliminar-les, que tot sigui canònic. `docs/audit/dead-code.md` (auditoria de 2026-06-19) ja tenia una categoria D de "candidats nets de poca controvèrsia" pendent d'una passada dedicada — exports UI sense cap consumidor. En lloc de confiar cegament en un document de ~3 setmanes, es revalida cada ítem amb grep real abans de tocar res (part ja no existia: `CalendarSections.tsx`, `ReviewsBadge`/`ReviewsInline` ja s'havien eliminat en passades prèvies; `lib/api-error-handler.ts` ja no existeix).
+
+- Autorització explícita propietari: "repeteix la feina arreu i localitza coses velles i elimina-les" + "que sigui tot canònic".
+
+### Canvi
+Eliminats (revalidats a 0 usos reals fora del propi fitxer, cap test els referenciava):
+- `lib/home-meta.ts`: `getDefaultHomeMeta` (la resta del fitxer — `getHomeMeta`, `getHomeKeywords` — es manté, en ús).
+- `lib/api-response.ts`: tipus `ApiResponse` (la resta —`successResponse`, `ApiErrors`— es manté, en ús real a `app/api/admin/customers/route.ts`).
+- `lib/services/publicServiceMediaService.ts`: `getPublicServicePortfolioSlug`.
+- `app/components/pwa/PWAProvider.tsx`: component `PWAInstallButton`.
+- `app/components/ui/LanguageSelector.tsx`: component `LanguageBar`.
+
+NO eliminats malgrat aparèixer al document (revalidats i descartats explícitament):
+- `app/admin/leads/colorTheme.ts` — el document parlava només dels *tipus*; el fitxer sencer està en ús actiu (`LeadsPanel.tsx`, `SummaryPanel.tsx`).
+- `lib/inventory-image-constants.ts: INVENTORY_IMAGE_USER_AGENT` — l'inventari d'òrfenes (`docs/audit/inventari-funcions-orfenes.md`) el marcava fals positiu: només escaneja `app/`+`lib/`, i el consumidor real és `scripts/localize-inventory-images.ts`.
+
+NO tocat (fora d'abast d'aquest tall, requereix decisió explícita del propietari per fitxer):
+- `docs/audit/inventari-funcions-orfenes.md` — 78 funcions òrfenes, moltes són RGPD/compliance legal (`privacyService.ts`) o possibles features demanades i desconnectades (heroVideoService, customerSegmentationService, portfolioEventService). El propi document exigeix decisió 1 a 1 del propietari (REFER/MATAR); eliminar-les en bloc violaria la norma "no fixes de merda" i el risc legal de la peça RGPD.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK complet; grep confirma 0 tests referenciaven cap dels 5 exports eliminats.
+- Validació funcional: cada eliminació verificada amb grep repo-wide abans de tocar (no es va confiar en l'edat del document).
+- Validació humana/UX: sense superfície visible — eren exports mai renderitzats/importats.
+
+### Tancament
+Counter -> 1932. Primera passada de la neteja "arreu": codi mort ja pre-auditat i revalidat. Pendent: `inventari-funcions-orfenes.md` (necessita decisions puntuals del propietari, especialment el clúster RGPD) i el handoff de Codex #1930 (artefactes de prova Zenit a BD, encara en curs — "Codex audita, Claude elimina").
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: repartiment de la reserva llegeix el transport viu, no la foto congelada (Canvi #1931, claude)
+
+### Context
+Seguint l'auditoria del cas real `OE-2026-006` (Cristina Rey, CONFIRMED, esdeveniment 2026-07-11): la línia `[travel-cost]` d'Òrbita (`collaboratorId=null`) tenia `costAmount=2,50 €` (tarifa congelada 0,25 €/km de quan es va crear la reserva), mentre `booking.travelCost` (el que realment resta al Marge) era `1,15 €` (tarifa viva 0,1151 €/km). El Marge estava bé (`costEngine.ts` ja exclou aquestes línies via `isTravelCostLine`); el panell de Repartiment mostrava el número vell.
+
+- Autorització explícita propietari: "fes la correcció estructural amb `buildBoloRepartimentLines`, com al lead" + "una sola veritat, una sola font canònica, tot passa per el mateix".
+
+### Canvi
+- `app/admin/bookings/[id]/page.tsx` deixa d'escampar `bookingServiceLines` directament dins `repartimentLines`. Ara: (1) separa les línies `[travel-cost]` amb `collaboratorId` real (pagament fet/pactat a un tercer — es conserven intactes, mai es recalculen soles) de les pròpies d'Òrbita (`collaboratorId=null`, foto congelada); (2) si no hi ha cap línia de col·laborador extern, substitueix la part d'Òrbita per una línia viva amb `booking.travelCost` (font única, ja usada pel Marge); (3) construeix `repartimentLines` amb `buildBoloRepartimentLines()` — el mateix helper canònic que ja fa servir `LeadBoloSection.tsx` — en lloc de muntar l'array a mà.
+- Zero canvis a `repartimentService.ts`/`computeBoloRepartiment` (el cervell no es toca ni es duplica: només es crida com ja fa el lead).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `npx vitest run __tests__/lib/services/repartimentService.test.ts __tests__/app/api/admin/bookings-detail-route.test.ts` OK (26 tests).
+- Validació funcional: script de verificació contra la reserva real `OE-2026-006` — abans `costInternOrbita` hauria sortit 2,50 € (línia congelada), després surt **1,15 €**, coincidint exactament amb `booking.travelCost` viu.
+- Validació humana/UX: Repartiment i Marge ja mostren el mateix número pel mateix concepte en aquesta reserva (i en qualsevol futura amb la mateixa deriva de tarifa); els col·laboradors externs amb transport pagat no es toquen.
+
+### Tancament
+Counter -> 1931 (Codex ha reservat `#1930` en directe — auditoria d'artefactes de prova Zenit; salto per no col·lidir). Repartiment de reserva alineat amb «una sola font canònica»: quan hi ha línies `[travel-cost]` només d'Òrbita, sempre es recalculen en viu; quan hi ha un col·laborador real pagat, la seva línia queda intacta.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: auditoria legacyLeadTaskId temporal (Canvi #1929, codex)
+
+### Context
+El §6.2 conserva un pendent antic molt concret: eliminar `Task.legacyLeadTaskId` quan ja no hi hagi dades amb aquest camp. Abans de tocar schema o migracions calia fer el pas Manolo correcte: mirar la BD real i convertir el fòssil en invariant auditable, no decidir per memòria.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar Manolo/Zenit fins al final, buscant carrils vells i sense pegats.
+
+### Canvi
+- `scripts/zenit-db-audit.mjs` afegeix `legacyLeadTaskLinks`: tasques que encara tenen `legacyLeadTaskId`.
+- `schemaProbe` exposa `legacyLeadTaskFieldAudited: "Task.legacyLeadTaskId"` perquè el report deixi clar quin camp temporal s'ha verificat.
+- `nextSteps.legacyLeadTaskLinks` separa dues decisions: si hi ha dades, mantenir compatibilitat; si és 0, estudiar neteja de schema en un tall separat amb migració i validació.
+- `scripts/check-zenit-tooling.mjs` exigeix `prisma.task.findMany`, el finding i el probe perquè aquesta cobertura no desaparegui.
+- `__tests__/scripts/check-zenit-tooling.test.ts` passa a 13 tests amb regressió específica del fòssil `legacyLeadTaskId`.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts` OK (1 fitxer / 13 tests); `node scripts\check-zenit-tooling.mjs` OK.
+- Validació funcional: `pnpm run zenit:db:audit` OK; retorna `legacyLeadTaskLinks.count=0`.
+- Validació humana/UX: Manolo ja pot veure que aquest carril vell de `LeadTask` no té dades vives abans de plantejar una futura neteja de schema; no s'ha fet cap migració ni cap escriptura.
+
+### Tancament
+Counter -> 1929. Tall d'auditoria/guard; sense schema, sense migracions, sense BD write, sense UI i sense tocar `app/admin/tasks`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: auditoria post-event no arrencat (Canvi #1928, codex)
+
+### Context
+El pas 15 de la checklist Manolo diu que el post-event no pot quedar en `booking COMPLETED` sense volant: agraïment, informe, survey, testimoni, social o referral han d'arrencar. El dashboard i el playbook ja projecten aquesta cua, però l'auditoria Zenit de BD encara no ho veia. Això deixava el risc fora del report repetible.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar Manolo/Zenit fins al final, sense pegats i canonitzant tots els processos.
+
+### Canvi
+- `scripts/zenit-db-audit.mjs` afegeix `completedBookingsPostEventNotStarted`: bookings `COMPLETED` dels últims 90 dies, amb més de 3 dies d'antiguitat, sense email post-event, sense informe i sense enquesta.
+- També afegeix `postEventEmailFlagWithoutSentAt`: incoherència de traça quan `postEventEmailSent=true` però `postEventEmailSentAt=null`.
+- `schemaProbe` exposa `postEventAuditWindowDays`, `postEventStartDueDays`, `postEventAuditFrom` i `postEventStartDueBefore`.
+- `nextSteps` apunta al camí canònic existent: playbook/hub post-event, email d'agraïment, informe intern o enquesta. No s'envia cap email real ni es muta cap client.
+- `scripts/check-zenit-tooling.mjs` exigeix aquests findings i `__tests__/scripts/check-zenit-tooling.test.ts` passa a 12 tests.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts` OK (1 fitxer / 12 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:zenit-tooling` OK; `git diff --check -- <perímetre #1928>` OK; `pnpm run validate:core` OK (75 fitxers de tests de scripts / 653 tests; `qa:admin-canon` conserva només 2 P3 coneguts, cap P1).
+- Validació funcional: `pnpm run zenit:db:audit` OK; detecta `completedBookingsPostEventNotStarted.count=2` (`OE-2026-004`, `OE-2026-005`) i `postEventEmailFlagWithoutSentAt.count=0`.
+- Validació humana/UX: els dos bolos completats queden visibles com a risc de post-event dins una auditoria repetible; l'operador ha d'arrencar-los pel playbook/hub, no per patch ni enviament automàtic cec.
+
+### Tancament
+Counter -> 1928. Tall d'auditoria/guard; sense BD write, sense schema, sense UI, sense emails, sense crons i sense serveis post-event.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: auditoria documents finals amb artefacte durable (Canvi #1927, codex)
+
+### Context
+Després de tancar els carrils legacy de pressupostos, quedava un risc adjacent dins l'E2E de producte: contracte, factura i albarà són documents finals que el portal/client i la fitxa de reserva només poden operar bé si l'estat avançat porta un artefacte durable. El #1880, #1881 i #1894 ja havien cosit els serveis; faltava que `zenit:db:audit` ho vigilés igual que vigila `Proposal`.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar Manolo/Zenit fins al final, sense pegats i canonitzant tots els processos.
+
+### Canvi
+- `scripts/zenit-db-audit.mjs` afegeix tres findings read-only: `advancedContractsMissingArtifact`, `activeInvoicesMissingPdf` i `advancedDeliveryNotesMissingPdf`.
+- L'auditoria considera KO un contracte `SENT|SIGNED` sense `contractReference`, `contractPdfUrl` o `contractPdfKey`; una factura activa (`DRAFT|PENDING_SYNC|SYNCED|SYNC_ERROR|PAID`) sense `pdfUrl/pdfKey`; i un albarà `DELIVERED|SIGNED` sense `pdfUrl/pdfKey`.
+- `schemaProbe` exposa `advancedContractStatusesAudited`, `activeInvoiceStatusesAudited` i `advancedDeliveryNoteStatusesAudited`.
+- `nextSteps` envia cada KO al servei canònic corresponent: contracte, factura o albarà; no patch manual ni substitució pel pressupost.
+- `scripts/check-zenit-tooling.mjs` exigeix aquests findings i `__tests__/scripts/check-zenit-tooling.test.ts` passa a 11 tests.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts` OK (1 fitxer / 11 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:zenit-tooling` OK; `git diff --check -- <perímetre #1927>` OK; `pnpm run validate:core` OK (75 fitxers de tests de scripts / 652 tests; `qa:admin-canon` conserva només 2 P3 coneguts, cap P1).
+- Validació funcional: `pnpm run zenit:db:audit` OK i retorna `advancedContractsMissingArtifact.count=0`, `activeInvoicesMissingPdf.count=0` i `advancedDeliveryNotesMissingPdf.count=0`.
+- Validació humana/UX: Manolo ja pot detectar si un document final sembla avançat dins l'admin però no existeix com a PDF/enllaç durable per al client, el portal o la fitxa de reserva.
+
+### Tancament
+Counter -> 1927. Tall d'auditoria/guard; sense BD write, sense schema, sense UI, sense emails, sense generar PDFs i sense serveis de negoci.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: guard upload LeadDocument QUOTE (Canvi #1926, codex)
+
+### Context
+El #1925 ha blindat la ruta legacy `/api/admin/leads/[id]/quote`, però encara hi havia una altra frontera que podia recrear pressupostos fantasmes si algú la relaxava: l'upload manual de documents de lead. `uploadLeadDocument()` ja rebutja `QUOTE`, però aquesta regla no estava dins el guard que corre a `validate:core`.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar Manolo/Zenit fins al final, sense pegats i eliminant carrils vells no canònics.
+
+### Canvi
+- `scripts/check-zenit-tooling.mjs` revisa també `lib/services/leadDocumentService.ts`.
+- El guard exigeix `rawType === 'QUOTE'`, 410, `/admin/presupuestos` i el missatge que els pressupostos `LeadDocument` estan desactivats.
+- `__tests__/scripts/check-zenit-tooling.test.ts` passa a 10 tests i simula que l'upload torni a acceptar `QUOTE`.
+
+### Validació
+- Validació tècnica: `node --check scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts __tests__\lib\services\leadDocumentService.test.ts` OK (2 fitxers / 20 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: cap upload manual pot tornar a crear un `LeadDocument QUOTE` sense trencar `validate:core`.
+- Validació humana/UX: el lead no pot recuperar pressupostos paral·lels pujats com a document manual; el carril client-facing continua sent `Proposal`.
+
+### Tancament
+Counter -> 1926. Tall de guard estàtic; sense BD, sense schema, sense UI, sense rutes i sense modificar el servei d'upload.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: guard contra lead quote legacy (Canvi #1925, codex)
+
+### Context
+Després del #1924 quedaven blindats `emails/quote` i `custom_quotes`, però el tercer carril antic de pressupost era `/api/admin/leads/[id]/quote`. El handler actual ja retorna 410, però no estava protegit pel guard estàtic que corre dins `validate:core`.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar Manolo/Zenit fins al final, sense pegats i eliminant carrils vells no canònics.
+
+### Canvi
+- `scripts/check-zenit-tooling.mjs` revisa també `lib/services/leads/quoteRouteHandler.ts`.
+- El guard exigeix `buildLegacyQuoteDisabledResponse`, `status: 410`, `canonicalRoute: '/admin/presupuestos'` i missatge de flux antic desactivat.
+- El guard falla si el handler torna a mutar `LeadDocument` (`create/update/delete/upsert`) o si intenta enviar email pel carril `QUOTE` retirat.
+- `__tests__/scripts/check-zenit-tooling.test.ts` passa a 9 tests i simula la recreació d'un `LeadDocument QUOTE`.
+
+### Validació
+- Validació tècnica: `node --check scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts __tests__\lib\services\leads\quoteRouteHandler.test.ts __tests__\app\api\admin\leads-quote-route.test.ts` OK (3 fitxers / 16 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: el carril antic de lead quote no pot tornar a crear `LeadDocument QUOTE` sense trencar `validate:core`.
+- Validació humana/UX: cap operador pot recuperar un pressupost fantasma vinculat al lead però absent de `/admin/presupuestos`.
+
+### Tancament
+Counter -> 1925. Tall de guard estàtic; sense BD, sense schema, sense UI, sense emails i sense modificar el handler retirat.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: guard contra pressupostos legacy paral·lels (Canvi #1924, codex)
+
+### Context
+L'auditoria de vells carrils comercials mostra que `custom_quotes` i `emails/quote` ja estan retirats: no són el forat actual. El risc és futur: si algú reactiva SMTP al servei vell o torna a escriure `custom_quotes`, reapareix el problema que el propietari ha assenyalat — pressupostos fora de `Proposal`, invisibles o divergents.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar Manolo/Zenit fins al final, sense pegats i eliminant carrils vells no canònics.
+
+### Canvi
+- `scripts/check-zenit-tooling.mjs` ara revisa també `lib/services/adminQuoteEmailService.ts`.
+- El guard exigeix que `adminQuoteEmailService` retorni 410, apunti a `/api/admin/proposals/:id/send` i no contingui `sendEmail`, `nodemailer` ni creació directa d'`EmailSend`.
+- El mateix guard revisa `lib/services/customQuoteAdminService.ts` i exigeix `CUSTOM_QUOTE_RETIRED_ERROR`, 410 i ruta canònica `/admin/presupuestos`.
+- El guard falla si `customQuoteAdminService` torna a fer `prisma.customQuote.create/update/delete/upsert`.
+- `__tests__/scripts/check-zenit-tooling.test.ts` passa a 8 tests i simula reactivació d'enviament legacy i mutació de `custom_quotes`.
+
+### Validació
+- Validació tècnica: `node --check scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts __tests__\lib\services\adminQuoteEmailService.test.ts __tests__\lib\services\customQuoteAdminService.test.ts __tests__\app\api\admin\emails-quote-route.test.ts __tests__\app\api\admin\custom-quotes-route.test.ts` OK (5 fitxers / 36 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: els carrils legacy continuen retornant 410 i ara `validate:core` fallarà si es reintrodueix enviament o CRUD real fora de `Proposal`.
+- Validació humana/UX: cap operador pot tornar a generar o enviar un pressupost paral·lel sense que Manolo trenqui el guard abans.
+
+### Tancament
+Counter -> 1924. Tall de guard estàtic; sense BD, sense schema, sense UI, sense emails i sense modificar els serveis retirats.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: auditoria ACCEPTED sense reserva (Canvi #1923, codex)
+
+### Context
+El #1920 ha canonitzat la lectura operativa: una `Proposal ACCEPTED` sense `bookingId` no és contracte pendent, és reserva pendent de crear. Però si això només viu al dashboard, continua sent massa fràgil per Manolo. El mateix invariant ha de ser visible a l'auditoria Zenit de BD.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar Manolo/Zenit fins al final, sense pegats i amb canonització de processos complets.
+
+### Canvi
+- `scripts/zenit-db-audit.mjs` afegeix el finding read-only `acceptedProposalsWithoutBooking`.
+- El `schemaProbe` exposa `acceptedProposalStatusesAudited` per deixar clar si l'enum real de BD conté `ACCEPTED`.
+- `nextSteps.acceptedProposalsWithoutBooking` apunta al carril correcte: crear reserva abans de contracte, no fer cap patch manual ni saltar el booking.
+- `scripts/check-zenit-tooling.mjs` exigeix que l'auditoria cobreixi aquest invariant.
+- `__tests__/scripts/check-zenit-tooling.test.ts` afegeix regressió perquè el guard falli si desapareix el finding.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts` OK (1 fitxer / 6 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: `pnpm run zenit:db:audit` OK i retorna `acceptedProposalStatusesAudited=["ACCEPTED"]` amb `acceptedProposalsWithoutBooking.count=0`.
+- Validació humana/UX: el procés queda auditable encara que ningú entri al dashboard; si una proposta acceptada queda sense reserva, Manolo ho veurà com a següent acció canònica.
+
+### Tancament
+Counter -> 1923. Tall d'auditoria read-only; sense escriptures a BD, sense schema, sense emails, sense PDFs, sense UI i sense cleaners.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: desglossament de costos de la reserva plegat (Canvi #1922, claude)
+
+### Context
+El propietari assenyala que `/admin/bookings/[id]` és interminable i pregunta si cal que sigui tan llarga. Auditant la reserva citada (`cmpv6tehp0002mittudtg9tui`, COMPLETED, 0 línies de servei/inventari/qüestionari) es confirma que la majoria de seccions ja gestionen bé l'estat buit (`BookingInventorySection`, `BookingQuestionnaireSection`...). Però `BookingMarginCard.tsx` té un bloc "Desglossament de costos" que:
+- és tècnic i cru (`Transport al client (vehicle + X h × Y pers.)`, `Pack (X% de Y€)`), exactament el patró que `CLAUDE.md` prohibeix com a interfície ("el text tècnic de debug MAI és interfície").
+- duplica el bloc humà de sobre ("On va cada euro d'aquest bolo"), que ja explica el mateix desglossament en llenguatge planer.
+- és sempre obert, quan la norma exigeix que els desglossaments vagin plegats amb `<details>` — patró que el mateix repo ja té construït a `RepartimentPanel.tsx` (`ap-rep-detail`/`ap-rep-detail-summary`/`ap-rep-detail-body`).
+
+- Autorització explícita propietari: confirmació directa ("ok") després de presentar la troballa concreta i la correcció proposada.
+
+### Canvi
+- `BookingMarginCard.tsx`: el bloc "Desglossament de costos" (abans `<div className="ap-card p-4 ...">` sempre obert) passa a `<details className="ap-rep-detail">` + `<summary className="ap-rep-detail-summary">` + `<div className="ap-rep-detail-body">`, reutilitzant les classes ja existents de `RepartimentPanel`. Plegat per defecte. Zero CSS nou, zero lògica nova, zero hardcode — només reorganització de marcat consumint un patró canònic ja construït.
+- Cap dada eliminada: el desglossament tècnic segueix disponible un clic més avall per qui el necessiti.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `npx vitest run __tests__/app/admin/bookings/BookingMarginCard.test.tsx __tests__/app/admin/bookings/BookingMarginCard-travel-cost-source.test.ts` OK (3 tests, inclou test nou que verifica que el bloc va plegat per defecte); `node scripts/check-admin-canon.mjs --strict` OK (mateixos 2 P3 coneguts, cap P1 nou); `node scripts/check-css-monocapa.mjs` OK; `node scripts/check-phantom-classes.mjs` OK; `pnpm run validate:core` OK complet.
+- Validació funcional: la fitxa de reserva (`/admin/bookings/[id]`) redueix la seva alçada estructural sense perdre cap dada; el bloc tècnic queda accessible sota un `<summary>` clar.
+- Validació humana/UX: l'operador ja no veu dos desglossaments del mateix cost (un humà i un tècnic) l'un sota l'altre sempre oberts; el detall tècnic hi és per qui el vulgui, no per defecte.
+
+### Tancament
+Counter -> 1922. Tall petit i acotat sobre un únic component, aplicant una norma ja escrita amb un patró de referència ja existent al repo — no una redisseny.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: purga de fixtures E2E ZENIT + eina reutilitzable (Canvi #1921, claude)
+
+### Context
+El propietari ha detectat un client de prova (`CLI-0049` / `ZENIT E2E Config 20260710112724`) i ha demanat eliminar tots els rastres de proves com aquesta. Auditant BD s'ha confirmat que no era un cas aïllat: 14 tandes d'E2E acumulades entre el 2026-07-09 i el 2026-07-10 havien creat `Customer`/`Lead`/`Booking` reals consumint numeració real (`customerNumber` 36-49, `Booking.reference` `OE-2026-007` a `OE-2026-020`) i tot el seu rastre (dossiers, proposals, factures, albarans, enquestes post-event, portal client, tasks...).
+
+- Autorització explícita propietari: ordre directa d'eliminar «tots els rastres de les proves com aquesta».
+
+### Canvi
+- Nou `scripts/zenit-clean-e2e-fixtures.mjs` (mateix patró que `zenit-clean-legacy-quotes.mjs`: dry-run per defecte, `--apply` explícit, `$transaction` atòmica). Filtra només `Customer`/`Lead` amb nom que comença per `ZENIT E2E` i encadena l'esborrat per les ~30 taules relacionades (bookings i tots els seus fills, proposals, dossiers, tasks, documents, emails, portal access, invoices, delivery notes, consent/data requests) abans d'esborrar lead/customer.
+- `package.json` afegeix `zenit:clean:e2e-fixtures`.
+- `scripts/check-zenit-tooling.mjs` estén el guard perquè també exigeixi el patró dry-run/`--apply`/`$transaction` en aquest cleaner nou (no només als dos anteriors).
+- `__tests__/scripts/check-zenit-tooling.test.ts` amplia fixtures i afegeix un test que falla si el cleaner E2E no exigeix dry-run/transacció.
+- Executat dry-run (966 files a 33 taules) i després `--apply` real: 14 customers, 42 leads, 14 bookings i tota la cadena relacionada eliminats. Verificat post-purga: 0 leads/customers `ZENIT E2E` restants.
+
+### Validació
+- Validació tècnica: `node scripts/check-zenit-tooling.mjs` OK; `npx vitest run __tests__/scripts/check-zenit-tooling.test.ts` OK (5 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- package.json scripts/zenit-clean-e2e-fixtures.mjs scripts/check-zenit-tooling.mjs __tests__/scripts/check-zenit-tooling.test.ts` OK.
+- Validació funcional: dry-run i `--apply` coincideixen exactament en comptes (966); consulta post-purga confirma 0 rastres `ZENIT E2E` a `Customer`/`Lead`.
+- Validació humana/UX: sense superfície nova; l'efecte visible és que els 14 clients/leads/reserves de prova desapareixen de tots els llistats, cercadors i calendari de l'admin sense deixar cap fila òrfena.
+- Nota de coordinació: `pnpm run validate:core` falla ara mateix a `qa:service-coverage` per `lib/services/proposalBookingConversionSuggestionService.ts` — fitxer nou de Codex creat en directe dins el seu `#1920` (`treballant`, agent-sync), no tocat ni relacionat amb aquest perímetre. `qa:zenit-tooling` i la resta de guards del meu perímetre passen aïllats.
+
+### Tancament
+Counter -> 1921 (Codex ha reservat `#1920` en directe per al seu propi tall; salto per no col·lidir amb el número, seguint la norma de no-col·lisió d'`agent-sync.md`). Eina de neteja Zenit reutilitzable per a futures tandes E2E + purga real dels rastres detectats pel propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-11 — Manolo: proposta acceptada sense reserva crea reserva (Canvi #1920, codex)
+
+### Context
+Durant la canonització documental de pressupostos ha aparegut un forat de procés: una `Proposal` `ACCEPTED` sense `bookingId` podia entrar mentalment a la cua de contractes, però l'ordre real del producte és un altre. Acceptar pressupost no és tenir reserva. Primer cal convertir la proposta acceptada en reserva; només després té sentit contracte, factura, inventari, calendari i post-event.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar Manolo/Zenit fins al final, sense pegats i canonitzant tots els processos.
+
+### Canvi
+- Nou servei read-only `proposalBookingConversionSuggestionService`: detecta `Proposal ACCEPTED` sense `bookingId`, amb client i artefacte documental enviat (`sentAt`, `pdfUrl`, `pdfKey`), i construeix una acció executiva de conversió a reserva.
+- `contractWorkflowSuggestionService` exigeix `bookingId`; una proposta acceptada sense reserva queda fora de la cua de contracte perquè encara no existeix el contenidor operatiu.
+- `today-actions` projecta aquestes propostes com `Crear reserva`, amb prioritat alta i URL canònica de creació de reserva preomplerta per `proposalId`, `leadId` i `customerId`.
+- `/admin` carrega el nou suggeriment al mateix lot de copilot diari, abans dels contractes, perquè la següent acció humana sigui l'ordre correcte.
+- Tests nous i ampliats cobreixen ranking, filtres de dades incompletes, exclusió del contract workflow i projecció visual de l'acció.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\proposalBookingConversionSuggestionService.test.ts __tests__\lib\services\contractWorkflowSuggestionService.test.ts __tests__\app\admin\today-actions.test.ts` OK (3 fitxers / 29 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:service-coverage` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK; `git diff --check -- <perímetre #1920>` OK.
+- Validació funcional: una proposta acceptada sense reserva ja no pot aparèixer com a contracte pendent; l'acció canònica és crear reserva i, quan la reserva existeix, el contract workflow pot continuar.
+- Validació humana/UX: l'operador no rep una ordre falsa de "contracte" quan encara falta el pas operatiu principal; el copilot d'Avui li diu el següent pas real.
+
+### Tancament
+Counter mantingut a 1921 perquè Claude ha tancat `#1921` en paral·lel mentre Codex tenia `#1920` obert; no es baixa `ADMIN_CHANGE_COUNTER`. Tall de workflow canònic, sense schema, sense BD runtime, sense emails, sense PDFs i sense mutacions.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: dispatch canònic de Proposal SENT/VIEWED (Canvi #1919, codex)
+
+### Context
+L'auditoria Zenit del #1918 ja es podia executar contra BD i ha trobat dues coses estructurals: la migració `20260711021500_add_proposal_viewed_status` encara no estava aplicada a la BD real, i la proposta `PROP-2026-0005` estava en `SENT` amb `pdfUrl/pdfKey` però `sentAt=null`.
+
+No s'ha resolt amb un `UPDATE` manual: això seria un pegat. El tall converteix la troballa en invariant canònic de dispatch documental.
+
+- Autorització explícita propietari: el propietari ha repetit que Manolo té permís per tot, que no vol preguntes i que no accepta pegats; aquest tall toca BD real i servei només per canonitzar el problema detectat i deixar-lo auditable.
+
+### Canvi
+- Aplicada a BD la migració pendent `20260711021500_add_proposal_viewed_status`; `ProposalStatus` real ara inclou `VIEWED`.
+- `scripts/zenit-db-audit.mjs` audita els valors reals de l'enum abans de buscar `SENT|VIEWED` i evita trencar-se si hi ha drift de schema.
+- El finding passa a dir-se `sentLikeProposalsIncompleteDispatch`, perquè el contracte real és `status=SENT|VIEWED` amb `pdfUrl`, `pdfKey` i `sentAt` presents.
+- `sendAdminProposal()` repara una proposta `SENT|VIEWED` amb PDF arxivat però `sentAt=null` sense generar PDF nou, sense enviar email, sense crear `EmailSend`, sense follow-up i amb `DOCUMENT_PROPOSAL_PDF_REPAIRED`.
+- Reparada la proposta real `PROP-2026-0005` (`cmret4ee30016ps71xmsqcxfg`) pel servei canònic: `sentAt=2026-07-10T10:42:56.508Z`, mateix `pdfUrl` i mateix `pdfKey`.
+- `docs/MANOLO.md` afegeix `0.10 No pegats`: cap mutació manual sense invariant, ruta canònica, guard/auditoria i registre compta com a canvi Manolo tancat.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts __tests__\lib\services\proposalDispatchService.test.ts` OK (2 fitxers / 21 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `node scripts\check-zenit-tooling.mjs` OK; `git diff --check -- <perímetre #1919>` OK; `pnpm run validate:core` OK (75 fitxers de tests de scripts / 645 tests; `qa:admin-canon` conserva només 2 P3 coneguts, cap P1).
+- Validació funcional: `npx prisma migrate status` OK i `pnpm run zenit:db:audit` OK amb `legacyLeadDocuments=0`, `legacyQuoteEmailDocuments=0`, `historicalQuoteDossiers=0`, `sentLikeProposalsIncompleteDispatch=0`, `retiredCustomQuotes=0`, `quoteEmailSignals=0`.
+- Validació humana/UX: `PROP-2026-0005` queda normalitzada sense reenviar cap email al client, sense generar PDF nou i mantenint el mateix enllaç documental que ja havia rebut; l'operador deixa de veure una proposta mig enviada.
+
+### Tancament
+Counter -> 1919. Tall de canonització de Proposal dispatch; amb migració real desplegada, reparació de dades per servei oficial i auditoria Zenit neta.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: verificació real E2E lead → dossier → reserva (passada de validació, claude, sense Canvi nou)
+
+### Context
+`docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` §7.5 punt 1 deixava com a pendent "una passada browser/captura real si es vol evidència visual punta a punta" del flux lead amb productes/desplaçament/peatges/dietes/imatges/cost col·laborador → dossier → PDF compost → reserva. Abans d'agafar codi nou al backlog Manolo calia comprovar si això seguia sent cert, perquè el mateix document data d'abans del Canvi #1846 i el repo ja té ~80 canvis més (#1847-#1918) sense que el bullet s'hagi tornat a mirar.
+
+### Verificació feta (sense codi nou)
+- Trobades 4 execucions prèvies reals de `scripts/zenit-e2e-trace.ts` + `scripts/zenit-e2e-capture.ts` (`.codex-captures/zenit-e2e-1850/*`), la més recent amb el lead `ZENIT E2E Config 20260710112724` (411,4 km / 29 € peatges / 22 línies de servei): 28/28 checks de backend OK (dossier amb identitat/imatges de col·laborador visibles, snapshot de dossier des del lead, pressupost i reserva heretant línies/ruta/transport, factura, post-event, enquestes, albarà, portal).
+- Revisades visualment les captures existents (`dossiers-from-lead-1440.png`, `booking-detail-1440.png`) i les captures posteriors `.codex-captures/zenit-proposal-booking-1855/*` (proposta → reserva amb transport real 83,6 km, cost intern 15,90 €, marge 42 €/14 % coherent) i `zenit-status-checklist-1858/*`: cap imatge trencada, cap xifra incoherent.
+- Passada EN VIU (dev server net arrencat aquesta sessió, `.codex-captures/zenit-e2e-verify-1919/*`): `/admin/leads/cmreupowk...`, `/admin/dossiers?leadId=...` i `/admin/bookings/cmreuptmt...` renderitzen sense `pageerror` ni respostes HTTP ≥400; l'endpoint `/api/admin/dossiers/.../composite` retorna `200 application/pdf` (1,47 MB, coherent amb imatges reals incrustades, no un PDF buit/trencat).
+- Conclusió: el punt 1 de §7.5 ja NO és un pendent real — ja es va tancar de facto amb els Canvis #1850-#1875 (captures mòbil/cookie/presupuestos/proposal-booking/status-checklist). El document només tenia el text desactualitzat.
+
+### Canvi documental (sense número, no és codi de producte)
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` §7.5 punt 1: el bullet es reescriu per deixar explícit que la passada browser/captura ja està feta i citada, evitant que un agent futur torni a obrir aquest front com si estigués pendent.
+
+### Tancament
+Sense Canvi de codi, sense tocar `ADMIN_CHANGE_COUNTER`. Norma de no-col·lisió respectada: Codex tenia el #1918 (tooling Zenit) `treballant`/`tancat` durant aquesta passada i cap fitxer de codi s'ha tocat. Següent front real: triar un punt de §7.5 (2-4) o un `PENDENT CRÍTIC` de §6 que no toqui el perímetre documental que Codex acaba d'anunciar que continua.
+- Fet per: `claude`
+
+## 2026-07-11 — Manolo: tooling Zenit contra approval gates (Canvi #1918, codex)
+
+### Context
+Després de la purga #1917, el problema operatiu ja no era només el cas `PRE-*`, sinó la manera de no quedar aturats quan el sandbox demana approval per BD, xarxa o accions destructives. El permís oral del propietari governa el criteri, però no elimina el gate tècnic de l'eina.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar sense preguntes. Aquest tall no toca BD, xarxa, schema, migracions ni dades destructives; converteix les operacions sensibles en tooling repo-nadiu amb dry-run.
+
+### Canvi
+- `docs/MANOLO.md` afegeix `0.9 Approval gates del sandbox`: acció sensible = script explícit, `--help`, dry-run, `--apply`, sortida verificable, guard i registre.
+- Nou `scripts/zenit-db-audit.mjs`: auditoria read-only de `LeadDocument QUOTE`, `quote-email:*`, `Dossier mode=quote`, `Proposal SENT|VIEWED` sense PDF/sentAt, `custom_quotes` i senyals `EmailSend`.
+- Nou `scripts/zenit-clean-legacy-quotes.mjs`: neteja acotada de `LeadDocument QUOTE` amb `fileUrl=quote-email:*` i `filePath=null`; dry-run per defecte, eliminació només amb `--apply`.
+- Nou `scripts/check-zenit-tooling.mjs` i script `qa:zenit-tooling` dins `validate:core`.
+- Nou test `__tests__/scripts/check-zenit-tooling.test.ts`.
+- No s'ha executat cap auditoria contra BD ni cap neteja real en aquest tall.
+
+### Validació
+- Validació tècnica: `node --check scripts\zenit-db-audit.mjs` OK; `node --check scripts\zenit-clean-legacy-quotes.mjs` OK; `node --check scripts\check-zenit-tooling.mjs` OK; `node scripts\zenit-db-audit.mjs --help` OK; `node scripts\zenit-clean-legacy-quotes.mjs --help` OK; `node scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\vitest.CMD run __tests__\scripts\check-zenit-tooling.test.ts` OK (1 fitxer / 4 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `git diff --check -- <perímetre #1918>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run validate:core` OK.
+- Validació funcional: el cleaner no pot eliminar res sense `--apply` i el guard falla si el contracte dry-run/read-only es trenca.
+- Validació humana/UX: quan aparegui un approval gate, la feina sensible queda separada en una comanda clara i la resta de Manolo pot continuar sense quedar aturat.
+
+### Tancament
+Counter -> 1918. Tall de tooling i protocol; sense BD runtime, sense dades destructives, sense schema, sense migracions i sense xarxa.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: purga de traces PRE legacy fora de Proposal (Canvi #1917, codex)
+
+### Context
+El cas `Pressupost PRE-2026-8JZG - Òrbita Events` queda confirmat contra BD: no era cap `Proposal`, sinó un `LeadDocument` `QUOTE` amb `fileUrl=quote-email:PRE-2026-8JZG`. Això explica que no sortís a `/admin/presupuestos` tot i estar vinculat a un lead: era una traça legacy sense PDF real ni contracte canònic.
+
+- Autorització explícita propietari: el propietari ha demanat canonització total, eliminar rastres vells i ha donat permís per continuar sense demanar. Aquest tall és destructiu però acotat a traces legacy sense fitxer real: `LeadDocument.type=QUOTE` i `fileUrl` començant per `quote-email:`.
+
+### Canvi
+- Purga BD executada: `deleteMany({ type: 'QUOTE', fileUrl: { startsWith: 'quote-email:' } })`.
+- Files eliminades: `cmrez8k6x001mgougrh2wxddu` (`PRE-2026-8JZG`), `cmrexxlz6000igougqexu1ozd` (`PRE-2026-XLU4`), `cmrenu6cd0003s1ih6to4ndpf` (`PRE-2026-U65K`) i `cmo16c8q300brv7nbefufp8ft` (`PRE-2026-C8OO`).
+- Verificació post-purga: `LeadDocument QUOTE = 0`, `Dossier mode=quote = 0`, `Proposal` amb `PRE-2026-8JZG = 0`.
+- Nou helper `lib/admin/commercialDocumentHistory.ts` centralitza labels històrics: un `LeadDocument QUOTE` hipotètic queda com `Traça legacy retirada` / `RETIRAT` i sense enllaç; un dossier antic `mode=quote` queda com `Dossier comercial històric`, no com a pressupost.
+- Lead detail i booking detail consumeixen el helper en lloc de repetir labels locals.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\admin\commercialDocumentHistory.test.ts __tests__\lib\services\leadDocumentService.test.ts __tests__\lib\services\leads\quoteRouteHandler.test.ts __tests__\app\admin\presupuestos\ProposalsList-bulk.test.ts` OK (4 fitxers / 19 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK.
+- Residus: `rg "Pressupost dossier|Traça pressupost antic|quote-email:" app lib __tests__ scripts` només troba el literal `quote-email:` dins el test de regressió nou.
+- Protocol/guards: `git diff --check -- <perímetre #1917>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: `/admin/presupuestos` ja no té cap pressupost PRE fantasma competint amb `Proposal`; el cas `PRE-2026-8JZG` queda eliminat com a traça no canònica.
+- Validació humana/UX: lead/reserva ja no poden presentar cap peça històrica com si fos un pressupost canònic actual.
+
+### Tancament
+Counter -> 1917. Tall de purga i llenguatge documental legacy; sense tocar `Proposal`, `Dossier`, `EmailSend`, PDFs reals, schema ni reenviaments. Següent front Manolo: continuar auditoria documental cap a dossiers/PDF/snapshots.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: VIEWED és estat persistible de pressupost (Canvi #1916, codex)
+
+### Context
+Després del #1915, `SENT|VIEWED` ja tenia helper canònic i consumidors coherents, però quedava una incoherència de sota-faldilles: DTO/UI/serveis coneixien `VIEWED`, mentre que l'enum Prisma `ProposalStatus` encara no el declarava. Això feia que "pressupost vist/llegit" fos comportament de producte però no estat persistible net.
+
+- Autorització explícita propietari: el propietari ha ordenat continuar Manolo/Zenit fins al final i ha dit literalment que hi ha permís per tot; aquest tall toca schema/migració perquè la divergència `VIEWED` DTO/UI vs Prisma només es resol de forma canònica afegint l'estat al model.
+
+### Canvi
+- `prisma/schema.prisma` afegeix `VIEWED` a `ProposalStatus` després de `SENT`.
+- Nova migració `prisma/migrations/20260711021500_add_proposal_viewed_status/migration.sql` afegeix el valor PostgreSQL `VIEWED`.
+- `proposalAdminService` blinda el carril: `SENT|VIEWED` no es poden escriure via `createAdminProposal` o `updateAdminProposal`; continuen reservats al flux canònic de dispatch/visualització.
+- Les rutes `/api/admin/proposals` i `/api/admin/proposals/[id]` accepten `VIEWED` al contracte de validació i deleguen el bloqueig de carril al servei canònic.
+- Tests ampliats: servei admin de propostes i rutes API cobreixen `VIEWED` com a estat de contracte però no editable fora del carril canònic.
+
+### Validació
+- Prisma: `npx prisma generate` OK.
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\proposalAdminService.test.ts __tests__\app\api\admin\proposals-detail-route.test.ts __tests__\app\api\admin\proposals-route.test.ts __tests__\lib\proposals\status.test.ts` OK (4 fitxers / 57 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK.
+- Schema: `pnpm run qa:schema-drift` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1916>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: `VIEWED` deixa de ser un estat fantasma; el producte el pot persistir sense obrir cap via manual per marcar propostes com enviades/llegides.
+- Validació humana/UX: el que l'operador veu com "vist/llegit" queda alineat amb BD/API i no depèn d'una excepció invisible.
+
+### Tancament
+Counter -> 1916. Tall schema/migració de Pressupostos autoritzat i acotat; sense BD manual destructiva, sense dades destructives i sense reenviaments. Següent front Manolo: continuar la canonització documental Pressupostos/PDF/Dossiers.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: font única per estat enviat de pressupost (Canvi #1915, codex)
+
+### Context
+Després del #1914, el criteri `SENT|VIEWED` ja funcionava a les superfícies principals, però estava repetit en components i serveis. Això és deute de monocapa: el proper canvi podia tornar a deixar un lloc amb `SENT` estricte i un altre amb `SENT|VIEWED`.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a helper compartit, consumidors UI/servei i tests, sense schema, migracions, BD manual, dades destructives ni reenviaments.
+
+### Canvi
+- Nou catàleg `SENT_LIKE_PROPOSAL_STATUSES` a `lib/constants/index.ts` i helper `isSentLikeProposalStatus()` a `lib/proposals/status.ts`.
+- `proposalDispatchService`, `proposalAdminService`, `proposalActive`, Customer Hub, `/admin/presupuestos` i el flux documental de reserva consumeixen la mateixa regla.
+- El guard d'acceptació canònica de `proposalAdminService` accepta també `VIEWED` amb `sentAt + pdfUrl + pdfKey`, de manera que la UI no promet una acció que el backend rebutgi.
+- `DocumentFlowSection` de reserva tria també una proposta `VIEWED` com a pressupost actiu abans d'un esborrany.
+- Tests ampliats: helper, servei admin de proposta, dispatch, llistat pressupostos, Customer Hub i flux documental de reserva.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\proposals\status.test.ts __tests__\lib\services\proposalAdminService.test.ts __tests__\lib\services\proposalDispatchService.test.ts __tests__\app\admin\presupuestos\ProposalsList-bulk.test.ts __tests__\app\admin\clientes\SummaryPanel.test.tsx __tests__\app\admin\clientes\ProposalsPanel.test.tsx __tests__\app\admin\bookings\DocumentFlowSection.test.tsx` OK (7 fitxers / 73 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1915>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: `VIEWED` ja no és una regla copiada a mà; el mateix helper governa filtre, resum, reparació, acceptació i flux documental.
+- Validació humana/UX: l'operador rep una experiència coherent: "llegit" continua sent seguiment comercial i es pot tancar igual que "enviat".
+
+### Tancament
+Counter -> 1915. Tall de monocapa d'estat de pressupost; sense schema, migració, BD manual, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: pressupost llegit compta com enviat operatiu (Canvi #1914, codex)
+
+### Context
+Després del #1913, les propostes `VIEWED` sense PDF ja podien reparar-se sense reenviament, però quedava una costura de producte: alguns comptadors, filtres i accions encara tractaven només `SENT` com a pendent de resposta. Això podia fer que un pressupost llegit pel client desaparegués dels KPIs de seguiment o no pogués tancar-se igual que un enviat.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a UI/lectura admin i tests, sense schema, migracions, BD manual, dades destructives ni reenviaments.
+
+### Canvi
+- `/admin/presupuestos` aplica un helper de filtre: el KPI/filtre `SENT` inclou també `VIEWED` com a família enviada/pendent.
+- Customer Hub `SummaryPanel` compta `VIEWED` com a pendent de resposta i activa el recordatori comercial.
+- Customer Hub `ProposalsPanel` permet tancar una proposta `VIEWED` amb PDF canònic amb les mateixes accions que `SENT`: acceptar, caducar o rebutjar.
+- Tests ampliats: llistat de pressupostos, resum del Customer Hub i panell de pressupostos del Customer Hub.
+- Observació de full de ruta: `lib/customer-hub/dto.ts` i la UI coneixen `VIEWED`, però `prisma/schema.prisma` no declara `VIEWED` dins `ProposalStatus`; si el producte vol persistir lectura real com estat de BD, cal tall separat amb autorització explícita de schema/migració.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\app\admin\presupuestos\ProposalsList-bulk.test.ts __tests__\app\admin\clientes\SummaryPanel.test.tsx __tests__\app\admin\clientes\ProposalsPanel.test.tsx` OK (3 fitxers / 22 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1914>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: una proposta llegida ja no es perd dels pendents comercials ni queda sense rebuig/caducitat des del Customer Hub.
+- Validació humana/UX: el significat operatiu "enviat/llegit = pendent de resposta" queda igualat en els punts de treball del propietari.
+
+### Tancament
+Counter -> 1914. Tall Pressupostos/Customer Hub de coherència d'estat; sense schema, migració, BD manual, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable, amb la divergència `VIEWED` DTO vs Prisma anotada com a possible tall estructural.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: pressupost vist sense PDF es pot reparar (Canvi #1913, codex)
+
+### Context
+Després del #1912, el panell `Pressupostos` del Customer Hub ja feia consultables els PDFs de proposta i contracte. La revisió del mateix flux detecta un encallament canònic: una proposta `VIEWED` antiga sense `pdfUrl/pdfKey` no podia marcar-se acceptada, però tampoc mostrava `Reparar PDF`; a més, la ruta canònica `/api/admin/proposals/:id/send` només reparava `SENT` sense artefacte.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat al servei canònic de dispatch/reparació de pressupostos i a dues superfícies admin, sense schema, migracions, BD manual, dades destructives ni reenviaments.
+
+### Canvi
+- `proposalDispatchService` tracta `SENT` i `VIEWED` com a estats enviats reparables quan falta `pdfUrl/pdfKey`.
+- Una proposta `VIEWED` amb PDF arxivat continua bloquejada contra reenviament.
+- Una proposta `VIEWED` sense PDF genera i puja l'artefacte, conserva `sentAt`, no canvia a reenviament email i deixa adminLog de reparació.
+- `ProposalsPanel` i `ProposalsList` mostren `Reparar PDF` per `SENT|VIEWED` sense artefacte canònic.
+- Tests ampliats: servei de dispatch, Customer Hub i guard estàtic de `/admin/presupuestos`.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\proposalDispatchService.test.ts __tests__\app\admin\clientes\ProposalsPanel.test.tsx __tests__\app\admin\presupuestos\ProposalsList-bulk.test.ts` OK (3 fitxers / 28 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1913>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: una proposta `VIEWED` sense PDF canònic deixa de quedar atrapada entre "no acceptar" i "no reparar".
+- Validació humana/UX: l'operador veu la mateixa reparació a Customer Hub i a `/admin/presupuestos`, i la reparació no envia cap correu nou al client.
+
+### Tancament
+Counter -> 1913. Tall Pressupostos/Customer Hub documental; sense schema, migració, BD manual, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: Customer Hub mostra el contracte enviat pendent (Canvi #1912, codex)
+
+### Context
+Després del #1911, el panell `Pressupostos` ja obria el PDF enviat de la proposta. El mateix panell encara tenia una costura adjacent: quan una proposta acceptada tenia contracte `SENT` i `contractPdfUrl`, mostrava estat i accions (`Marcar signat`, `Cancel·lar`) però no el PDF del contracte pendent fins que passava a signat.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a superfície Customer Hub/Pressupostos, sense schema, migracions, BD, API nova, dades destructives ni reenviaments.
+
+### Canvi
+- `ProposalsPanel` exposa `📄 PDF contracte` quan hi ha `contractPdfUrl` i el contracte encara no està signat.
+- El CTA obre en pestanya nova amb `noopener noreferrer`.
+- El cas de contracte signat conserva la seva caixa pròpia i no duplica el CTA pendent.
+- `__tests__/app/admin/clientes/ProposalsPanel.test.tsx` blinda el contracte enviat pendent amb PDF, link segur i acció de marcar signat.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\app\admin\clientes\ProposalsPanel.test.tsx` OK (1 fitxer / 7 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1912>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: un contracte enviat pendent de signatura amb PDF es pot obrir directament des del Customer Hub.
+- Validació humana/UX: l'operador pot revisar el mateix contracte que està esperant signatura sense sortir del hub ni esperar a l'estat signat.
+
+### Tancament
+Counter -> 1912. Tall Customer Hub/Pressupostos documental; sense schema, migració, BD, API nova, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: Customer Hub mostra el PDF enviat de pressupost (Canvi #1911, codex)
+
+### Context
+Després del #1910, la timeline del Customer Hub ja obria documents com a documents. Revisant el panell `Pressupostos`, el DTO de cada `Proposal` ja portava `pdfUrl/pdfKey` del PDF enviat, però la card només oferia `Editar` o `Obrir document` cap a Studio. Per consultar el PDF exacte rebut pel client, l'operador havia de sortir mentalment cap a la timeline o cap a Pressupostos.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a superfície Customer Hub/Pressupostos, sense schema, migracions, BD, API nova, dades destructives ni reenviaments.
+
+### Canvi
+- `ProposalsPanel` exposa `📄 PDF enviat` quan una proposta enviada té artefacte canònic `sentAt + pdfUrl + pdfKey`.
+- El CTA del PDF obre en pestanya nova amb `noopener noreferrer`.
+- El link de contracte signat del mateix panell passa també a `noopener noreferrer`.
+- `__tests__/app/admin/clientes/ProposalsPanel.test.tsx` blinda PDF enviat visible, absència del CTA quan falta artefacte i rel segur al contracte signat.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\app\admin\clientes\ProposalsPanel.test.tsx` OK (1 fitxer / 6 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1911>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: un pressupost enviat amb PDF canònic es pot obrir directament des del Customer Hub.
+- Validació humana/UX: l'operador no ha d'abandonar el hub ni buscar a la timeline per veure el PDF que ja es va enviar al client.
+
+### Tancament
+Counter -> 1911. Tall Customer Hub/Pressupostos documental; sense schema, migració, BD, API nova, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: Customer Hub obre documents de timeline com a documents (Canvi #1910, codex)
+
+### Context
+Després del #1909, la fitxa de reserva ja obria CTAs documentals correctament, però el `TimelinePanel` del Customer Hub renderitzava tots els `event.link` amb `Link` de Next. Això convertia PDFs externs, Holded o previews `/api/admin/dossiers/:id/preview` en navegació interna, quan en realitat són artefactes documentals que l'operador ha de poder obrir sense perdre el hub.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat al render de links de timeline del Customer Hub, sense schema, migracions, BD, API nova, dades destructives ni reenviaments.
+
+### Canvi
+- `TimelineEventLink` separa links interns de links documentals al Customer Hub.
+- Els links `https://...` i `/api/...` s'obren en pestanya nova amb `noopener noreferrer`.
+- Els links interns conserven navegació `Link` de Next.
+- `__tests__/app/admin/clientes/TimelinePanel.test.tsx` blinda link intern sense `target`, PDF extern segur i preview API segur.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\app\admin\clientes\TimelinePanel.test.tsx` OK (1 fitxer / 5 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1910>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: un document de timeline al Customer Hub obre com a document i no com a ruta interna.
+- Validació humana/UX: l'operador pot consultar PDF o preview sense perdre el context 360 del client.
+
+### Tancament
+Counter -> 1910. Tall Customer Hub/UI documental; sense schema, migració, BD, API nova, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: l'historial de reserva mostra CTAs documentals (Canvi #1909, codex)
+
+### Context
+Després del #1908, la timeline canònica de reserva ja transportava traces de factura i albarà amb link a PDF o a `#sec-documents`. Revisant la fitxa `/admin/bookings/[id]`, el bloc `Historial de canvis` calculava la descripció i rebia `entry.link`, però tots dos es renderitzaven amb `className="hidden"`. El cable existia, però l'operador no podia usar-lo.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a superfície visible de l'historial de reserva, sense schema, migracions, BD, API nova, dades destructives ni reenviaments.
+
+### Canvi
+- `BookingTimelineLink` centralitza el CTA visible de cada event de timeline dins la fitxa de reserva.
+- La descripció de l'event deixa de ser un node ocult i passa a mostrar-se en línia compacta.
+- Els links documentals tipus `https://...` o `/api/...` s'obren en pestanya nova amb `noopener noreferrer`.
+- Els links interns conserven navegació `Link` de Next.
+- `__tests__/app/admin/bookings/BookingTimelineLinks.test.ts` blinda que descripció i CTA no tornin a quedar amagats.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\app\admin\bookings\BookingTimelineLinks.test.ts` OK (1 fitxer / 2 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1909>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: l'historial de reserva mostra la descripció i el CTA del document que ja arribaven de la timeline canònica.
+- Validació humana/UX: l'operador pot obrir factura/albarà/dossier/document des del mateix historial sense haver d'endevinar que hi havia un link ocult.
+
+### Tancament
+Counter -> 1909. Tall Reserves/UI documental; sense schema, migració, BD, API nova, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: traces de factura i albarà entren a la timeline de reserva (Canvi #1908, codex)
+
+### Context
+Després del #1907, la traça documental de dossier ja obria l'artefacte exacte. El mateix patró apareixia dins la reserva: factures i albarans escriuen `adminLog` com `entity='invoice'` o `entity='deliveryNote'` amb `details.bookingId`, però `fetchCanonicalEventsForBooking()` només llegia `booking`, `booking_inventory` i `leadActivity`. La fitxa de reserva podia perdre la seva pròpia traça documental lateral.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a lectura timeline/adminLog i catàleg d'accions admin, sense schema, migracions, BD, API nova, UI de reserva ni reenviaments.
+
+### Canvi
+- `fetchCanonicalEventsForBooking()` incorpora `invoice` i `deliveryNote` filtrats per `details.bookingId`.
+- `buildAdminLogLink()` obre el PDF de factura/albarà si `details.pdfUrl` existeix.
+- Si no hi ha PDF, el link cau a `buildBookingHref(bookingId, 'sec-documents')`.
+- `ADMIN_ACTIVITY_ACTION_META` i `ADMIN_ACTIVITY_CATEGORY_MAP` incorporen `DOCUMENT_INVOICE_PDF_GENERATED` perquè la factura no surti com a acció crua.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\timelineQueryService.test.ts` OK (1 fitxer / 45 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1908>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: la timeline canònica d'una reserva inclou traces de factura i albarà vinculades per `bookingId`, amb CTA a PDF o a `#sec-documents`.
+- Validació humana/UX: l'operador pot reconstruir documents operatius des de l'historial de la reserva sense buscar en mòduls laterals.
+
+### Tancament
+Counter -> 1908. Tall Reserves/timeline documental; sense schema, migració, BD, API nova, UI de reserva, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: dossier enviat obre el preview guardat des del Customer Hub (Canvi #1907, codex)
+
+### Context
+Després del #1906, revisant les traces documentals canòniques, el dossier enviat ja deixava `DOCUMENT_DOSSIER_SENT` amb `dossierId`, `leadId` i `customerId`, però la timeline resolia el CTA cap a `/admin/dossiers` genèric. Això obligava l'operador a buscar manualment el dossier exacte que el client havia rebut.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a link canònic d'adminLog documental, sense schema, migracions, BD, API nova, UI de Dossiers ni reenviaments.
+
+### Canvi
+- `mapAdminLogToCanonicalEvent()` reutilitza `buildDossierStoredPreviewHref()` per a `DOCUMENT_DOSSIER_SENT` i qualsevol `adminLog` amb `entity='dossier'`.
+- Si `entityId` falta però `details.dossierId` existeix, el link també obre el preview guardat exacte.
+- Si no hi ha cap id de dossier, es manté el fallback a `/admin/dossiers`.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\timelineQueryService.test.ts` OK (1 fitxer / 42 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1907>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK.
+- Validació funcional: una traça documental de dossier amb id obre `/api/admin/dossiers/:id/preview` en lloc d'una llista genèrica.
+- Validació humana/UX: el Customer Hub deixa de fer buscar manualment quin dossier va rebre el client.
+
+### Tancament
+Counter -> 1907. Tall Customer Hub/documental; sense schema, migració, BD, API nova, UI Dossiers, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: contracte enviat pendent de signatura arriba al Customer Hub (Canvi #1906, codex)
+
+### Context
+Després del #1905, el Customer Hub ja reconstruïa pressupost, factura, albarà signat i contracte signat, però el DTO ja transportava `contractSentAt` sense que la timeline el projectés. Això deixava un forat de producte: un contracte enviat al client però encara pendent de signatura no apareixia com a document dins la memòria 360.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a lectura Customer Hub/timeline, sense schema, migracions, BD, API, SMTP runtime ni reenviaments.
+
+### Canvi
+- `buildCustomerBusinessTimelineEvents()` projecta `contractSentAt` com a event documental `CONTRACT` quan hi ha `contractPdfUrl`.
+- El contracte enviat no es projecta si està `CANCELLED`, si no té PDF o si ja està signat, perquè en aquest cas mana l'event final de contracte signat.
+- L'event conserva `contractReference`, `contractStatus`, `contractPdfUrl` i els enllaços d'origen cap a client, lead i reserva.
+- La metadata del contracte signat incorpora també `contractStatus`.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\customer-hub\timeline.test.ts` OK (1 fitxer / 8 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1906>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK.
+- Validació funcional: un contracte enviat amb PDF queda visible com a document al Customer Hub mentre està pendent de signatura; sense PDF, cancel·lat o ja signat no duplica documents.
+- Validació humana/UX: l'operador no ha de saltar a pressupostos per saber si el client té un contracte pendent de signar amb PDF real.
+
+### Tancament
+Counter -> 1906. Tall Customer Hub/documental; sense schema, migració, BD, API, SMTP runtime, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: cap `sendEmail()` futur sense EmailSend observable (Canvi #1905, codex)
+
+### Context
+Després del #1904, el mapa de `sendEmail(` confirmava que contracte, dossier, pressupost, reserva, post-event, leads i processos customer ja creen `EmailSend` abans del SMTP i persisteixen resultat. El risc restant era de regressió futura: que una nova sortida tornés a enviar correu directe sense snapshot ni estat SMTP/IMAP.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a guard/test/pipeline/docs, sense schema, migracions, BD, SMTP runtime ni reenviaments.
+
+### Canvi
+- Nou `scripts/check-email-send-observability.mjs`.
+- Regla: qualsevol `sendEmail()` productiu dins `app/` o `lib/`, excepte el core `lib/email.ts`, ha de conviure amb `recordEmailSend()` i `updateEmailSendResult()` al mateix fitxer.
+- Nou test `__tests__/scripts/check-email-send-observability.test.ts`.
+- Nou script `qa:email-send-observability` a `package.json`.
+- `validate:core` executa el guard després de `qa:canonical-fetches`.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\scripts\check-email-send-observability.test.ts` OK (1 fitxer / 6 tests).
+- Guard focal: `pnpm run qa:email-send-observability` OK (1242 fitxers revisats; cap `sendEmail()` sense `EmailSend` observable).
+- Protocol/guards: `package.json` OK; `git diff --check -- <perímetre #1905>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: una futura sortida SMTP directa sense `EmailSend.htmlBody` i sense resultat SMTP/IMAP persistent trencarà el pipeline.
+- Validació humana/UX: un client no podrà tornar a rebre un email que l'operador no pugui reconstruir o auditar després.
+
+### Tancament
+Counter -> 1905. Tall guard/pipeline; sense runtime d'enviament, schema, migració, BD, dades destructives ni reenviaments. Següent front Manolo: continuar pel següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: la factura documentada arriba a la memòria del Customer Hub (Canvi #1904, codex)
+
+### Context
+Després del #1903, la mateixa costura documental quedava oberta per factures: el portal client i la reserva ja podien exposar factura/PDF/URL Holded, però la memòria 360 del client no la reconstruïa com a fet documental del negoci.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a lectura Customer Hub/timeline, sense schema, migracions, BD manual, dades destructives, API nova, portal ni reenviaments.
+
+### Canvi
+- `CustomerHubBooking` incorpora `invoices` amb id, referència, estat, total, PDF, URL Holded i creació.
+- `fetchCustomerHubCollections()` carrega les factures de cada reserva ordenades per creació.
+- `fetchCustomerHub()` serialitza les factures al DTO del client.
+- `buildCustomerBusinessTimelineEvents()` projecta factures no cancel·lades amb `pdfUrl` o `holdedInvoiceUrl` com a event documental `INVOICE`.
+- Les factures cancel·lades o sense cap document no contaminen la timeline.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\customer-hub\data.test.ts __tests__\lib\customer-hub\fetchCustomerHub.test.ts __tests__\lib\customer-hub\timeline.test.ts` OK (3 fitxers / 26 tests).
+- TypeScript: `npx tsc --noEmit` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1904>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: una reserva amb factura activa i document deixa rastre al Customer Hub amb `documentType=INVOICE`, referència, bookingId, total i link al PDF o Holded.
+- Validació humana/UX: el client 360 ja pot explicar que hi ha factura disponible sense obligar l'operador a saltar manualment a reserva, portal o Holded.
+
+### Tancament
+Counter -> 1904. Tall Customer Hub/documental; sense schema, sense migració, sense BD manual, sense API nova, sense dades destructives i sense reenviar emails. Següent front Manolo: continuar la canonització de contracte/inventari/calendari/reserva segons el següent forat executable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-11 — Manolo: l’albarà signat arriba a la memòria del Customer Hub (Canvi #1903, codex)
+
+### Context
+Després del #1902, el següent front Manolo era revisar sortides no-email i coherència entre documents, reserva, portal i memòria de client. El domini d’albarans ja existia, el PDF podia ser visible al portal, i el post-event ja pujava al Customer Hub; faltava que l’albarà signat amb PDF no quedés només dins la reserva/portal, sinó també com a fet reconstruïble del client.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a lectura Customer Hub/timeline, sense schema, migracions, BD manual, dades destructives, API nova, portal ni reenviaments.
+
+### Canvi
+- `CustomerHubBooking` incorpora `deliveryNotes` amb camps mínims de document: id, referència, estat, PDF, lliurament, signatura i creació.
+- `fetchCustomerHubCollections()` carrega els albarans de cada reserva ordenats per signatura/creació.
+- `fetchCustomerHub()` serialitza els albarans al DTO del client.
+- `buildCustomerBusinessTimelineEvents()` projecta només albarans `SIGNED` amb `pdfUrl` com a event documental amb link directe al PDF.
+- Els esborranys, cancel·lats o albarans sense PDF no contaminen la timeline.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\customer-hub\data.test.ts __tests__\lib\customer-hub\fetchCustomerHub.test.ts __tests__\lib\customer-hub\timeline.test.ts` OK (3 fitxers / 25 tests).
+- TypeScript: `npx tsc --noEmit` OK.
+- Protocol/guards: `git diff --check -- <perímetre #1903>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+- Validació funcional: una reserva amb albarà signat i PDF deixa rastre al Customer Hub amb `documentType=DELIVERY_NOTE`, referència, bookingId i link al PDF; un albarà `DRAFT` amb PDF no surt.
+- Validació humana/UX: el client 360 ja pot reconstruir que el servei va quedar signat amb albarà, sense haver d’endevinar-ho entrant a la reserva o al portal.
+
+### Tancament
+Counter -> 1903. Tall Customer Hub/documental; sense schema, sense migració, sense BD manual, sense API nova, sense dades destructives i sense reenviar emails. Següent front Manolo: continuar auditoria de documents no-email cap a factura/contracte/inventari/calendari i coherència amb reserva.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: contacte web i avisos standalone exigeixen EmailSend observable (Canvi #1902, codex)
+
+### Context
+Després del #1901, el mapa `rg "sendEmail\(" lib app` ja no mostrava helpers client-facing testimonials sense snapshot, però encara quedaven dues famílies de bypass: el formulari públic de contacte feia servir `sendEmailWithTimeout()` directe, i diversos avisos admin/reporting enviaven SMTP cru sense `EmailSend.htmlBody`.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no deixar portes antigues. Aquest tall no toca schema, migracions, BD manual, dades destructives ni reenviaments.
+
+### Canvi
+- `sendTrackedStandaloneEmail()` passa a ser helper exportat i conserva `templateKey`, `htmlBody`, `leadId/customerId`, `locale`, `orbita`, tracking/pixel i resultat SMTP/IMAP.
+- Nou `sendTrackedStandaloneEmailWithTimeout()` per a fluxos fire-and-forget sense perdre snapshot.
+- `/api/contact` envia l'avís admin i la confirmació client amb `templateKey=public-contact-*`, `leadId` i `orbita=lead`.
+- `sendEmailWithTimeout()` queda eliminat perquè no hi hagi bypass futur.
+- Avisos standalone admin/reporting passen pel helper traçat: test admin, resum comercial diari, informe executiu, instantània tècnica de lead, nou lead admin, alerta urgent, benchmark setmanal, testimonial admin/reminder i avís admin de reserva pública.
+- `emailTrackingService` etiqueta tots els nous `templateKey` perquè els informes siguin llegibles.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\email-send-booking-confirmation.test.ts __tests__\lib\services\emailTrackingService.test.ts __tests__\app\api\contact-route.test.ts __tests__\lib\services\adminTestNotificationService.test.ts __tests__\lib\services\commercialDailyAutomationService.test.ts __tests__\lib\services\executiveReportDispatchService.test.ts __tests__\lib\services\leadSnapshotService.test.ts __tests__\lib\services\notificationService.test.ts __tests__\lib\services\urgentFollowUpAlertService.test.ts __tests__\lib\services\weeklyBenchmarkService.test.ts` OK (10 fitxers / 114 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1902>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: `rg "sendEmail\(" lib app` només deixa el core SMTP, el helper traçat i serveis que creen `EmailSend` abans d'enviar.
+- Validació humana/UX: contacte web i avisos interns deixen prova reconstruïble del cos enviat; una sortida no queda reduïda a "ha sortit SMTP".
+
+### Tancament
+Counter -> 1902. Tall contact/admin standalone observable; sense schema, sense migració, sense BD manual, sense dades destructives i sense reenviar emails. Següent front Manolo: continuar mapa E2E de sortides no-email i coherència entre documents/reserva/portal/inventari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: testimonial aprovat exportat exigeix EmailSend observable (Canvi #1901, codex)
+
+### Context
+Després del #1900, el mapa de `sendEmail` directes encara mostrava `sendTestimonialApprovedEmail()`: ara mateix no tenia callers, però és un helper exportat i client-facing si algú el reutilitza. Deixar-lo amb `sendEmail(payload)` directe era una trampa futura.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats. Aquest tall queda acotat al helper testimonial exportat; sense schema nou, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `sendTestimonialApprovedEmail()` reutilitza `buildTestimonialApprovedEmailPayload()` però envia via `sendTrackedStandaloneEmail()`.
+- El helper crea `EmailSend` amb `templateKey=testimonial-approved`, `htmlBody`, `locale` i `orbita=customer` abans de SMTP.
+- El cos real surt amb tracking/pixel i `updateEmailSendResult()` desa SMTP/IMAP; si falla `EmailSend`, no surt cap SMTP.
+- `emailTrackingService` etiqueta `testimonial-approved`.
+- Test focalitzat cobreix que l'export no pot saltar-se `EmailSend`.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\email-send-booking-confirmation.test.ts __tests__\lib\services\emailTrackingService.test.ts` OK (2 fitxers / 40 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1901>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: qualsevol ús futur del helper testimonial aprovat queda observable i reconstruïble.
+- Validació humana/UX: un codi de descompte testimonial no pot sortir pel canal sense prova del cos enviat.
+
+### Tancament
+Counter -> 1901. Tall testimonial approved helper observable; sense schema, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: mapa final de `sendEmail` directes restants i classificació intern/admin vs client-facing.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: privacitat i testimonial rebut exigeixen EmailSend observable (Canvi #1900, codex)
+
+### Context
+Després del #1899, encara quedaven helpers públics a `lib/email.ts` que podien escriure directament al canal SMTP sense snapshot: verificació de peticions de privacitat, resolució de petició de privacitat i email de testimonial rebut amb codi de descompte. Són sortides externes reals; els avisos interns/admin continuen separats.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats. Aquest tall queda acotat a privacitat/testimonial rebut i helper privat d'email standalone; sense schema nou, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `lib/email.ts` consolida `sendTrackedStandaloneEmail()` per correus client-facing sense servei propi: crea `EmailSend`, aplica tracking/pixel, envia amb `sendEmail()` i desa SMTP/IMAP.
+- `sendPrivacyVerificationEmail()` registra `templateKey=privacy-verification`, `htmlBody`, `locale` i `orbita=admin` amb id `privacy-<requestId>`.
+- `sendPrivacyRequestCompletedEmail()` registra `templateKey=privacy-request-completed`, accepta `requestId` opcional i usa el mateix context Òrbita quan existeix.
+- `sendTestimonialReceivedEmail()` registra `templateKey=testimonial-received`, `htmlBody` amb el codi de descompte i `orbita=customer` sense inventar `customerId`.
+- Si falla `EmailSend`, no surt cap SMTP; si falla SMTP, l'`EmailSend` queda marcat amb error.
+- `emailTrackingService` etiqueta `privacy-verification`, `privacy-request-completed` i `testimonial-received`.
+- Tests enfocats cobreixen reserva pública refactoritzada al helper, privacitat verificació/resolució, testimonial rebut, tracking/pixel, context Òrbita, fallida EmailSend i fallida SMTP.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\email-send-booking-confirmation.test.ts __tests__\lib\email-public-booking-request.test.ts __tests__\lib\services\publicBookingService.test.ts __tests__\lib\services\emailTrackingService.test.ts` OK (4 fitxers / 66 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1900>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: privacitat i testimonial rebut ja no poden arribar al client sense cos reconstruïble i canal observable.
+- Validació humana/UX: l'operador pot auditar què es va enviar en un procés legal o en un codi de descompte testimonial; si el canal cau, no queda una sortida fantasma.
+
+### Tancament
+Counter -> 1900. Tall privacitat/testimonial rebut email observable; sense schema, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: revisar els `sendEmail` directes restants com a interns/admin o convertir-los si apareix sortida client-facing.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: reserva pública exigeix EmailSend observable (Canvi #1899, codex)
+
+### Context
+Després del #1898, quedava una sortida client-facing de l'inici del flux: `sendBookingConfirmation()` envia al client la sol·licitud de reserva pública rebuda, però sortia per SMTP directe sense `EmailSend.htmlBody`, sense tracking/pixel, sense context Òrbita i sense persistir SMTP/IMAP. L'email intern `sendBookingNotificationToAdmin()` queda fora del tall perquè és avís admin.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats. Aquest tall queda acotat al correu públic de reserva entrant; sense schema nou, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `BookingEmailModel` exposa `customerId` opcional perquè la reserva pública pugui vincular l'`EmailSend` al Customer 360.
+- `sendBookingConfirmation()` crea `EmailSend` obligatori amb `templateKey=public-booking-request`, `htmlBody`, `customerId`, `locale` i `orbita=booking` abans de SMTP.
+- El cos enviat passa per tracking d'enllaços i pixel d'obertura; `updateEmailSendResult()` desa acceptació SMTP i APPEND IMAP.
+- Si falla `EmailSend`, no surt cap SMTP; si falla SMTP, l'`EmailSend` queda marcat amb error i la reserva pública continua creada per degradació segura del servei.
+- `publicBookingService` passa la reserva creada amb `customerId` al mail de client; l'email intern admin no es modifica.
+- `emailTrackingService` etiqueta `public-booking-request` com a "Sol·licitud pública de reserva".
+- Tests enfocats cobreixen snapshot obligatori, ordre EmailSend→SMTP, tracking/pixel, context Òrbita booking, resultat SMTP/IMAP, fallida EmailSend, fallida SMTP, builder públic i pas de `customerId` des del servei.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\email-send-booking-confirmation.test.ts __tests__\lib\email-public-booking-request.test.ts __tests__\lib\services\publicBookingService.test.ts __tests__\lib\services\emailTrackingService.test.ts` OK (4 fitxers / 63 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1899>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: una reserva pública ja no pot enviar el primer email al client sense foto reconstruïble del cos, canal observable i booking d'origen.
+- Validació humana/UX: si el client rep la sol·licitud rebuda, l'admin pot reconstruir què va sortir i vincular-ho al booking/customer; si SMTP falla, no queda un enviament fantasma.
+
+### Tancament
+Counter -> 1899. Tall public booking request email observable; sense schema, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: helpers públics de privacitat/testimonis i separació d'avisos interns.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: customer process exigeix EmailSend observable (Canvi #1898, codex)
+
+### Context
+Després del #1897, quedava un procés client-facing legacy: `customerProcessService` podia disparar `review_request`, `post_event`, `welcome` i `promo` amb SMTP directe, HTML inline sense snapshot `EmailSend.htmlBody`, sense tracking/pixel, sense context Òrbita i amb activitat de client registrada sense prova del cos enviat.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats. Aquest tall queda acotat a customer process i helper testimonial; sense schema nou, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `customerProcessService` centralitza els quatre enviaments en un helper canònic: crea `EmailSend` abans de SMTP amb `templateKey`, `htmlBody`, `customerId`, `locale` i context Òrbita.
+- L'HTML real enviat surt amb tracking d'enllaços i pixel d'obertura, i `updateEmailSendResult()` persisteix acceptació SMTP i APPEND IMAP.
+- Si falla `EmailSend`, no s'envia cap SMTP; si falla SMTP, l'`EmailSend` queda marcat amb error i el procés no retorna `success:true`.
+- `recordCustomerProcessStarted()` admet `emailSendId` i `emailSnapshot=EmailSend.htmlBody` perquè el timeline del client apunti al snapshot real.
+- `lib/email.ts` exposa `buildTestimonialApprovedEmailPayload()` per reutilitzar la plantilla testimonial de `post_event` sense duplicar HTML.
+- `emailTrackingService` etiqueta `customer-review-request`, `customer-post-event`, `customer-welcome` i `customer-promo`.
+- Tests enfocats cobreixen snapshot obligatori, ordre EmailSend→SMTP, tracking/pixel, context Òrbita customer/booking, resultat SMTP/IMAP, fallida EmailSend, fallida SMTP i customer activity amb `emailSendId`.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\customerProcessService.test.ts __tests__\lib\services\customerActivityService.test.ts __tests__\lib\services\emailTrackingService.test.ts` OK (3 fitxers / 57 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1898>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: un procés customer ja no pot deixar un client notificat sense foto reconstruïble del missatge, canal observable i entitat d'origen.
+- Validació humana/UX: si l'operador inicia un procés de client, el timeline pot apuntar al mateix snapshot que va rebre el client; si falla l'enviament, no queda una activitat d'èxit falsa.
+
+### Tancament
+Counter -> 1898. Tall customer process email observable; sense schema, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: continuar auditant la resta de `sendEmail` directes i separar avisos interns de sortides client-facing.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: portal completat exigeix EmailSend observable (Canvi #1897, codex)
+
+### Context
+Després del #1896, quedava un canal client-facing petit però crític: `bookingPortalCompletionService` crea accés al portal quan una reserva queda completada i podia enviar l'enllaç al client sense `EmailSend.htmlBody`, sense context Òrbita i sense SMTP/IMAP persistent.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats. Aquest tall queda acotat a email automàtic de portal completat; sense schema nou, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- L'email d'accés al portal crea `EmailSend` obligatori amb `templateKey=booking-portal-access`, `htmlBody`, `locale` i `orbita=booking` abans de SMTP.
+- El cos enviat inclou tracking d'enllaços i pixel d'obertura; `updateEmailSendResult()` persisteix SMTP/IMAP.
+- El portal creat no es desfà si falla el correu: el servei manté `emailStatus=failed`, no envia SMTP si falla `EmailSend`, i registra el log funcional.
+- `PORTAL_AUTO_CREATED` arrossega `emailSendId`, `emailSnapshot=EmailSend.htmlBody` i context Òrbita quan hi ha snapshot.
+- `emailTrackingService` etiqueta `booking-portal-access` com a "Accés portal client".
+- Tests enfocats cobreixen portal existent, placeholder, SMTP off, fallida SMTP, fallida EmailSend, tracking/pixel, `orbita=booking`, SMTP/IMAP i log amb snapshot.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\bookingPortalCompletionService.test.ts __tests__\lib\services\bookingStatusTransitionService.test.ts __tests__\lib\services\emailTrackingService.test.ts` OK (3 fitxers / 64 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1897>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: completar una reserva ja no pot generar un email de portal sense foto reconstruïble ni canal observable.
+- Validació humana/UX: si el client rep l'enllaç de portal, l'admin té prova del cos enviat i del booking d'origen; si el correu falla, el portal segueix creat però queda traçat com a fallida.
+
+### Tancament
+Counter -> 1897. Tall portal completat email observable; sense schema, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: auditar processos customer legacy i altres `sendEmail` directes separant client-facing real d'avisos interns.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: entrada lead i seqüència comercial exigeixen EmailSend observable (Canvi #1896, codex)
+
+### Context
+Després del #1895, el següent forat client-facing era el primer tram comercial: `leadWelcomeEmailService` i `commercialSequenceService` podien enviar benvingudes o follow-ups de lead sense `EmailSend.htmlBody`, sense context Òrbita i sense resultat SMTP/IMAP persistent.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats. Aquest tall queda acotat a welcome de lead i seqüència comercial email; sense schema nou, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `sendLeadWelcomeEmail()` crea `EmailSend` obligatori abans de SMTP amb `templateKey=welcome`, `htmlBody`, `leadId/customerId` quan existeixen, `locale` i context Òrbita. Si falla el snapshot, no s'envia el welcome i retorna degradació segura `{ ok:false }`.
+- `automationTriggers.onLeadCreated()` passa `leadId` al welcome perquè el primer correu del lead neixi amb `orbita=lead`.
+- `commercialSequenceService` crea `EmailSend` quan el pas de nurturing cau a email: `templateKey=<follow-up>`, `leadId`, `htmlBody`, tracking/pixel i `updateEmailSendResult()`. Si WhatsApp és el canal que funciona, no inventa `EmailSend` SMTP.
+- El `LeadActivity` de seqüència i l'`adminLog COMM_SEQUENCE_EXEC` arrosseguen `emailSendId` + `emailSnapshot=EmailSend.htmlBody` quan el canal és email.
+- `emailTrackingService` etiqueta `welcome` i els `follow-up-*` perquè els informes no mostrin claus tècniques crues.
+- Tests enfocats cobreixen snapshot obligatori, bloqueig si falla `EmailSend`, context Òrbita, tracking/pixel, resultat SMTP/IMAP, dedupe de welcome i metadades de lead activity.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\leadWelcomeEmailService.test.ts __tests__\lib\services\commercialSequenceService.test.ts __tests__\lib\services\leadActivityService.test.ts __tests__\lib\services\automationTriggers.test.ts __tests__\lib\services\emailTrackingService.test.ts` OK (5 fitxers / 107 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1896>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: el primer email de lead i els follow-ups comercials ja no poden quedar enviats sense cos reconstruïble, canal observable i entitat lead d'origen.
+- Validació humana/UX: si un lead rep benvinguda o nurturing per email, el sistema pot provar què va rebre i reconnectar la resposta al lead.
+
+### Tancament
+Counter -> 1896. Tall lead/comercial email observable; sense schema, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: separar processos customer legacy/portal i altres `sendEmail` directes segons risc client-facing.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: sortides reserva/post-event exigeixen EmailSend observable (Canvi #1895, codex)
+
+### Context
+Després del #1894, l'auditoria de sortides client-facing fora de pressupost/dossier/contracte ha trobat quatre canals de reserva/post-event que encara podien enviar email sense `EmailSend.htmlBody`, sense context Òrbita i sense persistir resultat SMTP/IMAP: confirmació de reserva, recordatori de pagament, comunicació manual de reserva i post-event.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats. Aquest tall queda acotat a sortides email de reserva/post-event; sense schema nou, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `sendBookingConfirmationEmail()` crea `EmailSend` abans de SMTP amb `templateKey=booking_confirmation`, `htmlBody`, `leadId/customerId/bookingId` quan existeixen i context Òrbita; si falla el snapshot, no envia la confirmació.
+- `sendPostEventEmailForBooking()` deixa de registrar tracking després de l'enviament: ara el snapshot és obligatori abans del SMTP, l'email surt amb tracking/pixel i `postEventEmailSent` només es marca després del canal observable.
+- `sendPaymentReminders()` i `executeBookingCommunication(...send_email...)` passen pel mateix patró canònic: `EmailSend.htmlBody` previ, `orbita=booking/lead/customer`, HTML traquejat, `updateEmailSendResult()` i `adminLog` amb `emailSendId` + `emailSnapshot=EmailSend.htmlBody`.
+- `bookingCreationService` passa `bookingId`, `leadId` i `customerId` al servei de confirmació perquè la conversa de resposta pugui tornar a l'entitat correcta.
+- `emailTrackingService` etiqueta `booking_confirmation`, `booking-communication`, `payment-reminder` i `post-event` perquè l'admin no mostri claus tècniques crues.
+- Tests enfocats cobreixen snapshot obligatori, bloqueig si falla `EmailSend`, context Òrbita, tracking/pixel, persistència SMTP/IMAP i logs amb `emailSendId`.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\bookingConfirmationEmailService.test.ts __tests__\lib\services\bookingCreationService.test.ts __tests__\lib\services\postEventDispatchService.test.ts __tests__\lib\services\paymentReminderService.test.ts __tests__\lib\services\bookingCommunicationService.test.ts __tests__\lib\services\emailTrackingService.test.ts` OK (6 fitxers / 130 tests).
+- TypeScript: `node_modules\.bin\tsc.CMD --noEmit` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1895>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: cap d'aquestes quatre sortides pot enviar un email client-facing i deixar el sistema sense snapshot reconstruïble ni estat SMTP/IMAP associat.
+- Validació humana/UX: si l'operador veu un email de reserva/post-event enviat, ja hi ha una prova interna consultable del cos, del canal i de l'entitat d'origen.
+
+### Tancament
+Counter -> 1895. Tall reserva/post-event email observable; sense schema, sense migració, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: continuar auditoria d'altres sortides client-facing i documents/portal que encara puguin divergir del snapshot canònic.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: contracte enviat exigeix EmailSend i PDF signable (Canvi #1894, codex)
+
+### Context
+Després del #1893, el front Documents continuava amb un forat en contractes: `sendContract()` podia enviar l'adjunt i marcar `contractStatus=SENT` sense crear `EmailSend.htmlBody`, i tampoc persistia el PDF no signat a `contractPdfUrl/contractPdfKey`. Això deixava una divergència greu: el client rebia un contracte, però el portal de signatura exigeix `contractPdfUrl` per considerar-lo signable.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats. Aquest tall queda acotat a `contractService`, enviament de contractes i traça documental; sense schema nou, sense migració, sense BD destructiva, sense reenviar emails i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `sendContract()` crea obligatòriament `EmailSend` amb `templateKey=contract`, `htmlBody`, `locale`, `leadId/customerId` i context Òrbita abans d'enviar. Si falla aquest snapshot, no hi ha SMTP, no hi ha upload i no es marca `SENT`.
+- El PDF de contracte no signat es desa a storage com `contracts/<proposalId>/<contractReference>.pdf` i queda persistit a `Proposal.contractPdfUrl/contractPdfKey` abans de considerar l'enviament canònic.
+- L'email real surt amb enllaços trackejats, pixel d'obertura i context `orbita` a `sendEmail`; el resultat SMTP/IMAP es desa amb `updateEmailSendResult()`.
+- `DOCUMENT_CONTRACT_SENT` guarda `emailSendId`, `emailSnapshot=EmailSend.htmlBody`, `contractPdfUrl` i `contractPdfKey`, i el `LeadDocument` creat pel lead apunta al PDF contractual real, no a un camp vell buit.
+- Tests enfocats cobreixen snapshot obligatori, bloqueig si falla `EmailSend`, upload del PDF no signat, estat `SENT` amb `contractPdfUrl/contractPdfKey`, lead document i consumidors de portal/signatura/timeline.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\contractService.test.ts __tests__\lib\services\contractSignatureService.test.ts __tests__\lib\clientPortalContract.test.ts` OK (3 fitxers / 71 tests).
+- Consumidors portal/timeline: `node_modules\.bin\vitest.CMD run __tests__\app\api\portal\sign-route.test.ts __tests__\lib\clientPortalTimeline.test.ts __tests__\lib\services\timelineQueryService.test.ts` OK (3 fitxers / 57 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: un contracte no pot quedar enviat si no es pot reconstruir el cos de l'email i si el portal no té el PDF contractual material que necessita per signar.
+- Validació humana/UX: l'operador ja no pot crear un estat aparentment avançat (`SENT`) que després bloqueja el client al portal per manca d'artefacte.
+
+### Tancament
+Counter -> 1894. Tall contracte/enviament documental; sense schema, sense migració, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: continuar Documents cap a reserva/factura/portal i revisar la resta de sortides client-facing amb la mateixa regla de snapshot + artefacte material.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: dossier enviat exigeix snapshot EmailSend i vista guardada (Canvi #1893, codex)
+
+### Context
+En reprendre el front Documents després del #1892, l'auditoria de dossiers ha trobat dues divergències de producte: el botó `Vista` del llistat podia obrir la preview viva del lead en lloc del dossier guardat, i `sendDossierByEmail()` podia marcar `sentAt` encara que la traça `EmailSend.htmlBody` fallés i no quedés cap snapshot reconstruïble del que havia rebut el client.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats. Aquest tall queda acotat a dossiers/enviament documental; sense schema nou, sense migració, sense BD destructiva, sense reenviar emails i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `sendDossierByEmail()` crea obligatòriament `EmailSend` amb `htmlBody`, `locale`, `customerId` i headers Òrbita abans d'enviar. Si aquest snapshot falla, no s'envia l'email, no s'escriu `sentAt` i no es crea log documental.
+- L'email real de dossier surt amb tracking d'enllaços i pixel d'obertura a partir del `trackingToken`, mantenint `EmailSend.htmlBody` com a foto durable del cos original.
+- El resultat SMTP/IMAP queda persistit amb `updateEmailSendResult()` i el log `DOCUMENT_DOSSIER_SENT` porta `emailSendId` obligatori i `emailSnapshot=EmailSend.htmlBody`.
+- `DossierListActions` obre sempre `/api/admin/dossiers/:id/preview` per a `Vista`, també quan el dossier té `leadId`; la preview del lead queda reservada al generador/pre-draft.
+- Tests enfocats cobreixen snapshot obligatori, bloqueig si falla `EmailSend`, tracking de l'email enviat, log amb `emailSendId` i la UI que no torna al lead viu.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\dossierService.test.ts __tests__\app\admin\dossiers\DossierListActions-errors.test.ts __tests__\app\api\admin\dossiers-send-route.test.ts` OK (3 fitxers / 31 tests; els logs d'error són els casos negatius esperats).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+- Validació funcional: un dossier no pot quedar "enviat" sense snapshot `EmailSend.htmlBody`, i la vista del llistat reflecteix el dossier guardat, no una recomposició viva del lead.
+- Validació humana/UX: l'operador veu i reenvia la mateixa peça documental que queda congelada al dossier; si el rastre d'email falla, el sistema para abans de crear una realitat comercial no reconstruïble.
+
+### Tancament
+Counter -> 1893. Tall dossier/enviament documental; sense schema, sense migració, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: continuar Documents cap a reserva/factura/portal i revisar altres sortides client-facing amb la mateixa regla de snapshot/artefacte.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: acceptació de pressupost exigeix PDF enviat canònic (Canvi #1892, codex)
+
+### Context
+El front documents/pressupostos ja havia retirat `PRE-*`, `LeadDocument QUOTE` i l'escriptura directa de `SENT`, però encara quedava un forat de producte: un `PATCH /api/admin/proposals/:id` podia marcar `ACCEPTED` i disparar el trigger de contracte encara que el pressupost no hagués passat pel dispatch canònic amb `sentAt + pdfUrl + pdfKey`.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i no fer pegats; aquest tall queda acotat a acceptació de `Proposal`, UI de pressupostos i Customer Hub, sense schema nou, sense migració, sense BD manual, sense reenviaments i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `updateAdminProposal()` afegeix `ProposalCanonicalAcceptanceError`: només es pot acceptar un `Proposal` existent si l'estat anterior és `SENT` i té `sentAt`, `pdfUrl` i `pdfKey`.
+- Si l'acceptació és vàlida, el servei segella `acceptedAt` quan falta i normalitza `acceptedAt` sol a `status=ACCEPTED`.
+- `PATCH /api/admin/proposals/:id` retorna `409` amb la ruta canònica `/api/admin/proposals/:id/send` i no dispara `proposal.accepted` quan el servei rebutja l'acceptació.
+- Customer Hub i `/admin/presupuestos` transporten `pdfUrl/pdfKey`; només mostren `Acceptat` si el PDF enviat existeix, i un `SENT` antic sense PDF ofereix `Reparar PDF` via el mateix `/send`.
+- La creació de reserva des del detall/llistat queda amagada per pressupostos acceptats sense artefacte canònic.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\services\proposalAdminService.test.ts __tests__\app\api\admin\proposals-detail-route.test.ts __tests__\app\admin\clientes\ProposalsPanel.test.tsx __tests__\app\admin\presupuestos\ProposalsList-bulk.test.ts` OK (4 fitxers / 56 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` només informa 2 P3 font-px coneguts, cap P1).
+- Validació funcional: un pressupost `DRAFT` o `SENT` sense PDF no pot saltar directament a `ACCEPTED`; l'operador veu reparació canònica abans d'acceptar.
+- Validació humana/UX: el client ja no pot avançar cap a contracte/reserva des d'una realitat que no existeix com a document enviat i reconstruïble.
+
+### Tancament
+Counter -> 1892. Tall Proposal acceptació/PDF canònic; sense schema, sense migració, sense dades destructives, sense reenviar emails i sense tocar tasks. Següent front Manolo: seguir auditoria de Documents/pressupostos cap a dossier, reserva, factura/portal i rastres enviats.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: informes post-event creen o obren portfolio canònic (Canvi #1891, codex)
+
+### Context
+El #1890 va deixar el servei idempotent per passar de report post-event completat + galeria marcada portfolio a `PortfolioEvent` canònic. Faltava exposar-ho dins l'admin: sense botó visible, l'operador continuava havent d'anar a `/admin/portfolio` i reconstruir manualment dades que ja existeixen a la reserva.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall exposa el servei a l'admin amb API CSRF i botó visible, sense schema nou, sense migració, sense publicació pública automàtica, sense dades destructives i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- Nova ruta `POST /api/admin/post-event/portfolio-event` amb `requireAuth`, `verifyCsrf` i validació Zod de `bookingId`.
+- La ruta crida `ensurePortfolioEventFromPostEventReport()` i retorna estats operatius: `CREATED`, `EXISTS`, `REPORT_REQUIRED`, `PORTFOLIO_MEDIA_REQUIRED` o `BOOKING_NOT_FOUND`.
+- Nou component client `EnsurePortfolioEventButton` a informes post-event: crea el draft, mostra errors funcionals o mostra `Obrir portfolio` si ja existeix.
+- `/admin/post-event/reports` consulta `PortfolioEvent` per `sourceBookingId` i origen `POST_EVENT_REPORT/BOOKING_GALLERY`, i mostra el botó a cada informe completat.
+- La targeta d'informe apila accions en mòbil i manté columna dreta en desktop per no carregar visualment la pàgina.
+- Tests nous cobreixen ruta API, auth/CSRF/body, estats de servei, botó existent, creació i error de media pendent.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__/app/api/admin/post-event-portfolio-event-route.test.ts __tests__/app/admin/post-event/EnsurePortfolioEventButton.test.tsx __tests__/lib/services/portfolioEventService.test.ts` OK (3 fitxers / 39 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` només informa 2 P3 font-px coneguts, cap P1).
+- Validació funcional: un informe post-event completat pot crear o obrir el draft de portfolio des del mateix llistat, reutilitzant l'origen canònic i sense duplicar si ja existeix.
+- Validació humana/UX: l'operador ja no ha de copiar manualment client, data, lloc, portada i origen cap a Portfolio; si falta media marcada, rep un missatge d'acció concreta.
+
+### Tancament
+Counter -> 1891. Tall post-event/portfolio API+UI+tests; sense schema, sense migració, sense publicació automàtica, sense dades destructives i sense tocar tasks. Següent front Manolo: continuar auditoria/canonització de documents enviats o reprendre la comprovació real de BD quan el proxy respongui.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: post-event pot assegurar PortfolioEvent canònic des de galeria (Canvi #1890, codex)
+
+### Context
+Després del #1888, `PortfolioEvent` ja tenia origen durable, però faltava el cable de servei perquè un post-event completat amb fotos marcades per portfolio no acabés en una mini-pàgina manual desenganxada. El report post-event guarda `iconicPhotoUrl`, però el flux real de media ja passa per `BookingGalleryPhoto.isPortfolio/portfolioSlug`; per tant el tall correcte és reutilitzar aquesta font, no inventar una segona via de fotos.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a servei/test de portfolio, sense schema nou, sense migració, sense publicació pública, sense dades destructives i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `portfolioEventService` guanya `ensurePortfolioEventFromPostEventReport(bookingId)`.
+- La funció és idempotent: retorna `BOOKING_NOT_FOUND`, `REPORT_REQUIRED`, `PORTFOLIO_MEDIA_REQUIRED`, `EXISTS` o `CREATED`.
+- Requisits de creació: reserva existent, `postEventReport.status=COMPLETED` i una foto de galeria marcada `isPortfolio=true` amb `portfolioSlug` vàlid.
+- Abans de crear, reutilitza qualsevol `PortfolioEvent` existent per `sourceBookingId` amb origen `POST_EVENT_REPORT` o `BOOKING_GALLERY`.
+- Si crea, l'event queda com a draft amb portada de galeria, `originType=POST_EVENT_REPORT`, `sourceBookingId`, `sourceGalleryPhotoId` i `originLabel=referència · client`.
+- Tests nous cobreixen reserva inexistent, report no completat, media absent, reutilització d'event existent i creació amb origen canònic.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__/lib/services/portfolioEventService.test.ts` OK (1 fitxer / 29 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` només informa 2 P3 font-px coneguts, cap P1).
+- Validació funcional: un report completat amb galeria de portfolio ja té una única porta de servei per crear o reconèixer el seu `PortfolioEvent`; no es duplica si ja n'hi ha un per la mateixa reserva.
+- Validació humana/UX: el següent pas UI podrà mostrar "crear/obrir portfolio" des del post-event sense demanar a l'operador que repeteixi títol, portada, data, lloc i origen a mà.
+
+### Tancament
+Counter -> 1890. Tall post-event/portfolio servei+tests; sense schema, sense migració, sense publicació externa, sense dades destructives i sense tocar tasks. Següent front Manolo: exposar aquesta acció al lloc operatiu adequat o continuar amb auditoria real de documents/pressupostos quan la BD respongui.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: el playbook post-event crea social amb origen canònic (Canvi #1889, codex)
+
+### Context
+Els canvis #1887 i #1888 van afegir origen durable a social i portfolio, però el playbook post-event encara tenia un forat: l'acció `social_post` creava un `SocialPost` directe amb `bookingId` i sense `originType/originId`. Això feia possible que una peça nascuda del post-event quedés fora de la nova monocapa social i pogués duplicar-se o no ser reconeguda després.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a post-event/social, sense schema nou, sense migració, sense publicació externa i sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `recordPostEventRecurrenceDecision()` busca esborranys socials existents tant per `bookingId` legacy com per origen canònic `originType=BOOKING` + `originId=booking.id`.
+- Quan el playbook crea l'esborrany social, el registra amb `originType=BOOKING`, `originId=booking.id` i `originLabel=referència · client`.
+- `loadPostEventPlaybook()` reconeix posts publicats vinculats a la reserva tant per `bookingId` com per `originId`, de manera que el playbook no deixa pendent un social ja publicat al model nou.
+- Tests ampliats perquè el draft social neixi amb origen canònic i perquè un post publicat només per `originId` tanqui l'acció del playbook.
+- `docs/admin-protocol.md` §6.9 deixa anotat que Social manté idees, calendari i post-event dins una sola lectura d'origen.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__/lib/services/postEventRecurrenceDecisionService.test.ts __tests__/lib/services/postEventPlaybookLoadService.test.ts __tests__/lib/services/postEventPlaybookService.test.ts` OK (3 fitxers / 38 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Protocol/guards: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` només informa 2 P3 font-px coneguts, cap P1).
+- Validació funcional: el playbook reutilitza esborranys existents sense duplicar i els socials publicats amb origen canònic de reserva tanquen l'acció `social_post`.
+- Validació humana/UX: a l'operador ja no li pot aparèixer el mateix bolo com a social pendent només perquè el post va néixer del playbook i no del workspace Social.
+
+### Tancament
+Counter -> 1889. Tall post-event/social; sense schema, sense migració, sense SMTP, sense publicació externa, sense dades destructives i sense tocar tasks. Següent front Manolo: revisar el cable equivalent post-event → portfolio perquè el report/galeria pugui crear o reconèixer event de portfolio canònic.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: PortfolioEvent deixa de ser una illa i guarda origen (Canvi #1888, codex)
+
+### Context
+El tall #1887 va fer canònic l'origen dels posts socials. El següent forat del mateix front era portfolio: `PortfolioEvent` podia utilitzar una portada de galeria de booking, però l'event no guardava cap origen durable cap al bolo, el report post-event o el testimoni. Això feia que una mini-pàgina pública pogués quedar desenganxada del material real que la justificava.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall introdueix schema, migració, API i BD per fer l'origen de portfolio canònic, sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `PortfolioEvent` guanya origen canònic: `originType`, `sourceBookingId`, `sourceGalleryPhotoId`, `sourceTestimonialId` i `originLabel`.
+- Nou enum `PortfolioEventOriginType`: `MANUAL`, `BOOKING_GALLERY`, `POST_EVENT_REPORT`, `TESTIMONIAL`.
+- Migració `20260710213000_add_portfolio_event_origin` crea enum/camps/índexs i fa backfill dels events amb portada `/api/uploads/bookings/{bookingId}/...` cap a `BOOKING_GALLERY`.
+- `portfolioEventService` deriva automàticament `sourceBookingId` quan la portada ve de galeria de booking i valida que post-event/report/testimoni no entrin sense ID d'origen.
+- `/api/admin/portfolio/events` accepta origen explícit en creació i manté el PATCH per a origen derivat quan canvia la portada.
+- `/admin/portfolio` mostra una traça compacta d'origen a cada event quan existeix.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\portfolioEventService.test.ts __tests__\app\api\admin\portfolio-events-route.test.ts __tests__\app\admin\portfolio\PortfolioPage-mutation-errors.test.ts` OK (3 fitxers / 35 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Migració: `npx prisma migrate deploy` OK i aplica `20260710213000_add_portfolio_event_origin` a la BD configurada.
+- Validació real pendent per incidència externa: la consulta Prisma posterior a `portfolioEvent.groupBy({ by: ['originType'] })` no arriba a `tramway.proxy.rlwy.net:57035` (`Can't reach database server`). La migració sí havia connectat i aplicat correctament abans d'aquest tall de connexió.
+- Validació funcional: crear o actualitzar un event amb portada de booking deriva `originType=BOOKING_GALLERY` i `sourceBookingId`; crear des de report post-event exigeix `sourceBookingId`.
+- Validació humana/UX: l'admin de portfolio mostra d'on ve l'event quan té origen, evitant mini-pàgines públiques sense fil amb el bolo real.
+
+### Tancament
+Counter -> 1888. Tall Portfolio/schema/API/UI/tests; sense publicació externa, sense tocar tasks i sense dades destructives. Següent front Manolo: reintentar auditoria real quan el proxy DB respongui i continuar amb el cable post-event → portfolio/social.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: SocialPost guarda origen canònic de booking/testimoni/portfolio (Canvi #1887, codex)
+
+### Context
+Després de traçar la moderació de testimonis al Customer Hub, el front següent era Social/portfolio: un testimoni aprovat o un event nou de portfolio podia convertir-se en idea social, però en crear el post només es persistia `bookingId`. Les fonts no booking (`testimonial`, `portfolio`, `upcoming-event`) perdien identitat durable i podien tornar a aparèixer com a idees duplicades.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a Social/portfolio sense tocar `app/admin/tasks/**`.
+
+### Canvi
+- `SocialPost` guanya origen canònic: `originType`, `originId` i `originLabel`, amb enum `MANUAL | BOOKING | TESTIMONIAL | PORTFOLIO | UPCOMING_EVENT` i índex `(originType, originId)`.
+- Migració `20260710210000_add_social_post_origin` aplicada amb backfill: els posts amb `bookingId` existent passen a `originType=BOOKING` i `originId=bookingId`.
+- `socialPostService` normalitza i valida l'origen: `bookingId` deriva a `BOOKING`; fonts derivades exigeixen `originId`; `BOOKING` no pot divergir entre `bookingId` i `originId`.
+- `/api/admin/social-posts` i `/api/admin/social-posts/[id]` accepten els camps d'origen.
+- `loadSocialIdeas()` deduplica idees per origen canònic, no només per `bookingId`: testimonials, portfolio i propers events ja no es tornen a suggerir si ja tenen post.
+- `/admin/social` propaga l'origen quan l'usuari prem `Usar aquesta idea`, elimina la idea per origen després de crear-la i mostra una traça compacta `Origen: ...` a la llista.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\socialIdeasService.test.ts __tests__\lib\services\socialPostService.test.ts __tests__\app\api\admin\social-posts-route.test.ts __tests__\app\admin\social\SocialClient.test.tsx` OK (4 fitxers / 69 tests).
+- TypeScript: `npx tsc --noEmit --pretty false` OK.
+- Migració: `npx prisma migrate deploy` OK i aplica `20260710210000_add_social_post_origin` a la BD configurada.
+- Validació real pendent per incidència externa: tres consultes Prisma posteriors a `socialPost.groupBy({ by: ['originType'] })` no han arribat a `tramway.proxy.rlwy.net:57035` (`Can't reach database server`). La migració sí havia connectat i aplicat correctament abans d'aquest tall de connexió.
+- Validació funcional: una idea de testimoni crea el post amb `originType=TESTIMONIAL`, `originId` i `originLabel`; el loader deixa de suggerir fonts que ja tenen `SocialPost` canònic.
+- Validació humana/UX: la llista social mostra una traça compacta d'origen i evita que l'operador vegi el mateix testimoni/portfolio repetit com si fos material nou.
+
+### Tancament
+Counter -> 1887. Tall Social/portfolio/schema/API/UI/tests; sense publicació externa, sense SMTP, sense tocar `app/admin/tasks/**` i sense dades destructives. Següent front Manolo: continuar Social/portfolio cap a material post-event/portfolio reutilitzable i reintentar auditoria real de posts quan el proxy DB respongui.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: moderació de testimonis queda traçada al Customer Hub (Canvi #1886, codex)
+
+### Context
+El front de testimonis/reviews tancava el cicle de prova social, però la moderació admin (`approve`, `hide`, `delete`) només canviava `CustomerTestimonial.isApproved` o eliminava el registre. El testimoni rebut sí deixava `TESTIMONIAL_SUBMITTED`, però la decisió editorial posterior no quedava reflectida al Customer Hub ni a la timeline canònica.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a testimonis/reviews/Customer Hub sense schema, migracions, publicació social, SMTP ni dades destructives.
+
+### Canvi
+- S'afegeixen accions canòniques `TESTIMONIAL_APPROVED`, `TESTIMONIAL_HIDDEN` i `TESTIMONIAL_DELETED`.
+- `moderateTestimonial()` passa a operar dins transacció: llegeix el testimoni, aplica la moderació i escriu `customerActivity` del client amb testimonialId, rating, eventType, preview i acció.
+- Si el testimoni no existeix, el servei retorna 404 i no fa cap update ni activitat falsa.
+- `timelineQueryService` etiqueta aquestes accions com `Testimoni aprovat`, `Testimoni amagat` o `Testimoni eliminat`, amb resum llegible.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\testimonialAdminService.test.ts __tests__\app\api\admin\testimonials-route.test.ts __tests__\lib\services\timelineQueryService.test.ts __tests__\lib\services\publicTestimonialService.test.ts` OK (4 fitxers / 82 tests).
+- Validació funcional: consulta real `customerTestimonial.groupBy({ by: ['isApproved'] })` retorna `[]` i `recent=[]`; no hi ha testimonis actuals a reparar.
+- Validació humana/UX: aprovar o amagar una prova social ja no és una decisió invisible; queda al Customer Hub del client.
+
+### Tancament
+Counter -> 1886. Tall testimonis/reviews/Customer Hub; sense schema, migracions, publicació social, SMTP, enviaments reals ni dades destructives. Següent front Manolo: revisar Social/portfolio perquè testimoni aprovat pugui convertir-se en actiu reutilitzable sense duplicar fonts.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: referrals i reactivació deixen traça al Customer Hub (Canvi #1885, codex)
+
+### Context
+El front següent del cicle post-event era review/referral/reactivació. L'auditoria detecta que `/admin/clientes/referrals` i `/admin/clientes/reactivation` permetien preparar o obrir accions comercials fora del sistema: copiar missatge, WhatsApp o email directe podia no deixar rastre al Customer Hub. A més, el composer no aplicava de forma genèrica la plantilla rebuda per query, així que `template=reactivacio` podia obrir un correu sense cos aplicat si no es triava manualment.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a CRM post-event/referrals/reactivació/Inbox sense schema, migracions, SMTP nou ni dades destructives.
+
+### Canvi
+- S'afegeixen accions canòniques `REFERRAL_ASK_PREPARED` i `REACTIVATION_PREPARED`.
+- `ReferralsClient` registra activitat al Customer Hub quan es copia el missatge i quan s'obre WhatsApp o Inbox.
+- `ReactivationClient` fa el mateix per reactivació, amb motiu, prioritat, canal i draft.
+- L'acció Email de referrals/reactivació deixa de passar per `mailtoUrl` i obre el composer canònic amb `buildCustomerComposeHref(customerId, 'referral' | 'reactivacio')`.
+- `inboxTemplateService` afegeix plantilla `referral` i `ComposeForm` aplica automàticament qualsevol `initialTemplate` canònica rebuda per query, incloent l'alias antic `recordatori -> seguiment`.
+- `timelineQueryService` mostra les accions noves com `Referral preparat` i `Reactivacio preparada` amb resum del draft, en comptes d'exposar només el codi intern.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\inboxTemplateService.test.ts __tests__\app\admin\inbox\compose\ComposeForm.test.tsx __tests__\app\admin\clientes\referrals\ReferralsClient.test.tsx __tests__\app\admin\clientes\reactivation\ReactivationClient.test.tsx __tests__\app\api\admin\customers-activities-route.test.ts __tests__\lib\services\timelineQueryService.test.ts` OK (6 fitxers / 86 tests).
+- Validació funcional: `generateAllTemplates({ name: 'Anna Garcia', locale: 'ca' })` retorna plantilla `referral` amb subject `Anna, ens recomanes?`; les pantalles ja no tenen `href={c.mailtoUrl}` i els emails apunten a `/admin/inbox/compose?customerId=...&template=...`.
+- Validació humana/UX: una acció comercial preparada ja no desapareix fora del sistema. El Customer Hub pot veure què s'ha preparat, per quin canal i amb quin text.
+
+### Tancament
+Counter -> 1885. Tall CRM post-event/referral/reactivació/Inbox; sense schema, migracions, SMTP nou, publicació social, enviaments reals ni dades destructives. Següent front Manolo: revisar testimonis/reviews i tancament post-event com a prova social aprofitable.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: Playbook post-event no tanca referrals per client genèric (Canvi #1884, codex)
+
+### Context
+Després de cosir Customer Hub i feedback, el següent front era el playbook post-event. L'auditoria detecta una costura de dades: `loadPostEventPlaybook()` acceptava qualsevol task del client amb text "referral" com a prova que el referral del bolo estava programat. Això podia fer que una task antiga o genèrica d'un client tapés accions pendents d'una altra reserva del mateix client.
+
+- Autorització explícita propietari: continuar Manolo fins al final i canonitzar tots els processos; aquest tall queda acotat a post-event/playbook sense tocar `app/admin/tasks/**`, schema, migracions ni dades destructives.
+
+### Canvi
+- El playbook només dona per fet `referral_ask` si existeix una decisió post-event amb `bookingId` o una `Task` de referral vinculada al mateix `bookingId`.
+- Les tasks de referral cancel·lades ja no compten com a acció programada.
+- Es conserva la decisió canònica `POST_EVENT_RECURRENCE_DECIDED` com a font de veritat per testimonial/social/referral preparats.
+- S'afegeix regressió perquè una task genèrica del client o una task d'una altra reserva no tanqui el referral del bolo actual.
+- S'actualitza el mock del loader vell de playbook perquè inclogui `customerActivity` i no amagui la dependència real del servei.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\postEventPlaybookService.test.ts __tests__\lib\services\postEventPlaybookLoadService.test.ts __tests__\lib\services\postEventPlaybookLoader.test.ts __tests__\app\admin\post-event-actions.test.ts __tests__\app\admin\today-actions.test.ts` OK (5 fitxers / 62 tests).
+- Validació funcional: consulta real `loadPostEventPlaybook(2026-07-10T20:45:00.000Z)` retorna 3 bolos completats recents, `fullyCompleted=0`, `withOverdue=3`, `pendingActionsTotal=12`; cap referral queda tancat per una task genèrica.
+- Validació humana/UX: el playbook deixa d'ensenyar progrés fals. Si un client té més d'un bolo, el post-event queda lligat al bolo correcte.
+
+### Tancament
+Counter -> 1884. Tall post-event/playbook/referrals; sense schema, migracions, BD manual destructiva, esborrat de proves ni canvis a `app/admin/tasks/**`. Següent front Manolo: revisar reactivació/review/referral com a cicle comercial i coherència amb Customer Hub.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: Customer Hub hereta post-event i feedback envia pel servei canònic (Canvi #1883, codex)
+
+### Context
+El següent front del reinici Manolo era post-event i Customer Hub. L'auditoria detecta dues costures: el Customer Hub carregava reserves però no projectava `PostEventReport` ni `ClientSurvey` com a fets propis de la timeline del client, i `/admin/post-event/feedback` podia obrir el redactor genèric en comptes del servei canònic que marca `postEventEmailSent`, genera token/review URL, registra tracking i deixa activitat/log.
+
+- Autorització explícita propietari: continuar Manolo fins al final, canonitzar tots els processos i veure dades que no s'arrosseguen; aquest tall no autoritza schema, migracions, BD manual destructiva ni esborrat d'artefactes.
+
+### Canvi
+- `CustomerHubBooking` carrega `postEventReport` i `clientSurvey` des de la reserva com a part del mateix DTO canònic del Customer Hub.
+- La timeline del Customer Hub afegeix events de negoci per `Informe post-event completat/creat` i `Enquesta post-event rebuda`, amb link directe a `buildBookingHref(id, 'sec-post-event')`.
+- La fitxa de reserva afegeix `SecDivider id="sec-post-event"` perquè els links diagonals caiguin al bloc exacte i no a una pantalla genèrica.
+- `PostEventEmailButton` accepta `initiallySent` i queda bloquejat quan la reserva ja consta enviada.
+- `/admin/post-event/feedback` deixa d'obrir `/admin/inbox/compose?template=post-event` i reutilitza `PostEventEmailButton`, per tant passa per `/api/admin/emails/send-post-event` i `sendPostEventEmailForBooking()`.
+- Es descarta expressament duplicar `PostEventReport` com `CustomerActivity`: la font de veritat és el model de report/enquesta i la timeline el projecta des d'aquí.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\admin\bookings\PostEventEmailButton.test.tsx __tests__\lib\customer-hub\timeline.test.ts __tests__\lib\customer-hub\fetchCustomerHub.test.ts __tests__\lib\customer-hub\data.test.ts __tests__\lib\services\customerActivityService.test.ts __tests__\lib\services\postEventReportAdminService.test.ts __tests__\lib\services\timelineQueryService.test.ts` OK (7 fitxers / 87 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: consulta real de `fetchCustomerHub('cmrdyankl0005127ofezdl665')` retorna `Enquesta post-event rebuda (OE-2026-007)` i `Informe post-event completat (OE-2026-007)` amb href `/admin/bookings/cmrdyasyp0017127ou77qlh9d#sec-post-event`.
+- Validació estàtica: `rg` confirma que `/admin/post-event/feedback` ja no importa `buildCustomerComposeHref`, `buildLeadComposeHref` ni `/admin/inbox/compose`; només renderitza `PostEventEmailButton`.
+- Validació humana/UX: `http://127.0.0.1:3000/admin/post-event/feedback` respon `401 Unauthorized`, coherent amb ruta admin protegida; no es fa captura sense sessió autenticada. El canvi redueix costura operativa: el hub mostra el final del bolo i feedback ja no salta a un email lliure.
+
+### Tancament
+Counter -> 1883. Tall post-event/Customer Hub; sense schema, migracions, BD manual destructiva, esborrat de proves ni canvis a tasks. Següent front Manolo: playbook post-event, review/referral/reactivació i coherència amb Customer Hub.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: contracte portal no usa PDF de pressupost com a fallback (Canvi #1882, codex)
+
+### Context
+L'auditoria contracte/portal no ha trobat residu real, però sí una permissivitat perillosa: `getClientPortalContractSummary()` i `signContractOnline()` acceptaven `proposal.pdfUrl` com a fallback si faltava `contractPdfUrl`. Això podia permetre veure o signar un pressupost com si fos contracte.
+
+### Què s'ha fet
+- El portal de contracte només considera PDF de contracte `contractPdfUrl`; el PDF de pressupost ja no compta com a document contractual.
+- La signatura online exigeix `contractStatus=SENT` i `contractPdfUrl` present.
+- Si un contracte enviat no té PDF de contracte, el portal pot mostrar estat no preparat, però no permet signar.
+- S'ha afegit cobertura explícita perquè un `SENT` amb només `proposal.pdfUrl` retorni `NOT_SIGNABLE`.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\clientPortalContract.test.ts __tests__\lib\services\contractSignatureService.test.ts __tests__\app\api\portal\sign-route.test.ts __tests__\app\portal\portalSignVisibility.test.ts __tests__\app\portal\portalSignAccessHit.test.ts` OK (5 fitxers / 27 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: auditoria BD real posterior `sentContractsWithOnlyProposalPdf=[]`; no cal reparació de dades.
+- Validació humana/UX: el client ja no pot signar ni descarregar un pressupost sota el rol de contracte.
+
+### Coordinació
+Counter -> 1882. Tall contracte/portal/signatura; sense schema, migracions, enviament email, factures, albarans addicionals ni dades reparades. Següent front Manolo: post-event i Customer Hub.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: albarà avançat força PDF actualitzat (Canvi #1881, codex)
+
+### Context
+El front contracte/albarà/portal encara tenia una incoherència: un albarà podia passar a `SIGNED` o `DELIVERED` sense PDF, o conservar un PDF antic generat abans del canvi d'estat. El portal només mostra albarans signats amb PDF, així que l'admin podia donar un document per signat mentre el client no el veia.
+
+### Què s'ha fet
+- `updateAdminDeliveryNoteStatus()` força `generateAdminDeliveryNotePdf(..., { force: true })` quan l'albarà passa a `DELIVERED` o `SIGNED`.
+- `generateAdminDeliveryNotePdf()` manté la reutilització normal quan es crida manualment, però accepta `force` per regenerar el PDF després d'un canvi d'estat.
+- El PDF regenerat reflecteix `deliveredAt`, `signedAt` i `signedBy` actuals.
+- La traça documental distingeix la generació manual de la generació causada pel canvi d'estat.
+- Reparació de dades real: `ALB-2026-0001` estava `SIGNED` sense PDF i s'ha reparat pel servei canònic.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\deliveryNoteAdminService.test.ts __tests__\app\api\admin\delivery-notes-route.test.ts __tests__\lib\clientPortalInvoice.test.ts` OK (3 fitxers / 29 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: auditoria BD prèvia `deliveryNotesAdvancedWithoutPdf=[ALB-2026-0001]` i `contractsAdvancedWithoutPdf=[]`; reparació aplicada; auditoria posterior `deliveryNotesAdvancedWithoutPdf=[]` i `contractsAdvancedWithoutPdf=[]`.
+- Validació humana/UX: un albarà signat o lliurat ja no pot quedar invisible al portal per falta de PDF ni mostrar un PDF anterior a la signatura.
+
+### Coordinació
+Counter -> 1881. Tall albarà/PDF/portal; sense schema, migracions, contracte nou, factura addicional, email ni canvis de pricing. Següent front Manolo: contracte/portal/enllaços i historial documental.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: factura local genera PDF i portal prioritza factura (Canvi #1880, codex)
+
+### Context
+El front documents operatius mostrava un carril mig cosit: el model `Invoice` tenia `pdfUrl/pdfKey` i existia `invoicePdfService`, però `createInvoiceFromBooking()` creava factures locals sense PDF durable. A la fitxa de reserva el `pdfUrl` es consultava però es perdia al mapping, i el portal de documents només podia descarregar el pressupost encara que la factura existís.
+
+### Què s'ha fet
+- `createInvoiceFromBooking()` genera i puja el PDF de factura en crear la factura local, omplint `Invoice.pdfUrl/pdfKey`.
+- Si ja existeix una factura activa sense PDF, el mateix servei la repara sense crear duplicat.
+- Les línies de factura surten de `BookingServiceLine` quan existeixen, filtrant línies internes `[travel-cost]`; pack/extres només queden com a fallback.
+- Holded, si està actiu, rep les mateixes línies client-facing que la factura PDF.
+- La fitxa de reserva arrossega `pdfUrl` de factura cap a `DocumentFlowSection` i `InvoiceSection`.
+- El portal client carrega `booking.invoices` i prioritza el PDF de factura activa per sobre del PDF de pressupost; el pressupost queda com a fallback.
+- El text del portal passa de "pressupost" a "pagaments i documents" a la navegació general, i diferencia descarregar factura vs pressupost.
+- Reparació de dades real: 18 factures actives que no tenien `pdfUrl/pdfKey` s'han reparat pel servei canònic; els PDFs han quedat a `uploads/invoices/...`.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\invoiceService.test.ts __tests__\lib\clientPortalInvoice.test.ts __tests__\lib\services\clientPortalAccess.test.ts __tests__\app\admin\bookings\DocumentFlowSection.test.tsx __tests__\app\admin\bookings\InvoiceSection.test.tsx` OK (5 fitxers / 56 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: auditoria BD prèvia detecta 18 factures actives sense PDF; reparació aplicada amb `createInvoiceFromBooking(bookingId)`; auditoria posterior confirma `activeInvoicesWithoutPdf=[]`.
+- Validació humana/UX: l'admin ja veu/obre el PDF real de factura i el portal deixa de presentar el pressupost com si fos l'únic document econòmic quan hi ha factura.
+
+### Coordinació
+Counter -> 1880. Tall factura/PDF/portal; sense schema, migracions, albarà funcional nou, contracte nou, enviament email ni Holded real. Següent front Manolo: contracte/albarà/portal contra estats i enllaços divergents.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: inventari completat tanca retorn i post-event hereta equipament (Canvi #1879, codex)
+
+### Context
+El front inventari/reserva encara tenia una contradicció de producte: en completar una reserva, l'item podia quedar `AVAILABLE`, però la fila `BookingInventory` seguia amb `checkedOut=false` i `checkedIn=false`. A més, el formulari de nou informe post-event llegia `assignedItems`, però l'endpoint real de `/api/admin/bookings/:id/inventory` retorna `assigned`.
+
+### Què s'ha fet
+- `applyBookingStatusSideEffects()` marca les assignacions de la reserva com `checkedOut=true` i `checkedIn=true` quan l'estat passa a `COMPLETED`.
+- Es manté la generació d'`InventoryUsage` i l'alliberament d'`InventoryItem.status`; el retorn físic queda cosit a la mateixa transició de completat.
+- Reparació de dades real: 14 files `BookingInventory` de reserves `COMPLETED` que encara constaven obertes s'han marcat com a sortides i retornades.
+- El formulari de nou informe post-event normalitza el payload real `assigned[].item` i el payload antic `assignedItems[].inventoryItem` amb un helper compartit.
+- El normalitzador rebutja files incompletes: només renderitza equipament amb `id`, `code`, `name`, `category` i `condition` vàlids.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\bookingStatusTransitionService.test.ts __tests__\app\admin\post-event\reports-new-inventory-payload.test.ts` OK (2 fitxers / 21 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: auditoria BD prèvia detecta 14 assignacions de reserves `COMPLETED` amb `checkedOut=false` o `checkedIn=false`; reparació aplicada; auditoria posterior confirma `completedAssignmentsOpen=[]`.
+- Validació humana/UX: un bolo completat ja no deixa l'inventari en un estat contradictori i el post-event torna a veure l'equipament real usat sense dependre d'un nom de camp antic.
+
+### Coordinació
+Counter -> 1879. Tall ús/retorn d'inventari i handoff a post-event; sense schema, migracions, factures, portal, PDF ni calendari addicional. Següent front Manolo: documents operatius, factures/albarans i portal.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: inventari assignat passa a IN_USE en confirmar (Canvi #1878, codex)
+
+### Context
+En el front inventari del reinici Manolo, la lectura de `bookingStatusTransitionService` mostra un KO latent: una reserva `PENDING` pot tenir inventari del pack ja assignat, però quan passa a `CONFIRMED` el servei el considera "ja assignat" i no actualitza l'estat de l'item a `IN_USE`.
+
+### Què s'ha fet
+- `applyBookingStatusSideEffects()` ara marca com `IN_USE` tots els items ja assignats a la reserva quan l'estat passa a `CONFIRMED`.
+- Es manté la regla existent de no duplicar `BookingInventory`: si l'item ja està assignat, no es crea una segona fila.
+- Els items nous autoassignats en la mateixa confirmació continuen passant a `IN_USE` com abans.
+- El test de transició blinda explícitament el cas "assignat abans de confirmar".
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\bookingStatusTransitionService.test.ts` OK (17 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`; `qa:admin-canon` només P3 `font-px`, sense P1).
+- Validació funcional: auditoria BD real posterior al canvi confirma `assignedWrong=[]` per assignacions en reserves `CONFIRMED/PREPARING` i `inUseWithoutBooking=[]` per items `IN_USE` sense reserva activa.
+- Validació humana/UX: una reserva confirmada ja no pot deixar material assignat llegint-se com a disponible a l'inventari pel fet d'haver-lo assignat abans de confirmar.
+
+### Coordinació
+Counter -> 1878. Tall inventari/reserva; sense schema, migracions, disponibilitat addicional, factures, portal ni post-event. Següent front Manolo: ús/retorn d'inventari i documents operatius.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: reserva sincronitza disponibilitat canònica (Canvi #1877, codex)
+
+### Context
+El reinici Manolo després del #1875 baixa al primer òrgan pendent: reserva com a veritat operativa i la seva costura amb calendari/disponibilitat. La lectura del codi mostrava que la creació de reserva escrivia `Availability`, però l'edició de data/estat i l'eliminació podien deixar dies antics bloquejats.
+
+### Què s'ha fet
+- Nou servei `bookingAvailabilitySyncService`: normalitza la data del bolo per dia, decideix si l'estat de la reserva bloqueja disponibilitat i refresca el dia antic buscant una altra reserva activa abans de marcar-lo lliure.
+- `createBookingFromInput()` deixa d'escriure `availability.upsert` directament i passa pel servei canònic.
+- `updateBookingDetail()` sincronitza disponibilitat quan canvia `eventDate` o `status`.
+- `changeBookingStatus()` sincronitza disponibilitat després del canvi d'estat.
+- `deleteBookingIfAllowed()` refresca disponibilitat amb la data real de la reserva en comptes de fer un `updateMany` cec per `bookingId`.
+- `DELETE /api/admin/bookings/[id]` conserva `eventDate` al payload intern perquè la neteja de disponibilitat sigui possible.
+- Reparació de dades real: 18 files `Availability` que seguien `BOOKED` tot i apuntar a reserves `COMPLETED` s'han alliberat amb `status=AVAILABLE`, `bookingId=null` i `note=null`.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\bookingAvailabilitySyncService.test.ts __tests__\lib\services\bookingRouteService.test.ts __tests__\lib\services\bookingCreationService.test.ts __tests__\app\api\admin\bookings-detail-route.test.ts` OK (4 fitxers / 99 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`; `qa:admin-canon` només P3 `font-px`, sense P1).
+- Validació funcional: consulta real prèvia detecta `bookedAvailabilityCount=19`, `activeBookingCount=1` i 18 `staleBooked`; reparació canònica allibera 18 files; consulta posterior confirma `bookedAvailabilityCount=1`, `activeBookingCount=1`, `staleBooked=[]`, `missing=[]`, `mismatchedOwner=[]`.
+- Validació humana/UX: el calendari/disponibilitat deixa de vendre com a ocupats dies que només tenien reserves completades; la reserva torna a ser la font de veritat per moure o alliberar un dia.
+
+### Coordinació
+Counter -> 1877. Tall reserva/disponibilitat; sense schema, migracions, PDF, factures, portal ni post-event. Següent front Manolo: inventari assignat, ús/retorn i coherència amb reserva.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo: reinici canònic després del #1875 (Canvi #1876, codex)
+
+### Context
+El propietari ha demanat que el full de ruta nou no quedi en un document lateral, sinó dins el protocol de treball Manolo, i que després de canonitzar el tram lead/dossier/proposta/reserva s'arrenqui de nou sense pegats.
+
+### Què s'ha fet
+- `docs/MANOLO.md` posa com a primera frase operativa que Manolo és l'única clau que pot tocar el repo, el producte i la màquina.
+- S'afegeix la secció `0.8 Reinici canònic després del #1875`, que converteix les troballes de `custom_quotes`, `LeadDocument QUOTE`, dossier sense lead i lead `WON` sense reserva en regla general.
+- El reinici obliga a respondre propietari canònic, entitats reconstruïbles, camps mutables/read-only, artefacte necessari abans d'avançar estat i evidència contra carrils laterals.
+- L'ordre següent queda fixat: reserva, inventari, calendari, contracte/factura/albarà/documents, portal, post-event i Customer Hub.
+- Els registres vells no es poden esborrar a cegues: s'han de classificar com a reparació per servei canònic, traça històrica read-only o purga explícita amb evidència.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`; `qa:admin-canon` només P3 `font-px`, sense P1).
+- Validació funcional: sense canvi runtime; el canvi fixa el contracte de treball que governa la següent auditoria canònica.
+- Validació humana/UX: el protocol Manolo ja diu a dalt que només Manolo toca repo/producte/màquina i força el reinici per òrgans abans de continuar.
+
+### Coordinació
+Counter -> 1876. Tall de protocol Manolo; prepara el reinici E2E cap a reserva/inventari/calendari/factures/portal/post-event sense tocar encara runtime ni dades.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Dossiers: previsualització única amb imatges reals (Canvi #1836, codex)
+
+### Context
+El propietari continuava sense veure imatges a la previsualització de dossier. El problema no era només visual: hi havia camins diferents entre lead, Dossiers i dossier desat, una imatge de Bingo apuntava a un fitxer inexistent, `Animació adults 1h` no tenia `imageUrl` i la preview HTML podia convertir els assets en URLs absolutes que el CSP bloquejava quan es barrejava `localhost` i `127.0.0.1`.
+
+### Què s'ha fet
+- `Previsualitzar dossier` des del lead passa a `/api/admin/leads/[id]/dossier-preview`, una preview server HTML construïda amb les línies actuals del lead sense guardar un dossier nou.
+- La llista de `/admin/dossiers` usa el mateix endpoint quan el dossier té `leadId`; els dossiers sense lead tenen fallback propi a `/api/admin/dossiers/[id]/preview`.
+- El botó `Previsualitzar` del generador de `/admin/dossiers` vinculat a un lead també deixa de fer `blob:` i obre el mateix endpoint server després de sincronitzar les línies del lead.
+- Les previews web ja no absolutitzen imatges amb `assetBaseUrl`; els assets queden relatius i no xoquen amb el CSP de la pàgina.
+- El servei de dossier comparteix resolució de payload entre preview, PDF compost i email, i evita duplicar productes propis legacy quan ja resolen a producte col·laborador.
+- `Bingo Musical` queda migrat a `/img/collaborators/masquerade/bingo-musical.jpg` i els snapshots antics amb `bingo-musical-cover.jpg` es rehidraten cap al fitxer existent.
+- `Animació adults 1h` guanya imatge real a `public/img/collaborators/masquerade/animacio-adults-1h.jpg`, derivada de `IMG_20260510_173132`, i el seed Masquerade queda sincronitzat.
+
+### Validació
+- Validació tècnica: tests focalitzats OK (88/88); `npx tsc --noEmit --pretty false` OK; `git diff --check` OK; `pnpm run qa:protocol` OK.
+- Validació funcional: Playwright contra `http://127.0.0.1:3000/api/admin/leads/cmranio7k0116zf6x62q3leo4/dossier-preview` retorna 5 imatges completes amb `naturalWidth > 0`; fallback de dossier desat `cmqfgn8hy000i14k8gv31n9kn` retorna 4 imatges completes, incloent `animacio-adults-1h.jpg`; el botó real `Previsualitzar` de `/admin/dossiers?leadId=cmranio7k0116zf6x62q3leo4` obre la mateixa ruta server i no un `blob:`.
+- Validació humana/UX: captures guardades a `.codex-captures/dossier-preview-images-1836-server/`; la preview ja mostra imatges a la pàgina renderitzada, no només a catàleg o al blob antic.
+
+### Coordinació
+Counter -> 1836. Tall Dossiers/PDF preview acotat; sense costos de ruta, post-event, schema, migracions, pricing core ni reobertura visual general de Manolo.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Analytics: tendència GA4 sparse sense caixa buida (Canvi #1835, codex)
+
+### Context
+La fitxa #1832 deixava un P2 visual clar a `/admin/analytics`: el card `Tendència 30 dies` podia semblar una caixa buida quan GA4 tenia una sèrie escassa o zero.
+
+### Què s'ha fet
+- El card de tendència GA4 deixa de dependre de microbarres d'alçada gairebé invisibles.
+- Amb dades sparse mostra tres lectures compactes: dies actius, pic de sessions i pic d'usuaris.
+- La sèrie de 30 dies passa a una franja compacta d'activitat dia a dia.
+- Si GA4 retorna sèrie zero, el card mostra un empty state amb `role=status`.
+- Afegit guard estàtic focalitzat a `__tests__/app/admin/analytics/trend-empty-state.test.ts`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\analytics\trend-empty-state.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK desktop/mòbil; captura mòbil full-page OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: Analytics continua llegint les mateixes dades GA4; no es toca connector, cache, Ads, Prisma, schema ni configuració externa.
+- Validació humana/UX: captures a `.codex-captures/analytics-1835/` i `.codex-captures/analytics-1835-mobile-full/`; el card ja mostra informació visible en desktop i apila correctament en mòbil.
+
+### Coordinació
+Counter -> 1835. Tall Comandament/Analytics acotat; sense Ads/config externa, serveis GA4, schema, BD manual, lead Alba, pricing core ni PDF builder.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Protocol: validació humana només per Canvis existents (Canvi #1834, codex)
+
+### Context
+La fitxa de `/admin/docs/protocol` deixava un P2 de contracte HTTP: la UI només envia `canviN` existents, però la route `POST/DELETE /api/admin/protocol/validations` acceptava qualsevol enter positiu. Això podia deixar residu a `Setting(protocol.canviValidations)` si algú entrava per API directa.
+
+### Què s'ha fet
+- La route de validacions llegeix `docs/admin-protocol.md`, parseja els `### Canvi #N` amb `protocolCanvisService` i comprova que el número existeixi abans de persistir o esborrar.
+- `POST` amb un canvi desconegut retorna `404 { ok:false, error:'unknown-canvi' }` i no crida `recordCanviValidation()`.
+- `DELETE` amb un canvi desconegut retorna el mateix `404 unknown-canvi` i no crida `removeCanviValidation()`.
+- Fitxa i inventari de Protocol actualitzats: el P2 API queda resolt al #1834; la pantalla continua pendent de validació visual humana.
+
+### Validació
+- Validació tècnica: tests focalitzats OK (45/45); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: el setting de validacions ja no pot créixer amb números fora del changelog real del protocol.
+- Validació humana/UX: sense canvi visual; el toggle manté el mateix flux i només rep error backend si el Canvi no existeix.
+
+### Coordinació
+Counter -> 1834. Tall Sistema/Protocol; sense lead Alba, schema, BD manual, pricing core, PDF builder ni Fase A tasks.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Lead Alba: accions de dossier solidàries amb `/admin/dossiers` (Canvi #1833, codex)
+
+### Context
+El propietari reobre explícitament el `TANCAT CHARLIE` de `/admin/leads/[id]` només pel cable de Dossiers: `Crear dossier` des del lead havia de comportar-se com la pàgina Dossiers, no com una creació directa amb PDF compost.
+
+### Què s'ha fet
+- `Crear dossier` entra a `/admin/dossiers?leadId=...`, amb desat previ si hi ha canvis bruts al bolo.
+- `Previsualitzar dossier` entra a `/admin/dossiers?leadId=...&action=preview`; el generador carrega el lead, neteja `action=preview` i obre la preview HTML en la mateixa pestanya.
+- El botó enrere des de la preview torna al workspace Dossiers amb el lead carregat, no a la fitxa del lead.
+- `dossierWorkspaceHref` queda com a helper canònic del salt Lead -> Dossiers i els guards focalitzats blinden que el lead no torni a fer `POST /api/admin/dossiers` pel seu compte.
+
+### Validació
+- Validació tècnica: tests focalitzats OK (16/16); `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: el lead conserva l'edició del bolo i només deriva al generador canònic; la preview no força repetir el tràmit a `/admin/dossiers`.
+- Validació humana/UX: captures desktop/mòbil OK a `.codex-captures/lead-dossier-actions-1833/`; lead sense overflow, Dossiers carrega Alba Orna i la preview blob mostra el dossier correcte.
+
+### Coordinació
+Counter -> 1833. Tall de cablejat Lead -> Dossiers autoritzat pel propietari; sense schema, BD manual, API nova, motor econòmic, pricing core, PDF builder ni reobertura genèrica de Manolo.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Analytics: fitxa forense de `/admin/analytics` (Canvi #1832, codex)
+
+### Context
+`/admin/analytics` formava part de l'òrgan Comandament auditat al #1156 i ja havia tingut fix de warning visual al #1416, però la fila pròpia del registre encara era `PENDENT`.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/analytics`.
+- Registre de fitxes passat de `PENDENT` a `FETA`.
+- Inventari actualitzat amb GA4 viu, Ads pendent i P2 visual de gràfic de tendència.
+- Captures autenticades desktop/mòbil a `.codex-captures/analytics-1832/`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK; `qa:no-dead-admin-views` OK, `npx tsc --noEmit --pretty false` OK, `qa:protocol` OK i `git diff --check` OK amb avisos CRLF aliens, tancats en la passada #1833.
+- Validació funcional: sense canvi de codi ni dades; la ruta queda delimitada com a panell read-only de rendiment amb Prisma, GA4 i Ads/GTM condicionals.
+- Validació humana/UX: desktop i mòbil sense overflow; GA4 carrega dades reals i Ads informa variables pendents. El gràfic de tendència GA4 pot semblar buit amb sèrie escassa, per tant no és `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1832. Tall documental/captures; sense tocar dashboards principals, runtime de negoci, schema, BD manual, tasks, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — MarkdownView: taules mòbil apilades per docs tècnics (Canvi #1831, codex)
+
+### Context
+Les fitxes #1826/#1827/#1828 detectaven el mateix deute compartit: les taules de `MarkdownView` no trencaven layout, però en mòbil quedaven poc inspeccionables perquè depenien de scroll-x en documents tècnics llargs.
+
+### Què s'ha fet
+- `MarkdownView` manté taula real a partir de `sm` i renderitza files mòbil com a blocs etiqueta/valor.
+- Guard estàtic nou per blindar el contracte responsive.
+- Esquema, Full de ruta i Organisme actualitzats al mapa com a taules mòbil apilades #1831.
+- Captures autenticades desktop/mòbil a `.codex-captures/docs-markdown-1831/`.
+
+### Validació
+- Validació tècnica: test `MarkdownView-responsive-table` OK (1/1); `audit:visual:admin` focalitzat OK (6/6); `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: desktop conserva `<table>` real; mòbil mostra files apilades amb etiqueta/valor i les tres rutes queden amb `scrollWidth=390`, sense overflow.
+- Validació humana/UX: ja no cal scroll-x per entendre taules; l'Atles continua molt llarg en mòbil, per tant no és `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1831. Tall compartit de renderer docs; sense tocar contingut dels documents, runtime de negoci, schema, BD manual, tasks, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Docs atles elèctric: fitxa forense de `/admin/docs/electric-atlas` (Canvi #1830, codex)
+
+### Context
+`/admin/docs/electric-atlas` existia al sidebar i alimenta el Master, però no constava al registre de fitxes ni a l'inventari Sistema actualitzat. Calia auditar-la com a escàner viu del repo, no com a document estàtic.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/docs/electric-atlas`.
+- Registre de fitxes incorpora `/admin/docs/electric-atlas` com a `FETA`.
+- Inventari de Sistema actualitzat amb Atles elèctric.
+- Captures autenticades desktop/mòbil a `.codex-captures/docs-electric-atlas-1830/`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK; test `repoElectricAtlasService` OK (3/3); `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: sense canvi de codi ni dades; la ruta queda delimitada com a consola read-only de `repoElectricAtlasService`, amb exclusions de secrets/generats i catàlegs canònics a `repo-atlas`.
+- Validació humana/UX: el manual inicial renderitza bé a desktop/mòbil; tabs de cens amb taules amples pendents de validació humana. No és `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1830. Tall documental/captures; sense tocar runtime, schema, BD manual, tasks, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Docs master: fitxa forense de `/admin/docs/master` (Canvi #1829, codex)
+
+### Context
+`/admin/docs/master` existia al sidebar com a porta Master Òrbita (#1420/#1422/#1425), però no constava al registre de fitxes ni a l'inventari Sistema actualitzat. Calia auditar-la com a pantalla viva, no com a Markdown.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/docs/master`.
+- Registre de fitxes incorpora `/admin/docs/master` com a `FETA`.
+- Inventari de Sistema actualitzat amb Master Òrbita.
+- Captures autenticades desktop/mòbil a `.codex-captures/docs-master-1829/`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK; test `masterAtlasService` OK (6/6); `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: sense canvi de codi ni dades; la ruta queda delimitada com a consola read-only de `masterAtlasService` sobre Atles elèctric + auditoria visual + constants canòniques.
+- Validació humana/UX: desktop i mòbil sense overflow; útil com a porta única, però densitat/priorització de palanques pendent de criteri humà. No és `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1829. Tall documental/captures; sense tocar runtime, schema, BD manual, tasks, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Docs organisme: fitxa forense de `/admin/docs/organisme` (Canvi #1828, codex)
+
+### Context
+El registre encara tenia `/admin/docs/organisme` com a pendent, tot i que el #961/#962/#963/#965 ja havien creat l'Atles, la pàgina admin, el renderer compartit i l'entrada al sidebar.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/docs/organisme`.
+- Registre de fitxes passat de `PENDENT` a `FETA`.
+- Inventari de Sistema actualitzat amb Atles de l'organisme.
+- Captures autenticades desktop/mòbil a `.codex-captures/docs-organisme-1828/`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: sense canvi de codi ni dades; la ruta queda delimitada com a viewer read-only del document local, sense API ni mutacions.
+- Validació humana/UX: desktop complet però dens; mòbil sense overflow de pàgina però amb llegibilitat limitada per taules i densitat del Markdown. No és `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1828. Tall documental/captures; sense tocar runtime, MarkdownView shared, schema, BD manual, tasks, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Docs full de ruta: fitxa forense de `/admin/docs/full-de-ruta` (Canvi #1827, codex)
+
+### Context
+El registre encara tenia `/admin/docs/full-de-ruta` com a pendent, tot i que el #963/#964/#965 ja havien creat la pàgina, el document mestre `docs/producte-zenit-full-de-ruta.md` i l'entrada al sidebar.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/docs/full-de-ruta`.
+- Registre de fitxes passat de `PENDENT` a `FETA`.
+- Inventari de Sistema actualitzat amb Full de ruta.
+- Captures autenticades desktop/mòbil a `.codex-captures/docs-full-de-ruta-1827/`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: sense canvi de codi ni dades; la ruta queda delimitada com a viewer read-only del document local, sense API ni mutacions.
+- Validació humana/UX: desktop llegible; mòbil sense overflow de pàgina però amb llegibilitat limitada per densitat del Markdown llarg. No és `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1827. Tall documental/captures; sense tocar runtime, MarkdownView shared, schema, BD manual, tasks, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Docs esquema: fitxa forense de `/admin/docs/esquema` (Canvi #1826, codex)
+
+### Context
+El registre encara tenia `/admin/docs/esquema` com a pendent, tot i que el #965 ja havia creat la pàgina i el document `docs/admin-esquema-absolut.md`.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/docs/esquema`.
+- Registre de fitxes passat de `PENDENT` a `FETA`.
+- Inventari de Sistema actualitzat amb Esquema absolut.
+- Captures autenticades desktop/mòbil a `.codex-captures/docs-esquema-1826/`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: sense canvi de codi ni dades; la ruta queda delimitada com a viewer read-only del document local, sense API ni mutacions.
+- Validació humana/UX: desktop llegible; mòbil sense overflow de pàgina però amb llegibilitat pobre de taules/diagrames amples. No és `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1826. Tall documental/captures; sense tocar runtime, MarkdownView shared, schema, BD manual, tasks, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Codis descompte: toggle API i feedback accessible (Canvi #1825, codex)
+
+### Context
+La fitxa #1824 detectava un P1 funcional: el botó d'activar/desactivar codis enviava `_action:'toggle'` al `POST` de creació, però la route només validava creació. També quedaven permisos fins, euro corrupte i feedback/loading sense semàntica.
+
+### Què s'ha fet
+- Nou servei `setAdminDiscountCodeActive()` amb update de `isActive` i `adminLog`.
+- `GET/POST/PATCH /api/admin/discount-codes` passen per `read/mutate`; `PATCH` és el contracte de toggle.
+- El client usa `PATCH`, elimina `_action`, mostra `€` net i anuncia loading/error/èxit amb `role`/`aria-live`.
+- Guard estàtic nou del client i tests de route/servei ampliats.
+
+### Validació
+- Validació tècnica: tests focalitzats OK (31/31); `qa:api-admin-auth` OK; `qa:api-admin-csrf` OK; `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: crear continua per `POST`, llistar per `GET` i activar/desactivar per `PATCH`; permisos i CSRF queden en l'ordre canònic.
+- Validació humana/UX: captures desktop/mòbil del formulari mostren `Comanda mínima (€)` sense mojibake i sense overflow; queda visual/densitat pendent abans de `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1825. Tall acotat a codis descompte; sense schema, BD manual, pricing core, tasks, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Codis descompte: fitxa forense de `/admin/discount-codes` (Canvi #1824, codex)
+
+### Context
+El registre encara tenia `/admin/discount-codes` com a pendent. La pantalla governa codis globals `DiscountCode` i calia separar-la dels codis personalitzats `CustomerDiscountCode`.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/discount-codes`.
+- Registre de fitxes passat de `PENDENT` a `FETA`.
+- Inventari actualitzat amb deute real: P1 toggle/API, mojibake euro, permisos fins i feedback accessible.
+- Captures autenticades base desktop/mòbil i formulari desktop/mòbil a `.codex-captures/discount-codes-1824/`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK; tests route+servei OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: sense canvi de codi ni dades; queda documentat que `toggleActive()` envia `_action:'toggle'` al POST de creació i no té backend viu.
+- Validació humana/UX: ruta base renderitza bé i sense overflow; el formulari mostra euro corrupte `â‚¬` i feedback/loading pendents, per tant no és `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1824. Tall documental/captures; sense tocar runtime, schema, BD manual, leads, pricing core ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Catàleg hub: semàfor visual real (Canvi #1823, codex)
+
+### Context
+La fitxa #1822 detecta que `/admin/catalog` calculava `Sa`, `Vigilar` i `Crític`, però `resolveHealthTone()` retornava classes buides. El risc econòmic es llegia com a text, no com a senyal visual.
+
+### Què s'ha fet
+- `resolveHealthTone()` connecta `Sa/Vigilar/Crític` amb classes canòniques `admin-tone-*`.
+- Guard estàtic nou per evitar `badgeClass`/`dotClass` buits.
+- Captures post-canvi a `.codex-captures/catalog-1823/`.
+- Fitxa i inventari de `/admin/catalog` actualitzats.
+
+### Validació
+- Validació tècnica: `health-tone-contract.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: no canvia càlculs, queries, serveis, preus ni persistència; només pinta el to ja calculat.
+- Validació humana/UX: captura desktop mostra `Crític` en danger i `Sa` en success; continua pendent densitat/taula abans de `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1823. Tall visual petit a `/admin/catalog`; sense tocar pricing core, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Catàleg hub: fitxa forense de `/admin/catalog` (Canvi #1822, codex)
+
+### Context
+El registre encara tenia `/admin/catalog` com a pendent, tot i que l'òrgan Catàleg general ja havia estat auditat al #1132. Faltava baixar a la ruta concreta i separar què fa el hub de Packs, Pricing, Inventari i Extres.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/catalog`.
+- Registre de fitxes passat de `PENDENT` a `FETA`.
+- Inventari actualitzat amb el deute real: semàfor visual i densitat, no runtime.
+- Captures autenticades base desktop/mòbil i queries `extras`, `inventory`, `pricing`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK; queries desktop 200 sense overflow ni errors consola; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: sense canvi de codi ni dades; `/admin/catalog` queda delimitat com a hub de lectura/navegació sense mutacions.
+- Validació humana/UX: ruta base i tabs renderitzen bé; no `TANCAT CHARLIE` perquè el semàfor calcula `Sa/Vigilar/Crític` però no pinta to visual real.
+
+### Coordinació
+Counter -> 1822. Tall documental/captures; sense tocar preus, serveis, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs extres: feedback i botons accessibles (Canvi #1821, codex)
+
+### Context
+Amb permisos (#1819) i labels humans (#1820) resolts, `/admin/packs/extras` encara tenia deute petit però real: loading/error sense semàntica accessible, cap confirmació de desat i botons locals fora de la jerarquia canònica.
+
+### Què s'ha fet
+- Loading, error i èxit de desat passen a `role=status/alert` amb `aria-live`.
+- El botó de desat exposa `aria-busy`; els toggles de família exposen `aria-pressed`.
+- `+ Nou extra`, `Desar canvis` i `Eliminar` passen a variants `ap-btn`.
+- Guard estàtic nou per blindar feedback i botons.
+
+### Validació
+- Validació tècnica: `extras-client-a11y.test.ts` OK (2/2); `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: no canvia payload, endpoint, servei, preus, compatibilitats ni persistència.
+- Validació humana/UX: captures desktop/mòbil mantenen labels humans i jerarquia d'accions més clara; la pantalla continua `🔴` per densitat/formulari tècnic.
+
+### Coordinació
+Counter -> 1821. Tall acotat al client d'Extres, guard, captures i docs; sense tocar servei, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs extres: labels admin sense claus i18n (Canvi #1820, codex)
+
+### Context
+La fitxa #1818 i el saneig de permisos #1819 deixaven pendent el P1 visible de `/admin/packs/extras`: els camps `Nom` i `Descripció` mostraven claus `services.mobile.extras...` en comptes de text humà.
+
+### Què s'ha fet
+- `extrasConfiguratorService` resol labels/descripcions admin en català amb `resolvePublicExtraDefinition(..., 'ca')` quan rep claus i18n.
+- `PUBLIC_EXTRA_REGISTRY` incorpora `micro-inalambric` com a alias de `wireless-microphone`.
+- Tests de servei ampliats per claus i18n i micro inalàmbric.
+- Fitxa i inventari d'Extres actualitzats; visual/a11y continua pendent, no `TANCAT CHARLIE`.
+
+### Validació
+- Validació tècnica: `extrasConfiguratorService.test.ts` + `publicExtrasService.test.ts` OK (27/27); `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: no canvia schema, preus ni model Prisma `Extra`; només neteja el contracte admin perquè no retorni claus tècniques en camps visibles.
+- Validació humana/UX: captures desktop/mòbil mostren `Hora extra DJ`, `Llums extra` i `Micròfon sense fils`; la pantalla encara queda `🔴` per visual/a11y tècnica.
+
+### Coordinació
+Counter -> 1820. Tall acotat a servei/registre/tests/docs/captures; sense tocar UI gran, preus, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Extras API: permisos read/mutate (Canvi #1819, codex)
+
+### Context
+La fitxa #1818 detecta que `/api/admin/extras` encara no diferenciava permisos de lectura i mutació, tot i que ja tenia auth i CSRF al PUT.
+
+### Què s'ha fet
+- `GET /api/admin/extras` exigeix `read`.
+- `PUT /api/admin/extras` exigeix `mutate` abans de CSRF/body/servei.
+- Test de route ampliat a permisos de lectura/mutació.
+- Fitxa i inventari d'Extres actualitzats.
+
+### Validació
+- Validació tècnica: `extras-route.test.ts` OK (8/8); `npx tsc --noEmit --pretty false` OK; `qa:api-admin-auth` OK; `qa:api-admin-csrf` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: només canvia la frontera d'autorització; no toca `extrasConfiguratorService`, schema, BD ni payload.
+- Validació humana/UX: sense canvi visual; la pantalla manté pendent les claus i18n crues.
+
+### Coordinació
+Counter -> 1819. Tall API acotat; sense tocar UI, dades d'extres, serveis, schema, BD manual, preus, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs extres: fitxa forense del configurador (Canvi #1818, codex)
+
+### Context
+Faltava baixar a `/admin/packs/extras`, que no edita packs sinó `Setting(extras.configurator)`. És una pantalla sensible perquè alimenta configurador, nova reserva, pressupostos i lectura d'extres.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/packs/extras`.
+- Registre de fitxes passat de `PENDENT` a `FETA`.
+- Inventari actualitzat amb P1 de permisos API i claus i18n crues.
+- Captures autenticades desktop/mòbil a `.codex-captures/packs-extras-1818/`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK sobre `/admin/packs/extras`; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: la pantalla queda delimitada com a editor de `Setting(extras.configurator)` i no com a editor universal del model `Extra`.
+- Validació humana/UX: render 200 desktop/mòbil, sense overflow ni errors consola; no és `TANCAT CHARLIE` per claus i18n crues, permisos API incomplets i visual tècnica.
+
+### Coordinació
+Counter -> 1818. Tall documental acotat; sense tocar preus, càlculs, API, serveis, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs nou: formulari canònic i accessible (Canvi #1817, codex)
+
+### Context
+La fitxa #1816 deixava clar que `/admin/packs/new` era funcional però tenia deutes petits: serveis duplicats al select, error sense semàntica, CTA pla i PVP inicial `0` mentre el servei rebutja `!price`.
+
+### Què s'ha fet
+- Select de servei alimentat per `PACK_SERVICE_OPTIONS`.
+- `price` inicial buit amb `min={1}` i `step={1}`; `djHours` continua amb valor inicial `3`.
+- Error anunciat com alerta accessible.
+- Accions amb `ap-btn--primary` i `ap-btn--secondary`.
+- Guard estàtic nou i captures post-canvi a `.codex-captures/packs-new-1817/`.
+
+### Validació
+- Validació tècnica: `new-form-contract.test.ts` OK (3/3); `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: no canvia API, servei, schema ni persistència; el formulari continua creant pack base i redirigint al detall.
+- Validació humana/UX: desktop/mòbil 200, sense overflow ni errors consola; mòbil queda més net, desktop continua minimalista.
+
+### Coordinació
+Counter -> 1817. Tall acotat al formulari nou; sense tocar preus, càlculs, API, serveis, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs nou: fitxa forense del creador base (Canvi #1816, codex)
+
+### Context
+Després de tancar la fitxa de la llista de packs i el detall complet, quedava pendent `/admin/packs/new`. La ruta crea dades comercials reals però només prepara un pack base; el detall continua sent el lloc on completar inventari, textos, economia i publicació.
+
+### Què s'ha fet
+- Fitxa forense específica de `/admin/packs/new`.
+- Registre de fitxes passat de `PENDENT` a `FETA`.
+- Inventari actualitzat amb el saneig pendent del formulari.
+- Captures autenticades desktop/mòbil a `.codex-captures/packs-new-1816/`.
+
+### Validació
+- Validació tècnica: `audit:visual:admin` focalitzat OK sobre `/admin/packs/new`; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+- Validació funcional: `POST /api/admin/packs` continua com a camí únic de creació, amb `mutate`, CSRF i `createAdminPack()`.
+- Validació humana/UX: render 200 desktop/mòbil, sense overflow ni errors consola; no és `TANCAT CHARLIE` per deutes de select, feedback, CTA i `price`.
+
+### Coordinació
+Counter -> 1816. Tall documental acotat; sense tocar preus, càlculs, API, serveis, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Shell admin: logo sense warning Next Image (Canvi #1815, codex)
+
+### Context
+Les captures del detall de packs repetien una warning de Next Image sobre `logoplanetatextdreta.svg` perquè el CSS del shell forçava dimensions del logo.
+
+### Què s'ha fet
+- `.ax__logo` manté amplada controlada però deixa l'alçada en `auto`.
+- El breakpoint mòbil també deixa `height:auto`.
+- Guard estàtic nou per no tornar a forçar l'alçada del logo.
+- Captura post-canvi a `.codex-captures/admin-shell-1815/`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\shell-logo-ratio.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: el shell renderitza el logo i el detall pack sense overflow.
+- Validació humana/UX: captura mòbil amb consola neta; el logo manté ràtio real.
+
+### Coordinació
+Counter -> 1815. Tall CSS de shell acotat; sense tocar navegació, càlculs, serveis, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs detall: labels Textos/Publicació i tabs estables (Canvi #1814, codex)
+
+### Context
+Després de #1813 quedaven camps de Textos/Publicació sense label. Durant la captura s'ha detectat també que els tabs manuals podien rebotar a Economia perquè l'efecte depenia de `searchParams`.
+
+### Què s'ha fet
+- Labels `sr-only` + `id` per nom, tagline, descripció i features per idioma.
+- Label `sr-only` + `id` per `Ordre de publicació`.
+- `tabParam` estable perquè `?tab=content` funcioni i els clics manuals a tabs no es perdin.
+- Guard estàtic nou i ampliació del guard de query.
+- Captures post-canvi a `.codex-captures/packs-detail-1814/`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs\detail-tab-query.test.ts __tests__\app\admin\packs\detail-tab-icons.test.ts __tests__\app\admin\packs\detail-feedback-a11y.test.ts __tests__\app\admin\packs\detail-economic-labels.test.ts __tests__\app\admin\packs\detail-content-labels.test.ts __tests__\app\admin\packs\detail-texts-publish-labels.test.ts` OK (6/6); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: Textos i Publicació queden actius en clicar-los; no canvia cap preu, inventari, endpoint ni dades.
+- Validació humana/UX: mateix aspecte visual, 12 labels a Textos i 1 a Publicació, overflow 0.
+
+### Coordinació
+Counter -> 1814. Tall a11y/navegació acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs detall: labels Content (Canvi #1813, codex)
+
+### Context
+Després dels labels d'Economia #1812, la pestanya Content encara tenia cerca/slug/servei i quantitats sense label real.
+
+### Què s'ha fet
+- Labels `sr-only` + `id` per cerca, slug i servei intern.
+- Label no visual, `id` i `aria-label` per la quantitat de cada item inclòs.
+- Guard estàtic nou dels labels Content.
+- Captures post-canvi a `.codex-captures/packs-detail-1813/`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs\detail-tab-query.test.ts __tests__\app\admin\packs\detail-tab-icons.test.ts __tests__\app\admin\packs\detail-feedback-a11y.test.ts __tests__\app\admin\packs\detail-economic-labels.test.ts __tests__\app\admin\packs\detail-content-labels.test.ts` OK (5/5); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap drag/drop, lot, preu, càlcul, endpoint ni dades.
+- Validació humana/UX: mateix aspecte visual, 15 labels Content detectats al DOM, overflow 0 i consola neta.
+
+### Coordinació
+Counter -> 1813. Tall a11y acotat a Content; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs detall: labels Economia (Canvi #1812, codex)
+
+### Context
+La pestanya Economia del detall `/admin/packs/[id]` tenia controls de diners i capacitat amb text adjacent però sense label real.
+
+### Què s'ha fet
+- Labels `htmlFor`/`id` per aforament, watts, PVP pack i PVP hora extra.
+- `aria-label` als botons de reduir/augmentar hores DJ.
+- Guard estàtic nou dels labels econòmics.
+- Captures post-canvi a `.codex-captures/packs-detail-1812/`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs\detail-tab-query.test.ts __tests__\app\admin\packs\detail-tab-icons.test.ts __tests__\app\admin\packs\detail-feedback-a11y.test.ts __tests__\app\admin\packs\detail-economic-labels.test.ts` OK (4/4); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap preu, càlcul, inventari, endpoint ni dades.
+- Validació humana/UX: mateix aspecte visual, però els controls econòmics ja tenen label real; overflow 0.
+
+### Coordinació
+Counter -> 1812. Tall a11y acotat a Economia; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs detall: feedback accessible (Canvi #1811, codex)
+
+### Context
+Després del P1 #1809 i els tabs #1810, el detall `/admin/packs/[id]` encara anunciava `error/info/success` globals del formulari només com a text visual.
+
+### Què s'ha fet
+- `error` global del formulari passa a `role=alert` i `aria-live=assertive`.
+- `info` i `success` passen a `role=status` i `aria-live=polite`.
+- Guard estàtic nou per no perdre la semàntica accessible.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs\detail-tab-query.test.ts __tests__\app\admin\packs\detail-tab-icons.test.ts __tests__\app\admin\packs\detail-feedback-a11y.test.ts` OK (3/3); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap preu, inventari, endpoint, model de packs ni dades.
+- Validació humana/UX: sense canvi visual; error/info/èxit ja s'anuncien correctament.
+
+### Coordinació
+Counter -> 1811. Tall a11y acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs detall: tabs Lucide (Canvi #1810, codex)
+
+### Context
+Després del P1 #1809, el detall `/admin/packs/[id]` encara portava emojis locals als tabs, mentre Pricing i Packs llista ja estaven migrats a Lucide.
+
+### Què s'ha fet
+- `ADMIN_PACK_EDITOR_TABS` passa a claus d'icona tipades (`banknote`, `sliders`, `languages`, `check`).
+- `EditPackForm` renderitza Lucide per als quatre tabs.
+- Guard estàtic nou impedeix que el bloc de tabs del detall torni a emoji.
+- Captures post-canvi a `.codex-captures/packs-detail-1810/`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs\detail-tab-query.test.ts __tests__\app\admin\packs\detail-tab-icons.test.ts` OK (2/2); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap preu, inventari, endpoint, model de packs ni dades; `?tab=content` continua funcionant.
+- Validació humana/UX: captures amb 4 SVG als tabs, text net sense emoji i overflow 0; queda una warning preexistent de Next Image del logo global en mòbil.
+
+### Coordinació
+Counter -> 1810. Tall visual acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs detall: `Equip` obre inventari (Canvi #1809, codex)
+
+### Context
+La fitxa #1808 detectava que `/admin/packs` generava `Equip` cap a `/admin/packs/[id]?tab=content`, però el detall ignorava el query i obria sempre Economia.
+
+### Què s'ha fet
+- `EditPackForm` llegeix `useSearchParams()` i resol `tab` cap a `economic/content/texts/publish`.
+- `activeTab` arrenca i se sincronitza amb `?tab=content`.
+- Guard estàtic nou blinda helper d'enllaç + consum del query al detall.
+- Captures post-canvi a `.codex-captures/packs-detail-1809/`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs\detail-tab-query.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: `/admin/packs/cmmhz705w0007gxdq9vnv371m?tab=content` obre `Contingut`, mostra `Inventari del pack` i no mostra `Economia i semàfors`.
+- Validació humana/UX: l'acció `Equip` de la llista ja porta al lloc que promet; captures desktop/mòbil sense overflow ni errors.
+
+### Coordinació
+Counter -> 1809. Tall UI/navegació acotat; sense tocar preus, càlculs, serveis, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs detall: fitxa forense específica (Canvi #1808, codex)
+
+### Context
+Després de la fitxa #1805 i els talls #1806/#1807 a la llista de packs, `/admin/packs/[id]` continuava pendent tot i ser l'editor complet de pack.
+
+### Què s'ha fet
+- Fitxa específica de `/admin/packs/[id]` amb components, API, serveis, dades governades, accions, veïns, residus visuals/a11y, riscos i evidència.
+- El registre de fitxes passa `/admin/packs/[id]` a `FETA`.
+- Inventari Pack detall anota fitxa #1808, permisos API #1800 i P1 `?tab=content` ignorat.
+- Captures post-auditoria a `.codex-captures/packs-detail-1808/`.
+
+### Validació
+- Validació tècnica: `pnpm run qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap preu, inventari, endpoint, model de packs ni dades; només documenta el detall com a editor complet i deixa el tall executable clar.
+- Validació humana/UX: captures sense overflow ni errors; pendent `?tab=content`, tabs emoji i a11y de formulari.
+
+### Coordinació
+Counter -> 1808. Tall documental/captures; sense tocar càlculs, serveis econòmics, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs: icones locals a lucide (Canvi #1807, codex)
+
+### Context
+Després de la fitxa #1805 i l'a11y #1806, `/admin/packs` encara mostrava icones locals com emoji/text symbols a la llista i al botó/resultat de sincronització.
+
+### Què s'ha fet
+- `page.tsx` usa Lucide per info, destacat, música, watts, fum, micro, convidats, editar, equip i empty state.
+- `SyncButton` usa Lucide per sincronitzar, èxit, error, total/creats/actualitzats.
+- Test estàtic nou blinda que no tornin els símbols locals.
+- Captures post-canvi a `.codex-captures/packs-1807/`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs\icon-contract.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap preu, càlcul, endpoint, sync ni model de packs.
+- Validació humana/UX: captures sense overflow ni errors; 73 SVG renderitzats al cos.
+
+### Coordinació
+Counter -> 1807. Tall UI/test acotat; sense tocar càlculs, serveis econòmics, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs: quick editor accessible (Canvi #1806, codex)
+
+### Context
+La fitxa #1805 va deixar clar que `PackPriceQuickEditor` muta PVP real però els inputs no tenien labels reals i el feedback de desat/error no anunciava estat.
+
+### Què s'ha fet
+- Labels `htmlFor`/`id` per `Pack PVP` i `Hora extra PVP`.
+- Feedback de desat/error amb `role=status` o `role=alert`.
+- Test estàtic nou del contracte accessible.
+- Captures post-canvi a `.codex-captures/packs-1806/`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs\quick-editor-a11y.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap preu, càlcul, endpoint, sync ni model de packs.
+- Validació humana/UX: captures sense overflow ni errors; DOM amb 24 labels PVP reals.
+
+### Coordinació
+Counter -> 1806. Tall a11y/test acotat; sense tocar càlculs, serveis econòmics, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs: fitxa forense específica (Canvi #1805, codex)
+
+### Context
+Packs tenia permisos API corregits al #1800, però la ruta `/admin/packs` continuava sense fitxa específica. És editor real de PVP i hora extra, per tant calia separar-lo de la fitxa antiga de l'òrgan Catàleg.
+
+### Què s'ha fet
+- Fitxa específica de `/admin/packs` amb components, API, serveis, dades governades, accions, veïns, duplicacions, residus visuals i riscos.
+- El registre de fitxes passa `/admin/packs` a `FETA`; `[id]`, `new` i `extras` continuen pendents.
+- Inventari manté `🔴` i anota fitxa #1805 + permisos API #1800.
+- Captures a `.codex-captures/packs-1805/` per vista completa i focus `alert` en desktop i mòbil.
+
+### Validació
+- Validació tècnica: `pnpm run qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: la fitxa delimita Packs com a editor de PVP/hora extra i Pricing com a lectura de packs.
+- Validació humana/UX: captures sense overflow horitzontal ni errors; no és TANCAT CHARLIE per emojis locals, a11y del quick editor i densitat mòbil extrema.
+
+### Coordinació
+Counter -> 1805. Tall documental/captures; sense tocar UI Packs, càlculs, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Pricing: tarifes sense estat mort (Canvi #1804, codex)
+
+### Context
+La fitxa #1801 detectava `pricingConfig/savingConfig` com a estat parcial per editar tarifes, però no hi havia servei, setter ni persistència. La UI també prometia "Aviat: editable des d'aquí".
+
+### Què s'ha fet
+- Eliminat l'estat local mort de tarifes.
+- La taula de tarifes llegeix directament `SERVICE_HOURLY_RATES`.
+- Copy visible ajustat a la veritat actual: tarifes de referència i edició a constants.
+- Guard estàtic nou per evitar reintroduir estat local mort o promeses d'edició futura.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\pricing\tariff-source-contract.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap preu ni càlcul; conserva `SERVICE_HOURLY_RATES` com a font única.
+- Validació humana/UX: captures `.codex-captures/pricing-1804/desktop-tarifes.png` i `mobile-tarifes.png` sense overflow ni errors; sense copy de funció futura.
+
+### Coordinació
+Counter -> 1804. Tall cleanup/test acotat; sense tocar API, serveis econòmics, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Pricing: feedback inicial accessible (Canvi #1803, codex)
+
+### Context
+La fitxa #1801 deixava pendent un detall d'accessibilitat: el loading i l'error inicial de `/admin/pricing` eren visibles, però no anunciaven estat/alerta correctament.
+
+### Què s'ha fet
+- Loading inicial amb `role="status"` i `aria-live="polite"`.
+- Error inicial sense dades amb `role="alert"` i `aria-live="assertive"`.
+- Guard estàtic nou per blindar el contracte.
+- Fitxa i inventari actualitzats: feedback inicial resolt; Pricing continua `🔴` per densitat/validació humana.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\pricing\feedback-a11y.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia càrrega, retry, API, preus ni dades.
+- Validació humana/UX: sense canvi visual; millora per lectors de pantalla.
+
+### Coordinació
+Counter -> 1803. Tall a11y/test acotat; sense tocar càlculs, serveis econòmics, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Pricing: icones locals a lucide (Canvi #1802, codex)
+
+### Context
+La fitxa #1801 va deixar Pricing documentat però amb deute visual objectiu: tabs, KPI, avisos i microaccions encara usaven emoji/text symbols. Economia ja havia establert el patró correcte amb `lucide-react`.
+
+### Què s'ha fet
+- `ADMIN_PRICING_TABS` passa d'emoji a claus `PricingTabIcon`.
+- `PricingAdminPage` mapa les claus a Lucide i substitueix icones locals de tabs, KPI, capçaleres, missatges, extres, packs i inventari.
+- Test estàtic nou blinda el contracte d'icones de Pricing.
+- Captures post-canvi a `.codex-captures/pricing-1802/` per 5 pestanyes en desktop i mòbil.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\pricing\icon-contract.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: sense canvi de càlculs, API, preus, heatmap, model de packs ni dades; només render local d'icones.
+- Validació humana/UX: captures sense overflow horitzontal; recaptura final de `desktop-overview` sense errors de consola ni loader.
+
+### Coordinació
+Counter -> 1802. Tall UI/test acotat; sense tocar càlculs, serveis econòmics, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Pricing: fitxa forense específica (Canvi #1801, codex)
+
+### Context
+Després dels permisos #1799 i #1800, `/admin/pricing` continuava al registre com a fitxa específica pendent. La fitxa antiga de l'òrgan Catàleg (#1132) no era prou granular per decidir el següent tall real de Pricing.
+
+### Què s'ha fet
+- Fitxa específica de `/admin/pricing` escrita amb ruta, component viu, API, servei, dades governades, òrgans veïns, duplicacions, residus visuals, riscos i evidència.
+- El registre de fitxes passa `/admin/pricing` a `FETA`; l'inventari conserva `🔴` perquè falta validació visual.
+- Captures Playwright autenticades a `.codex-captures/pricing-1801/` per `overview`, `tarifes`, `extras`, `packs` i `inventory` en desktop 1440 i mòbil 390.
+- Deutes clars: emoji/icones locals, feedback inicial sense `role=alert`, estat parcial de tarifes editables i densitat mòbil.
+
+### Validació
+- Validació tècnica: `pnpm run qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: Pricing renderitza dades reals i manté la frontera correcta: extres editables, packs/inventari només lectura amb derivació al workspace corresponent.
+- Validació humana/UX: captures sense overflow horitzontal ni errors de consola; no queda TANCAT CHARLIE per deute visual/densitat.
+
+### Coordinació
+Counter -> 1801. Tall documental/captures; sense tocar UI Pricing, càlculs, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Packs: permisos API de catàleg (Canvi #1800, codex)
+
+### Context
+Després del #1799, les rutes de packs adjacents a Pricing encara podien llegir o mutar catàleg amb auth + CSRF però sense `requirePermission`. Crear, editar o sincronitzar packs altera preus i catàleg visible.
+
+### Què s'ha fet
+- `GET /api/admin/packs` i `GET /api/admin/packs/[id]` exigeixen `read`.
+- `POST /api/admin/packs`, `PATCH /api/admin/packs/[id]` i `POST /api/admin/packs/sync` exigeixen `mutate` abans de CSRF/body.
+- Tests de route ampliats a 25 casos.
+- Inventari/registre de fitxes anoten permisos #1800 i fitxes específiques pendents.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\packs-route.test.ts __tests__\app\api\admin\packs-detail-route.test.ts __tests__\app\api\admin\packs-sync-route.test.ts` OK (25/25); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: rols sense `read/mutate` ja no poden llegir ni mutar packs via API directa.
+- Validació humana/UX: sense canvi visual; frontera de seguretat coherent amb Pricing i Economia.
+
+### Coordinació
+Counter -> 1800. Tall API/test acotat; sense tocar UI Packs/Pricing, càlculs, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Pricing: permisos API per lectura i mutació (Canvi #1799, codex)
+
+### Context
+En començar la fitxa específica de `/admin/pricing`, la route `/api/admin/pricing` tenia auth + CSRF en `PUT`, però no `requirePermission`. `pricing/model-config` ja estava alineat amb `read/mutate`; canviar preus d'extres no pot quedar per sota d'aquest llistó.
+
+### Què s'ha fet
+- `GET /api/admin/pricing` exigeix `read`.
+- `PUT /api/admin/pricing` exigeix `mutate` abans de CSRF i abans de llegir el body.
+- El test de route cobreix auth, permisos, CSRF, happy path i errors.
+- Inventari/registre de fitxes anoten permisos #1799 i fitxa específica pendent.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\pricing-route.test.ts` OK (8/8); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: rols sense `read/mutate` ja no poden llegir ni mutar preus via API directa.
+- Validació humana/UX: sense canvi visual; és coherència de seguretat amb Economia i model-config.
+
+### Coordinació
+Counter -> 1799. Tall API/test acotat; sense tocar càlculs, UI Pricing, model de packs, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Shell admin: `+ Nova entrada` sense clipping (Canvi #1798, codex)
+
+### Context
+La passada agregada d'Economia ja sortia neta, però les mètriques repetien un residu global del shell: el botó lateral `+ Nova entrada` quedava 2-9px curt segons captura perquè compartia amplada exacta amb `Safata`.
+
+### Què s'ha fet
+- `.ax__add` rep més proporció de flex i `.ax__inbox` en rep menys.
+- Test estàtic nou blinda que el repartiment no torni a 1:1.
+- Captura/mesura Playwright a `.codex-captures/admin-shell-1798/`: `+ Nova entrada` 118/118 i `Safata` 79/79.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\shell-primary-actions.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright 200 desktop sense errors de consola i sense clipping dels botons; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia rutes, permisos, nav ni cap dada.
+- Validació humana/UX: el CTA principal persistent deixa de semblar tallat en desktop.
+
+### Coordinació
+Counter -> 1798. Tall CSS/test acotat del shell; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: config de packs en cards compactes (Canvi #1797, codex)
+
+### Context
+`/admin/economia?tab=config` encara començava amb una taula de 1450px per al `Semàfor de packs`. En mòbil només es veia una part i en desktop normal continuava sent massa ampla per la lectura principal.
+
+### Què s'ha fet
+- El semàfor de packs passa a cards compactes en mòbil, tablet i desktop normal.
+- La taula completa es conserva només en `2xl+`.
+- Test estàtic nou blinda el contracte responsive.
+- Captures Playwright finals a `.codex-captures/economia-1797/`.
+- Fitxa/inventari Economia actualitzats: config packs resolt #1797.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\pack-pricing-mobile-cards.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright 200 desktop/mòbil sense errors de consola ni overflow visible; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap càlcul, servei, endpoint, model de pricing ni dada.
+- Validació humana/UX: `Config` ja no obre amb una taula impossible; Economia continua 🔴 fins passada visual agregada i decisió humana.
+
+### Coordinació
+Counter -> 1797. Tall responsive/test acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: previsions mòbil sense taules tallades (Canvi #1796, codex)
+
+### Context
+Després de resoldre tresoreria, `/admin/economia?tab=previsions` encara amagava informació clau en mòbil: rang, YoY i confirmades a `Previsió de vendes`, i conversió, despesa i CAC real a `CAC per canal`.
+
+### Què s'ha fet
+- `Previsió de vendes` passa a cards mensuals en mòbil i manté taula en `md+`.
+- `CAC per canal` passa a cards de canal en mòbil i manté taula en `md+`.
+- Tests estàtics nous blinden els dos contractes responsive.
+- Captures Playwright finals a `.codex-captures/economia-1796/`.
+- Fitxa/inventari Economia actualitzats: previsions mòbil resoltes #1796.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\forecast-mobile-cards.test.ts __tests__\app\admin\economia\cac-mobile-cards.test.ts` OK (2/2); `npx tsc --noEmit --pretty false` OK; Playwright 200 desktop/mòbil sense errors de consola ni overflow visible; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap càlcul, servei, endpoint ni dada.
+- Validació humana/UX: `Previsions` ja és llegible en mòbil; Economia continua 🔴 fins revisar `Config`.
+
+### Coordinació
+Counter -> 1796. Tall responsive/test acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: tresoreria mòbil sense scroll lateral (Canvi #1795, codex)
+
+### Context
+L'auditoria visual de les pestanyes denses d'Economia mostrava que `/admin/economia?tab=tresoreria` amagava en mòbil costos, flux net i acumulat dins una taula horitzontal. La lectura de caixa quedava incompleta si no es feia scroll lateral.
+
+### Què s'ha fet
+- `Previsió de tresoreria` passa a cards mensuals en mòbil.
+- La taula completa es conserva en `md+`.
+- Test estàtic nou blinda el contracte responsive.
+- Captures Playwright finals a `.codex-captures/economia-1795/`.
+- Fitxa/inventari Economia actualitzats: tresoreria mòbil resolta #1795.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\cashflow-mobile-cards.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright 200 desktop/mòbil sense errors de consola ni overflow visible; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap càlcul, servei, endpoint ni dada.
+- Validació humana/UX: la lectura mensual de caixa ja és completa en mòbil; Economia continua 🔴 fins revisar `Previsions` i `Config`.
+
+### Coordinació
+Counter -> 1795. Tall responsive/test acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: rendibilitat mòbil sense taula tallada (Canvi #1794, codex)
+
+### Context
+La captura de `/admin/economia?tab=rendibilitat` després del #1793 confirmava que la pestanya ja tenia icones reals, però en mòbil la taula `Rendibilitat per canal d'adquisició` quedava tallada i els noms del top de marge es truncaven massa.
+
+### Què s'ha fet
+- `Rendibilitat per canal` passa a cards mòbils i manté taula en `md+`.
+- Els títols del top de marge poden fer línia en mòbil i només trunquen a partir de `sm`.
+- Test estàtic nou blinda el contracte responsive.
+- Captures Playwright finals a `.codex-captures/economia-1794/`.
+- Fitxa/inventari Economia actualitzats: rendibilitat mòbil resolta #1794.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\profitability-mobile-cards.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright 200 desktop/mòbil sense errors de consola ni overflow visible; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap càlcul, servei, endpoint ni dada.
+- Validació humana/UX: la pestanya de rendibilitat ja no és una taula desktop encabida en mòbil; Economia continua 🔴 fins revisar la resta de pestanyes denses.
+
+### Coordinació
+Counter -> 1794. Tall responsive/test acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: icones de secció reals (Canvi #1793, codex)
+
+### Context
+Després del #1792, les pestanyes d'Economia ja havien deixat els emoji, però les cards d'alerta/top i capçaleres de secció encara usaven `⚠️`, `📉`, `🏆`, `📊` i `⏰`. En un cockpit financer, això deixava la pàgina visualment a mig fer.
+
+### Què s'ha fet
+- `EconomiaClient` substitueix aquests emoji locals per icones `lucide-react`.
+- `section-icons.test.ts` blinda que aquests emoji no tornin al client.
+- Captures Playwright finals a `.codex-captures/economia-1793/`.
+- Fitxa/inventari Economia actualitzats: icones de secció resoltes #1793.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\section-icons.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright 200 desktop/mòbil amb `sectionEmoji=[]`, `bodySvgCount=11`, sense errors de consola i sense overflow global; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap càlcul, servei, endpoint, tab ni dada.
+- Validació humana/UX: millora visual puntual; Economia continua 🔴 i pendent de revisió de densitat/taules abans de `TANCAT CHARLIE`.
+
+### Coordinació
+Counter -> 1793. Tall visual/test acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: tabs amb icones reals (Canvi #1792, codex)
+
+### Context
+Les captures de `/admin/economia` després del #1791 mostraven pestanyes amb emoji. En una pantalla financera d'operativa, això baixava el to i trencava el patró d'icones reals que ja s'ha anat aplicant a l'admin.
+
+### Què s'ha fet
+- `TABS` passa d'emoji a claus `TabIcon`.
+- `EconomiaClient` renderitza les pestanyes amb `lucide-react`.
+- Test estàtic nou blinda que les pestanyes no tornin a pintar `tab.icon` com a text/emoji.
+- Captures Playwright finals a `.codex-captures/economia-1792/`.
+- Fitxa/inventari Economia actualitzats: tabs resolts #1792.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\tab-icons.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright 200 desktop/mòbil amb `tabSvgCount=6`, `emojiTabs=[]`, sense errors de consola i sense overflow global; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap tab, càlcul, servei ni ruta.
+- Validació humana/UX: millora visual puntual; Economia continua 🔴 i pendent de revisió visual completa.
+
+### Coordinació
+Counter -> 1792. Tall visual/test acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: feedback accessible (Canvi #1791, codex)
+
+### Context
+La fitxa forense #1789 deixava un P2: editors/historials de configuració i bulk payment mostraven missatges visibles, però sense semàntica accessible clara.
+
+### Què s'ha fet
+- `bulkError` de cobraments massius passa a `role="alert"`.
+- Els missatges de `ProfitabilityConfigEditor`, `PackPricingModelEditor`, `ProfitabilityConfigHistory` i `PackPricingModelHistory` passen a `Notice { type, text }`.
+- Èxits amb `role="status"` i errors amb `role="alert"`.
+- Test estàtic nou blinda que el feedback no torni a text pla.
+- Fitxa/inventari Economia actualitzats: P2 feedback resolt #1791.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\accessible-feedback.test.ts` OK (5/5); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap càlcul, servei ni endpoint; només s'anuncien millor els resultats de les accions.
+- Validació humana/UX: Economia continua 🔴 i pendent de revisió visual real.
+
+### Coordinació
+Counter -> 1791. Tall UI/a11y acotat; sense tocar càlculs, serveis econòmics, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: permisos de bulk i despesa (Canvi #1790, codex)
+
+### Context
+La fitxa forense #1789 ha detectat un P1: `bulk-payment` i `marketing/spend` mutaven dades econòmiques amb auth + CSRF, però sense `requirePermission`, a diferència de booking individual, comunicacions, rendibilitat i model de packs.
+
+### Què s'ha fet
+- `POST /api/admin/bookings/bulk-payment` exigeix `mutate`.
+- `GET /api/admin/marketing/spend` exigeix `read`.
+- `POST` i `DELETE /api/admin/marketing/spend` exigeixen `mutate`.
+- Tests nous de route blinden l'ordre `auth -> permission -> CSRF -> servei`.
+- Fitxa i inventari d'Economia actualitzats: P1 permisos resolt #1790.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-bulk-payment-route.test.ts __tests__\app\api\admin\marketing-spend-route.test.ts` OK (12/12); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: un rol `VIEWER` ja no pot mutar cobraments massius ni despesa de màrqueting per API directa.
+- Validació humana/UX: sense canvi visual ni de càlcul; només frontera de permisos coherent.
+
+### Coordinació
+Counter -> 1790. Tall API/test acotat; sense tocar càlculs, serveis econòmics, UI client, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Economia (Canvi #1789, codex)
+
+### Context
+`/admin/economia` és un òrgan crític: caixa, cobraments, marge, tresoreria, forecast, CAC, vehicle i model econòmic de packs. Després de netejar el mojibake #1788, faltava deixar la pantalla entesa abans de tocar permisos o visual.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/economia` a `docs/admin-fitxes-pantalles.md`.
+- Documentat el circuit real: `Booking` + timeline `PAYMENT` + `profitabilityService` + `packPricingHealth` + `MarketingSpend` + forecast/cash/CAC + configs persistides a `Setting`.
+- Inventari actualitzat: Economia continua 🔴, però amb fitxa FETA #1789.
+- P1 detectat: `/api/admin/bookings/bulk-payment` i `/api/admin/marketing/spend` no exigeixen `requirePermission`, a diferència de booking individual, comunicacions, rendibilitat i model de packs.
+- P2 detectats: feedback accessible pendent en editors/historials de config i bulk error.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: queda clar que Economia escriu diners, comunicacions i criteris econòmics; el següent tall segur és permisos, no visual.
+- Validació humana/UX: no es marca `🟢` ni `TANCAT CHARLIE`; queda pendent captura i revisió visual de densitat.
+
+### Coordinació
+Counter -> 1789. Tall documental/forense; sense tocar runtime, càlculs, serveis, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: neteja de mojibake intern (Canvi #1788, codex)
+
+### Context
+En començar l'auditoria de `/admin/economia`, `app/admin/economia/page.tsx` encara tenia quatre separadors de comentari corruptes (`â...`) al voltant dels blocs de finances i rendibilitat.
+
+### Què s'ha fet
+- Substituïts els quatre separadors corruptes per separadors ASCII simples.
+- Inventari i registre de fitxes actualitzats: Economia continua 🔴 i pendent de fitxa forense.
+- No s'ha tocat cap càlcul, servei, API, UI client, schema ni BD.
+
+### Validació
+- Validació tècnica: `rg -n "â|Ã|�" app\admin\economia\page.tsx` sense resultats; `qa:encoding` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap comportament; només desapareix soroll corrupte del codi.
+- Validació humana/UX: la pantalla no queda migrada ni `TANCAT CHARLIE`; segueix pendent l'auditoria de distribució i riscos.
+
+### Coordinació
+Counter -> 1788. Tall mecànic acotat; sense tocar client, motors econòmics, serveis, API, schema, BD manual ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Protocol (Canvi #1787, codex)
+
+### Context
+`/admin/docs/protocol` ja és una eina operativa: llegeix el protocol canònic, indexa Canvis i seccions, i manté la cua de validació humana. Després del #1786, faltava deixar-la classificada com a pantalla auditada sense confondre-la amb una migració visual tancada.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/docs/protocol` a `docs/admin-fitxes-pantalles.md`.
+- Documentat el circuit real: `docs/admin-protocol.md` -> parsers `protocolCanvisService` -> viewer server -> `ProtocolValidationToggle` -> `Setting(protocol.canviValidations)`.
+- Inventari actualitzat: Protocol continua 🔴, però amb fitxa FETA #1787 i P1 de toggle resolt #1786.
+- P2 anotats: API pot validar `canviN` positius no existents si s'entra per HTTP directe; pantalla densa pendent de validació visual.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: queda clar que Protocol és viewer normatiu + cua de validació humana, no editor Markdown ni gestor del comptador.
+- Validació humana/UX: no es marca `🟢` ni `TANCAT CHARLIE`; queda pendent revisió visual del propietari.
+
+### Coordinació
+Counter -> 1787. Tall documental/forense; sense tocar runtime, API route, servei de validacions, parser, schema ni BD manual.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Protocol: toggle de validació humana sense doble mutació (Canvi #1786, codex)
+
+### Context
+`/admin/docs/protocol` ja tenia l'acció real de marcar/desfer validació humana, però el botó només quedava condicionat pel `useTransition` del `router.refresh()`. Durant el `fetch` HTTP encara podia rebre un segon clic i duplicar la mutació.
+
+### Què s'ha fet
+- `ProtocolValidationToggle` afegeix estat `isSaving`, `isBusy`, guard d'entrada als handlers, `disabled` real mentre guarda i `aria-busy` al panell.
+- Els errors de `POST/DELETE` passen a `role="alert"`.
+- Test nou amb promesa oberta: comprova que el botó mostra `Guardant...`, queda deshabilitat i el segon clic no dispara un segon `fetch`.
+- Inventari/registre de fitxes actualitzats: Protocol continua 🔴 i pendent de fitxa forense, però el toggle queda blindat #1786.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\app\admin\docs\ProtocolValidationToggle.test.tsx` OK (6/6); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no es poden enviar dues validacions humanes mentre la mutació segueix pendent.
+- Validació humana/UX: estat de guardat visible i errors anunciats semànticament.
+
+### Coordinació
+Counter -> 1786. Tall UI/test acotat; sense tocar servei de validacions, API route, schema, BD manual ni parser del protocol.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Manual (Canvi #1785, codex)
+
+### Context
+`/admin/manual` encara figurava com a `PENDENT`, però és la memòria externa del producte: explica què existeix, què és automàtic, què continua sent manual i on entrar.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/manual` a `docs/admin-fitxes-pantalles.md`.
+- Documentat el circuit real: constants `adminManual.ts` + lectura del §9 del protocol -> server component `/admin/manual`.
+- Inventari actualitzat: Manual continua 🔴, però amb fitxa FETA #1785.
+- P2 detectat: pantalla molt llarga i pendent de validació visual humana abans de `🟢`.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: queda clar que no és editor ni executor; és memòria operativa i enllaços.
+- Validació humana/UX: la frontera Manual vs Protocol queda explícita.
+
+### Coordinació
+Counter -> 1785. Tall documental/forense; sense tocar constants, roadmap, UI runtime, schema ni BD.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Stats icones reals (Canvi #1784, codex)
+
+### Context
+La fitxa #1783 va detectar que `/admin/stats` pintava literalment les claus internes `party`, `people`, `calendar`, `star` i `sparkle`.
+
+### Què s'ha fet
+- `StatsPage` guanya un `STAT_ICON_MAP` local amb icones `lucide-react`.
+- Les cards renderitzen SVGs reals via `StatIcon`.
+- Nou test de component blinda que `party/people` no apareixen com a text i que hi ha SVG per les claus.
+- Fitxa/inventari Stats actualitzats: P1 visual resolt #1784.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\stats\StatsPage.test.tsx __tests__\app\api\admin\stats-route.test.ts __tests__\lib\services\adminStatsService.test.ts __tests__\lib\services\publicStatsService.test.ts` OK (32/32); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no toca cap càlcul, fallback, setting ni servei públic.
+- Validació humana/UX: les cards ja no mostren claus tècniques com si fossin contingut.
+
+### Coordinació
+Counter -> 1784. Tall visual/test local; sense tocar serveis, API, BD, schema ni dades.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Stats (Canvi #1783, codex)
+
+### Context
+`/admin/stats` encara figurava com a `PENDENT`, però governa números públics sensibles. Després de resoldre el pont de claus al #1782, calia deixar documentat què calcula, què sobreescriu i què veu el públic.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/stats` a `docs/admin-fitxes-pantalles.md`.
+- Documentat el circuit: `ADMIN_STATS_DEFINITIONS` -> `/api/admin/stats` -> `adminStatsService` -> `Setting(category=stats)` -> `publicStatsService` -> `/api/public/stats`.
+- Inventari actualitzat: Stats continua 🔴, però amb fitxa FETA #1783.
+- P1 visual detectat: `stat.icon` es pinta literalment com a text (`party`, `people`, etc.).
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: queda clar que Stats no és dashboard analític; és govern de números públics i fallbacks.
+- Validació humana/UX: el propietari pot distingir valors calculats, manuals i impacte públic.
+
+### Coordinació
+Counter -> 1783. Tall documental/forense; sense tocar runtime addicional, BD manual, schema ni UI.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Stats admin governa stats públiques (Canvi #1782, codex)
+
+### Context
+En revisar `/admin/stats`, l'admin escrivia claus `stats.events_completed`, `stats.people_entertained`, `stats.years_experience` i `stats.rating_average`, però `publicStatsService` llegia principalment claus camel/legacy. Un override manual podia quedar sense impacte a `/api/public/stats`.
+
+### Què s'ha fet
+- `publicStatsService` accepta les claus admin actuals i conserva compatibilitat amb claus antigues/camel.
+- `stats.years_experience` governa el text públic d'anys d'experiència.
+- `stats.rating_average` governa `averageRating/googleRating`.
+- Test nou de servei públic blinda que els overrides del panell admin afecten la sortida pública.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\publicStatsService.test.ts __tests__\lib\services\adminStatsService.test.ts __tests__\app\api\admin\stats-route.test.ts` OK (31/31); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no hi ha migració ni canvi de noms; el pont és compatible en lectura pública.
+- Validació humana/UX: l'admin ja no veu un valor manual que després el públic ignora per diferència de clau.
+
+### Coordinació
+Counter -> 1782. Tall de servei/test; sense tocar UI, BD manual, schema ni route pública.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Text Manager alertes accessibles (Canvi #1781, codex)
+
+### Context
+La fitxa #1779 deixava un P2: els missatges de `/admin/text-manager` eren visibles però no anunciats amb semàntica accessible explícita.
+
+### Què s'ha fet
+- Loading inicial amb `role="status"` i `aria-live="polite"`.
+- Error inicial i banner d'error amb `role="alert"` i `aria-live="assertive"`.
+- Banner d'èxit amb `role="status"` i `aria-live="polite"`.
+- Test de component per error de càrrega inicial persistent.
+- Fitxa/inventari Text Manager actualitzats: P2 alertes resolt #1781.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\text-manager\TextManagerPage.test.tsx __tests__\app\api\admin\text-manager-route.test.ts __tests__\lib\services\textManagerService.test.ts` OK (21/21); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia cap desat ni lectura; només com s'anuncien els estats.
+- Validació humana/UX: errors i èxits del Text Manager queden més clars per a tecnologia assistiva.
+
+### Coordinació
+Counter -> 1781. Tall UI/test accessible; sense editar textos, JSON, BD, API route, permisos, autotraducció ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Text Manager GET alineat amb rol editorial (Canvi #1780, codex)
+
+### Context
+La fitxa #1779 va detectar que el layout de `/admin/text-manager` bloquejava `VIEWER`, però la lectura directa `GET /api/admin/text-manager` només exigia auth.
+
+### Què s'ha fet
+- `GET /api/admin/text-manager` comprova `canManageContent(getAdminRole(req))`.
+- `VIEWER` rep 403 abans de carregar el catàleg editorial.
+- Test de route cobreix el 403 i blinda que `getTextManagerPayload()` no s'invoca.
+- Fitxa/inventari Text Manager actualitzats: P1 frontera GET/API resolt #1780.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\text-manager-route.test.ts __tests__\lib\services\textManagerService.test.ts` OK (20/20); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: rols editorials mantenen la lectura; `VIEWER` ja no pot llegir el catàleg per API directa.
+- Validació humana/UX: la frontera visible de la UI i la frontera real de l'API coincideixen.
+
+### Coordinació
+Counter -> 1780. Tall de route/test; sense editar textos, JSON, BD, UI page, auto-traducció ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Text Manager (Canvi #1779, codex)
+
+### Context
+`/admin/text-manager` encara figurava com a `PENDENT`, però és una superfície crítica: edita copy pública, dossiers i textos multidioma. La revisió havia de separar fitxers base, overrides BD, autotraducció i permisos.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/text-manager` a `docs/admin-fitxes-pantalles.md`.
+- Documentat el circuit real: `messages/*.json` + `Translation` -> `textManagerService` -> `/api/admin/text-manager` -> page full-screen.
+- Inventari actualitzat: Text Manager continua 🔴, però amb fitxa FETA #1779.
+- P1 detectat: el layout bloqueja UI a `OWNER/MANAGER`, però `GET /api/admin/text-manager` només exigeix auth.
+- P2 detectats: missatges sense `role=alert` explícit i `POST sync/export/validate` testat però no exposat a la UI actual.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: queda clar que desar textos escriu a `Translation`, no als JSON base.
+- Validació humana/UX: la frontera de permisos i el model base+override queden visibles abans de tocar copy editorial.
+
+### Coordinació
+Counter -> 1779. Tall documental/forense; sense editar textos, executar accions, tocar JSON, BD, API runtime ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Features icones reals (Canvi #1778, codex)
+
+### Context
+La fitxa #1777 va detectar que `/admin/features` pintava literalment les claus internes `star`, `calendar`, `gift`, `chat`, `note` i `controls` dins les cards.
+
+### Què s'ha fet
+- `FeaturesPage` guanya un `FEATURE_ICON_MAP` local amb icones `lucide-react`.
+- Les cards renderitzen SVGs reals via `FeatureIcon`.
+- Nou test de component blinda que `star/calendar` no apareixen com a text i que hi ha SVG per les claus.
+- Fitxa/inventari Features actualitzats: el P1 visual queda resolt #1778.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\features\FeaturesPage.test.tsx __tests__\app\api\admin\features-route.test.ts __tests__\lib\services\adminFeaturesService.test.ts` OK (16/16); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no canvia API, servei ni persistència; només es deixa de filtrar la clau interna com a text visible.
+- Validació humana/UX: les targetes de Features ja semblen controls reals.
+
+### Coordinació
+Counter -> 1778. Tall visual/test local; sense consumidor públic, API, servei, schema ni BD.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Features (Canvi #1777, codex)
+
+### Context
+`/admin/features` encara figurava com a `PENDENT`, però promet governar funcionalitats públiques del web. La revisió havia de comprovar si els toggles escriuen una font de veritat real o només settings admin.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/features` a `docs/admin-fitxes-pantalles.md`.
+- Documentat el circuit real: `ADMIN_FEATURE_DEFINITIONS` -> `GET/POST /api/admin/features` -> `adminFeaturesService` -> `Setting(features.*)` + `adminLog`.
+- Inventari actualitzat: Features continua 🔴, però amb fitxa FETA #1777.
+- P1 producte detectat: no hi ha consumidor públic de `features.*`; `SITE_CONFIG.features` és una font estàtica separada.
+- P1 visual detectat: `feature.icon` es pinta literalment com a text (`star`, `calendar`, etc.).
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: queda clar que avui el panell persisteix settings i registra activitat, però no prova impacte real al web públic.
+- Validació humana/UX: abans de vendre aquestes flags com a control de producció, cal connectar consumidor canònic o reetiquetar-les com a internes.
+
+### Coordinació
+Counter -> 1777. Tall documental/forense; sense runtime, consumidor públic, schema, BD manual ni feature flags noves.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Scripts guard de fitxers (Canvi #1776, codex)
+
+### Context
+La fitxa #1774 deixava un P2: el catàleg local de `/admin/scripts` podia quedar stale si un fitxer es movia o desapareixia.
+
+### Què s'ha fet
+- Nou `ScriptsClient-catalog-files.test.ts`.
+- El test extreu tots els `file: '...'` de `ScriptsClient.tsx`.
+- Falla si algun path no existeix al repo.
+- Fitxa/inventari Scripts actualitzats: el P2 de paths queda resolt #1776.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\scripts\ScriptsClient-catalog-files.test.ts __tests__\app\admin\scripts\ScriptsClient.test.tsx` OK (3/3); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: el catàleg ja no pot apuntar silenciosament a fitxers inexistents.
+- Validació humana/UX: no es copia una comanda trencada per path obsolet sense que el guard ho detecti.
+
+### Coordinació
+Counter -> 1776. Tall de test; sense executar scripts, sense canviar comandes, sense API, schema ni BD.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Scripts marca risc de dades (Canvi #1775, codex)
+
+### Context
+La fitxa #1774 va detectar que `/admin/scripts` només marcava un script com a destructiu, però molts seed/sync/fix/autofix poden tocar BD o configuració si es copien i executen.
+
+### Què s'ha fet
+- `ScriptsClient.tsx` guanya metadata `mutatesData`.
+- El resum mostra `Toca dades` en lloc de limitar-se a destructius.
+- Les cards sensibles mostren badge `toca dades`.
+- Test de component cobreix resum, badges sensibles i badge destructiu.
+- Fitxa/inventari Scripts actualitzats: el P1 de risc queda resolt #1775.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\scripts\ScriptsClient.test.tsx` OK (2/2); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: no s'executa cap script i no es canvia cap comanda; només es classifica millor el risc.
+- Validació humana/UX: l'usuari veu abans de copiar si la comanda pot tocar dades/config.
+
+### Coordinació
+Counter -> 1775. Tall UI/metadades; sense executar scripts, sense canviar comandes, sense API, schema ni BD.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Scripts (Canvi #1774, codex)
+
+### Context
+`/admin/scripts` encara figurava com a `PENDENT`, però concentra comandes de manteniment, informes, sync i correcció. No executa scripts, però sí facilita copiar ordres potencialment sensibles.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/scripts` a `docs/admin-fitxes-pantalles.md`.
+- Documentat que és catàleg/copiador de comandes, sense API ni execució server-side.
+- Inventari actualitzat: Scripts continua 🔴, però amb fitxa FETA #1774.
+- P1 detectat: metadata `danger` infra-marca scripts `fix` que poden mutar dades.
+- P2 detectat: catàleg local dins `ScriptsClient.tsx`, sense validació contra fitxers reals.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: queda clar que no hi ha executor admin; el risc és de còpia i classificació.
+- Validació humana/UX: l'usuari pot distingir comandes informatives de comandes que toquen dades.
+
+### Coordinació
+Counter -> 1774. Tall documental/forense; sense executar scripts, sense canviar comandes, sense API, schema ni BD.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — CSS Manager error inicial persistent (Canvi #1773, codex)
+
+### Context
+La fitxa #1771 deixava un P2: si `GET /api/admin/css` fallava, l'editor podia quedar buit sense explicar que la càrrega inicial havia fallat.
+
+### Què s'ha fet
+- `AdminCssManagerPage` guanya estat `loadError`.
+- La càrrega inicial passa per `loadCss()` i llegeix `error/message` del payload.
+- La pantalla mostra `role="alert"` persistent amb botó `Reintentar`.
+- Nou test de component per error inicial, alerta i reintent.
+- Fitxa/inventari CSS Manager actualitzats: l'error inicial queda resolt #1773.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\css-manager\AdminCssManagerPage-load-error.test.tsx __tests__\app\admin\css-manager\AdminCssManagerPage-sanitized.test.ts __tests__\app\api\admin\css-route.test.ts` OK (8/8); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: una fallada de `/api/admin/css` queda visible i recuperable sense tocar el CSS persistent.
+- Validació humana/UX: l'usuari no confon una fallada de càrrega amb un CSS buit real.
+
+### Coordinació
+Counter -> 1773. Tall UI local; sense sanititzador, paletes, schema, BD manual ni tema global.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — CSS Manager aplica CSS sanititzat (Canvi #1772, codex)
+
+### Context
+La fitxa #1771 va detectar que CSS Manager podia persistir CSS sanititzat al backend però aplicar en viu el CSS cru del textarea fins a recarregar.
+
+### Què s'ha fet
+- `PUT /api/admin/css` retorna també `css` sanititzat.
+- `AdminCssManagerPage.save()` actualitza textarea, DOM live i event `admin-css-updated` amb `savedCss`.
+- Test de route actualitzat amb el nou contracte.
+- Guard de font nou blinda que la page no torni a propagar el CSS cru.
+- Fitxa/inventari CSS Manager actualitzats: el P1 live/persistent queda resolt #1772.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\css-route.test.ts __tests__\app\admin\css-manager\AdminCssManagerPage-sanitized.test.ts __tests__\lib\services\adminCustomCssService.test.ts` OK (13/13); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: el CSS aplicat en viu coincideix amb el CSS sanititzat persistent.
+- Validació humana/UX: si el sistema neutralitza una regla prohibida, l'usuari veu la versió real guardada.
+
+### Coordinació
+Counter -> 1772. Tall de contracte route/client; sense canviar sanititzador, paletes, schema, BD manual ni tema global.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense CSS Manager (Canvi #1771, codex)
+
+### Context
+`/admin/css-manager` encara figurava com a `PENDENT`, però edita CSS persistent que s'aplica en viu a tot `/admin`. No podia quedar com una eina menor sense mapa.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/css-manager` a `docs/admin-fitxes-pantalles.md`.
+- Documentats page, route `/api/admin/css`, `adminCustomCssService`, `sanitizeAdminCss()` i guards que eximeixen CSS Manager d'hex/rgba.
+- Inventari actualitzat: CSS Manager continua 🔴, però amb fitxa FETA #1771.
+- P1 detectat: el client aplica CSS cru encara que el backend el sanititzi.
+- P2 detectat: error de càrrega inicial sense estat persistent.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: queda documentat el cable editor -> route -> setting -> adminLog -> style live.
+- Validació humana/UX: queda clar que aquesta pantalla pot alterar l'admin sencer i necessita coherència entre CSS sanititzat i CSS aplicat.
+
+### Coordinació
+Counter -> 1771. Tall documental/forense; sense runtime, route, sanititzador, schema, BD ni CSS real de producció.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Crons error persistent (Canvi #1770, codex)
+
+### Context
+Després del #1769, `/admin/crons` tenia route i health blindats, però si la càrrega fallava només sortia un toast. La pantalla no conservava cap estat d'error visible.
+
+### Què s'ha fet
+- `CronsClient` guanya estat `error`.
+- Les respostes `{ok:false}` o HTTP error llegeixen `error/message` del payload.
+- La pantalla mostra `role="alert"` persistent amb botó `Reintentar`.
+- Nou test de component per error inicial, alerta, reintent i toast.
+- Fitxa/inventari Crons actualitzats: l'error state queda resolt #1770.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\crons\CronsClient.test.tsx __tests__\app\api\admin\crons-route.test.ts` OK (4/4); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+- Validació funcional: una fallada de `/api/admin/crons` queda visible i recuperable sense executar jobs.
+- Validació humana/UX: el propietari veu que el monitor ha fallat i pot reintentar.
+
+### Coordinació
+Counter -> 1770. Tall UI local; sense scheduler, `/api/cron/*`, CRON_SECRET, schema, BD, execució de jobs ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Crons route test (Canvi #1769, codex)
+
+### Context
+La fitxa #1767 deixava un P2 clar: `GET /api/admin/crons` no tenia test de route propi, tot i ser la porta que alimenta el monitor.
+
+### Què s'ha fet
+- Nou `__tests__/app/api/admin/crons-route.test.ts`.
+- Cobert auth abans de llegir Settings.
+- Coberta la delegació a `readCronRunStatuses([...ADMIN_CRON_PREFIXES])`.
+- Cobert error 500 amb logging.
+- Fitxa/inventari Crons actualitzats: el P2 de route queda resolt #1769.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\crons-route.test.ts __tests__\lib\services\cronRunStatusService.test.ts __tests__\lib\constants\adminCronPrefixes.test.ts` OK (19/19); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: la route del monitor queda blindada sense executar cap cron.
+- Validació humana/UX: Crons ja té contracte bàsic de regressió en la porta admin.
+
+### Coordinació
+Counter -> 1769. Tall de test; sense UI, scheduler, `/api/cron/*`, CRON_SECRET, schema, BD, execució de jobs ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Crons health per freqüència real (Canvi #1768, codex)
+
+### Context
+La fitxa #1767 va detectar que `/admin/crons` marcava salut amb 26h per tot: massa permissiu per jobs ràpids i massa estricte per un benchmark setmanal.
+
+### Què s'ha fet
+- `ADMIN_CRON_PREFIXES` guanya `maxAgeHours` per cada cron.
+- `readCronRunStatuses()` usa aquest llindar i manté 26h com a default retrocompatible.
+- Tests de servei/constants blinden Calendar Sync 2h, alertes urgents 8h, diaris 26h i benchmark setmanal 192h.
+- Fitxa/inventari Crons actualitzats: el P1 de health uniforme queda resolt #1768.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\cronRunStatusService.test.ts __tests__\lib\constants\adminCronPrefixes.test.ts` OK (16/16); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: el monitor calcula retard segons freqüència real sense executar cap job.
+- Validació humana/UX: Crons deixa de donar falsa calma en sincronitzacions ràpides i falsa alarma en el setmanal.
+
+### Coordinació
+Counter -> 1768. Tall de lectura de salut; sense scheduler, `/api/cron/*`, CRON_SECRET, schema, BD, execució de jobs ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Crons (Canvi #1767, codex)
+
+### Context
+`/admin/crons` encara figurava com a `PENDENT` al registre de fitxes, però és la pantalla que diu si les automatitzacions del sistema estan vives. Calia separar què observa de què executa.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/crons` a `docs/admin-fitxes-pantalles.md`.
+- Documentats `CronsClient`, `GET /api/admin/crons`, `ADMIN_CRON_PREFIXES` i `cronRunStatusService`.
+- Inventari actualitzat: Crons continua 🔴, però amb fitxa FETA #1767.
+- P1 detectat: el health usa un llindar únic de 26h per crons amb freqüències diferents.
+- P2 detectat: falta test de route propi per `GET /api/admin/crons`.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: queda clar que la pantalla llegeix Settings i no executa cap cron.
+- Validació humana/UX: el propietari pot veure on el monitor pot donar falsa calma o falsa alarma.
+
+### Coordinació
+Counter -> 1767. Tall documental/forense; sense codi funcional, schema, BD, scheduler, `/api/cron/*`, CRON_SECRET, serveis de negoci ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Coverage mostra busy a remove/toggle (Canvi #1766, codex)
+
+### Context
+Després del #1765, `/admin/coverage` ja no callava els errors, però eliminar o activar/desactivar una ciutat encara podia semblar un clic mort mentre el backend responia.
+
+### Què s'ha fet
+- Afegits helpers de clau de mutació per acció/ciutat a `coverage-utils.ts`.
+- `CoveragePage` marca `pendingAreaMutation` per remove/toggle.
+- Els botons mostren `Eliminant...` o `Actualitzant...`, exposen `aria-busy` i queden deshabilitats mentre hi ha una mutació pendent.
+- Test focalitzat ampliat a 9 asserts totals amb la ruta admin de coverage.
+- Fitxa/inventari Coverage actualitzats: el deute de busy remove/toggle queda resolt #1766.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\coverage\coverage-utils.test.ts __tests__\app\api\admin\coverage-route.test.ts` OK (9/9); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: no hi ha mutacions concurrents de ciutat i `areas` continua venint de la resposta backend.
+- Validació humana/UX: eliminar o activar/desactivar ja comunica que l'acció està en curs.
+
+### Coordinació
+Counter -> 1766. Tall UI/client-side de feedback d'acció; sense schema, BD, `lib/coverage.ts`, endpoint públic, pricing, transport ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Coverage mostra errors d'API (Canvi #1765, codex)
+
+### Context
+La fitxa #1764 va detectar que `/admin/coverage` podia rebre `{ok:false}` o errors com `city_exists` sense feedback visible. L'usuari veia que no passava res, mentre el motiu quedava al backend o a consola.
+
+### Què s'ha fet
+- Nou helper `readCoverageApiError()` a `app/admin/coverage/coverage-utils.ts`.
+- `CoveragePage` converteix GET `ok:false` en `fetchError`.
+- Les mutacions add/remove/toggle mostren un `role="alert"` amb el missatge backend o fallback local.
+- Test focalitzat nou per prioritat `error/message` i fallback.
+- Fitxa/inventari Coverage actualitzats: el P1 de feedback queda resolt #1765.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\coverage\coverage-utils.test.ts __tests__\app\api\admin\coverage-route.test.ts` OK (8/8); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: errors de cobertura deixen de ser muts i no es toca persistència, endpoint públic ni catàlegs.
+- Validació humana/UX: l'admin rep resposta quan una ciutat no es pot afegir/eliminar/activar.
+
+### Coordinació
+Counter -> 1765. Tall UI/client-side de feedback; sense schema, BD, `lib/coverage.ts`, endpoint públic, pricing, transport ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Coverage territorial (Canvi #1764, codex)
+
+### Context
+`/admin/coverage` encara figurava com a `PENDENT`, però la pantalla governa dades públiques: `coverage.areas` alimenta `/api/public/coverage`, el footer i zones territorials/SEO. Calia deixar clar que no és una taula interna menor.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/coverage` a `docs/admin-fitxes-pantalles.md`.
+- Documentats page, route admin, `lib/coverage.ts`, endpoint públic, public client i `weddingCoverage`.
+- Inventari actualitzat: Coverage continua 🔴 per validació/migració visual pendent, però amb fitxa FETA #1764.
+- P1 anotat: la UI no mostra feedback quan l'API torna `{ok:false}` o `city_exists`.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: el mapa documenta el cable admin -> setting -> endpoint públic/footer/zones sense tocar runtime.
+- Validació humana/UX: queda clar que Coverage és configuració pública i que els errors de mutació han de ser visibles abans de validar-la.
+
+### Coordinació
+Counter -> 1764. Tall documental/forense; sense codi funcional, schema, BD, APIs, migracions ni canvis visuals.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Activity log (Canvi #1763, codex)
+
+### Context
+`/admin/activity` encara figurava com a `PENDENT` al registre de fitxes. La pantalla és petita però crítica: és el visor transversal del rastre `adminLog` que fan servir emails, crons, documents, pagaments, automatitzacions i accions CRUD.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/activity` a `docs/admin-fitxes-pantalles.md`.
+- Documentat que la route `GET /api/admin/activity` és read-only, saneja query i delega a `fetchCanonicalAdminActivityPage()`.
+- Documentat el contracte UI: filtres per categoria, finestra temporal, paginació, stats, mobile cards, taula desktop i links a entitats.
+- Inventari actualitzat: Activity continua 🔴 per validació/migració visual pendent, però ja té fitxa FETA #1763.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: Activity queda classificada com a visor transversal read-only sobre `adminLog`, no com a motor ni com a timeline contextual.
+- Validació humana/UX: el propietari sap què està mirant: rastre de sistema, filtres de diagnòstic i salts a entitats quan la timeline pot resoldre link.
+
+### Coordinació
+Counter -> 1763. Tall documental/forense; sense codi funcional, schema, BD, APIs, migracions ni canvis visuals.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Clients aplica links entrants de segment (Canvi #1762, codex)
+
+### Context
+La fitxa forense #1761 va detectar que `/admin/clientes?segment=at-risk` existia com a destí des de serveis com Daily Brief, però la pàgina no llegia `segment`; només obria el modal d'alta amb `add/date`.
+
+### Què s'ha fet
+- `customer-utils.ts`: afegit `resolveCustomerSegmentFilter()` per traduir ids de `CUSTOMER_SEGMENTS` als filtres CRM existents.
+- `page.tsx`: si el query param `segment` és vàlid, aplica lifecycle/tag/healthScore/minSpent sense inventar un segon mapa.
+- `customer-utils.test.ts`: cobertura de `at-risk`, `high-value`, `vip` i segments desconeguts/null.
+- Docs de #1761 i inventari actualitzats: el P1 `?segment=` queda resolt.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\customer-utils.test.ts` OK (4/4); `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: els links entrants a Clients amb `segment` reutilitzen els mateixos filtres CRM que els botons de la pantalla.
+- Validació humana/UX: el salt arriba ja enfocat i evita que el propietari hagi de tornar a filtrar manualment.
+
+### Coordinació
+Counter -> 1762. Tall de cablejat client-side; sense API, serveis Prisma, schema, BD, email, Customer Hub, Referrals ni lead Alba.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Clients llista (Canvi #1761, codex)
+
+### Context
+El següent tall nonstop dins Zenit era regularitzar `/admin/clientes`: l'inventari la marcava `🟢`, però amb nota antiga de `clientes.css` i el registre de fitxes encara la tenia `PENDENT`. La lectura viva confirma que el #1273 va esborrar el CSS local i va passar la pàgina al sistema canònic `AdminPage`/`ap-*`.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/clientes` a `docs/admin-fitxes-pantalles.md`.
+- Documentats page, `CustomersPageSections`, `ClientesModals`, `customer-utils`, APIs `/api/admin/customers`, `/check-duplicates`, `/start-process` i serveis associats.
+- Inventari corregit: Clients llista continua `🟢`, però la nota ara diu #811 + #1273 + fitxa #1761, no `clientes.css`.
+- Fitxa mare de Clients passa a `FETA` perquè llista, fitxa 360, reactivació i referrals ja tenen mapa forense.
+- Deute P1 anotat: links entrants `?segment=at-risk` existeixen, però `page.tsx` encara no consumeix `segment`.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: el mapa Zenit reflecteix el codi viu real i deixa el següent tall executable clar.
+- Validació humana/UX: queda explícit que Clients no és només una taula; crea clients, fa dedupe i pot iniciar processos comercials amb email/codi.
+
+### Coordinació
+Counter -> 1761. Tall documental/forense; sense codi funcional, schema, BD, API, migracions ni processos comercials.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Fitxa forense Referrals clients (Canvi #1760, codex)
+
+### Context
+Després de blindar la fitxa del lead Alba com a `TANCAT CHARLIE`, el següent tall nonstop havia de sortir del lead protegit. `/admin/clientes/referrals` figurava com a `PENDENT` al registre de fitxes, però la documentació antiga afirmava que el #1140 ja havia drenat visualment `ReferralsClient`.
+
+### Què s'ha fet
+- Afegida fitxa forense completa de `/admin/clientes/referrals` a `docs/admin-fitxes-pantalles.md`.
+- Documentada la realitat viva: page server amb `AdminPage`, client `ReferralsClient`, servei `referralsService`, tests vius, top referrers, candidats, WhatsApp/email/copiar/descartar i Customer Hub.
+- Reoberta com a deute la discrepància #1140: no hi ha `referrals.css` viu i el component encara usa `ap-*`/utilitats visuals.
+- Inventari actualitzat: Referrals continua 🔴, però amb fitxa FETA #1760 i nota clara de migració pendent.
+
+### Validació
+- Validació tècnica: `qa:no-dead-admin-views` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: el mapa Zenit ja no ven Referrals com a pendent opac ni com a migrada; separa fitxa forense FETA de migració visual pendent.
+- Validació humana/UX: queda clar què pot revisar Manolo en el futur sense reobrir el lead TANCAT CHARLIE.
+
+### Coordinació
+Counter -> 1760. Tall documental/forense; sense codi funcional, schema, BD, API, migracions ni càlculs.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — TANCAT CHARLIE de la fitxa del lead Alba (Canvi #1759, codex)
+
+### Context
+El propietari valida visualment la fitxa `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` i ordena marcar `TANCAT CHARLIE` abans de continuar en mode nonstop cap al Zenit. El protocol obliga a consolidar-ho al mapa, fitxa i sync abans de fer feina nova.
+
+### Què s'ha fet
+- `/admin/leads/[id]` queda marcat com a `TANCAT CHARLIE` a `docs/admin-inventari-pagines.md`.
+- La fitxa forense de `docs/admin-fitxes-pantalles.md` passa de pendent de validació visual a protegida pel propietari (#1759).
+- `app/admin/leads/[id]/page.tsx` i `LeadDetailClient.tsx` porten marca de ruta protegida/revalidada.
+- `docs/agent-sync.md` deixa l'avís perquè Claude/Codex no reobrin aquesta superfície per auditories genèriques.
+
+### Validació
+- Validació tècnica: `qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: inventari, fitxa forense, fitxer principal i counter apunten al mateix tancament #1759.
+- Validació humana/UX: la validació del propietari queda blindada i la feina pot seguir nonstop cap al següent tall Zenit.
+
+### Coordinació
+Counter -> 1759. Tall documental/protecció de ruta; sense codi funcional, schema, BD, API, migracions ni càlculs.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Remat Manolo del Zenit del lead Alba (Canvi #1758, codex)
+
+### Context
+El propietari continua la revisió visual del lead Alba i demana corregir tres punts d'acabat: `Net estimat` en blanc tot i estar en vigilància, peatges orfes dins el resum del transport i el bloc `Següent pas` centrat però massa alt/amb vora poc clara.
+
+### Què s'ha fet
+- El to `orange` del rail financer pinta valor i percentatge del net estimat.
+- El resum de pressupost queda com a fórmula centrada; els peatges, quan hi són, viuen sota `Transport` com `inclou peatges X €`.
+- `Cost col·laborador` i `Següent pas` queden en fila de decisió: accions centrades, panell més curt en vertical, mateixa amplada de columna i vora daurada visible.
+- Captures Playwright finals a `.codex-captures/lead-alba-layout-1758/` amb prefix `manolo-zenit-*` en desktop 1440 i mòbil 390.
+
+### Validació
+- Validació tècnica: Playwright autenticat desktop/mòbil OK, sense console errors i sense overflow; tests focalitzats de lead OK (10/10); `tsc` OK; `qa:visual-overflow` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: l'estat de BD manté `490 € + 315 € = 805 €`; la prova amb `Peatges 29 €` integra el text dins de `Transport` i elimina el resum orfe.
+- Validació humana/UX: la pàgina queda més neta com a pantalla de decisió, no com a formulari administratiu de pactes.
+
+### Coordinació
+Counter -> 1758. Tall visual/copy/layout del lead; sense schema, BD, API, migracions ni càlculs econòmics.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Repàs de distribució visual del lead Alba (Canvi #1757, codex)
+
+### Context
+El propietari demana mirar tota la pàgina `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` amb captures, no només el desplaçament. Diagnosi visual: el resum `Serveis / Transport / Total client` pesava massa com a contenidor i el llenguatge `pacte/tarifa partner` feia pensar en una validació o negociació, quan en realitat és el cost del col·laborador segons tarifa Òrbita.
+
+### Què s'ha fet
+- Captures Playwright abans/després a `.codex-captures/lead-alba-layout-1757/` en desktop 1440, tablet 768 i mòbil 390.
+- Desplaçament polit: formats locals (`411,4 km`), microcopy curta i camps de ruta/equip alineats.
+- Resum client convertit en fórmula compacta amb etiqueta sota l'import: serveis + transport = total client.
+- `Pacte/Tarifa partner` passa a `Cost col·laborador`; el rail financer diu `Col·laborador` i `Veure cost col·laborador`.
+- Cost col·laborador compactat: contenidor màxim 32rem, card interna a 100%, sense caixa buida ni guionet de details.
+
+### Validació
+- Validació tècnica: tests focalitzats de lead OK (10/10); `tsc` OK; `qa:visual-overflow` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK amb avisos CRLF preexistents.
+- Validació funcional: Playwright autenticat confirma `scrollWidth == clientWidth`, sense overflow, sense `Tarifa partner`, `Veure tarifa partner` ni `Pacte amb partner` visibles.
+- Validació humana/UX: la pàgina llegeix millor la decisió econòmica: serveis + transport = total client, i el cost col·laborador queda separat sense semblar una aprovació pendent.
+
+### Coordinació
+Counter -> 1757. Tall visual/copy de lead i repartiment; sense schema, BD, API, migracions ni càlculs econòmics.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Captures i tancament visual Zenit del lead Alba (Canvi #1756, codex)
+
+### Context
+El propietari demana captures i deixar ja d'una vegada la pàgina Zenit de `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` després de retirar la validació amb partner del #1755. La revisió havia de ser visual real, no una opinió sense pantalla.
+
+### Què s'ha fet
+- Generades captures Playwright autenticades desktop i mòbil a `.codex-captures/lead-alba-zenit-1756/`, versió final `*-v4.png`.
+- Netejat el residu visual `a operatiu` a les línies d'equip propi: ara mostra `inclòs` i conserva el `title` tècnic.
+- Compactada la nav admin mòbil perquè no retalli seccions a 390px.
+- Eliminat el buit abans de l'històric comercial neutralitzant, només al Zenit del lead, el `padding-bottom: 10rem` global que s'aplicava a qualsevol `<main>` mòbil.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` OK (6/6); Playwright captura/mesura v4 OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:visual-overflow` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK (73 fitxers test / 634 asserts dins `qa:protocol:test`); `git diff --check` OK (només avisos CRLF preexistents).
+- Validació funcional: desktop 1440 i mòbil 390 queden amb `overflow=[]`, `scrollWidth == clientWidth`, `Validar pacte=0`, `Desfer validació=0`, `Pacte validat=0`, `Veure pacte partner=1`, `Crear dossier=1`, `a operatiu=0` i `Crear dossier` primari.
+- Validació humana/UX: Manolo queda com a pàgina de decisió: marge amunt a mòbil, pacte llegible, dossier principal i històric sense espai mort.
+
+### Coordinació
+Counter -> 1756. Tall visual/copy de lead + shell mòbil; sense schema, BD, API nova, portfolio ni revertir el paquet #1754 dirty.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Manolo blindat i validació amb partner fora del lead (Canvi #1755, codex)
+
+### Context
+El propietari atura el següent tall i pregunta què ha fet Claude a `/admin/leads/cmr1xh7la0000ug7dj4jnihjr`. La revisió detecta que el #1753 havia convertit el pacte amb partner en una validació persistent nova (`partnerPactValidatedAt`, PATCH, botons i jerarquia de dossier), que el propietari no havia demanat. Ordre directa: `validació amb partner fora` i `blinda Manolo`.
+
+### Què s'ha fet
+- Fora `Validar pacte`, `Desfer validació`, `Pacte validat`, `Validar partner` i l'estat de pacte validat al lead.
+- `Crear dossier` torna a ser primari; el rail financer només salta a `Veure pacte partner`.
+- Fora el contracte `partnerPactValidated` de l'API/servei i fora `Lead.partnerPactValidatedAt` del schema; nova migració inversa per dropejar la columna quan es desplegui.
+- Eliminats sis residus tracked `.dbg-*`: `.dbg-audit-batch.mjs`, `.dbg-audit-capture.mjs`, `.dbg-audit-rest.mjs`, `.dbg-manolo-lead.cjs`, `.dbg-manolo-pacte.cjs` i `.dbg-studio.cjs`.
+- Nou guard `qa:manolo-boundary` integrat a `validate:core`: Manolo no pot tocar schema/migracions/endpoints/API/BD sense autorització explícita del propietari al Canvi #N.
+
+### Validació
+- Validació tècnica: tests focalitzats de lead/servei/guard OK (31/31); `qa:manolo-boundary` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `tsc` OK; `qa:schema-drift` OK; `npx prisma generate` OK després d'aturar el dev server que retenia el DLL; `validate:core` OK (73 fitxers test / 634 asserts dins `qa:protocol:test`).
+- Validació funcional: Playwright real sobre `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` amb auth confirma `Validar pacte=0`, `Desfer validació=0`, `Pacte validat=0`, `Veure pacte partner=1` i `Crear dossier` primari.
+- Validació humana/UX: el pacte torna a ser lectura clara del repartiment, no una tasca administrativa inventada.
+
+### Coordinació
+Counter -> 1755. Revert quirúrgic del #1753 + guard de protocol; preserva el paquet #1754 dirty i no executa cap acció destructiva de BD.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-08 — Portfolio/media: portada d'event no pot usar producte/partner (Canvi #1754, codex)
+
+### Context
+Tall Manolo lluny del carril Lead/Reserva de Claude: el pipeline de portfolio havia de demostrar que cada imatge surt d'on toca. El forat era `PortfolioEvent.coverImage`: podia acceptar una URL manual de producte/partner i barrejar l'aparador públic amb el dossier/producte.
+
+### Què s'ha fet
+- Afegit contracte compartit a `lib/constants/portfolio-media.ts` per validar fonts de portada d'event.
+- `createPortfolioEvent` i `updatePortfolioEvent` bloquegen portades fora de `/api/uploads/portfolio/`, `/api/uploads/bookings/` o `/img/portfolio/`.
+- Tests de `portfolioEventService` cobreixen el rebuig de `/img/collaborators/...` i l'acceptació de portfolio/bookings.
+- Fitxa forense de `/admin/portfolio` completada i roadmap Manolo actualitzat: el front queda parcialment drenat, pendent encara de prova real browser/drop-in o selector de portada.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\portfolioEventService.test.ts` OK (20/20); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK (només avisos CRLF coneguts); `pnpm run validate:core` OK (72 fitxers test / 629 asserts).
+- Validació funcional: una portada de producte/partner ja no entra en create/update d'event; portfolio, booking gallery i catàleg estàtic de portfolio continuen acceptats.
+- Validació humana/UX: la frontera queda clara: portfolio per galeria pública, producte per dossier/producte i snapshot per documents enviats.
+
+### Coordinació
+Counter -> 1754. Carril limitat a constants/servei/tests de portfolio i docs; sense schema, BD, lead, reserva, PDF render, migracions ni `app/admin/tasks`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-08 — Pacte partner: UNA acció de validació que encén el dossier (Canvi #1753, claude)
+
+### Context
+Segona part del veredicte Manolo (el propietari diu `endavant`): «a validar» apareixia a tres llocs sense cap acció real i `Crear dossier` era primari sempre. La validació del pacte havia de ser una decisió d'un clic, persistida, amb conseqüència visible al pas següent.
+
+### Què s'ha fet
+- Nou camp `Lead.partnerPactValidatedAt` (migració `20260708231500_lead_partner_pact_validated` aplicada a Railway via `migrate deploy`; el shadow DB del `migrate dev` falla per una migració antiga pre-existent — patró manual ja establert).
+- `PATCH /api/admin/leads/[id]` accepta `partnerPactValidated: boolean`; el servei el mapa a timestamp/null.
+- El bloc «Pacte amb partner» té UNA acció al head: `Validar pacte` (primari) o `Desfer validació` + data quan ja està validat; la vora del bloc passa a to d'èxit.
+- Jerarquia real del següent pas: amb partner pendent, `Crear dossier` no és primari i la microcopy mana validar primer; amb pacte clar torna a ser el pas primari. Res es bloqueja.
+- El rail de marge reflecteix l'estat: `Validar partner ↓` només amb partner pendent; `Pacte validat ✓` en verd quan està clar.
+
+### Validació
+- Validació tècnica: `prisma migrate deploy` + `prisma generate` OK; `tsc` 0; tests del pacte 25/25 (LeadBoloSection + leadRouteService); `validate:core` verd; `pnpm test:run` + `pnpm build` amb el dev apagat.
+- Validació funcional: Playwright real al lead d'Alba: clic a `Validar pacte` → PATCH persistit, capçalera «validat el …», `Crear dossier` primari, rail «Pacte validat ✓».
+- Validació humana/UX: mirada Manolo — la validació passa d'adjectiu repartit a decisió d'un clic amb conseqüència; el camí lead → dossier ara té un ordre que es veu.
+
+### Coordinació
+Counter -> 1753. Canvi de carril claude (schema + servei + UI del lead): migració nova, `leadRouteService`, ruta PATCH, `LeadBoloSection`, `LeadDetailClient`, `page.tsx`, `admin-shell.css`, tests. Sense tocar motors econòmics ni `app/admin/tasks`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ## 2026-07-08 — Manolo executa: lead de decisió (VALOR computat + marge amunt a mòbil + afinat premium) (Canvi #1752, claude)
 
@@ -40693,3 +45630,930 @@ El propietari ha aclarit el criteri de producte: els dossiers serveixen per ense
 
 ### Tancament
 - `ADMIN_CHANGE_COUNTER` = 1369.
+
+## 2026-07-09 — Documents comercials: IVA seleccionable i recàrrec de temporada visible (Canvi #1837, codex)
+
+### Context
+El propietari detecta que el `+ IVA` no es pot seleccionar al Studio de pressupostos i que el recàrrec d'alta temporada només viu al pressupost, però no apareix ni al dossier ni al resum Manolo del lead.
+
+### Canvi
+- `/admin/presupuestos`: selector `Factura / IVA` amb opció d'aplicar IVA o deixar-lo sense IVA aplicat. El càlcul alimenta preview, PDF, proposta desada i contracte amb `taxableBase`, `vatRate`, `vatAmount` i total final coherents.
+- Quote PDF: quan hi ha IVA mostra base imposable i IVA desglossat; quan no n'hi ha, manté el bloc compacte i ho diu explícitament.
+- `/admin/leads/[id]`: el recàrrec de data usa `applyDatePricing` sobre els serveis del bolo i suma al `Total client`, però no entra al repartiment ni al cost del col·laborador.
+- Dossiers: el snapshot congela `eventDate`; el builder HTML mostra el recàrrec de temporada al bloc de proposta quan la data l'aplica, amb copy via `messages/*.json`.
+- Preview de dossier desplegada: verificat en producció que el botó `Previsualitzar` obre `/api/admin/leads/:id/dossier-preview`, no `blob:` ni `about:blank`, i les imatges carreguen.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierSnapshotService.test.ts __tests__\lib\services\dossierAutoDraftService.test.ts __tests__\lib\services\dossierService.test.ts __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts __tests__\lib\services\quotePdfService.test.ts` OK (82 tests); `npx tsc --noEmit --pretty false` OK; `pnpm build` OK.
+- Validació funcional: lead de juliol amb serveis 240 aplica `Recàrrec alta temporada` +15% i total client 276 sense tocar el cost col·laborador; dossier amb serveis 490 mostra línia de recàrrec de temporada; pressupost pot alternar IVA/sense IVA.
+- Validació humana/UX: el recàrrec deixa de ser una sorpresa tardana del pressupost i passa a ser visible al dossier i al resum Manolo; l'IVA queda com a decisió explícita, no amagada.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1837.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Suplement TA retirat de soca-rel (Canvi #1838, codex)
+
+### Context
+Després de revisar el tall #1837, el propietari aclareix que el suplement de temporada alta no estava demanat ni validat com a política comercial. Ordre directa: `eliminaho de socarrel i la temporada que ve ja es veura`; criteri Manolo: cap recàrrec comercial nou entra al flux client sense decisió explícita del propietari.
+
+### Canvi
+- Eliminats `lib/constants/pricingRules.ts`, `lib/services/pricing/datePricingService.ts` i el test canònic que feia passar l'autopricing per data com a regla viva.
+- `/admin/leads/[id]`: Manolo ja no aplica cap recàrrec per data; `Total client` torna a ser serveis + transport, i el marge no rep ingressos TA.
+- `/admin/presupuestos`: el total fiscal queda `base + extres + transport - descompte`, amb IVA seleccionable intacte. Preview, PDF i snapshot de proposta deixen d'acceptar/propagar `seasonSurcharge`, `seasonLabel` i `seasonPct`.
+- Dossiers: el builder HTML elimina la línia i CSS `bud-season`; el snapshot del dossier ja no congela `eventDate` per calcular temporada. Els textos i18n del dossier retiren `seasonDetail` i deixen només nota d'IVA.
+- `proposalDispatchService`: els snapshots documentals nous ignoren camps antics de temporada si una proposta vella els porta al JSON.
+- Documentació viva: el checklist B.7 del protocol queda `RETIRAT` pel #1838; l'Atles i inventari de recursos ja no anuncien `datePricingService/pricingRules` com a live.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierSnapshotService.test.ts __tests__\lib\services\dossierAutoDraftService.test.ts __tests__\lib\services\dossierService.test.ts __tests__\lib\services\quotePdfService.test.ts __tests__\lib\services\proposalDispatchService.test.ts __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts` OK (92 tests); `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-catalog-layout.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts __tests__\app\admin\dossiers\DossierListActions-errors.test.ts __tests__\lib\admin\dossierWorkspaceHref.test.ts` OK (16 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: `rg` confirma que no queda runtime ni copy actiu de `datePricingService/pricingRules/applyDatePricing/seasonSurcharge/seasonDetail`; només queden asserts negatius de test per impedir que torni `bud-season`.
+- Validació humana/UX: el client ja no veu ni paga cap suplement TA automàtic; IVA i transport continuen visibles i governats pels fluxos existents.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1838.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Pressupostos: preview PDF, transport i editor més curt (Canvi #1839, codex)
+
+### Context
+El propietari revisa `/admin/presupuestos?customerId=cmranioai0118zf6xlmtm1zf3&proposalId=cmrdl12vi000v10q5yq2glahq` i detecta que la pàgina és massa llarga, que falta un botó clar de previsualització i que el transport no queda prou visible al flux de pressupost.
+
+### Canvi
+- `/admin/presupuestos`: afegit bloc lateral `Previsualització PDF` amb botó explícit `Previsualitzar PDF`, visor embegut del PDF real i enllaç `Obrir en pestanya` quan el blob ja existeix.
+- Transport: nova secció pròpia del Studio amb `Km anada+tornada`, `Peatges` i import `Transport al client`, sempre calculat amb `computeBoloTransport` i inclòs en subtotal, IVA, PDF, contracte, email i snapshot.
+- Densitat: `Marca`, `Pack i condicions`, `Extres` i `Dades del contracte` queden plegats per defecte via constant comuna; el logotip passa a la secció de marca i les àrees de text del pack ocupen menys alçada sense perdre edició.
+- Guàrdia: el test del Studio blinda que existeixen transport, preview PDF real, peatges, seccions plegades i obertura en pestanya.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts __tests__\lib\services\quotePdfService.test.ts` OK (14 tests); `npx tsc --noEmit --pretty false` OK; `pnpm build` OK.
+- Validació funcional: Playwright autenticat a producció confirma l'estat previ: 3208px d'alt, 2,7 pantalles, sense `Previsualització` ni `Transport`. Playwright local amb el mateix `customerId/proposalId` confirma el nou estat: 2278px/2316px segons preview, 1,9 pantalles, `Previsualització PDF`, `Transport al client`, peatges i iframe PDF sense errors.
+- Validació humana/UX: la primera lectura queda en configuració, client/esdeveniment i transport; la resta segueix disponible però no obliga a baixar tota la pàgina per arribar a accions i totals.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1839.
+- Captures: `.codex-captures/presupuestos-review-20260709/prod-desktop-full.png`, `.codex-captures/presupuestos-review-20260709/local-compact-v2-desktop-full.png`, `.codex-captures/presupuestos-review-20260709/local-compact-v2-preview-transport-full.png`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Documents comercials: sense IVA, ruta heretada i Bingo +70 (Canvi #1840, codex)
+
+### Context
+Després del repàs de conversa, el propietari fixa criteris pendents abans de continuar cap al Zenit: dossiers amb preus sense IVA, pressupostos que arrosseguen desplaçament del lead, transport i IVA visibles, marges coherents, i assistent per a Bingo Musical a partir de 70 convidats.
+
+### Canvi
+- Dossiers: la nota del resum econòmic passa a dir explícitament `Preus sense IVA` en català, castellà i anglès; el pressupost definitiu és qui desglossa IVA, transport i total final.
+- `/admin/presupuestos`: quan s'obre amb `leadId`, el Studio carrega `distanceKm` i `tollsEur` del lead i no esborra els km si no pot recalcular Google Maps; els km/peatges heretats alimenten el transport ja incorporat al PDF, snapshot i IVA.
+- Bingo Musical: nova regla compartida `Bingo +70` amb llindar canònic 70 pax. El configurador compartit de leads, nova reserva i editor de reserva afegeix una línia `Assistent Bingo Musical (+70 pax)` quan hi ha Bingo Musical adult i 70+ convidats.
+- Transport/marges: la línia d'assistent compta com a persona física a `deriveTravelHeadcount`, de manera que el cost/càrrec de ruta i el marge es recalculen amb la mateixa font única `computeBoloTransport`. No s'inventa cap PVP ni cost de col·laborador nou; queda com a línia operativa editable.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\bingoAssistantRule.test.ts __tests__\lib\constants\orbita-services.test.ts __tests__\lib\services\travelLaborCost.test.ts __tests__\app\admin\bookings\useNewBookingSubmit.test.tsx __tests__\app\admin\bookings\BookingServiceLinesSection-partner-products.test.ts __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts __tests__\lib\utils\dossier-html-builder.test.ts` OK (69 tests); `npx tsc --noEmit --pretty false` OK; `pnpm build` OK.
+- Validació funcional: el dossier renderitza `Preus sense IVA`; el pressupost obert des d'un lead conserva km i peatges persistits; un bolo amb `Bingo Musical` adult i `70` pax genera una sola línia d'assistent i la ruta passa de comptar Bingo+tècnic a Bingo+tècnic+assistent.
+- Validació humana/UX: el client no veu un IVA ambigu al dossier, el pressupost no perd desplaçament ja calculat, i el +70 de Bingo deixa de ser memòria oral per entrar al procés únic de bolo sense cobrar imports no definits.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1840.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Zenit: guàrdia lead→dossier→reserva final (Canvi #1841, codex)
+
+### Context
+El roadmap Manolo encara marcava pendent verificar el cas complet `lead -> dossier -> reserva`: productes visibles, desplaçament, peatges, línies ocultes `[travel-cost]`, cost de col·laborador i regla Bingo +70. Després del #1840, aquest és el punt crític a blindar abans de seguir obrint fronts visuals.
+
+### Canvi
+- Afegida una guàrdia a `useNewBookingSubmit.test.tsx` que simula el salt final amb línies de lead ja normalitzades pel mapper, client/lead d'origen, `411,4` km, `29` € de peatges, `344` € de transport intern, Bingo Musical adult, tècnic de so inclòs i línia oculta `[travel-cost]`.
+- La prova exigeix que el payload de `/api/admin/bookings` conservi `leadId`, `customerId`, `distanceKm`, `tollsEur`, `travelCost`, serveis visibles i liquidació oculta de ruta.
+- La mateixa prova blinda que Bingo +70 afegeix una sola línia `Assistent Bingo Musical (+70 pax)` i que cap `travelHeadcount` local es filtri a l'API.
+- El roadmap Manolo queda actualitzat: el cas final ja té regressió funcional; queda només pendent una captura/browser real si es vol evidència visual punta a punta.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\useNewBookingSubmit.test.tsx __tests__\app\admin\bookings\bookingLeadServiceLineMapper.test.ts __tests__\app\admin\bookings\bingoAssistantRule.test.ts` OK (12 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el payload final de nova reserva conserva serveis, cost col·laborador, ruta oculta, km, peatges, transport i client/lead d'origen, i afegeix l'assistent de Bingo sense duplicar-lo.
+- Validació humana/UX: el procés comercial deixa de dependre de recordar manualment què portava el dossier; allò que el lead/dossier havien construït arriba a la reserva contractual sense perdre diners ni operativa.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1841.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Portfolio: selector de portada existent (Canvi #1842, codex)
+
+### Context
+El roadmap Manolo marcava pendent el front `Portfolio/media pipeline`: #1754 ja impedia al servei que `PortfolioEvent.coverImage` vingués de `/img/collaborators/...`, però el formulari d'events encara mostrava un camp manual `URL de portada`, que convidava a enganxar una imatge de producte i topar amb l'error tardà del backend.
+
+### Canvi
+- `/admin/portfolio`: el formulari `Nou event` substitueix el camp manual de portada per un selector carregat des de `/api/admin/portfolio/media?slug=<categoria>`.
+- El selector només ofereix imatges existents de la categoria; si la categoria encara no té media editable, usa el catàleg estàtic públic del portfolio com a fallback segur.
+- Canviar la categoria neteja la portada seleccionada, evitant que una portada d'una categoria quedi enganxada en un event d'una altra.
+- Les targetes de media deixen d'oferir `Fer portada de` quan la peça és vídeo: el vídeo pot anar a galeria, però la portada pública ha de ser imatge.
+- Guàrdia de font: `PortfolioPage-mutation-errors.test.ts` comprova que no torna `placeholder="URL de portada"` i que el formulari carrega portades existents.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\portfolio\PortfolioPage-mutation-errors.test.ts __tests__\lib\services\portfolioEventService.test.ts` OK (23 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: l'event nou ja no pot néixer des d'una URL manual de producte; ha de triar una portada de portfolio/booking/static portfolio que el servei ja accepta.
+- Validació humana/UX: l'admin veu una decisió concreta, no un camp lliure per equivocar-se; la frontera queda clara: portfolio per aparador, producte per dossier, snapshot per documents enviats.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1842.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Economia: dashboard sense doble ruta antiga (Canvi #1843, codex)
+
+### Context
+El roadmap Manolo deixava com a següent risc econòmic revisar bolos antics on conviuen `booking.travelCost` i línies internes `[travel-cost]`. El motor de marge ja ignorava aquestes línies, però faltava una guàrdia sobre la projecció del dashboard econòmic, que és on el propietari mira marge/cobrament sense entrar a la fitxa.
+
+### Canvi
+- `bookingEconomics.test.ts`: afegit cas amb `travelCost=158`, Bingo Musical amb cost de partner i dues línies internes `[travel-cost]`.
+- La prova exigeix que `computeDashboardNextEventEconomics` calculi `directCost = 45 operatiu + 158 travelCost + 200 servei partner`, sense sumar els `75 + 83` de les línies de repartiment.
+- La mateixa prova comprova `netMargin=577`, incloent CAC del motor, perquè el dashboard i `costEngine` quedin alineats.
+- Sense migracions ni normalitzacions massives: el tall és una regressió contra duplicació visible, no una reescriptura de bolos antics.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\admin\bookingEconomics.test.ts __tests__\lib\services\costEngine.test.ts` OK (84 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: un bolo antic amb `travelCost` i línies `[travel-cost]` no es converteix en fals marge crític al dashboard econòmic.
+- Validació humana/UX: el propietari pot mirar alertes de marge/cobrament sense que una liquidació interna de ruta li dupliqui el cost visualment.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1843.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Copilot Avui: dossiers pendents entren al ranking (Canvi #1844, codex)
+
+### Context
+El roadmap Manolo mantenia pendent convertir documents pendents en feina executiva dins `Avui`, no en una altra pantalla amagada. La cua de dossiers a preparar ja existia a `loadDossierDraftSuggestions()`, però el dashboard no la projectava dins `Fes això ara`.
+
+### Canvi
+- `/admin` carrega `loadDossierDraftSuggestions(3, now)` en el mateix `Promise.all` del dashboard i transforma cada suggeriment en una acció documental amb `projectDossierDraftTodayAction()`.
+- Les accions noves apunten al generador canònic `/admin/dossiers?leadId=...`; no creen cap endpoint, procés, schema, PDF builder ni camí paral·lel.
+- `AdminTodayAction.source` accepta `document`, amb badge `Document · ALTA/MITJANA/BAIXA`, detall de motius, data estimada i nombre de línies de bolo quan existeixen.
+- `pickTopTodayActions()` queda blindat perquè un dossier pendent amb prioritat suficient pugui entrar abans del fallback genèric de `dailyBrief`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\today-actions.test.ts __tests__\lib\services\dossierDraftSuggestionService.test.ts` OK (19 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: `/admin` reutilitza la cua canònica de dossiers pendents i la converteix en accions `Document` cap a `/admin/dossiers?leadId=...`; la BD local només té un suggeriment `BAIXA`, per això les accions NBA crítiques continuen per davant.
+- Validació humana/UX: auditoria visual de `/admin` desktop/tablet/mobile OK a `.codex-captures/zenit-copilot-1844-admin-rerun/`; el primer audit va detectar chunks antics del dev server, es va reiniciar localment i el segon va quedar net.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1844.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Copilot Avui: contractes pendents sense segon procés (Canvi #1845, codex)
+
+### Context
+Després del #1844, el següent tall natural del roadmap Manolo era revisar pressupostos/contractes pendents. Els pressupostos enviats ja creen tasca de seguiment amb `ensureQuoteFollowUpTask()`, i `nextBestActionService` ja fa pujar tasques vençudes; duplicar-los des de `Proposal` seria soroll. El forat real és el contracte acceptat que encara no està generat, enviat o signat.
+
+### Canvi
+- Nou servei pur `contractWorkflowSuggestionService`: llegeix propostes `ACCEPTED` amb contracte pendent i les classifica com `GENERATE_CONTRACT`, `SEND_CONTRACT` o `FOLLOW_SIGNATURE`.
+- `/admin` carrega `loadContractWorkflowSuggestions(3, now)` i projecta aquestes cues com a accions `Contracte · ALTA/MITJANA/BAIXA` dins `Fes això ara`, amb CTA al panell canònic de pressupostos del Customer Hub.
+- No es genera PDF, no s'envia email, no es crea endpoint i no es muta cap dada: el copilot només apunta a l'acció ja existent.
+- `ProposalsPanel` corregeix el cas `contractStatus=DRAFT` sense `contractReference`: mostra `Generar contracte`, no `Enviar contracte`, perquè `sendContract()` exigeix referència.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\contractWorkflowSuggestionService.test.ts __tests__\app\admin\today-actions.test.ts __tests__\app\admin\clientes\ProposalsPanel.test.tsx` OK (26 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: `loadContractWorkflowSuggestions(5, new Date())` corre contra BD local i retorna `[]`, és a dir, no hi ha contractes pendents reals avui i `/admin` no mostra accions falses.
+- Validació humana/UX: auditoria visual de `/admin` desktop/tablet/mobile OK a `.codex-captures/zenit-copilot-1845-admin/`; la home manté el ranking actual i queda preparada per fer aparèixer contractes pendents quan n'hi hagi.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1845.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Copilot Avui: pressupostos draft entren al ranking (Canvi #1846, codex)
+
+### Context
+Després del #1845, la BD real mostra 5 pressupostos en `DRAFT` i cap contracte pendent. Aquests esborranys vivien a `/admin/presupuestos`, però `Avui` no els convertia en feina executiva; el risc era continuar tenint documents comercials començats però amagats darrere de la llista.
+
+### Canvi
+- Nou servei pur `proposalDraftSuggestionService`: llegeix `Proposal.DRAFT` amb client assignat, sense `sentAt`, i els prioritza per data de bolo, antiguitat, vincle lead/reserva i import.
+- `/admin` consumeix `loadProposalDraftSuggestions(3, now)` i projecta els resultats amb `projectProposalDraftTodayAction()` com a accions `Pressupost · ALTA/MITJANA/BAIXA` dins `Fes això ara`.
+- El CTA obre l'Studio canònic existent amb `/admin/presupuestos?customerId=...&proposalId=...`; no crea endpoint, PDF builder, procés d'enviament ni pantalla paral·lela.
+- `automationTriggers.onProposalAccepted()` deixa de dir que auto-genera contracte: el log i el detall ara expliquen que només marca el contracte pendent de generar.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\proposalDraftSuggestionService.test.ts __tests__\app\admin\today-actions.test.ts __tests__\lib\services\automationTriggers.test.ts` OK (40 tests).
+- Validació funcional: `loadProposalDraftSuggestions(5, 2026-07-09T21:45+02:00)` contra BD real retorna primer `PROP-2026-0027` d'Albert Aujas amb `score=98`, `ALTA`, `daysUntilEvent=8` i href a l'Studio amb `customerId` + `proposalId`; els drafts vells continuen sortint però ja no passen per davant d'un bolo proper.
+- Validació humana/UX: auditoria visual de `/admin` desktop/tablet/mobile OK a `.codex-captures/zenit-copilot-1846-admin/` sense overflow, errors JS ni assets fallits. En la foto actual el top 3 continua ocupat per accions NBA de reserva, però la cua de pressupostos queda operativa i entrarà quan el ranking ho justifiqui.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1846.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Zenit E2E: producte traçable de lead a factura (Canvi #1847, codex)
+
+### Context
+El propietari atura els pegats de pantalla i demana una inspecció end-to-end exhaustiva: un producte ha de poder entrar per web/configurador/WhatsApp/mail/admin, convertir-se en lead, dossier, pressupost, reserva, calendari/dia, inventari, marge, col·laborador, transport, factura, enquesta i tancament sense perdre dades ni bifurcar processos.
+
+### Canvi
+- `scripts/zenit-e2e-trace.ts` crea un cas `ZENIT E2E` complet amb múltiples entrades, productes propis, productes de col·laborador, ruta, peatges, pressupost amb IVA, reserva, inventari, factura, post-event, enquesta i alta/baixa de producte col·laborador.
+- `scripts/zenit-e2e-capture.ts` captura lead, dossiers, pressupostos, proposta, reserva, calendari, enquestes, col·laboradors i inventari en desktop i mòbil.
+- El dossier reutilitza identitat de catàleg des de notes estructurades (`Producte de catàleg: ...`) per no perdre imatges ni convertir col·laboradors en serveis genèrics.
+- L'Studio de pressupostos rep les línies de lead, transport i cost/km efectiu; el camí lead -> pressupost ja no arrenca un bolo buit.
+- El transport queda unificat amb cost/km efectiu, mínim comercial per km facturable i `travelHeadcount` persistent en notes. Els passatgers de ruta del producte són 1 o 2; l'assistent de Bingo és una persona extra separada.
+- El lead sincronitza l'assistent de Bingo a partir de 70 convidats i la reserva preserva aquest marcador sense duplicar-lo.
+- Les distàncies treballades al lead/reserva deixen de ser sobreescrites per recalculs automàtics quan ja hi ha km persistits.
+- Els serveis de col·laborador/equip sense imatge fiable queden fora del dossier visible fins tenir asset real, evitant miniatures trencades.
+- Forat real detectat: `albarans` no té model, ruta ni flux canònic; queda com a següent domini a definir, no com a bug maquillat.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; vitest focal de transport, headcount, lead service lines, booking creation/route, fuel reference, dossier mapping, pressupost Studio i submit de reserva OK.
+- Validació funcional: trace `.codex-captures/zenit-e2e-1847/20260709213824/report.json` OK excepte `albarans.model-or-route`, perquè no existeix domini d'albarans.
+- Validació humana/UX: captures `.codex-captures/zenit-e2e-1847/20260709213824/screenshots` amb 12 pantalles HTTP 200; lead, pressupost i reserva conserven 20 persones, `411,4` km, `29` EUR de peatges, transport i IVA coherents.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1847.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-09 — Zenit E2E: albarans canònics de reserva (Canvi #1848, codex)
+
+### Context
+El trace #1847 va deixar el Zenit end-to-end gairebé verd, però amb un KO real: `albarans` no existia com a domini. No hi havia model, API ni peça visible a la fitxa de reserva; per tant el procés podia passar de contracte/factura/post-event sense un document operatiu d'execució.
+
+### Canvi
+- Afegit `DeliveryNote` i `DeliveryNoteStatus` a Prisma, amb referència `ALB-YYYY-NNNN`, relació a reserva/client, snapshot del bolo, estat, lliurament/signatura i futur enllaç PDF.
+- Afegida migració `20260709223000_add_delivery_notes` i aplicada a Railway amb `npx prisma migrate deploy`. En la mateixa execució s'ha aplicat també `20260709093000_drop_lead_partner_pact_validated`, que ja estava pendent i elimina la validació partner retirada.
+- Nou `deliveryNoteAdminService`: crea albarà des de reserva de forma idempotent, congela pack/extres/línies visibles i exclou les línies internes `[travel-cost]`.
+- Noves rutes `/api/admin/delivery-notes` i `/api/admin/delivery-notes/[id]` amb auth, permisos, CSRF i validació.
+- Nova `DeliveryNoteSection` a la fitxa de reserva: crear albarà, marcar lliurat, marcar signat i cancel·lar quan encara no està signat.
+- `DocumentFlowSection` passa a quatre passos: Pressupost, Contracte, Albarà, Factura. L'històric comercial també incorpora `Albarà`.
+- `scripts/zenit-e2e-trace.ts` deixa de fer una comprovació de model i crea/signa un albarà real del booking E2E. Les captures passen a `.codex-captures/zenit-e2e-1848`.
+
+### Validació
+- Validació tècnica: `npx prisma generate` OK; `npx prisma migrate deploy` OK; `npx tsc --noEmit --pretty false` OK; `npx vitest run __tests__/lib/services/deliveryNoteAdminService.test.ts __tests__/app/api/admin/delivery-notes-route.test.ts __tests__/app/admin/bookings/DocumentFlowSection.test.tsx` OK (12 tests); `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: `node_modules\.bin\tsx.cmd scripts\zenit-e2e-trace.ts` OK; report `.codex-captures/zenit-e2e-1848/20260709215855/report.json` amb `failedChecks: []` i `ALB-2026-0001` signat.
+- Validació humana/UX: `node_modules\.bin\tsx.cmd scripts\zenit-e2e-capture.ts` OK; 12 captures HTTP 200 a `.codex-captures/zenit-e2e-1848/20260709215855/screenshots`; la fitxa de reserva mostra albarà dins Documents i no crea una illa fora del flux.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1848.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit E2E: PDF canònic d’albarà (Canvi #1849, codex)
+
+### Context
+El #1848 va crear el domini `DeliveryNote` i va deixar `pdfUrl/pdfKey` preparats, però l’albarà encara no produïa cap document descarregable. Això tancava el model però no el flux documental complet: la fitxa de reserva podia mostrar l’albarà signat sense PDF operatiu.
+
+### Canvi
+- Nou `deliveryNotePdfService`: renderitza un PDF d’albarà des del `DeliveryNote.snapshot`, sense recalcular imports ni llegir de nou el booking per decidir contingut.
+- `deliveryNoteAdminService` afegeix `generateAdminDeliveryNotePdf()`: idempotent, reutilitza PDF existent, genera buffer, puja a `uploads/delivery-notes/...`, persisteix `pdfUrl/pdfKey` i escriu traça documental.
+- Nova route `POST /api/admin/delivery-notes/[id]/pdf` amb auth, permís `mutate` i CSRF.
+- `DeliveryNoteSection` mostra `Generar PDF` quan falta document i `Obrir PDF` quan ja existeix.
+- El trace Zenit passa a exigir que `albarans.booking-delivery-note` tingui `status=SIGNED`, `pdfUrl` i `pdfKey`.
+- Les captures E2E passen a `.codex-captures/zenit-e2e-1849`.
+
+### Validació
+- Validació tècnica: tests focals OK (`deliveryNotePdfService`, `deliveryNoteAdminService`, route d’albarans i `DocumentFlowSection`) amb 18 tests; `npx tsc --noEmit --pretty false` OK; `qa:api-admin-auth` OK; `qa:api-admin-csrf` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: `node_modules\.bin\tsx.cmd scripts\zenit-e2e-trace.ts` OK; report `.codex-captures/zenit-e2e-1849/20260709222220/report.json` amb `failedChecks: []`; check `albarans.booking-delivery-note` crea `ALB-2026-0003` signat amb `pdfUrl` i `pdfKey`.
+- Validació humana/UX: `node_modules\.bin\tsx.cmd scripts\zenit-e2e-capture.ts` OK; 12 captures HTTP 200 a `.codex-captures/zenit-e2e-1849/20260709222220/screenshots`; la fitxa de reserva mostra l’albarà dins Documents amb acció `Obrir PDF`. El PDF generat respon HTTP 200 `application/pdf`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1849.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit E2E: albarà PDF visible al portal client (Canvi #1850, codex)
+
+### Context
+El #1849 deixava l’albarà PDF generat i visible a admin, però el portal client encara no llegia `DeliveryNote`. Això mantenia un forat real del flux documental: l’operador podia tenir `ALB-...pdf` signat a reserva mentre el client només veia pressupost/contracte/pagaments.
+
+### Canvi
+- `findPortalAccessByRawToken()` inclou ara `booking.deliveryNotes` amb `select` mínim (`reference`, `status`, `pdfUrl`, `signedAt`, `createdAt`), sense exposar snapshots ni dades internes al portal.
+- `clientPortalInvoice` afegeix `getClientPortalDeliveryNoteDocument()`: només retorna albarans `SIGNED` amb `pdfUrl`, ordenats pel signat més recent.
+- El hub del portal mostra l’albarà dins `Documents`, amb referència, estat signat i acció de descàrrega PDF.
+- La pàgina `portal/[token]/invoice` mostra pressupost i albarà com a documents descarregables de fila completa, amb metadada sota el títol perquè no es comprimeixi en mòbil.
+- Els missatges del portal incorporen labels d’albarà en ca/es/en.
+- `scripts/zenit-e2e-trace.ts` passa a `.codex-captures/zenit-e2e-1850` i afegeix el check `portal.documents.delivery-note-pdf`: emet un portal de prova i verifica que el client veu el mateix PDF d’albarà signat.
+- `scripts/zenit-e2e-capture.ts` passa a `.codex-captures/zenit-e2e-1850` i captura també `portal-hub` i `portal-invoice` en desktop i mòbil quan el report porta `portalUrl`.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__/lib/clientPortalInvoice.test.ts __tests__/lib/clientPortalMessages.test.ts __tests__/lib/services/clientPortalAccess.test.ts __tests__/app/portal/portalHubExternalLinks.test.ts __tests__/app/portal/portalSubpageExternalLinks.test.ts` OK (48 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: `node_modules\.bin\tsx.cmd scripts\zenit-e2e-trace.ts` OK; report `.codex-captures/zenit-e2e-1850/20260709224454/report.json` amb `failedChecks: []`, `ALB-2026-0004` i `portal.documents.delivery-note-pdf` verd.
+- Validació humana/UX: `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000 node_modules\.bin\tsx.cmd scripts\zenit-e2e-capture.ts` OK; 16 captures HTTP 200 a `.codex-captures/zenit-e2e-1850/20260709224454/screenshots`, incloent portal hub/pressupost desktop i mòbil amb l’albarà visible.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1850.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit portal: mòbil sense navegació pública solapada (Canvi #1851, codex)
+
+### Context
+Les captures del #1850 van ensenyar un problema visual real del portal client en mòbil: la bottom nav pública (`Inici`, `Serveis`, `Portfolio`, `Contacte`) convivia amb la navegació pròpia del portal (`Portal`, `Pagaments`, `Procés`, `Contracte`, `Fotos`). El client podia veure dos sistemes de navegació barrejats en una superfície privada.
+
+### Canvi
+- `PUBLIC_MOBILE_CHROMELESS_ROUTE_PREFIXES` incorpora `/portal`, de manera que en mòbil el layout públic amaga footer, floating CTAs i `MobileBottomNav` global a totes les rutes del portal.
+- No es toca la navegació pròpia `PortalBottomNav`; queda com a única nav inferior del portal client.
+- El test de `publicChrome` blinda `/portal/raw-token` i `/portal/raw-token/invoice` com a rutes chromeless en mòbil.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__/lib/constants/publicChrome.test.ts __tests__/app/portal/PortalBottomNav.test.tsx` OK (3 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: `shouldHidePublicMobileChrome('/portal/raw-token/invoice', true)` queda blindat per test i el layout públic deixa de renderitzar `MobileBottomNav`/footer/floating CTAs en mòbil sota `/portal`.
+- Validació humana/UX: captura mòbil `http://127.0.0.1:3000/ca/portal/.../invoice` OK a `.codex-captures/zenit-portal-mobile-1851/portal-invoice-mobile-390.png`; desapareix la nav pública i queda la nav del portal.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1851.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit portal: cookies mòbils sense trepitjar la nav privada (Canvi #1852, codex)
+
+### Context
+La captura del #1851 resolia la nav pública duplicada, però deixava un segon problema visual: el banner mòbil de cookies (`CookieConsent`) quedava fixat a baix i se solapava amb `PortalBottomNav`. En una superfície privada de client això feia que el consentiment legal i la navegació del portal competissin pel mateix espai.
+
+### Canvi
+- `publicChrome` afegeix `isClientPortalRoute()` i `shouldOffsetMobileCookieConsentForPortalNav()` per detectar `/portal/...` de manera compartida, sense condicions locals dins del component de cookies.
+- `LayoutWrapper` calcula l’offset de cookies a partir de la ruta sense locale i el passa a `CookieConsent`.
+- `CookieConsent` manté el banner visible, però en portal mòbil el col·loca sobre la nav privada amb `bottom: calc(var(--o-portal-bottom-nav-h) + var(--safe-bottom))`.
+- `PortalBottomNav` i cookies comparteixen el token `--o-portal-bottom-nav-h`; `portal-shell-bg` reserva padding inferior mòbil amb `--o-cookie-mobile-banner-h` perquè el final del portal no quedi atrapat sota chrome fix.
+- No es toquen albarans, pressupostos, pricing, schema, rutes API ni transport.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__/lib/constants/publicChrome.test.ts __tests__/app/portal/portalCookieConsentOffset.test.ts __tests__/app/portal/PortalBottomNav.test.tsx` OK (5 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: `shouldOffsetMobileCookieConsentForPortalNav('/portal/raw-token/invoice', true)` queda cobert per test; fora de portal i en desktop retorna `false`.
+- Validació humana/UX: captura `.codex-captures/zenit-portal-cookie-1852/portal-invoice-mobile-cookie-390.png` OK amb HTTP 200; mesura Playwright `cookie.bottom=776`, `nav.y=776`, `separated=true`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1852.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit pressupostos: Studio rehidrata lead vinculat i preview traçable (Canvi #1853, codex)
+
+### Context
+El flux real `lead -> pressupost` encara podia perdre dades quan s'obria un pressupost existent només amb `customerId + proposalId`: `PROP-2026-0027` tenia `leadId` vinculat, però el snapshot antic guardava event buit, `travelKm: 0`, `80` convidats i cap línia comercial. La pantalla ensenyava botó de previsualització i transport, però no arrossegava Cornellà, 100 pax, Bingo ni els km del lead.
+
+### Canvi
+- `/admin/presupuestos` resol `customerId` i `leadId` des del `proposalId` quan el query no els porta explícits, i passa el lead complet al PDF Studio.
+- `getAdminProposalById()` retorna el lead operatiu mínim del pressupost: event, ruta, peatges, convidats i `serviceLines`.
+- `PresupuestoPdfStudio` manté el snapshot com a font quan és complet, però si detecta un snapshot antic buit vinculat a un lead amb línies, rehidrata productes, event, convidats i ruta des del lead sense crear cap segon procés.
+- La vista ràpida de l'Studio llista els serveis comercials reals sota el pack, de manera que `Bingo Musical KIDS · Masquerade Events` ja és visible abans de generar el PDF.
+- La validació inferior accepta pressupostos amb base 0 quan hi ha línies comercials del lead; ja no mostra el fals `Indica el preu base`.
+- Les captures Playwright intercepten mutacions (`PATCH/POST`) per no reescriure dades mentre es verifica la pantalla.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts __tests__\app\admin\presupuestos\studio-utils.test.ts` OK (7 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: GET local de `/api/admin/proposals/cmrdl12vi000v10q5yq2glahq` retorna `lead.serviceLines` amb 3 línies, `distanceKm=83.6`, `guestCount=100` i `leadId=cmranio7k0116zf6x62q3leo4`.
+- Validació humana/UX: captura `.codex-captures/zenit-presupuestos-1853/after5-desktop-ok.png` OK amb HTTP 200; pantalla mostra Albert, `100 convidats`, Cornellà, `83,6` km, transport `17,50 €`, `Bingo Musical KIDS · Masquerade Events`, total `263,18 €` i estat `Tot correcte`; captura `.codex-captures/zenit-presupuestos-1853/after4-desktop-preview-open.png` confirma iframe de previsualització PDF `blob:` i missatge d'actualització. Després de `pnpm build`, dev server reiniciat i verificat: root HTTP 200 i `/admin/presupuestos?...proposalId=cmrdl12vi000v10q5yq2glahq` HTTP 200 amb `hasBingo=true`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1853.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit pressupostos: preview mòbil abans del formulari (Canvi #1854, codex)
+
+### Context
+La captura mòbil posterior al #1853 confirmava una fricció visual real: en 390 px la previsualització PDF començava a `y=3087`, després de tot el formulari i les accions. El botó que el propietari demanava quedava fora del primer recorregut i l'estat buit ocupava massa alçada.
+
+### Canvi
+- `PresupuestoPdfStudio` reordena només en responsive: el lateral `Previsualització PDF` + `Vista ràpida` passa abans del formulari en mòbil (`order-1`) i conserva la disposició lateral en desktop (`xl:order-2`).
+- El formulari passa a `order-2` en mòbil i `xl:order-1` en desktop; no canvia cap camp, càlcul, API, PDF builder ni autosave.
+- L'estat buit del visor PDF baixa de `min-h-64` global a `min-h-40 sm:min-h-64`, fent el primer viewport mòbil més dens sense eliminar el visor real.
+- La regressió font blinda que el lateral no torni a quedar sota tot el formulari.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts __tests__\app\admin\presupuestos\studio-utils.test.ts` OK (7 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: el mateix cas `PROP-2026-0027` conserva el procés canònic de preview i dades del #1853 (`Bingo Musical KIDS`, 100 convidats, Cornellà, transport i `Tot correcte`) mentre el lateral passa davant del formulari només en mòbil; desktop conserva formulari esquerra i lateral dret.
+- Validació humana/UX: abans `.codex-captures/zenit-presupuestos-1854/before-mobile-390.png` tenia `previewBox.y=3087`; després `.codex-captures/zenit-presupuestos-1854/after-mobile-390.png` té `previewBox.y=336`, `hasBingo=true`, `has100=true`, `statusText=true` i HTTP 200. Després de `pnpm build`, dev server reiniciat i verificat: root HTTP 200 i `/admin/presupuestos?...proposalId=cmrdl12vi000v10q5yq2glahq` HTTP 200 amb `hasBingo=true`, `hasAlbert=true`, `hasCornella=true`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1854.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit pressupost → reserva: handoff canònic i headcount de ruta (Canvi #1855, codex)
+
+### Context
+El flux de Zenit necessitava que una proposta acceptada pogués convertir-se en reserva sense perdre el pressupost d'origen, el lead, el client, el total pactat, l'IVA, els serveis i el transport. En reproducció real amb `PROP-2026-0027`, la reserva nova carregava dades però el transport mostrava `0 integrants`, perquè `NewBookingForm` recalculava el headcount localment i ignorava la regla canònica de `PROVIDER_SERVICE` amb col·laborador.
+
+### Canvi
+- `buildProposalBookingCreateHref()` centralitza el salt `/admin/bookings/new?proposalId=...` i afegeix `leadId&prefill=lead` o `customerId` quan existeixen.
+- `ProposalsList` i el detall `/admin/presupuestos/[id]` mostren `Crear reserva` quan el pressupost està `ACCEPTED` i no té `bookingId`; si ja està vinculat, mostren `Reserva`/`Obrir reserva`.
+- `POST /api/admin/bookings` accepta `proposalId`; `createBookingFromInput` resol proposta, bloqueja duplicats, hereta `leadId/customerId/total/vatRate` quan cal i actualitza `Proposal.bookingId`, `status=ACCEPTED` i `acceptedAt`.
+- `NewBookingForm` llegeix `proposalId`, rehidrata `leadId/customerId`, total tancat, fiscalitat i dades bàsiques de client/event; el camí de `customerId` sol també omple nom/email/telèfon.
+- El càlcul de persones de ruta a `NewBookingForm` deixa la reimplementació local i usa `deriveTravelHeadcount(serviceLines, hasOrbitaPack)`, el mateix cervell que lead/reserva/transport.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\admin\proposalWorkspaceHref.test.ts __tests__\app\admin\bookings\useNewBookingSubmit.test.tsx __tests__\lib\services\bookingCreationService.test.ts __tests__\app\admin\bookings\NewBookingForm-travel-headcount.test.ts` OK (60 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: `/api/admin/leads/cmranio7k0116zf6x62q3leo4/service-lines` retorna `Bingo Musical KIDS · Masquerade Events` i línies internes de ruta; el servei de creació de reserva vincula `proposalId` a `Proposal.bookingId` i bloqueja `409` si ja hi ha reserva.
+- Validació humana/UX: captura `.codex-captures/zenit-proposal-booking-1855/proposal-to-booking-desktop-after-headcount.png` amb HTTP 200 mostra Albert Aujas, Cornellà, `Bingo Musical KIDS · Masquerade...`, total `302,50`, IVA activat i desplaçament amb `PERSONES 1`; la captura anterior del mateix tall mostrava `0 integrants`, corregit. Després de `pnpm build`, dev server reiniciat i verificat: root HTTP 200 i Playwright sobre `/admin/bookings/new?proposalId=cmrdl12vi000v10q5yq2glahq&leadId=cmranio7k0116zf6x62q3leo4&prefill=lead` amb `hasAlbert=true`, `hasBingo=true`, `hasOnePerson=true`, `hasZeroPeople=false`, `hasManualTotal=true`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1855.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit reserva → documents: traça viva després del handoff (Canvi #1856, codex)
+
+### Context
+El procés Zenit no es pot validar mirant pantalles aïllades: cal repetir el circuit end-to-end i detectar on una peça queda bonica però no tanca el flux. Després del #1855, el tram següent era comprovar què passa quan un pressupost queda vinculat a una reserva i ha de seguir cap a contracte, albarà, factura i historial.
+
+### Canvi
+- `createBookingFromInput()` ara també prepara el contracte quan vincula una reserva a un pressupost sense contracte: deixa `contractStatus=DRAFT` i `contractSentAt=null`, sense reobrir contractes ja existents.
+- `DocumentFlowSection` rep l'enllaç canònic al pressupost i mostra acció `Gestionar` quan el contracte és `DRAFT` però encara no té PDF; no crea cap procés paral·lel.
+- L'albarà registra traça documental quan es crea, es lliura, se signa o es cancel·la, a més de la traça existent de PDF generat.
+- `DOCUMENT_ADMIN_LOG_ACTIONS` i el timeline admin incorporen `DOCUMENT_DELIVERY_NOTE_CREATED`, `DELIVERED`, `SIGNED` i `CANCELLED`.
+- Es fixa com a criteri operatiu repetir el bucle end-to-end: lead/pressupost/reserva/documents/captura/proves, arreglar només el tall canònic i tornar a passar el circuit.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\deliveryNoteAdminService.test.ts __tests__\app\admin\bookings\DocumentFlowSection.test.tsx __tests__\lib\services\bookingCreationService.test.ts` OK (59 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: lectura de BD confirma que no hi ha cap `Proposal.status=ACCEPTED` amb `bookingId` vinculat actualment; els casos nous queden coberts per tests de servei. Les reserves E2E amb pressupost vinculat existeixen i renderitzen la zona documental.
+- Validació humana/UX: captura `.codex-captures/zenit-booking-docflow-1856/booking-documents-desktop.png` amb HTTP 200 mostra fitxa de reserva amb `Documents`, `Històric comercial`, `Flux documental` i `Pressupost`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1856.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit inventari: conflictes per dia de bolo, no globals (Canvi #1857, codex)
+
+### Context
+En repetir el circuit de reserva preparada, l'inventari tenia una pèrdua de model: un element assignat a qualsevol reserva activa podia quedar bloquejat per totes les altres reserves, encara que fossin d'un altre dia. Això convertia l'inventari en una llista global ocupada, no en un recurs calendaritzat.
+
+### Canvi
+- Nou helper `bookingInventoryAvailability` amb `getBookingEventDayRange()` i `buildBookingInventoryConflictBookingWhere()`.
+- L'autoassignació d'inventari del pack en crear reserva filtra conflictes per mateix dia de bolo.
+- La confirmació de reserva (`applyBookingStatusSideEffects`) usa el mateix helper quan autoassigna inventari del pack.
+- La vista/API manual d'inventari (`getBookingInventoryView` i `assignBookingInventory`) només bloqueja items assignats a altres reserves actives del mateix dia.
+- El script Zenit E2E passa `eventDate` a `applyBookingStatusSideEffects`, de manera que el trace també governa inventari per data.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\bookingInventoryAvailability.test.ts __tests__\lib\services\bookingInventoryService.test.ts __tests__\lib\services\bookingStatusTransitionService.test.ts __tests__\lib\services\bookingCreationService.test.ts __tests__\lib\services\bookingRouteService.test.ts` OK (105 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: els tests exigeixen que el `where.booking.eventDate` sigui `[dia UTC, dia+1)` tant en creació, confirmació com assignació manual.
+- Validació humana/UX: captura `.codex-captures/zenit-inventory-calendar-1857/booking-inventory-desktop.png` amb HTTP 200 mostra fitxa de reserva amb `Equipament assignat` i accés de calendari visibles.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1857.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit status: checklist pre-event centralitzada (Canvi #1858, codex)
+
+### Context
+En el tram status/checklist del bucle end-to-end, el camí principal de la fitxa (`BookingStatusChanger` -> `/api/admin/bookings/[id]/status`) passava per `changeBookingStatus`, però el trigger `booking.confirmed` només es disparava a la ruta genèrica `PATCH /api/admin/bookings/[id]`. Això podia confirmar una reserva sense crear la tasca checklist pre-event.
+
+### Canvi
+- `applyBookingStatusSideEffects()` crida `onBookingConfirmed()` quan una reserva entra a `CONFIRMED` des de qualsevol estat diferent.
+- La ruta genèrica `PATCH /api/admin/bookings/[id]` deixa de disparar el trigger directament; el servei de transició és l'únic propietari.
+- El camí UI `/status`, el PATCH genèric i el trace/script E2E passen pel mateix punt.
+- Els tests de ruta canvien de "disparar auto-trigger" a "delegar el status al servei", evitant un segon procés.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\bookingStatusTransitionService.test.ts __tests__\lib\services\automationTriggers.test.ts __tests__\lib\services\bookingRouteService.test.ts __tests__\app\api\admin\bookings-detail-route.test.ts __tests__\app\admin\bookings\BookingStatusChanger.test.tsx` OK (80 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: no hi ha reserves `CONFIRMED`/`PREPARING` a la BD actual per capturar checklist real sense mutar dades; els tests verifiquen que el servei de transició crida `onBookingConfirmed('booking-1', { source: 'booking-status-transition' })`.
+- Validació humana/UX: captura `.codex-captures/zenit-status-checklist-1858/booking-status-desktop.png` amb HTTP 200 mostra fitxa de reserva completada i accés `Sincronitza Google Calendar ara`; `hasChecklist=false` és coherent amb status `COMPLETED`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1858.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Zenit COMPLETED: ús d'inventari idempotent (Canvi #1859, codex)
+
+### Context
+En el bucle end-to-end de reserves, el pas final `COMPLETED` encara tenia un risc de doble comptatge: reobrir una reserva completada i tornar-la a completar podia recrear notificació viva i duplicar ús d'inventari, convertint el tancament operatiu en una mutació no idempotent.
+
+### Canvi
+- `applyBookingStatusSideEffects()` deixa de fer l'increment legacy directe sobre `settings.total_events/total_people` en entrar a `COMPLETED`.
+- La notificació live de completat només es crea si no existeix ja per aquella reserva; `statsUpdated` només queda actiu quan realment s'ha creat la primera notificació.
+- `syncCompletionInventoryUsage()` actualitza l'ús d'inventari existent per `bookingId/itemId` i només crea les files que faltin, sense duplicats en recompletar.
+- Els tests cobreixen notificació única, actualització d'ús existent i creació només de l'ús absent.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\bookingStatusTransitionService.test.ts __tests__\lib\services\bookingRouteService.test.ts __tests__\lib\services\bookingOperationalService.test.ts` OK (68 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: els mocks verifiquen `liveNotification.findFirst`, `inventoryUsage.findMany`, `updateMany` i creació només per l'item absent.
+- Validació humana/UX: captura `.codex-captures/zenit-completed-usage-1859/booking-completed-usage-desktop.png` amb HTTP 200 i fitxa de reserva completada visible amb `Equipment` i `Calendar`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1859.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Pressupost Adrià: lead prefill canònic i preview PDF desbloquejada (Canvi #1860, codex)
+
+### Context
+El propietari estava a Adrià i havia de fer un pressupost des de `/admin/presupuestos?leadId=cmpnuxuxd000010t0c460pi90`. La pàgina semblava no arrossegar el lead: capçalera sense client, tipus d'esdeveniment erroni, línies amagades i cada obertura podia crear un nou `DRAFT`. La preview PDF també generava `blob:` però el CSP bloquejava l'iframe.
+
+### Canvi
+- `/admin/presupuestos` resol el client des del lead quan el query només porta `leadId`, i mostra `Adrià` a capçalera i acció de fitxa.
+- El Studio infereix el tipus de servei des del lead i les seves línies: Bingo/Asistent passen a `Animació`, no a `bodas`.
+- Quan s'obre un lead sense `proposalId`, la pàgina reutilitza l'últim `DRAFT` del lead en lloc de crear-ne un de nou; alhora prefereix el prefill fresc del lead per no quedar atrapat en snapshots antics buits.
+- Les seccions `Pack i condicions` i `Extres personalitzats` s'obren quan hi ha línies del lead, perquè Bingo, Asistent i hora addicional siguin visibles sense caçar desplegables.
+- El transport hereta km, peatges i línies del lead, i la vista ràpida mostra el total amb IVA.
+- `next.config.mjs` permet `blob:` només a `frame-src`, mantenint `frame-ancestors 'none'` i el cas embeddable controlat dels endpoints Studio.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\admin\presupuestos\studio-utils.test.ts __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts` OK (10 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: captura Playwright `.codex-captures/adria-presupuesto-prefill/after-preview-csp-fixed-desktop.png` amb HTTP 200 confirma client Adrià, `Bingo Musical`, `Asistent Bingo`, total `484`, iframe `blob:http://127.0.0.1:3000/...`, `Previsualització PDF actualitzada` i zero errors CSP.
+- Validació humana/UX: captura final revisada visualment; la pantalla ja permet fer el pressupost en una sola vista amb client, esdeveniment, transport, serveis i preview PDF al lateral.
+- Validació de dades: la consulta real a BD manté `count=4` drafts (`PROP-2026-0001` a `PROP-2026-0004`) després d'obrir i previsualitzar; no s'ha creat cap cinquè draft.
+- Validació de headers: resposta autenticada de `/admin/presupuestos?leadId=cmpnuxuxd000010t0c460pi90` porta `frame-src 'self' blob:` sense relaxar qui pot emmarcar la pàgina.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1860.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Pressupost Adrià: accions PDF sense redundància (Canvi #1861, codex)
+
+### Context
+Després de desbloquejar la preview d'Adrià, la pantalla encara obligava a entendre dos punts d'acció: el visor lateral tenia `Previsualitzar PDF` i el final del formulari repetia preview, descarregar, imprimir i enviar. Això feia que el PDF semblés un pas bloquejant en comptes del lloc natural per revisar i avançar.
+
+### Canvi
+- `PresupuestoPdfStudio` centralitza `Previsualitzar/Actualitzar preview`, `Obrir en pestanya`, `Descarregar PDF`, `Imprimir PDF` i `Enviar pressupost/presupuesto` dins el panell lateral `Previsualització PDF`.
+- El bloc final del formulari queda com a validació comercial i neteja d'esborrany; ja no duplica preview ni enviament.
+- Els missatges de preview/descarrega/impressió/enviament es mostren al mateix panell del visor, a prop del botó que els dispara.
+- El test focal de pressupostos blinda que les accions PDF viuen al visor i que el bloc final no pot tornar a duplicar `previewPdf`, `downloadPdf`, `printPdf` ni `sendQuoteEmail`.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts __tests__\app\admin\presupuestos\studio-utils.test.ts` OK (11 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: captura Playwright `.codex-captures/adria-1861-after/after-desktop.png` amb HTTP 200 confirma `previewButtonCount=1`, `finalHasPreview=false`, `finalHasSend=false`, `previewHasDownload=true`, `previewHasPrint=true`, `previewHasSend=true`, `hasOpenTab=true`, iframe `blob:` i `Previsualització PDF actualitzada`.
+- Validació humana/UX: captura revisada visualment; l'esquerra queda per editar/validar i el lateral concentra la revisió i accions del PDF sense repetir el camí al fons del formulari.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1861.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — MANOLO: sistema d'auditoria, costura i E2E producte (Canvi #1862, codex)
+
+### Context
+El propietari separa explícitament dues feines: el full de ruta general cap al Zenit i l'E2E com a producte. Aquesta segona feina no pot quedar reduïda a un script verd: cal comportar-se com un usuari/operador, capturar cada pas i detectar incongruències de dades, pantalles carregades, accions duplicades i costures visibles entre òrgans.
+
+- Autorització explícita propietari: el propietari ordena fixar Manolo com a primera capa sobirana del protocol, exigeix que tot el que vingui després vagi sota Manolo i demana afegir el nou document E2E/producte com a part de la caixa d'eines de Manolo.
+
+### Canvi
+- Nou `docs/MANOLO.md` com a manifest i porta d'entrada operativa del sistema Manolo.
+- El document fixa la cadena `Entrada -> Lead -> Customer -> Dossier -> Proposal -> Booking -> Documents -> Portal -> Post-event -> Customer Hub`.
+- La secció inicial evita el pegat documental: Manolo no és un document solt, sinó el conjunt format per protocol, atles, fitxes, auditories, fulls de ruta, captures, dades i criteri humà; aquest fitxer només n'és la porta d'entrada.
+- S'afegeix la sobirania d'intervenció: només Manolo toca el producte i la màquina; Claude, Codex o qualsevol eina només executen Manolo i Manolo registra tot.
+- `CLAUDE.md` obre ara amb la frase sobirana: "MANOLO és l'única capa que toca el producte i la màquina; tot el que ve després va sota Manolo."
+- Just sota aquesta frase, `CLAUDE.md` exigeix sempre llegir tot el protocol de treball abans de tocar res.
+- Es declaren dades crítiques que no es poden perdre: IDs de context, contacte, event, productes, hores, inventari, diners, documents i especialment `travelHeadcount` / passatgers de ruta separat de `guestCount`.
+- Es defineixen checklists vertical, horitzontal i diagonal, criteris de càrrega visual, evidència obligatòria per captura i severitat `KO-P0` a `KO-P3`.
+- Es deixa escrit que un report `ok=true` no tanca res si hi ha errors de consola, warnings no modelats, captures no revisades o dades no comparades entre òrgans.
+
+### Validació
+- Validació tècnica: document nou creat a `docs/MANOLO.md` i `ADMIN_CHANGE_COUNTER` actualitzat a 1862.
+- Validació funcional: el checklist cita i aplica els documents mare de costura (`admin-build-method`, herència de context, flux lead/dossier/pressupost/reserva i reset Manolo Zenit) i fixa que tota intervenció sobre producte o màquina passa pel règim Manolo, amb la regla col·locada com a primera frase del protocol de treball i lectura completa obligatòria tot seguit.
+- Validació humana/UX: el criteri del propietari queda traduït a una pauta operativa concreta per auditar dades que no s'arrosseguen, pantalles massa carregades i passatgers de ruta.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1862.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: SMTP/portal sense fals verd (Canvi #1863, codex)
+
+### Context
+La passada Manolo E2E havia quedat tècnicament verda (`failedChecks: []`), però la consola mostrava errors vermells esperats perquè el trace desactiva SMTP i els serveis de confirmació de reserva i portal intentaven enviar correus igualment. Això és un fals verd de producte: el report deia OK mentre el procés real deixava soroll d'error no modelat.
+
+- Autorització explícita propietari: el propietari ordena continuar Manolo fins al final i corregir els falsos verds detectats per l'auditoria E2E; aquest canvi no autoritza schema, migracions ni BD manual i es limita a la degradació SMTP/portal.
+
+### Canvi
+- `sendBookingConfirmationEmail()` comprova `isSmtpConfigured()` abans de preparar plantilla o enviar; si SMTP no està configurat retorna `skipped: "smtp_not_configured"` sense log vermell.
+- `createBookingFromInput()` ja no registra `Confirmació de reserva no enviada` quan la causa és SMTP absent i explícitament saltat.
+- `tryEnsureCompletedBookingPortalAccess()` manté la creació del portal encara que l'email no es pugui enviar.
+- El portal post-completed guarda `emailStatus` a `adminLog.details`: `sent`, `failed`, `no_recipient`, `placeholder` o `smtp_not_configured`.
+- Si SMTP està configurat i l'enviament del portal falla, continua sent error real (`Auto portal email failed`) però no converteix l'accés creat en un fals error de portal.
+- Tests focals afegeixen cobertura per SMTP absent i per fallada d'email posterior a l'accés portal creat.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\bookingConfirmationEmailService.test.ts __tests__\lib\services\bookingPortalCompletionService.test.ts __tests__\lib\services\bookingCreationService.test.ts __tests__\lib\services\bookingStatusTransitionService.test.ts` OK (84 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`).
+- Validació funcional: `node_modules\.bin\tsx.cmd scripts\zenit-e2e-trace.ts` OK amb `failedChecks: []`, `warningCount: 0` i sense `SMTP_HOST is required`; report a `.codex-captures/zenit-e2e-1850/20260710111113/report.json`. `scripts\zenit-e2e-capture.ts` contra `http://127.0.0.1:3000` genera 16 captures desktop/mòbil HTTP 200 a `.codex-captures/zenit-e2e-1850/20260710111113/screenshots`.
+- Validació humana/UX: SMTP absent passa de ser error vermell implícit a estat explícit i auditable; el portal no queda marcat com fallit quan l'accés ja s'ha creat.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1863.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: portal conserva passatgers i cost de transport (Canvi #1864, codex)
+
+### Context
+La revisió visual de captures Manolo va detectar una costura greu de dades: lead i reserva mostraven `411,4 km · 20 persones` i transport `2.369,35 €`, però el portal client mostrava `12 persones` i `1.473 €`. El problema venia del loader del portal: no carregava `serviceLines.notes`, on viuen els marcadors `[travel-headcount:N]`, i el hub recalculava el transport sense `fuelCostPerKm` guardat.
+
+- Autorització explícita propietari: el propietari havia marcat el nombre de passatgers com a dada crítica i va ordenar continuar Manolo fins al final; aquest canvi no autoritza schema, migracions ni BD manual, només repara la continuïtat de lectura portal.
+
+### Canvi
+- `findPortalAccessByRawToken()` inclou `notes` a `booking.serviceLines`, preservant els marcadors `[travel-headcount:N]` que ja s'havien guardat en reserva.
+- El hub del portal passa a `computeBoloTransport()` amb `hasOrbitaPack` i `vehicleCostPerKm` de la reserva, en lloc de recalcular amb defaults.
+- `scripts/zenit-e2e-trace.ts` afegeix el check `portal.travel.matches-booking`, que compara headcount i import de transport portal contra la reserva.
+- Nova guàrdia estàtica `portalTravelContinuity.test.ts` perquè el portal no torni a calcular transport amb metadades amputades.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\clientPortalAccess.test.ts __tests__\app\portal\portalTravelContinuity.test.ts __tests__\lib\services\travelLaborCost.test.ts __tests__\lib\clientPortalMessages.test.ts` OK (46 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`).
+- Validació funcional: HTML real local de `http://127.0.0.1:3000/ca/portal/...` confirma `20 persones` i `2.369`, i ja no conté `12 persones` ni `1.473`. Trace nou `.codex-captures/zenit-e2e-1850/20260710112724/report.json` OK amb `portal.travel.matches-booking` esperat/actual `headcount=20`, `clientCharge=2369.35`.
+- Validació humana/UX: captura mòbil `.codex-captures/zenit-e2e-1850/20260710112724/screenshots/portal-hub-mobile-390.png` revisada visualment; el portal ja mostra `Km extra: 20 persones` i `Cost estimat 2.369 €`, coherent amb lead/reserva.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1864.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: Partners oculta productes inactius del trace (Canvi #1865, codex)
+
+### Context
+La captura Manolo de `/admin/collaborators` mostrava el llistat contaminat per productes inactius generats pel trace Zenit (`ZENIT E2E alta baixa ...`). No era un error de BD ni una dada a eliminar: era soroll de producte a la vista normal de Partners.
+
+- Autorització explícita propietari: el propietari ordena continuar Manolo fins al final i detectar pantalles carregades, incongruències i rastres que facin el producte menys operable; aquest canvi no autoritza schema, migracions, BD manual ni esborrat de dades.
+
+### Canvi
+- `/admin/collaborators` oculta per defecte els productes inactius dins del resum de cada partner.
+- La toolbar incorpora el control `Mostrar productes inactius` perquè el rastre continuï sent auditable quan cal revisar-lo.
+- Cada partner mostra un avís curt amb quants productes inactius s'han ocultat.
+- Els KPIs de Partners passen a comptar productes i valor de catàleg només sobre productes actius, evitant que l'històric inactiu infli la lectura operativa.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\admin\collaborators\CollaboratorsClient.test.tsx __tests__\app\admin\collaborators\CollaboratorsClient-errors.test.ts __tests__\app\admin\collaborators\CollaboratorProductsPanel-errors.test.ts __tests__\lib\services\collaboratorAdminService.test.ts` OK (21 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`).
+- Validació funcional: el test nou confirma que `Bingo Musical` continua visible, que `ZENIT E2E alta baixa 20260710` queda ocult per defecte i que reapareix en activar `Mostrar productes inactius`.
+- Validació humana/UX: recaptura `.codex-captures/zenit-e2e-1850/20260710112724/screenshots/collaborators-1440.png` revisada visualment; Carlos mostra `15 productes inactius ocults`, manté 10 productes actius visibles i ja no ensenya el soroll E2E a la lectura principal.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1865.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: pressupost deriva la durada del bolo de l'horari (Canvi #1866, codex)
+
+### Context
+La captura Manolo de `/admin/presupuestos?leadId=cmreupowk000010m404mz29fd` mostrava `Durada (h)=168` a `Pack i condicions`, mentre el mateix pressupost indicava horari `20:30-23:30`. El problema venia de sumar `hours` de línies comercials del lead: alguns productes de catàleg porten `90` o `70` com a metadada de durada de producte, no com a hores reals del bolo.
+
+- Autorització explícita propietari: el propietari ordena continuar Manolo fins al final i detectar dades que no s'arrosseguen o queden incongruents entre pantalles; aquest canvi no autoritza schema, migracions, BD manual, pricing core ni PDF builder.
+
+### Canvi
+- `studio-utils` afegeix `deriveEventScheduleDurationHours()` per llegir durada real des d'horaris com `20:30-23:30`.
+- `deriveStudioDurationHours()` prioritza l'horari del bolo i només usa service lines com a fallback sanejat.
+- El fallback `deriveLeadDurationHours()` ignora valors `hours` superiors a 24, evitant que durades de producte/minuts inflin el camp del pack.
+- `PresupuestoPdfStudio` usa el nou helper tant en prefill de lead com en rehidratació de propostes antigues vinculades a lead.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\admin\presupuestos\studio-utils.test.ts __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts` OK (12 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`).
+- Validació funcional: consulta real a BD del lead E2E confirma línies amb `hours=90` i `hours=70`; el nou helper retorna `3` per `20:30-23:30` i no `168`.
+- Validació humana/UX: recaptura `.codex-captures/zenit-e2e-1850/20260710112724/screenshots/presupuestos-from-lead-1440.png` revisada visualment; `Pack i condicions` mostra `Durada (h)=3` i conserva transport, total i serveis.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1866.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: portal client sense banner públic de cookies (Canvi #1867, codex)
+
+### Context
+La captura Manolo del portal client mostrava el banner públic de cookies sobre la zona de pagaments i documents. En una superfície privada i operativa, això amagava informació crítica just quan el client necessita veure imports, documents i estat del procés.
+
+- Autorització explícita propietari: el propietari ordena continuar Manolo fins al final i detectar pàgines carregades o capes que tapen accions importants; aquest canvi no autoritza schema, migracions, BD manual, payments ni documents.
+
+### Canvi
+- `publicChrome` afegeix `shouldRenderCookieConsent()` com a regla compartida.
+- `LayoutWrapper` deixa de muntar `CookieConsent` quan la ruta sense locale és `/portal` o `/portal/...`.
+- Es conserva la regla existent d'offset mòbil del banner per si es fa servir en una altra superfície, però el portal client ja no rep el banner públic.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\constants\publicChrome.test.ts __tests__\app\portal\portalCookieConsentOffset.test.ts` OK (5 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`).
+- Validació funcional: captura Playwright focal espera 4,5 s a `http://127.0.0.1:3000/ca/portal/...` i retorna `cookieBannerCount=0`.
+- Validació humana/UX: recaptura `.codex-captures/zenit-e2e-1850/20260710112724/screenshots/portal-hub-1440.png` revisada visualment; pagaments i documents ja no queden tapats pel banner de cookies.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1867.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: bottom nav del portal només en mòbil (Canvi #1868, codex)
+
+### Context
+Un cop retirat el banner públic de cookies del portal, la captura desktop deixava veure un segon KO: `PortalBottomNav` era `fixed bottom-0` també en desktop i travessava el contingut del portal, especialment `Estat del procés`. Aquesta navegació és útil en mòbil, però en desktop es converteix en una capa invasiva.
+
+- Autorització explícita propietari: el propietari ordena continuar Manolo fins al final i detectar capes que tapen contingut o fan la pantalla menys operable; aquest canvi no autoritza schema, migracions, BD manual, payments ni documents.
+
+### Canvi
+- `PortalBottomNav` afegeix `md:hidden` a la capa `<nav>`, mantenint-la fixa només en mòbil.
+- El test de `PortalBottomNav` blinda que la navegació inferior porta el tall responsive.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\portal\PortalBottomNav.test.tsx` OK (2 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`).
+- Validació funcional: captura Playwright focal confirma `Navegació del portal` amb `display:none` en 1440 px i `display:block` amb 68 px d'alçada en 390 px.
+- Validació humana/UX: captures `.codex-captures/zenit-e2e-1850/20260710112724/screenshots/portal-hub-1440.png` i `portal-hub-mobile-390.png` revisades visualment; desktop ja no té cap barra travessant contingut i mòbil conserva la nav pròpia del portal.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1868.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: lead diferencia base neta i total amb IVA (Canvi #1869, codex)
+
+### Context
+La captura Manolo del lead mostrava dues xifres aparentment contradictòries: la capçalera i l'històric comercial indicaven `5.946 €`, mentre el resum del bolo deia `4.914 € Total client`. La diferència era correcta tècnicament (`4.914,35 €` és subtotal/base neta i `5.946,36 €` és total amb IVA), però el label `Total client` feia pensar que les dades no s'arrossegaven bé entre lead i pressupost.
+
+- Autorització explícita propietari: el propietari ordena continuar Manolo fins al final i corregir incongruències visibles entre pantalles; aquest canvi no autoritza schema, migracions, BD manual, pricing core, pressupostos ni motor fiscal.
+
+### Canvi
+- `LeadBoloSection` reanomena el resum econòmic del bolo a `Resum net del bolo`.
+- La suma `Serveis + Transport` deixa de dir `Total client` i passa a dir `Base neta` amb el subtext `abans d'IVA`.
+- No es canvia cap import: el valor segueix sortint del mateix `computeBookingFinancialSummary`; només es corregeix la lectura perquè quadri amb pressupost, reserva i factura.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` OK (7 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`; `admin-canon` només P3 `font-px`, sense P1).
+- Validació funcional: recaptura Playwright focal de `/admin/leads/cmreupowk000010m404mz29fd` retorna `totalCard="Base neta\nabans d'IVA\n4.914 €"`, `headerValue="VALOR\n5.946 €"` i `counter1869Visible=true`.
+- Validació humana/UX: captura `.codex-captures/zenit-e2e-1850/20260710112724/screenshots/lead-detail-1440.png` revisada visualment; el lead deixa clar que `4.914 €` és base neta i que `5.946 €` és el valor final heretat del pressupost/històric.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1869.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: selecció múltiple per netejar proves (Canvi #1870, codex)
+
+### Context
+La passada Manolo ha generat molts artefactes `ZENIT E2E` a dossiers, pressupostos i leads. El propietari demana no fer un pegat ni esborrar ara a cegues: primer deixar instal·lada selecció múltiple perquè després, quan acabi la feina, es puguin eliminar totes les proves sense anar una per una.
+
+- Autorització explícita propietari: el propietari ordena instal·lar la selecció múltiple abans de continuar i deixar l'esborrat real dels artefactes per després del tancament de la feina Manolo; aquest canvi no autoritza schema, migracions, BD manual ni esborrat immediat de dades.
+
+### Canvi
+- `/admin/dossiers` amaga per defecte artefactes de prova del llistat normal i dels suggeriments, mostra el recompte ocult i deixa un toggle `Mostrar prova` / `Ocultar prova` per revisar-los.
+- El llistat de dossiers desats passa a `DossierSavedList`, amb selecció visible, comptador, neteja de selecció i acció massiva `Enviar a paperera` reutilitzant el `DELETE /api/admin/dossiers/[id]` canònic i `ConfirmDialog`.
+- `/admin/presupuestos` afegeix selecció múltiple al llistat desktop i mòbil, comptador de seleccionats i acció massiva `Eliminar seleccionats` via `DELETE /api/admin/proposals/[id]`.
+- `/admin/leads` afegeix selecció múltiple a la vista `Llista`, només per entrades lead reals, amb `Eliminar seleccionades` via `DELETE /api/admin/leads/[id]`.
+- La llista de leads deixa de tallar la taula en mòbil: `.ap-leads-list` passa a tenir desplaçament horitzontal i la taula conserva un `min-width` operable.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\app\admin\dossiers\DossiersPage-test-artifact-filter.test.ts __tests__\app\admin\dossiers\DossierSavedList-bulk.test.ts __tests__\app\admin\presupuestos\ProposalsList-bulk.test.ts __tests__\app\admin\leads\LeadsSeasonClient-bulk.test.ts` OK (8 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`; `admin-canon` només P3 `font-px`, sense P1).
+- Validació funcional: captures Playwright locals HTTP 200 a `.codex-captures/zenit-e2e-1870/20260710T125125/screenshots/` confirmen selecció massiva a dossiers, pressupostos i leads en desktop i mòbil, amb xip `#1870` visible en desktop.
+- Validació humana/UX: captura mòbil desplaçada `leads-bulk-list-mobile-scrolled-390.png` confirma `scrollLeft=490`, `scrollWidth=846`, `clientWidth=356`; la llista de leads ja no deixa les columnes de la dreta inaccessibles.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1870.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: proves fora de KPIs i lectura normal (Canvi #1871, codex)
+
+### Context
+Després d'instal·lar la selecció múltiple, la passada visual ha mostrat un KO de producte: els artefactes `ZENIT E2E` encara contaminaven la lectura normal. A `/admin/leads`, els KPIs arribaven a xifres absurdes i la llista mostrava entrades de prova barrejades amb bolos reals; a `/admin/presupuestos`, els pressupostos de prova ocupaven el llistat i els comptadors.
+
+- Autorització explícita propietari: el propietari demana que Manolo sigui la caixa d'eines real, que no es facin pegats i que les proves no embrutin la lectura de negoci; l'esborrat real dels artefactes queda pendent per al final de la feina.
+
+### Canvi
+- Nou catàleg `lib/constants/adminTestArtifacts.ts` i helper canònic `lib/admin/testArtifacts.ts` per detectar artefactes de prova compartits (`@example.test`, `ZENIT E2E`, `ZENIT WhatsApp/Mail/Config/Admin`).
+- `/admin/dossiers` reutilitza el detector compartit en comptes de tenir criteri local duplicat.
+- `/admin/leads` amaga proves per defecte de focus, KPIs, safata sense data, calendari, pipeline i vista llista; afegeix xip de recompte i toggle `Mostrar proves` / `Ocultar proves`.
+- `/admin/presupuestos` amaga proves per defecte de KPIs, totals, cerca, llistat desktop/mòbil i selecció visible; afegeix xip de recompte i toggle `Mostrar proves` / `Ocultar proves`.
+- No s'esborra cap dada: el mode revisió torna a mostrar les proves i permet eliminar-les amb la selecció múltiple del #1870.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\admin\testArtifacts.test.ts __tests__\app\admin\dossiers\DossiersPage-test-artifact-filter.test.ts __tests__\app\admin\dossiers\DossierSavedList-bulk.test.ts __tests__\app\admin\presupuestos\ProposalsList-bulk.test.ts __tests__\app\admin\leads\LeadsSeasonClient-bulk.test.ts` OK (13 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`; `admin-canon` només P3 `font-px`, sense P1).
+- Validació funcional: captures Playwright locals a `.codex-captures/zenit-e2e-1871/20260710T150749/screenshots/` retornen HTTP 200, confirmen `counter1871=true`, `hasZenitRows=false` en mode normal i `hasZenitRows=true` després de `Mostrar proves` tant a leads com a pressupostos.
+- Validació humana/UX: captures `leads-hidden-tests-list-1440.png` i `pressupostos-hidden-tests-1440.png` revisades visualment; els xips de proves ocultes són visibles, els KPIs tornen a xifres operables i no hi ha files `ZENIT` a la lectura normal.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1871.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: cuadrant repartiment no duplica leads amb reserva (Canvi #1872, codex)
+
+### Context
+El propietari obre `/admin/cuadrant/repartiment` i diu que no quadra. La captura real de juliol 2026 mostra `4.015 € facturat` i Cristina Rey dues vegades al detall de bolos. La BD confirma la causa: el loader sumava alhora el lead `WON` de Cristina i la reserva `OE-2026-006` vinculada al mateix lead. El model ja diu que, quan hi ha reserva, `BookingServiceLine` és la font de veritat i `LeadServiceLine` queda com a foto antiga.
+
+- Autorització explícita propietari: el propietari reporta incoherència a la ruta del cuadrant/repartiment; el tall no autoritza schema, migracions, BD manual ni esborrat de dades.
+
+### Canvi
+- `crewScheduleService` afegeix `filterSupersededLeadLines()`: si una reserva activa té `leadId`, les línies del lead vinculat surten del cuadrant/repartiment.
+- `loadCrewLines()` llegeix `Booking.leadId`, filtra les línies de leads substituïts i només després resol els noms dels col·laboradors.
+- `/admin/cuadrant/repartiment` deixa de dir `facturat` i passa a `PVP client`, perquè la vista pot sumar repartiment previst de leads sense reserva i repartiment real de reserves.
+- No es toca cap import guardat: només es corregeix la lectura agregada.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\crewScheduleService.test.ts` OK (24 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers test / 635 asserts dins `qa:protocol:test`; `admin-canon` només P3 `font-px`, sense P1).
+- Validació funcional: consulta directa de juliol 2026 passa de `revenue=4015` amb Cristina duplicada a `revenue=3735`, 5 bolos i una sola Cristina. Captura prèvia: `.codex-captures/zenit-e2e-1872/before/screenshots/repartiment-before-1440.png`. Captures finals: `.codex-captures/zenit-e2e-1872/final/screenshots/repartiment-final-1440.png` i `repartiment-final-mobile-390.png`.
+- Validació humana/UX: desktop i mòbil revisats visualment; el detall per bolo ja mostra 5 files, el xip de copy diu `PVP client` i el total ja no promet facturació.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1872.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: post-event sense enquestes de prova a la lectura normal (Canvi #1873, codex)
+
+### Context
+La revisió Manolo de captures va detectar que `/admin/post-event/surveys` estava completament governada pels artefactes `ZENIT E2E`: `Total Enquestes=14`, NPS `10`, valoració `5.0` i totes les files eren proves. Era el mateix problema de producte que el #1871 havia drenat a leads/pressupostos, però dins l'òrgan post-event.
+
+- Autorització explícita propietari: el propietari ordena acabar la feina en curs i parar; aquest tall no autoritza schema, migracions, BD manual, esborrat de dades ni fluxos nous.
+
+### Canvi
+- `lib/admin/testArtifacts.ts` afegeix `isAdminTestBookingArtifact()` com a helper canònic per detectar reserves de prova des de booking/lead/email/notes.
+- `/admin/post-event/surveys` filtra per defecte les enquestes de prova, calcula KPIs només sobre `visibleSurveys` i manté un mode explícit `Mostrar proves`.
+- `/admin/post-event` filtra també informes, enquestes i pendents de prova perquè el hub i el detall no es contradiguin.
+- Les proves no s'esborren: queden auditables via `?showTestSurveys=1` i `?showTestPostEvent=1`.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\admin\testArtifacts.test.ts __tests__\app\admin\post-event\surveys-page-test-artifact-filter.test.ts __tests__\app\admin\post-event\page-test-artifact-filter.test.ts` OK (10 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: Playwright local confirma `/admin/post-event/surveys` normal amb HTTP 200, `hasZenit=false`, xip `14 enquestes de prova ocultes` i counter `#1873`; mode `?showTestSurveys=1` torna a mostrar `ZENIT E2E`.
+- Validació humana/UX: captures a `.codex-captures/zenit-e2e-1873/final/screenshots/`; la lectura normal de surveys queda buida i honesta en lloc de vendre proves com reputació real.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1873.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: canonització pressupost/PDF/email sense `PRE-*` legacy (Canvi #1874, codex)
+
+### Context
+El propietari detecta que `Pressupost PRE-2026-8JZG - Òrbita Events` s'havia enviat al client però no apareixia a `/admin/presupuestos` com a pressupost filtrable. La BD confirma la doble veritat: `PRE-2026-8JZG` era un `LeadDocument` `QUOTE` amb `fileUrl=quote-email:*`, creat pel flux legacy `/api/admin/emails/quote`, mentre el `Proposal` real vinculat al lead era `PROP-2026-0010` i tenia un total diferent. Això feia possible que el client rebés format i productes divergents del pressupost canònic.
+
+- Autorització explícita propietari: el propietari demana canonització, no pegats, i "aniquilar" camins vells no només de PDF sinó de qualsevol ruta que pugui crear/enviar/mostrar pressupostos fora de la font canònica.
+
+### Canvi
+- `sendAdminProposal()` passa a ser l'únic enviador real de pressupostos: congela `quoteSnapshot`, genera PDF amb `generateQuotePDF`, desa `pdfUrl/pdfKey` a `Proposal`, crea `EmailSend`, envia SMTP amb el PDF adjunt i només llavors marca `status=SENT`.
+- `/api/admin/emails/quote`, `adminQuoteEmailService` i `/api/admin/leads/[id]/quote` queden retirats amb `410 Gone`; ja no poden crear `PRE-*`, `quote-email:*`, HTML legacy ni `LeadDocument QUOTE`.
+- `adminEmailSendService` bloqueja `quote` al redactor genèric amb `410`: ja no pot crear adjunts HTML `TMP-*` ni `admin_compose_with_quote`.
+- `PresupuestoPdfStudio` deixa de cridar `/api/admin/emails/quote`: desa `Proposal` en `DRAFT` i envia només per `/api/admin/proposals/:id/send`.
+- `ComposeForm` deixa de tenir mode pressupost; el customer hub envia l'acció `Envia pressupost` cap a `/admin/presupuestos`.
+- `/admin/presupuestos` ja no consulta ni renderitza `LeadDocument` tipus `QUOTE`; la pantalla queda reservada a `Proposal`.
+- `LeadDetailClient` i booking detail mantenen els `QUOTE` antics com a traça històrica (`Traça pressupost antic`, `HISTÒRIC`) però sense enllaç executable.
+- `uploadLeadDocument()` rebutja `type=QUOTE` amb `410`; un upload manual ja no pot crear pressupostos legacy.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run` sobre 11 fitxers enfocats OK (64 tests): dispatch canònic, rutes legacy 410, redactor, lead documents i guardes estàtiques de Studio/ProposalsList; `npx tsc --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (exit 0, `qa:admin-canon` només P3 `font-px`, sense P1).
+- Validació funcional: `rg` no troba `quote-email:`, `TMP-*`, `admin_compose_with_quote` ni crides productives a `/api/admin/emails/quote`; només queda el mateix endpoint retirat i tests de retirada. La consulta DB prèvia localitzava 4 `LeadDocument` antics `quote-email:PRE-*`, que ara queden sense camí de recreació.
+- Validació humana/UX: `/admin/presupuestos` queda conceptualment reservat a `Proposal`; l'acció `Envia pressupost` del customer hub porta al workspace de pressupostos, el redactor deixa de mostrar mode pressupost i els documents antics es presenten com a traça històrica sense enllaç executable.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1874.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-10 — Manolo E2E: contractes canònics contra carrils parcials (Canvi #1875, codex)
+
+### Context
+Després de retirar el flux `PRE-*`, l'auditoria transversal confirma que el problema no era un únic PDF vell sinó el patró: podien existir estats comercials parcials o flotants. La BD local havia detectat `Proposal SENT` sense `pdfUrl/pdfKey`, un dossier enviat sense `leadId`, leads `WON` sense reserva, `custom_quotes` encara mutables tot i no tenir dades, i la calculadora de costos podia semblar una via alternativa de pressupost.
+
+- Autorització explícita propietari: el propietari demana canonització de tots els processos, no pegats, i pregunta quantes coses més poden no estar cosides. Aquest tall tanca els carrils parcials confirmats al tram lead/dossier/proposta/reserva sense schema, migracions, BD manual destructiva ni neteja de dades històriques.
+
+### Canvi
+- `sendAdminProposal()` és idempotent: si la proposta ja és `SENT` i té `pdfUrl/pdfKey`, retorna `409` i no reenvia email, no duplica logs i no crea follow-up.
+- `sendAdminProposal()` pot reparar una proposta antiga `SENT` sense PDF generant i arxivant només l'artefacte durable, amb `DOCUMENT_PROPOSAL_PDF_REPAIRED`, sense reenviar email ni registrar activitat comercial nova.
+- `PROP-2026-0010` (`cmrexs8ko000cgougzp3gi8mv`) s'ha reparat executant el servei canònic: manté `status=SENT` i ara té `pdfUrl=/api/uploads/proposals/cmrexs8ko000cgougzp3gi8mv/PROP-2026-0010.pdf` i `pdfKey=proposals/cmrexs8ko000cgougzp3gi8mv/PROP-2026-0010.pdf`.
+- L'upload del PDF de proposta és obligatori: si no retorna `path/publicUrl`, no es marca `SENT`, no s'envia email i no es crea cap traça parcial.
+- `createAdminProposal()` i `updateAdminProposal()` rebutgen `status=SENT`, `sentAt`, `pdfUrl` i `pdfKey`; aquests camps només els pot escriure `/api/admin/proposals/:id/send`.
+- `customQuoteAdminService` conserva llistat/detall històric, però `create/update/delete` responen `410 Gone` amb `canonicalRoute=/admin/presupuestos`.
+- `/admin/cost-calculator` queda com a simulador intern: ja no desa documents comercials i mostra sempre el handoff visible a `/admin/presupuestos`.
+- `createDossier()` i `POST /api/admin/dossiers` exigeixen `leadId`; la creació real passa per `createDossierDraftFromLead()` i no pot néixer un dossier nou flotant.
+- `updateLeadFromInput()` i `handleLeadStatusPatch()` bloquegen la transició nova a `WON` si el lead encara no té reserva; permeten editar històrics que ja eren `WON` per no bloquejar sanejaments.
+
+### Validació
+- Validació tècnica: `npx vitest run __tests__\lib\services\customQuoteAdminService.test.ts __tests__\app\api\admin\custom-quotes-route.test.ts __tests__\app\admin\cost-calculator\CostCalculatorClient-errors.test.ts __tests__\lib\services\leadRouteService.test.ts __tests__\lib\services\leads\statusRouteHandler.test.ts __tests__\lib\services\dossierService.test.ts __tests__\app\api\admin\dossiers-route.test.ts __tests__\lib\services\proposalDispatchService.test.ts __tests__\lib\services\proposalAdminService.test.ts __tests__\app\api\admin\proposals-route.test.ts __tests__\app\api\admin\proposals-detail-route.test.ts` OK (11 fitxers / 146 tests); reexecució `proposalDispatchService` OK (14 tests); reexecució `CostCalculatorClient-errors` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (exit 0, `qa:admin-canon` només P3 `font-px`, sense P1).
+- Validació funcional: `rg` no troba crides de calculadora a `/api/admin/custom-quotes`; Playwright autenticat a `/admin/cost-calculator` confirma `Obrir Pressupostos`, `Aquesta pantalla no desa documents comercials`, sense `/api/admin/custom-quotes` ni `Desar pressupost`; execució canònica de reparació retorna `repaired=true` per `PROP-2026-0010` i la consulta posterior retorna `sentWithoutPdf=[]`.
+- Validació humana/UX: captura revisada a `.codex-captures/zenit-e2e-1875/cost-calculator-canonical-1440.png`; el handoff a Pressupostos és visible abans d'afegir components i no queda enterrat darrere d'un estat de simulació.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1875.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`

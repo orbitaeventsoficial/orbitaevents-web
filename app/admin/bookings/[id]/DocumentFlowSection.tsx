@@ -1,11 +1,13 @@
 'use client';
 
-import { getBookingDocumentFlowStepStyle, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
+import { getBookingDocumentFlowStepStyle, getContractStatusLabel, getDeliveryNoteStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { ADMIN_BOOKING_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { isSentLikeProposalStatus } from '@/lib/proposals/status';
 interface ProposalDoc {
   id: string;
   reference: string;
   status: string;
+  href: string;
   pdfUrl: string | null;
   contractStatus: string | null;
   contractReference: string | null;
@@ -22,6 +24,14 @@ interface InvoiceDoc {
   reference: string;
   status: string;
   holdedInvoiceUrl: string | null;
+  pdfUrl?: string | null;
+}
+
+interface DeliveryNoteDoc {
+  id: string;
+  reference: string;
+  status: string;
+  pdfUrl: string | null;
 }
 
 function formatSignedAt(value: string | null) {
@@ -31,26 +41,71 @@ function formatSignedAt(value: string | null) {
   return date.toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
 }
 
-export default function DocumentFlowSection({ proposals, invoices }: { proposals: ProposalDoc[]; invoices: InvoiceDoc[] }) {
-  const activeProposal = proposals.find((p) => p.status === 'ACCEPTED' || p.status === 'SENT') || proposals[0];
+export default function DocumentFlowSection({ proposals, invoices, deliveryNotes }: { proposals: ProposalDoc[]; invoices: InvoiceDoc[]; deliveryNotes: DeliveryNoteDoc[] }) {
+  const activeProposal = proposals.find((p) => p.status === 'ACCEPTED' || isSentLikeProposalStatus(p.status)) || proposals[0];
+  const activeDeliveryNote = deliveryNotes.find((deliveryNote) => deliveryNote.status !== 'CANCELLED');
   const activeInvoice = invoices.find((inv) => inv.status !== 'CANCELLED');
 
   const hasProposal = !!activeProposal;
   const proposalAccepted = activeProposal?.status === 'ACCEPTED';
   const hasContract = !!activeProposal?.contractStatus;
   const contractSigned = activeProposal?.contractStatus === 'SIGNED';
+  const hasDeliveryNote = !!activeDeliveryNote;
+  const deliveryDone = activeDeliveryNote?.status === 'DELIVERED' || activeDeliveryNote?.status === 'SIGNED';
   const hasInvoice = !!activeInvoice;
   const invoicePaid = activeInvoice?.status === 'PAID';
 
-  if (!hasProposal && !hasInvoice) return null;
+  if (!hasProposal && !hasDeliveryNote && !hasInvoice) return null;
 
   const steps = [
-    { label: 'Pressupost', icon: '📄', done: proposalAccepted, style: getBookingDocumentFlowStepStyle(proposalAccepted, hasProposal && !proposalAccepted), ref: activeProposal?.reference, status: activeProposal ? getProposalStatusDisplay(activeProposal.status).label : null, link: activeProposal?.pdfUrl ? { href: activeProposal.pdfUrl, label: 'PDF' } : null, empty: !hasProposal ? 'Sense pressupost' : null },
-    { label: 'Contracte', icon: '📝', done: contractSigned, style: getBookingDocumentFlowStepStyle(contractSigned, hasContract && !contractSigned), ref: activeProposal?.contractReference, status: hasContract ? getContractStatusLabel(activeProposal?.contractStatus ?? null) : null, link: activeProposal?.contractPdfUrl ? { href: activeProposal.contractPdfUrl, label: 'PDF' } : null, empty: !hasContract ? (proposalAccepted ? 'Pendent de generar' : 'Requereix pressupost acceptat') : null },
-    { label: 'Factura', icon: '🧾', done: invoicePaid, style: getBookingDocumentFlowStepStyle(invoicePaid, hasInvoice && !invoicePaid), ref: activeInvoice?.reference, status: activeInvoice ? getInvoiceStatusLabel(activeInvoice.status) : null, link: activeInvoice?.holdedInvoiceUrl ? { href: activeInvoice.holdedInvoiceUrl, label: 'Holded' } : null, empty: !hasInvoice ? 'Sense factura' : null },
+    {
+      label: 'Pressupost',
+      icon: '📄',
+      done: proposalAccepted,
+      style: getBookingDocumentFlowStepStyle(proposalAccepted, hasProposal && !proposalAccepted),
+      ref: activeProposal?.reference,
+      status: activeProposal ? getProposalStatusDisplay(activeProposal.status).label : null,
+      link: activeProposal ? { href: activeProposal.pdfUrl || activeProposal.href, label: activeProposal.pdfUrl ? 'PDF' : 'Obrir', targetBlank: Boolean(activeProposal.pdfUrl) } : null,
+      empty: !hasProposal ? 'Sense pressupost' : null,
+    },
+    {
+      label: 'Contracte',
+      icon: '📝',
+      done: contractSigned,
+      style: getBookingDocumentFlowStepStyle(contractSigned, hasContract && !contractSigned),
+      ref: activeProposal?.contractReference,
+      status: hasContract ? getContractStatusLabel(activeProposal?.contractStatus ?? null) : null,
+      link: activeProposal && hasContract ? { href: activeProposal.contractPdfUrl || activeProposal.href, label: activeProposal.contractPdfUrl ? 'PDF' : 'Gestionar', targetBlank: Boolean(activeProposal.contractPdfUrl) } : null,
+      empty: !hasContract ? (proposalAccepted ? 'Pendent de generar' : 'Requereix pressupost acceptat') : null,
+    },
+    {
+      label: 'Albarà',
+      icon: '📋',
+      done: deliveryDone,
+      style: getBookingDocumentFlowStepStyle(deliveryDone, hasDeliveryNote && !deliveryDone),
+      ref: activeDeliveryNote?.reference,
+      status: activeDeliveryNote ? getDeliveryNoteStatusLabel(activeDeliveryNote.status) : null,
+      link: activeDeliveryNote?.pdfUrl ? { href: activeDeliveryNote.pdfUrl, label: 'PDF', targetBlank: true } : null,
+      empty: !hasDeliveryNote ? 'Pendent d’execució' : null,
+    },
+    {
+      label: 'Factura',
+      icon: '🧾',
+      done: invoicePaid,
+      style: getBookingDocumentFlowStepStyle(invoicePaid, hasInvoice && !invoicePaid),
+      ref: activeInvoice?.reference,
+      status: activeInvoice ? getInvoiceStatusLabel(activeInvoice.status) : null,
+      link: activeInvoice?.pdfUrl
+        ? { href: activeInvoice.pdfUrl, label: 'PDF', targetBlank: true }
+        : activeInvoice?.holdedInvoiceUrl
+          ? { href: activeInvoice.holdedInvoiceUrl, label: 'Holded', targetBlank: true }
+          : null,
+      empty: !hasInvoice ? 'Sense factura' : null,
+    },
   ];
 
-  const progressWidth = invoicePaid ? 'calc(100% - 3rem)' : hasInvoice ? 'calc(83% - 2.5rem)' : contractSigned ? 'calc(67% - 2rem)' : hasContract ? 'calc(50% - 1.5rem)' : proposalAccepted ? 'calc(33% - 1rem)' : hasProposal ? 'calc(16% - 0.5rem)' : '0%';
+  const progressIndex = invoicePaid ? 3 : hasInvoice ? 3 : deliveryDone ? 2 : hasDeliveryNote ? 2 : contractSigned ? 1 : hasContract ? 1 : proposalAccepted ? 0 : hasProposal ? 0 : 0;
+  const progressWidth = `${Math.round((progressIndex / Math.max(1, steps.length - 1)) * 100)}%`;
   const contractSignedAt = formatSignedAt(activeProposal?.contractSignedAt ?? null);
 
   return (
@@ -71,7 +126,7 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3" {...helpAttrs(ADMIN_BOOKING_HELP_2.documentFlow.steps)}>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4" {...helpAttrs(ADMIN_BOOKING_HELP_2.documentFlow.steps)}>
         {steps.map((step, i) => (
           <div key={i} className={`${step.style.card} rounded-xl p-3.5 transition-all`}>
             <div className="mb-2 flex items-center gap-1.5">
@@ -82,7 +137,16 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
             {step.ref && <p className="truncate font-mono text-sm font-semibold">{step.ref}</p>}
             {step.status && <span className={`mt-1.5 inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${step.style.badge}`}>{step.status}</span>}
             {step.empty && <p className="mt-1 text-xs admin-tone-text-slate">{step.empty}</p>}
-            {step.link && <a href={step.link.href} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs font-medium transition-colors admin-tone-text-info">{step.link.label}</a>}
+            {step.link && (
+              <a
+                href={step.link.href}
+                target={step.link.targetBlank ? '_blank' : undefined}
+                rel={step.link.targetBlank ? 'noopener noreferrer' : undefined}
+                className="mt-2 inline-flex items-center gap-1 text-xs font-medium transition-colors admin-tone-text-info"
+              >
+                {step.link.label}
+              </a>
+            )}
             {i === 1 && contractSigned && (
               <div className="mt-3 space-y-1 rounded-lg border admin-tone-border-success admin-tone-bg-success p-2 text-xs leading-snug admin-tone-text-success">
                 {activeProposal?.contractSignedBy && <p>Signat per {activeProposal.contractSignedBy}</p>}

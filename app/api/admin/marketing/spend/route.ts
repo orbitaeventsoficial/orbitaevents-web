@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import {
@@ -25,6 +25,8 @@ const spendSchema = z.object({
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'read');
+  if (permissionError) return permissionError;
   try {
     const entries = await listMarketingSpend();
     return NextResponse.json({ entries });
@@ -37,6 +39,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
   try {
@@ -56,6 +60,8 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
   try {

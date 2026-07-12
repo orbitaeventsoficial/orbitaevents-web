@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockSendEmail, mockBuildReport, mockGetRecipientsAsString } = vi.hoisted(() => ({
+const { mockPrisma, mockSendTrackedStandaloneEmail, mockBuildReport, mockGetRecipientsAsString } = vi.hoisted(() => ({
   mockPrisma: {
     adminLog: { create: vi.fn() },
   },
-  mockSendEmail: vi.fn(),
+  mockSendTrackedStandaloneEmail: vi.fn(),
   mockBuildReport: vi.fn(),
   mockGetRecipientsAsString: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
-vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
+vi.mock('@/lib/email', () => ({ sendTrackedStandaloneEmail: mockSendTrackedStandaloneEmail }));
 vi.mock('@/lib/logger', () => ({ log: { warn: vi.fn() } }));
 vi.mock('@/lib/services/executiveReportService', () => ({
   buildExecutiveReport: mockBuildReport,
@@ -38,7 +38,7 @@ beforeEach(() => {
     },
     funnel: { NEW: 5, CONTACTED: 3, QUOTE_SENT: 1, NEGOTIATING: 1, WON: 0, LOST: 0 },
   });
-  mockSendEmail.mockResolvedValue({});
+  mockSendTrackedStandaloneEmail.mockResolvedValue({});
   mockPrisma.adminLog.create.mockResolvedValue({});
   mockGetRecipientsAsString.mockResolvedValue('reports@test.com');
 });
@@ -48,8 +48,12 @@ describe('sendExecutiveReport', () => {
     const result = await sendExecutiveReport();
 
     expect(result.ok).toBe(true);
-    expect(mockSendEmail).toHaveBeenCalledWith(
-      expect.objectContaining({ subject: expect.stringContaining('Executive Report') })
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateKey: 'executive-report',
+        subject: expect.stringContaining('Executive Report'),
+        orbita: expect.objectContaining({ kind: 'admin', origin: 'executive-report' }),
+      })
     );
     expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -6,7 +6,9 @@ import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
 import {
   getAdminProposalById,
+  ProposalCanonicalAcceptanceError,
   getProposalFinancialConsistencyIssues,
+  ProposalCanonicalDispatchError,
   updateAdminProposal,
   deleteAdminProposal,
 } from '@/lib/services/proposalAdminService';
@@ -107,6 +109,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
+    if (error instanceof ProposalCanonicalAcceptanceError) {
+      return NextResponse.json(error.body, { status: error.status });
+    }
+    if (error instanceof ProposalCanonicalDispatchError) {
+      return NextResponse.json(error.body, { status: error.status });
+    }
     log.error('Error actualitzant pressupost', error, {
       context: {
         requestId,

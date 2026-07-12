@@ -18,6 +18,7 @@ export type DossierServiceLineLike = {
   revenueAmount?: number | null;
   costAmount?: number | null;
   quantity?: number | null;
+  notes?: string | null;
 };
 
 export type DossierLeadServiceLinePayload = {
@@ -152,6 +153,11 @@ function isDjFirstHourLabel(label: string): boolean {
     (label.includes('1a hora') || label.includes('primera hora'));
 }
 
+function catalogProductIdFromNotes(notes?: string | null): string | null {
+  const match = (notes ?? '').match(/Producte de cat[aà]leg:\s*([a-z0-9_-]+)/i);
+  return match?.[1] ? `collab:${match[1]}` : null;
+}
+
 export function dossierDjHoursFromServiceLines(lines: DossierServiceLineLike[]): number {
   const djRevenue = lines
     .filter((line) => line.kind === 'DJ' && !isDjContinuationLabel(normalizeDossierProductText(line.label)))
@@ -169,6 +175,9 @@ export function productIdsFromDossierServiceLines(
   const byName = new Map(products.map((product) => [normalizeDossierProductText(product.nom), product.id]));
   const ids = lines
     .map((line) => {
+      const catalogId = catalogProductIdFromNotes(line.notes);
+      if (catalogId && validProductIds.has(catalogId)) return catalogId;
+
       const directId = line.collaboratorId
         ? (line.collaboratorId.startsWith('collab:') ? line.collaboratorId : `collab:${line.collaboratorId}`)
         : null;

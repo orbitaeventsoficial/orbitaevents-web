@@ -60,6 +60,8 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     createdAt: proposal.createdAt.toISOString(),
     sentAt: proposal.sentAt?.toISOString(),
     acceptedAt: proposal.acceptedAt?.toISOString(),
+    pdfUrl: proposal.pdfUrl || null,
+    pdfKey: proposal.pdfKey || null,
     snapshot: (proposal.snapshot as Record<string, unknown> | null) || undefined,
     contractReference: proposal.contractReference || null,
     contractStatus: proposal.contractStatus || null,
@@ -96,6 +98,45 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       depositPaid: bookingRow.depositPaid ?? undefined,
       remainingPaid: bookingRow.remainingPaid ?? undefined,
       discountCode: bookingRow.discountCode || undefined,
+      invoices: bookingRow.invoices?.map((invoice) => ({
+        id: invoice.id,
+        reference: invoice.reference,
+        status: invoice.status,
+        total: Number(invoice.total || 0),
+        pdfUrl: invoice.pdfUrl || null,
+        holdedInvoiceUrl: invoice.holdedInvoiceUrl || null,
+        createdAt: invoice.createdAt.toISOString(),
+      })) ?? [],
+      deliveryNotes: bookingRow.deliveryNotes?.map((deliveryNote) => ({
+        id: deliveryNote.id,
+        reference: deliveryNote.reference,
+        status: deliveryNote.status,
+        pdfUrl: deliveryNote.pdfUrl || null,
+        deliveredAt: deliveryNote.deliveredAt?.toISOString() || null,
+        signedAt: deliveryNote.signedAt?.toISOString() || null,
+        createdAt: deliveryNote.createdAt.toISOString(),
+      })) ?? [],
+      postEventReport: bookingRow.postEventReport
+        ? {
+            id: bookingRow.postEventReport.id,
+            status: bookingRow.postEventReport.status,
+            completedAt: bookingRow.postEventReport.completedAt?.toISOString() || null,
+            createdAt: bookingRow.postEventReport.createdAt.toISOString(),
+            soundQuality: bookingRow.postEventReport.soundQuality,
+            maxDancefloor: bookingRow.postEventReport.maxDancefloor,
+            hadIncidents: bookingRow.postEventReport.hadIncidents,
+          }
+        : null,
+      clientSurvey: bookingRow.clientSurvey
+        ? {
+            id: bookingRow.clientSurvey.id,
+            submittedAt: bookingRow.clientSurvey.submittedAt.toISOString(),
+            overallRating: bookingRow.clientSurvey.overallRating,
+            npsScore: bookingRow.clientSurvey.npsScore,
+            testimonialPermission: bookingRow.clientSurvey.testimonialPermission,
+            createdTestimonialId: bookingRow.clientSurvey.createdTestimonialId,
+          }
+        : null,
     };
   });
 

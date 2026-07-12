@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { fetchWithCsrf } from '@/lib/csrf';
-import { useToast } from '../components/ToastProvider';
 import { EditorControlStrip } from '../components/EditorControlStrip';
 
 // ─── Component types ────────────────────────────────────────────────────────
@@ -44,24 +42,11 @@ const AVAILABLE_COMPONENTS: AvailableComponent[] = [
 
 let nextId = 1;
 
-async function readCustomQuoteSaveError(response: Response): Promise<string> {
-  try {
-    const payload = await response.json() as { error?: string; message?: string };
-    return payload.error || payload.message || 'Error desant el pressupost';
-  } catch {
-    return 'Error desant el pressupost';
-  }
-}
-
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export default function CostCalculatorClient() {
-  const toast = useToast();
   const [components, setComponents] = useState<CostComponent[]>([]);
   const [marginPct, setMarginPct] = useState(30);
-  const [quoteName, setQuoteName] = useState('');
-  const [clientName, setClientName] = useState('');
-  const [saving, setSaving] = useState(false);
   const [dragOver, setDragOver] = useState(false);
 
   // Afegir component
@@ -113,21 +98,12 @@ export default function CostCalculatorClient() {
     () => components.reduce((sum, component) => sum + (component.hours * component.quantity), 0),
     [components],
   );
-  const hasQuoteBase = quoteName.trim().length > 0;
   const actionTitle = components.length === 0
-    ? 'Començar afegint la base del pressupost'
-    : !hasQuoteBase
-      ? 'Posar nom i tancar la base abans de desar'
-      : saving
-        ? 'Deixar que el pressupost es desi correctament'
-        : 'Refinar marge i cost abans de guardar';
+    ? 'Començar afegint la base de la simulació'
+    : 'Refinar marge i cost abans de crear la proposta';
   const actionDescription = components.length === 0
     ? 'Sense components no hi ha lectura econòmica real sobre la qual calcular marge o PVP.'
-    : !hasQuoteBase
-      ? 'El retorn més alt ara no és seguir afegint peces, sinó identificar el pressupost i tancar la base editable.'
-      : saving
-        ? 'Ara mateix el sistema està persistint el pressupost personalitzat.'
-        : 'Amb la base completa, el pas bo és ajustar marge i revisar el preu suggerit abans de desar.';
+    : 'Amb la base completa, el pas bo és ajustar marge i portar el PVP a Pressupostos si s’ha d’enviar al client.';
 
   // Drag & Drop
   const handleDragStart = (e: React.DragEvent, component: AvailableComponent) => {
@@ -142,48 +118,14 @@ export default function CostCalculatorClient() {
     if (component) addComponent(component);
   };
 
-  // Guardar
-  const handleSave = async () => {
-    if (!quoteName.trim()) { toast.error('Posa un nom al pressupost'); return; }
-    if (components.length === 0) { toast.error('Afegeix almenys un component'); return; }
-
-    setSaving(true);
-    try {
-      const res = await fetchWithCsrf('/api/admin/custom-quotes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: quoteName.trim(),
-          clientName: clientName.trim() || null,
-          components: components.map((c) => ({
-            type: c.type, label: c.label, hours: c.hours, quantity: c.quantity, unitCost: c.unitCost, total: c.total,
-          })),
-          totalCost: totals.totalCost,
-          suggestedPrice: totals.suggestedPrice,
-          marginPct: totals.marginPct,
-        }),
-      });
-      if (!res.ok) throw new Error(await readCustomQuoteSaveError(res));
-      toast.success('Pressupost desat');
-      setQuoteName('');
-      setClientName('');
-      setComponents([]);
-    } catch (err) {
-      console.error('Error desant pressupost', err);
-      toast.error(err instanceof Error ? err.message : 'Error desant el pressupost');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
-    <div className="grid lg:grid-cols-[300px_1fr] gap-6" data-help-title="Calculadora de costos" data-help-desc="Munta pressupostos personalitzats arrossegant components (DJ, so, llums, transport...). Calcula cost, marge i preu suggerit.">
+    <div className="grid lg:grid-cols-[300px_1fr] gap-6" data-help-title="Calculadora de costos" data-help-desc="Simula costos interns arrossegant components (DJ, so, llums, transport...). Calcula cost, marge i preu suggerit.">
       <div className="lg:col-span-2">
         <EditorControlStrip
           overview={{
             eyebrow: 'Cobertura',
-            title: 'Quin estat té ara mateix el pressupost',
-            tone: components.length === 0 ? 'default' : hasQuoteBase ? 'success' : 'warning',
+            title: 'Quin estat té ara mateix la simulació',
+            tone: components.length === 0 ? 'default' : 'success',
             stats: [
               { label: 'Components', value: components.length, tone: components.length > 0 ? 'success' : 'warning', hint: 'base activa' },
               { label: 'Cost total', value: `${totals.totalCost}€`, hint: 'cost real' },
@@ -193,34 +135,36 @@ export default function CostCalculatorClient() {
           status={{
             eyebrow: 'Estat',
             title: 'Què convé revisar abans de desar',
-            tone: components.length === 0 || !hasQuoteBase || saving ? 'warning' : 'info',
+            tone: components.length === 0 ? 'warning' : 'info',
             items: [
               components.length === 0
-                ? 'Encara no hi ha components al pressupost.'
+                ? 'Encara no hi ha components a la simulació.'
                 : `Hi ha ${components.length} components i ${totalHours} hores/unitats agregades de treball.`,
-              hasQuoteBase
-                ? `El pressupost ja té nom: ${quoteName.trim()}.`
-                : 'Encara falta el nom del pressupost per deixar-lo identificat.',
-              clientName.trim()
-                ? `Client associat: ${clientName.trim()}.`
-                : 'No hi ha client associat a aquesta simulació.',
+              'Aquesta pantalla no desa documents comercials.',
+              'El document client-facing viu a Pressupostos.',
             ],
           }}
           action={{
             eyebrow: 'Acció principal',
             title: actionTitle,
             description: actionDescription,
-            tone: components.length === 0 || !hasQuoteBase || saving ? 'warning' : 'success',
+            tone: components.length === 0 ? 'warning' : 'success',
             secondaryPills: [
-              clientName.trim() ? 'Amb client' : 'Sense client',
-              saving ? 'Desant' : 'Sessió estable',
+              'Simulació interna',
+              'Proposal canònica',
             ],
           }}
         />
+        <div className="mt-3 flex flex-col gap-2 text-sm text-[var(--t3)] sm:flex-row sm:items-center sm:justify-between">
+          <span>Els documents client-facing es creen i s'envien des del workspace canònic de Pressupostos.</span>
+          <a href="/admin/presupuestos" className="ap-btn ap-btn--secondary">
+            Obrir Pressupostos
+          </a>
+        </div>
       </div>
 
       {/* Sidebar — Components disponibles */}
-      <div className="ap-card rounded-xl p-5" data-help-title="Components disponibles" data-help-desc="Arrossega o clica components per afegir-los al pressupost. Cada component té un cost/hora estimat.">
+      <div className="ap-card rounded-xl p-5" data-help-title="Components disponibles" data-help-desc="Arrossega o clica components per afegir-los a la simulació. Cada component té un cost/hora estimat.">
         <h3 className="text-sm font-bold text-[var(--t2)] uppercase tracking-wider mb-4">Components</h3>
         <p className="mb-4 text-xs admin-tone-text-slate">Arrossega o clica per afegir</p>
         <div className="space-y-2">
@@ -357,25 +301,15 @@ export default function CostCalculatorClient() {
               </div>
             </div>
 
-            {/* Save form */}
+            {/* Canonical proposal handoff */}
             <div className="border-t pt-4 admin-tone-border-neutral">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  value={quoteName} onChange={(e) => setQuoteName(e.target.value)}
-                  placeholder="Nom del pressupost (ex: DJ 3h sense altaveus)"
-                  className="flex-1 px-4 py-2.5 rounded-xl border admin-tone-border-neutral admin-tone-bg-neutral text-sm "
-                />
-                <input
-                  value={clientName} onChange={(e) => setClientName(e.target.value)}
-                  placeholder="Client (opcional)"
-                  className="sm:w-48 px-4 py-2.5 rounded-xl border admin-tone-border-neutral admin-tone-bg-neutral text-sm "
-                />
-                <button
-                  onClick={handleSave} disabled={saving}
-                  className="ap-btn ap-btn--primary disabled:opacity-50"
-                >
-                  {saving ? 'Desant...' : 'Desar pressupost'}
-                </button>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-[var(--t3)]">
+                  Per enviar o arxivar una proposta, crea-la al workspace canònic de Pressupostos.
+                </p>
+                <a href="/admin/presupuestos" className="ap-btn ap-btn--primary">
+                  Obrir Pressupostos
+                </a>
               </div>
             </div>
           </div>
@@ -384,4 +318,3 @@ export default function CostCalculatorClient() {
     </div>
   );
 }
-

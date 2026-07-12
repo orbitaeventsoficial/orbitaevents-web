@@ -88,6 +88,9 @@ describe('/api/admin/portfolio/events', () => {
       title: 'Titol',
       coverImage: '/x.jpg',
       services: ['dj'],
+      originType: 'POST_EVENT_REPORT',
+      sourceBookingId: 'booking-1',
+      originLabel: 'OE-2026-001',
     }));
 
     expect(res.status).toBe(201);
@@ -98,6 +101,9 @@ describe('/api/admin/portfolio/events', () => {
       coverImage: '/x.jpg',
       services: ['dj'],
       published: false,
+      originType: 'POST_EVENT_REPORT',
+      sourceBookingId: 'booking-1',
+      originLabel: 'OE-2026-001',
     }));
     await expect(res.json()).resolves.toEqual({ data: { id: 'evt-1', slug: 'casament-demo' } });
   });

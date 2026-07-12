@@ -35,6 +35,7 @@ import {
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { getLeadPriorityColorDisplay } from '@/app/admin/leads/colorTheme';
 import { bookingOutstandingBreakdown } from '@/lib/payment-status';
+import { isSentLikeProposalStatus } from '@/lib/proposals/status';
 
 type CustomerEditableFields = {
   name: string;
@@ -80,7 +81,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
   const openTasks = data.tasks.filter((t) => !t.done).length;
   const urgentTasks = data.tasks.filter((t) => !t.done && t.priority === 'HIGH').length;
   const draftProposals = data.proposals.filter((p) => p.status === 'DRAFT').length;
-  const sentProposals = data.proposals.filter((p) => p.status === 'SENT').length;
+  const sentProposals = data.proposals.filter((p) => isSentLikeProposalStatus(p.status)).length;
   const acceptedProposals = data.proposals.filter((p) => p.status === 'ACCEPTED').length;
   const confirmedBookings = data.bookings.filter((b) => b.status === 'CONFIRMED').length;
   const upcomingBookings = data.bookings.filter(

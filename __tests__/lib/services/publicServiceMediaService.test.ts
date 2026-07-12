@@ -23,7 +23,6 @@ vi.mock('@/lib/services/galleryService', () => ({
 import {
   getPublicServiceHeroImage,
   getPublicServiceGalleryImages,
-  listPublicMobileServiceCardImages,
 } from '@/lib/services/publicServiceMediaService';
 
 beforeEach(() => {
@@ -115,52 +114,5 @@ describe('getPublicServiceGalleryImages', () => {
 
     const result = await getPublicServiceGalleryImages('bodas', 4);
     expect(result).toEqual(['/same.avif']);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// listPublicMobileServiceCardImages
-// ---------------------------------------------------------------------------
-
-describe('listPublicMobileServiceCardImages', () => {
-  it('usa override especific de home.servicesCards si existeix', async () => {
-    mockGetOverride.mockImplementation(async (key: string) => {
-      if (key === 'home.servicesCards.bodas') return { src: '/card/bodas.avif' };
-      if (key === 'home.servicesCards.halloween') return { src: '/card/halloween.avif' };
-      return null;
-    });
-
-    const result = await listPublicMobileServiceCardImages();
-    expect(result.bodas).toBe('/card/bodas.avif');
-    expect(result.halloween).toBe('/card/halloween.avif');
-    // Sense override de card → cau al fallback estàtic (no hi ha media/photos)
-    expect(result.fiestas).toBe('/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif');
-  });
-
-  it('cau al hero del servei si no hi ha override de card', async () => {
-    // Override només del hero del servei, no de la card
-    mockGetOverride.mockImplementation(async (key: string) => {
-      if (key === 'services.bodas.hero') return { src: '/hero/bodas.avif' };
-      return null;
-    });
-
-    const result = await listPublicMobileServiceCardImages();
-    expect(result.bodas).toBe('/hero/bodas.avif');
-  });
-
-  it('retorna les 5 keys esperadas', async () => {
-    const result = await listPublicMobileServiceCardImages();
-    expect(Object.keys(result).sort()).toEqual(['bodas', 'empresas', 'fiestas', 'halloween', 'monmagic']);
-  });
-
-  it('prioritza card override sobre hero override', async () => {
-    mockGetOverride.mockImplementation(async (key: string) => {
-      if (key === 'home.servicesCards.bodas') return { src: '/card-specific.avif' };
-      if (key === 'services.bodas.hero') return { src: '/hero-general.avif' };
-      return null;
-    });
-
-    const result = await listPublicMobileServiceCardImages();
-    expect(result.bodas).toBe('/card-specific.avif');
   });
 });

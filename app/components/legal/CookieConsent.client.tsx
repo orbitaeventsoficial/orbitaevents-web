@@ -8,6 +8,10 @@ import { useTranslations } from 'next-intl';
 
 const COOKIE_CONSENT_KEY = 'orbita_cookie_consent';
 
+interface CookieConsentProps {
+  mobileBottomOffset?: boolean;
+}
+
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
   useEffect(() => {
@@ -19,7 +23,7 @@ function useIsMobile() {
   return mobile;
 }
 
-export default function CookieConsent() {
+export default function CookieConsent({ mobileBottomOffset = false }: CookieConsentProps) {
   const t = useTranslations('footer.cookieConsent');
   const [showBanner, setShowBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -192,16 +196,21 @@ export default function CookieConsent() {
 
   // ── Mòbil: banner compacte que no tapa el contingut ──
   if (isMobile) {
+    const mobileBannerPosition = mobileBottomOffset
+      ? 'bottom-[calc(var(--o-portal-bottom-nav-h)+var(--safe-bottom))]'
+      : 'bottom-0';
+    const mobileBannerSafeArea = mobileBottomOffset ? '' : 'safe-bottom';
+
     return (
       <AnimatePresence>
         <motion.div
-          className="fixed bottom-0 left-0 right-0 z-50"
+          className={`fixed left-0 right-0 z-50 ${mobileBannerPosition}`}
           initial={{ y: 80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         >
-          <div className="bg-neutral-950/95 backdrop-blur-xl border-t border-oe-gold/20 px-4 py-3 safe-area-bottom">
+          <div className={`bg-neutral-950/95 backdrop-blur-xl border-t border-oe-gold/20 px-4 py-3 ${mobileBannerSafeArea}`}>
             <AnimatePresence mode="wait">
               {!showSettings ? (
                 <motion.div

@@ -6,11 +6,14 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { CUSTOM_BOOKING_PACK_MARKER } from '@/lib/constants/pricing';
+import { TRAVEL_COST_LINE_MARKER, withTravelHeadcountNote } from '@/lib/services/travelLaborCost';
 import type { BookingFormData, BookingLeadData, BookingSelectedExtras, BookingServiceLineFormInput } from './booking-form.types';
+import { syncBingoAssistantForGuests } from './bingoAssistantRule';
 
 interface UseNewBookingSubmitOptions {
   form: BookingFormData;
   selectedExtras: BookingSelectedExtras;
+  proposalId?: string | null;
   leadId: string | null;
   leadData: Pick<BookingLeadData, 'customerId'> | null;
   customerId: string | null;
@@ -74,13 +77,17 @@ function buildServiceLines(input?: UseNewBookingSubmitOptions['relationshipConte
 }
 
 function stripFormOnlyFields(line: BookingServiceLineFormInput): Omit<BookingServiceLineFormInput, 'travelHeadcount'> {
-  const { travelHeadcount: _travelHeadcount, ...cleanLine } = line;
-  return cleanLine;
+  const { travelHeadcount, ...cleanLine } = line;
+  const notes = cleanLine.notes?.includes(TRAVEL_COST_LINE_MARKER)
+    ? cleanLine.notes.trim()
+    : withTravelHeadcountNote(cleanLine.notes, travelHeadcount);
+  return notes ? { ...cleanLine, notes } : { ...cleanLine, notes: undefined };
 }
 
 export function useNewBookingSubmit({
   form,
   selectedExtras,
+  proposalId,
   leadId,
   leadData,
   customerId,
@@ -120,9 +127,12 @@ export function useNewBookingSubmit({
     setError(null);
 
     try {
-      const visibleServiceLines = explicitServiceLines && explicitServiceLines.length > 0
-        ? explicitServiceLines.map(stripFormOnlyFields)
-        : buildServiceLines(relationshipContext);
+      const visibleServiceLines = syncBingoAssistantForGuests(
+        explicitServiceLines && explicitServiceLines.length > 0
+          ? explicitServiceLines
+          : buildServiceLines(relationshipContext),
+        form.guestCount,
+      ).map(stripFormOnlyFields);
       const routeSettlementLines = routeCostLines && routeCostLines.length > 0
         ? routeCostLines.map(stripFormOnlyFields)
         : [];
@@ -131,6 +141,7 @@ export function useNewBookingSubmit({
         ?? (relationshipContext?.mode === 'PARTNER_HIRES_ORBITA' ? relationshipContext.partnerId || undefined : undefined);
       const notes = form.notes.trim();
       const body = {
+        proposalId: proposalId || undefined,
         leadId: leadId || undefined,
         customerId: leadData?.customerId || customerId || undefined,
         sourceCollaboratorId: sourceCollaboratorId || undefined,
@@ -186,7 +197,7 @@ export function useNewBookingSubmit({
     } finally {
       setSubmitting(false);
     }
-  }, [customerId, form, internalTravelCost, leadData, leadId, manualTotalPrice, relationshipContext, router, selectedExtras, sourceCollaboratorId, customPackPrice, invoiceRequired, explicitServiceLines, routeCostLines, explicitBilledCollaboratorId]);
+  }, [customerId, form, internalTravelCost, leadData, leadId, manualTotalPrice, proposalId, relationshipContext, router, selectedExtras, sourceCollaboratorId, customPackPrice, invoiceRequired, explicitServiceLines, routeCostLines, explicitBilledCollaboratorId]);
 
   return {
     submitting,

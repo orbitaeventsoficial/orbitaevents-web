@@ -33,14 +33,21 @@ function item(overrides: Partial<PlaybookItem> = {}): PlaybookItem {
 }
 
 describe('buildPostEventNextActionHref', () => {
-  it('obre la reserva concreta per enviar agraiment', () => {
-    expect(buildPostEventNextActionHref(item())).toBe('/admin/bookings/booking-1#sec-client');
+  it('obre el bloc post-event de la reserva concreta per enviar agraiment', () => {
+    expect(buildPostEventNextActionHref(item())).toBe('/admin/bookings/booking-1#sec-post-event');
   });
 
   it('porta testimoni a comunicacions del client si hi ha customerId', () => {
     expect(buildPostEventNextActionHref(item({
       nextAction: { key: 'testimonial', label: 'Testimoni', status: 'PENDING', daysSinceEvent: 5, note: null },
     }))).toBe('/admin/clientes/customer-1?tab=comms');
+  });
+
+  it('porta testimoni sense customerId al bloc post-event de la reserva', () => {
+    expect(buildPostEventNextActionHref(item({
+      customerId: null,
+      nextAction: { key: 'testimonial', label: 'Testimoni', status: 'PENDING', daysSinceEvent: 5, note: null },
+    }))).toBe('/admin/bookings/booking-1#sec-post-event');
   });
 
   it('porta social post al workspace social', () => {
@@ -66,7 +73,7 @@ describe('buildPreparedPostEventAction', () => {
 
     expect(prepared).toMatchObject({
       key: 'thank_you',
-      href: '/admin/bookings/booking-1#sec-client',
+      href: '/admin/bookings/booking-1#sec-post-event',
       ctaLabel: 'Obrir reserva',
       safetyLabel: 'Preparat, no enviat',
     });
@@ -82,6 +89,16 @@ describe('buildPreparedPostEventAction', () => {
     expect(prepared?.href).toBe('/admin/clientes/customer-1?tab=comms');
     expect(prepared?.ctaLabel).toBe('Obrir comunicacions');
     expect(prepared?.draft).toContain('testimoni curt');
+  });
+
+  it('prepara testimoni sense client cap al bloc post-event de la reserva', () => {
+    const prepared = buildPreparedPostEventAction(item({
+      customerId: null,
+      nextAction: { key: 'testimonial', label: 'Testimoni', status: 'PENDING', daysSinceEvent: 5, note: null },
+    }));
+
+    expect(prepared?.href).toBe('/admin/bookings/booking-1#sec-post-event');
+    expect(prepared?.ctaLabel).toBe('Obrir reserva');
   });
 
   it('prepara social sense posar el nom del client al draft public', () => {

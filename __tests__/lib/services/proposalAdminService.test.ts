@@ -22,6 +22,8 @@ import {
   listAdminProposals,
   createAdminProposal,
   getAdminProposalById,
+  ProposalCanonicalAcceptanceError,
+  ProposalCanonicalDispatchError,
   ProposalFinancialConsistencyError,
   updateAdminProposal,
   reassignProposalOwner,
@@ -178,6 +180,54 @@ describe('createAdminProposal', () => {
 
     expect(mockPrisma.proposal.create).not.toHaveBeenCalled();
   });
+
+  it('rebutja crear una proposta directament com a enviada', async () => {
+    await expect(createAdminProposal({
+      status: 'SENT',
+      currency: 'EUR',
+      validityDays: 30,
+      subtotal: 500,
+      discount: 0,
+      vatRate: 21,
+      vatAmount: 105,
+      total: 605,
+      snapshot: {},
+    })).rejects.toBeInstanceOf(ProposalCanonicalDispatchError);
+
+    expect(mockPrisma.proposal.create).not.toHaveBeenCalled();
+  });
+
+  it('rebutja crear una proposta directament com a vista', async () => {
+    await expect(createAdminProposal({
+      status: 'VIEWED',
+      currency: 'EUR',
+      validityDays: 30,
+      subtotal: 500,
+      discount: 0,
+      vatRate: 21,
+      vatAmount: 105,
+      total: 605,
+      snapshot: {},
+    })).rejects.toBeInstanceOf(ProposalCanonicalDispatchError);
+
+    expect(mockPrisma.proposal.create).not.toHaveBeenCalled();
+  });
+
+  it('rebutja crear una proposta amb PDF escrit fora del dispatch canònic', async () => {
+    await expect(createAdminProposal({
+      currency: 'EUR',
+      validityDays: 30,
+      subtotal: 500,
+      discount: 0,
+      vatRate: 21,
+      vatAmount: 105,
+      total: 605,
+      snapshot: {},
+      pdfUrl: 'https://cdn.test/proposal.pdf',
+    })).rejects.toBeInstanceOf(ProposalCanonicalDispatchError);
+
+    expect(mockPrisma.proposal.create).not.toHaveBeenCalled();
+  });
 });
 
 describe('getAdminProposalById', () => {
@@ -198,28 +248,132 @@ describe('getAdminProposalById', () => {
 
 describe('updateAdminProposal', () => {
   it('actualitza camp específic', async () => {
-    const result = await updateAdminProposal('prop1', { status: 'SENT' });
+    const result = await updateAdminProposal('prop1', { locale: 'es' });
 
     expect(result.status).toBe(200);
     expect(mockPrisma.proposal.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: 'prop1' },
-        data: expect.objectContaining({ status: 'SENT' }),
+        data: expect.objectContaining({ locale: 'es' }),
       })
     );
   });
 
-  it('parseja dates sentAt/acceptedAt', async () => {
+  it('parseja acceptedAt', async () => {
     await updateAdminProposal('prop1', {
-      sentAt: '2026-03-15T10:00:00Z',
       acceptedAt: null,
     });
 
     expect(mockPrisma.proposal.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
-          sentAt: expect.any(Date),
           acceptedAt: null,
+        }),
+      })
+    );
+  });
+
+  it('rebutja marcar SENT fora del dispatch canònic', async () => {
+    await expect(updateAdminProposal('prop1', { status: 'SENT' })).rejects.toBeInstanceOf(ProposalCanonicalDispatchError);
+    expect(mockPrisma.proposal.update).not.toHaveBeenCalled();
+  });
+
+  it('rebutja marcar VIEWED fora del dispatch canònic', async () => {
+    await expect(updateAdminProposal('prop1', { status: 'VIEWED' })).rejects.toBeInstanceOf(ProposalCanonicalDispatchError);
+    expect(mockPrisma.proposal.update).not.toHaveBeenCalled();
+  });
+
+  it('rebutja escriure sentAt o PDF fora del dispatch canònic', async () => {
+    await expect(updateAdminProposal('prop1', { sentAt: '2026-03-15T10:00:00Z' })).rejects.toBeInstanceOf(ProposalCanonicalDispatchError);
+    await expect(updateAdminProposal('prop1', { pdfUrl: 'https://cdn.test/proposal.pdf' })).rejects.toBeInstanceOf(ProposalCanonicalDispatchError);
+    expect(mockPrisma.proposal.update).not.toHaveBeenCalled();
+  });
+
+  it('rebutja acceptar un pressupost que no ha sortit pel dispatch canònic', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValueOnce({
+      status: 'DRAFT',
+      sentAt: null,
+      pdfUrl: null,
+      pdfKey: null,
+    });
+
+    await expect(updateAdminProposal('prop1', { status: 'ACCEPTED' })).rejects.toBeInstanceOf(ProposalCanonicalAcceptanceError);
+
+    expect(mockPrisma.proposal.update).not.toHaveBeenCalled();
+  });
+
+  it('rebutja acceptar un pressupost enviat sense PDF durable', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValueOnce({
+      status: 'SENT',
+      sentAt: new Date('2026-07-09T10:00:00Z'),
+      pdfUrl: null,
+      pdfKey: null,
+    });
+
+    await expect(updateAdminProposal('prop1', { acceptedAt: '2026-07-10T10:00:00Z' })).rejects.toBeInstanceOf(ProposalCanonicalAcceptanceError);
+
+    expect(mockPrisma.proposal.update).not.toHaveBeenCalled();
+  });
+
+  it('accepta només pressupostos enviats amb PDF i segella acceptedAt', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValueOnce({
+      status: 'SENT',
+      sentAt: new Date('2026-07-09T10:00:00Z'),
+      pdfUrl: '/api/uploads/proposals/prop1/PROP-2026-0001.pdf',
+      pdfKey: 'proposals/prop1/PROP-2026-0001.pdf',
+    });
+
+    const result = await updateAdminProposal('prop1', { status: 'ACCEPTED' });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'prop1' },
+        data: expect.objectContaining({
+          status: 'ACCEPTED',
+          acceptedAt: expect.any(Date),
+        }),
+      })
+    );
+  });
+
+  it('accepta pressupostos llegits amb PDF canònic i segella acceptedAt', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValueOnce({
+      status: 'VIEWED',
+      sentAt: new Date('2026-07-09T10:00:00Z'),
+      pdfUrl: '/api/uploads/proposals/prop1/PROP-2026-0001.pdf',
+      pdfKey: 'proposals/prop1/PROP-2026-0001.pdf',
+    });
+
+    const result = await updateAdminProposal('prop1', { status: 'ACCEPTED' });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'prop1' },
+        data: expect.objectContaining({
+          status: 'ACCEPTED',
+          acceptedAt: expect.any(Date),
+        }),
+      })
+    );
+  });
+
+  it('normalitza acceptedAt sol a status ACCEPTED si el PDF canònic existeix', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValueOnce({
+      status: 'SENT',
+      sentAt: new Date('2026-07-09T10:00:00Z'),
+      pdfUrl: '/api/uploads/proposals/prop1/PROP-2026-0001.pdf',
+      pdfKey: 'proposals/prop1/PROP-2026-0001.pdf',
+    });
+
+    await updateAdminProposal('prop1', { acceptedAt: '2026-07-10T10:00:00Z' });
+
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: 'ACCEPTED',
+          acceptedAt: new Date('2026-07-10T10:00:00Z'),
         }),
       })
     );

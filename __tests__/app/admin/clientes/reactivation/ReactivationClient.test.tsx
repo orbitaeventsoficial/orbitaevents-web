@@ -3,8 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ReactivationCandidate } from '@/lib/services/reactivationService';
 import ReactivationClient from '@/app/admin/clientes/reactivation/ReactivationClient';
 
-const { mockClipboardWriteText } = vi.hoisted(() => ({
+const { mockClipboardWriteText, mockFetchWithCsrf } = vi.hoisted(() => ({
   mockClipboardWriteText: vi.fn(),
+  mockFetchWithCsrf: vi.fn(),
+}));
+
+vi.mock('@/lib/csrf', () => ({
+  fetchWithCsrf: mockFetchWithCsrf,
 }));
 
 const candidates: ReactivationCandidate[] = [
@@ -68,6 +73,7 @@ describe('ReactivationClient', () => {
       configurable: true,
       value: { writeText: mockClipboardWriteText },
     });
+    mockFetchWithCsrf.mockResolvedValue({ ok: true });
   });
 
   afterEach(() => {
@@ -89,6 +95,35 @@ describe('ReactivationClient', () => {
     expect(copyButtons[0]).not.toHaveAttribute('aria-invalid');
     expect(copyButtons[1]).toHaveAttribute('aria-invalid', 'true');
     expect(mockClipboardWriteText).toHaveBeenCalledWith('Missatge reactivacio 2');
+    expect(mockFetchWithCsrf).not.toHaveBeenCalled();
     expect(consoleErrorSpy).toHaveBeenCalled();
+  });
+
+  it('registra al Customer Hub quan copia un missatge de reactivacio', async () => {
+    mockClipboardWriteText.mockResolvedValueOnce(undefined);
+
+    render(<ReactivationClient initialCandidates={candidates} />);
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Copiar missatge' })[0]);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '✓ Copiat' })).toBeInTheDocument();
+    });
+
+    expect(mockFetchWithCsrf).toHaveBeenCalledWith('/api/admin/customers/customer-1/activities', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: expect.stringContaining('REACTIVATION_PREPARED'),
+    });
+    expect(mockFetchWithCsrf.mock.calls[0][1].body).toContain('Missatge reactivacio 1');
+  });
+
+  it('obre Email pel composer canonic del client', () => {
+    render(<ReactivationClient initialCandidates={candidates} />);
+
+    expect(screen.getAllByRole('link', { name: '✉️ Email' })[0]).toHaveAttribute(
+      'href',
+      '/admin/inbox/compose?customerId=customer-1&template=reactivacio',
+    );
   });
 });

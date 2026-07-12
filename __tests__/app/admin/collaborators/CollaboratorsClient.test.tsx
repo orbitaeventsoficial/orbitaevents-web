@@ -11,7 +11,13 @@ vi.mock('@/app/admin/components/ConfirmDialog', () => ({
   useConfirmDialog: () => ({ confirm: vi.fn(), dialogProps: {} }),
 }));
 vi.mock('@/app/admin/collaborators/CollaboratorProductsPanel', () => ({
-  default: () => null,
+  default: ({ products }: { products: Array<{ id: string; name: string }> }) => (
+    <div data-testid="collaborator-products">
+      {products.map((product) => (
+        <span key={product.id}>{product.name}</span>
+      ))}
+    </div>
+  ),
 }));
 
 import CollaboratorsClient from '@/app/admin/collaborators/CollaboratorsClient';
@@ -31,7 +37,10 @@ const collaboratorsResponse = {
       costPerHour: 100,
       notes: null,
       isActive: true,
-      products: [],
+      products: [
+        { id: 'active-product', name: 'Bingo Musical', isActive: true },
+        { id: 'inactive-product', name: 'ZENIT E2E alta baixa 20260710', isActive: false },
+      ],
       _count: { sourcedLeads: 0, sourcedBookings: 0 },
     },
     {
@@ -80,5 +89,19 @@ describe('CollaboratorsClient', () => {
 
     expect(screen.getByText('Carlos Lucas Fernández')).toBeInTheDocument();
     expect(screen.queryByText('Proveïdor de so')).not.toBeInTheDocument();
+  });
+
+  it('oculta productes inactius del catàleg resum fins que s’activa el filtre', async () => {
+    render(<CollaboratorsClient />);
+
+    await waitFor(() => expect(screen.getByText('Carlos Lucas Fernández')).toBeInTheDocument());
+
+    expect(screen.getByText('Bingo Musical')).toBeInTheDocument();
+    expect(screen.queryByText('ZENIT E2E alta baixa 20260710')).not.toBeInTheDocument();
+    expect(screen.getByText('1 productes inactius ocults. Activa el filtre per revisar-los.')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Mostrar productes inactius' }));
+
+    expect(screen.getByText('ZENIT E2E alta baixa 20260710')).toBeInTheDocument();
   });
 });

@@ -265,6 +265,7 @@ export default function BookingMarginCard({
   useEffect(() => {
     const destination = [eventVenue || '', eventLocation || ''].filter(Boolean).join(', ').trim();
     if (!destination) return;
+    if ((initialDistanceKm ?? 0) > 0) return;
     if (destination === lastDistanceDestinationRef.current) return;
 
     const timer = setTimeout(() => {
@@ -272,7 +273,7 @@ export default function BookingMarginCard({
     }, 450);
 
     return () => clearTimeout(timer);
-  }, [eventLocation, eventVenue, calculateDistanceForDestination]);
+  }, [eventLocation, eventVenue, initialDistanceKm, calculateDistanceForDestination]);
 
   return (
     <section
@@ -438,7 +439,11 @@ export default function BookingMarginCard({
         </div>
       )}
 
-      <div className="ap-card p-4 text-sm space-y-1 mb-6" data-help-title="Desglossament de costos" data-help-desc="Mostra el detall tècnic del cost del pack, extres, hores extra i desplaçament usat per calcular el marge.">
+      <details className="ap-rep-detail mb-6" data-help-title="Desglossament de costos" data-help-desc="Mostra el detall tècnic del cost del pack, extres, hores extra i desplaçament usat per calcular el marge.">
+        <summary className="ap-rep-detail-summary">
+          <span>Desglossament de costos</span>
+        </summary>
+        <div className="ap-rep-detail-body text-sm">
         <div className="flex justify-between">
           <span>
             {typeof inventoryCostReal === 'number' && inventoryCostReal > 0
@@ -495,7 +500,8 @@ export default function BookingMarginCard({
             {formatCurrency(transportMargin.marginAmount)} {calculatedTravelCharge > 0 ? `(${transportMargin.marginPct.toFixed(1)}%)` : ''}
           </span>
         </div>
-      </div>
+        </div>
+      </details>
 
       <div className="ap-card p-4" data-help-title="Desplaçament" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
         {/* ── DESPLAÇAMENT: MATEIXA targeta compartida que el lead (#1380). La reserva hereta

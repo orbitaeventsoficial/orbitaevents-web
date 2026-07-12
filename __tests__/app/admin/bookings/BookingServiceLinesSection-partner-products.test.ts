@@ -26,4 +26,9 @@ describe('BookingServiceLinesSection partner products guard', () => {
     expect(source).toContain('`cost ${p.costPrice}€`');
     expect(source).toContain('{productCatalogPriceLabel(p)}');
   });
+
+  it('sincronitza la regla Bingo +70 des del configurador compartit', () => {
+    expect(source).toContain('guestCount?: string | number | null;');
+    expect(source).toContain('syncBingoAssistantForGuests(lines, guestCount)');
+  });
 });

@@ -40,6 +40,15 @@ export const SOCIAL_CATEGORIES = {
 } as const;
 export type SocialCategory = (typeof SOCIAL_CATEGORIES)[keyof typeof SOCIAL_CATEGORIES];
 
+export const SOCIAL_POST_ORIGIN_TYPES = {
+  MANUAL: 'MANUAL',
+  BOOKING: 'BOOKING',
+  TESTIMONIAL: 'TESTIMONIAL',
+  PORTFOLIO: 'PORTFOLIO',
+  UPCOMING_EVENT: 'UPCOMING_EVENT',
+} as const;
+export type SocialPostOriginType = (typeof SOCIAL_POST_ORIGIN_TYPES)[keyof typeof SOCIAL_POST_ORIGIN_TYPES];
+
 export const SOCIAL_PLATFORM_LABELS: Record<SocialPlatform, string> = {
   INSTAGRAM: 'Instagram',
   TIKTOK: 'TikTok',
@@ -78,11 +87,20 @@ export const SOCIAL_CATEGORY_LABELS: Record<SocialCategory, string> = {
   COLLAB: 'Collab',
 };
 
+export const SOCIAL_POST_ORIGIN_LABELS: Record<SocialPostOriginType, string> = {
+  MANUAL: 'Manual',
+  BOOKING: 'Reserva',
+  TESTIMONIAL: 'Testimoni',
+  PORTFOLIO: 'Portfolio',
+  UPCOMING_EVENT: 'Proper event',
+};
+
 export const SOCIAL_VALIDATION_SETS = {
   platforms: new Set<SocialPlatform>(Object.values(SOCIAL_PLATFORMS)),
   statuses: new Set<SocialPostStatus>(Object.values(SOCIAL_POST_STATUSES)),
   contentTypes: new Set<SocialContentType>(Object.values(SOCIAL_CONTENT_TYPES)),
   categories: new Set<SocialCategory>(Object.values(SOCIAL_CATEGORIES)),
+  originTypes: new Set<SocialPostOriginType>(Object.values(SOCIAL_POST_ORIGIN_TYPES)),
 } as const;
 
 export const TASK_QUEUE_VALUES = ['VENÇUT', 'AVUI', 'VIP', 'BLOQUEJAT', 'NORMAL'] as const;

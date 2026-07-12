@@ -69,6 +69,7 @@ describe('onProposalAccepted', () => {
     const result = await onProposalAccepted('p1');
 
     expect(result.triggered).toBe(true);
+    expect(result.detail).toBe('Contract pending generation for proposal p1');
     expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
       where: { id: 'p1' },
       data: { contractStatus: 'DRAFT', contractSentAt: null },

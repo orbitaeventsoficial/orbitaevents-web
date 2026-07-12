@@ -220,7 +220,7 @@ describe('PATCH /api/admin/bookings/[id]', () => {
     });
   });
 
-  it('dispara auto-trigger quan status és CONFIRMED', async () => {
+  it('delega el status CONFIRMED al servei de reserva', async () => {
     mockUpdateBooking.mockResolvedValueOnce({
       status: 200,
       body: { booking: { ...sampleBooking, status: 'CONFIRMED' } },
@@ -228,15 +228,7 @@ describe('PATCH /api/admin/bookings/[id]', () => {
     });
     const { req, params } = makePatchRequest('book-1', { status: 'CONFIRMED' });
     await PATCH(req, params);
-    expect(mockDispatchAutoTrigger).toHaveBeenCalledWith({
-      type: 'booking.confirmed',
-      bookingId: 'book-1',
-    });
-  });
-
-  it('no dispara auto-trigger per altres status', async () => {
-    const { req, params } = makePatchRequest('book-1', { status: 'PREPARING' });
-    await PATCH(req, params);
+    expect(mockUpdateBooking).toHaveBeenCalledWith('book-1', expect.objectContaining({ status: 'CONFIRMED' }));
     expect(mockDispatchAutoTrigger).not.toHaveBeenCalled();
   });
 
@@ -299,7 +291,7 @@ describe('DELETE /api/admin/bookings/[id]', () => {
     mockRequirePermission.mockReturnValue(null);
     mockGetBookingDetail.mockResolvedValue({
       status: 200,
-      body: { booking: { id: 'book-1', reference: 'ORB-2026-001', status: 'PENDING', customerId: 'cust-1' } },
+      body: { booking: { id: 'book-1', reference: 'ORB-2026-001', status: 'PENDING', customerId: 'cust-1', eventDate: '2026-06-20' } },
     });
     mockDeleteBooking.mockResolvedValue({ status: 200, body: { ok: true } });
   });

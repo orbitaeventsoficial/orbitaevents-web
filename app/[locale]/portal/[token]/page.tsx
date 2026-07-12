@@ -28,7 +28,7 @@ import {
 import { buildClientPortalContractPath, getClientPortalContractSummary } from '@/lib/clientPortalContract';
 import { buildClientPortalPaymentsPath, getClientPortalPaymentSummary, type ClientPortalPaymentSummary } from '@/lib/clientPortalPayment';
 import { buildClientPortalTimelinePath } from '@/lib/clientPortalTimeline';
-import { buildClientPortalInvoicePath } from '@/lib/clientPortalInvoice';
+import { buildClientPortalInvoicePath, getClientPortalDeliveryNoteDocument } from '@/lib/clientPortalInvoice';
 import { getBookingQuestionnaire } from '@/lib/services/questionnaireService';
 import { buildClientPortalQuestionnairePath } from '@/lib/clientPortalQuestionnaire';
 import { buildClientPortalGalleryPath } from '@/lib/clientPortalGallery';
@@ -300,6 +300,9 @@ export default async function ClientPortalPage({
   const proposals = booking.proposals;
   const latestProposal = proposals.find((p) => !!p.pdfUrl) || proposals[0];
   const contractSummary = getClientPortalContractSummary(proposals);
+  const deliveryNoteDocument = getClientPortalDeliveryNoteDocument(booking.deliveryNotes ?? []);
+  const latestInvoice = (booking.invoices ?? []).find((invoice) => invoice.status !== 'CANCELLED' && invoice.pdfUrl);
+  const hasDocument = Boolean(contractSummary || latestProposal || deliveryNoteDocument || latestInvoice);
   const paymentSummary = getClientPortalPaymentSummary(booking);
   const bookingExtras = booking.extras;
   const totalTravelKm = typeof booking.distanceKm === 'number' ? booking.distanceKm : 0;
@@ -307,10 +310,17 @@ export default async function ClientPortalPage({
   const travel = computeBoloTransport({
     roundTripKm: totalTravelKm,
     serviceLines: booking.serviceLines ?? [],
+    hasOrbitaPack: (booking.pack.price ?? 0) > 0,
     tollsEur: typeof booking.tollsEur === 'number' ? booking.tollsEur : 0,
+    vehicleCostPerKm: typeof booking.fuelCostPerKm === 'number' ? booking.fuelCostPerKm : null,
   });
   const travelHeadcount = travel.headcount;
   const travelCharge = travel.clientCharge;
+  const portalPostEventTimelineStatus = booking.postEventReport
+    ? t.postEventDone
+    : booking.postEventEmailSent
+      ? t.postEventEmailSent
+      : t.postEventEmailPending;
 
   const progressSteps = getProgressSteps(t, booking, locale, paymentSummary);
   const nextAction = getNextActionLabel(t, paymentSummary, contractSummary);
@@ -325,6 +335,9 @@ export default async function ClientPortalPage({
     month: 'long',
     day: 'numeric',
   });
+  const deliveryNoteSignedDate = deliveryNoteDocument?.signedAt
+    ? new Date(deliveryNoteDocument.signedAt).toLocaleDateString(toIntlLocale(locale))
+    : null;
   const eventPlace = formatClientPortalEventPlace(booking.eventVenue, booking.eventLocation);
   const isUpcoming = eventDateObj.getTime() > Date.now();
 
@@ -629,9 +642,33 @@ export default async function ClientPortalPage({
                     </Link>
                   </div>
                 </div>
-              ) : !latestProposal ? (
+              ) : !hasDocument ? (
                 <p className="text-sm text-white/40 mb-3">{t.noDocuments}</p>
               ) : null}
+              {deliveryNoteDocument && (
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-4 mb-3">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs text-white/35 uppercase tracking-wide">{t.deliveryNoteLabel}</p>
+                      <p className="text-base font-semibold text-white mt-0.5">{deliveryNoteDocument.reference}</p>
+                      <p className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.successText}`}>
+                        {t.deliveryNoteStatusSigned}
+                        {deliveryNoteSignedDate ? ` · ${deliveryNoteSignedDate}` : ''}
+                      </p>
+                    </div>
+                    <a
+                      href={deliveryNoteDocument.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
+                      style={{ borderColor: accentBorder, backgroundColor: accentBg }}
+                    >
+                      {t.deliveryNoteDownloadPdf}
+                      <span className="sr-only"> ({t.opensInNewTab})</span>
+                    </a>
+                  </div>
+                </div>
+              )}
               <div className="flex flex-wrap gap-2">
                 <Link href={buildClientPortalInvoicePath(locale, params.token)}
                   className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
@@ -668,7 +705,7 @@ export default async function ClientPortalPage({
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.postEvent}</p>
-                  <p className="text-sm font-semibold">{booking.postEventReport ? t.postEventDone : t.postEventProgress}</p>
+                  <p className="text-sm font-semibold">{portalPostEventTimelineStatus}</p>
                 </div>
               </div>
               <Link href={buildClientPortalTimelinePath(locale, params.token)}
@@ -765,7 +802,7 @@ export default async function ClientPortalPage({
           {visibility.postEvent && booking.status === 'COMPLETED' && (
             <SectionCard icon={<StarIcon className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />} title={t.postEvent} accentHex={accentHex}>
               <p className="text-sm text-white/50">
-                {t.trackingStatus}: {booking.clientFeedback ? t.feedbackSent : t.pendingClose}.
+                {t.trackingStatus}: {booking.postEventEmailSent ? t.postEventEmailSent : t.postEventEmailPending}.
               </p>
             </SectionCard>
           )}

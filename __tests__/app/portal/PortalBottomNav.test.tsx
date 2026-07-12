@@ -39,4 +39,10 @@ describe('PortalBottomNav', () => {
     expect(screen.queryByRole('navigation', { name: 'Navegació del portal' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Pagos' })).toHaveAttribute('aria-current', 'page');
   });
+
+  it('nomes es mostra com a navegacio inferior en mobil', () => {
+    renderBottomNav();
+
+    expect(screen.getByRole('navigation', { name: 'Navegación del portal' })).toHaveClass('md:hidden');
+  });
 });

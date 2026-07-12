@@ -5,13 +5,6 @@ import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_SHARED_HELP, helpAttrs } from './adminHelpContent';
 
-type CronSummary = {
-  processed: number;
-  sent: number;
-  skipped: number;
-  errors: number;
-};
-
 type RunAllSummary = {
   sequences: {
     executed: number;
@@ -33,38 +26,13 @@ type DailySummary = {
 
 export default function QuickActions() {
   const [loading, setLoading] = useState(false);
-  const [summary, setSummary] = useState<CronSummary | null>(null);
   const [runAllSummary, setRunAllSummary] = useState<RunAllSummary | null>(null);
   const [dailySummary, setDailySummary] = useState<DailySummary | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function runCron() {
-    setLoading(true);
-    setError(null);
-    setSummary(null);
-    setRunAllSummary(null);
-    setDailySummary(null);
-    try {
-      const res = await fetchWithCsrf('/api/admin/emails/run-cron', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'Error executant cron');
-      }
-      setSummary(data.summary || null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error executant cron');
-    } finally {
-      setLoading(false);
-    }
-  }
-
   async function runAll() {
     setLoading(true);
     setError(null);
-    setSummary(null);
     setRunAllSummary(null);
     setDailySummary(null);
     try {
@@ -87,7 +55,6 @@ export default function QuickActions() {
   async function runDailySummaryNow() {
     setLoading(true);
     setError(null);
-    setSummary(null);
     setRunAllSummary(null);
     setDailySummary(null);
     try {
@@ -126,9 +93,13 @@ export default function QuickActions() {
         <Link href="/admin/leads" className="ap-btn ap-btn--secondary w-full" {...helpAttrs(ADMIN_SHARED_HELP.viewLeads)}>
           Veure entrades
         </Link>
-        <button type="button" onClick={runCron} disabled={loading} className="ap-btn ap-btn--secondary w-full" {...helpAttrs(ADMIN_SHARED_HELP.runPostEvent)}>
-          {loading ? 'Executant...' : 'Executar post-event'}
-        </button>
+        <Link
+          href="/admin/post-event"
+          className="ap-btn ap-btn--secondary w-full"
+          {...helpAttrs(ADMIN_SHARED_HELP.runPostEvent)}
+        >
+          Revisar post-event
+        </Link>
         <button type="button" onClick={runAll} disabled={loading} className="ap-btn ap-btn--secondary w-full" {...helpAttrs(ADMIN_SHARED_HELP.runAll)}>
           {loading ? 'Executant...' : 'Executar-ho tot'}
         </button>
@@ -137,11 +108,6 @@ export default function QuickActions() {
         </button>
       </div>
 
-      {summary && (
-        <div className="ap-card p-2.5 text-xs text-[var(--t2)]">
-          Cron OK · Enviats {summary.sent} · Errors {summary.errors}
-        </div>
-      )}
       {runAllSummary && (
         <div className="ap-card p-2.5 text-xs text-[var(--t2)]">
           Tot OK · Seqüències {runAllSummary.sequences.executed} (correu {runAllSummary.sequences.sentEmail}, WA {runAllSummary.sequences.sentWhatsapp}) ·

@@ -16,12 +16,18 @@ const PRE_CLS =
 const HR_CLS = 'border-0 border-t border-[var(--ax-line)] my-7';
 const QUOTE_CLS =
   'border-l-2 border-[var(--ax-gold)] bg-[var(--ax-raised)] px-4 py-3 mb-4 text-[var(--ax-t3)] italic';
-const TABLEWRAP_CLS = 'overflow-x-auto mb-5 border border-[var(--ax-line)] rounded-[var(--o-r-md)]';
+const TABLEWRAP_CLS = 'mb-5 overflow-hidden border border-[var(--ax-line)] rounded-[var(--o-r-md)]';
 const TABLE_CLS =
-  'w-full border-collapse text-[length:var(--o-text-xs)] min-w-[32rem] [&_tr:last-child_td]:border-b-0';
+  'hidden sm:table w-full border-collapse text-[length:var(--o-text-xs)] min-w-[32rem] [&_tr:last-child_td]:border-b-0';
 const TH_CLS =
   'text-left px-3 py-2 border-b border-[var(--ax-line)] align-top text-[var(--ax-gold)] font-semibold whitespace-nowrap bg-[var(--ax-raised)]';
 const TD_CLS = 'text-left px-3 py-2 border-b border-[var(--ax-line)] align-top text-[var(--ax-t2)]';
+const MOBILE_TABLE_CLS = 'sm:hidden divide-y divide-[var(--ax-line)]';
+const MOBILE_TABLE_ROW_CLS = 'grid gap-3 p-3';
+const MOBILE_TABLE_CELL_CLS = 'grid min-w-0 gap-1';
+const MOBILE_TABLE_LABEL_CLS = 'font-mono text-[0.68rem] uppercase tracking-normal text-[var(--ax-gold)]';
+const MOBILE_TABLE_VALUE_CLS =
+  'min-w-0 text-[var(--ax-t2)] break-words [&_code]:whitespace-normal [&_code]:break-words';
 const P_CLS = 'mb-3.5';
 const LIST_CLS = 'mb-4 pl-5 [&_li]:mb-1.5';
 const HEAD_CLS: Record<number, string> = {
@@ -54,6 +60,36 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
 
 function splitRow(line: string): string[] {
   return line.replace(/^\||\|$/g, '').split('|').map((cell) => cell.trim());
+}
+
+function renderTable(header: string[], rows: string[][], tableKey: number) {
+  return (
+    <div key={tableKey} className={TABLEWRAP_CLS}>
+      <table className={TABLE_CLS}>
+        <thead>
+          <tr>{header.map((cell, c) => <th key={c} scope="col" className={TH_CLS}>{renderInline(cell, `th${tableKey}-${c}`)}</th>)}</tr>
+        </thead>
+        <tbody>
+          {rows.map((row, r) => (
+            <tr key={r}>{row.map((cell, c) => <td key={c} className={TD_CLS}>{renderInline(cell, `td${tableKey}-${r}-${c}`)}</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className={MOBILE_TABLE_CLS}>
+        {rows.map((row, r) => (
+          <div key={r} className={MOBILE_TABLE_ROW_CLS}>
+            {row.map((cell, c) => (
+              <div key={c} className={MOBILE_TABLE_CELL_CLS}>
+                <span className={MOBILE_TABLE_LABEL_CLS}>{renderInline(header[c] ?? `Columna ${c + 1}`, `tmh${tableKey}-${r}-${c}`)}</span>
+                <span className={MOBILE_TABLE_VALUE_CLS}>{renderInline(cell, `tmc${tableKey}-${r}-${c}`)}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function MarkdownView({ markdown }: { markdown: string }) {
@@ -106,20 +142,7 @@ export function MarkdownView({ markdown }: { markdown: string }) {
         rows.push(splitRow(lines[i]));
         i += 1;
       }
-      blocks.push(
-        <div key={key++} className={TABLEWRAP_CLS}>
-          <table className={TABLE_CLS}>
-            <thead>
-              <tr>{header.map((cell, c) => <th key={c} scope="col" className={TH_CLS}>{renderInline(cell, `th${key}-${c}`)}</th>)}</tr>
-            </thead>
-            <tbody>
-              {rows.map((row, r) => (
-                <tr key={r}>{row.map((cell, c) => <td key={c} className={TD_CLS}>{renderInline(cell, `td${key}-${r}-${c}`)}</td>)}</tr>
-              ))}
-            </tbody>
-          </table>
-        </div>,
-      );
+      blocks.push(renderTable(header, rows, key++));
       continue;
     }
 

@@ -6,6 +6,7 @@ const { mockPrisma } = vi.hoisted(() => ({
       findMany: vi.fn(),
       findUnique: vi.fn(),
       create: vi.fn(),
+      update: vi.fn(),
     },
     adminLog: { create: vi.fn() },
   },
@@ -16,6 +17,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 import {
   listAdminDiscountCodes,
   createAdminDiscountCode,
+  setAdminDiscountCodeActive,
 } from '@/lib/services/discountCodeAdminService';
 
 const NOW = new Date();
@@ -27,6 +29,7 @@ beforeEach(() => {
   mockPrisma.discountCode.findMany.mockResolvedValue([]);
   mockPrisma.discountCode.findUnique.mockResolvedValue(null);
   mockPrisma.discountCode.create.mockResolvedValue({ id: 'dc-1', code: 'TEST10' });
+  mockPrisma.discountCode.update.mockResolvedValue({ id: 'dc-1', code: 'TEST10', isActive: false });
   mockPrisma.adminLog.create.mockResolvedValue({});
 });
 
@@ -52,6 +55,39 @@ describe('listAdminDiscountCodes', () => {
 
     expect(result.stats.total).toBe(0);
     expect(result.stats.totalUses).toBe(0);
+  });
+});
+
+describe('setAdminDiscountCodeActive', () => {
+  it('actualitza isActive i crea adminLog', async () => {
+    mockPrisma.discountCode.findUnique.mockResolvedValueOnce({ id: 'dc-1', code: 'PROMO10' });
+    mockPrisma.discountCode.update.mockResolvedValueOnce({ id: 'dc-1', code: 'PROMO10', isActive: false });
+
+    const result = await setAdminDiscountCodeActive({ id: 'dc-1', isActive: false });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.discountCode.update).toHaveBeenCalledWith({
+      where: { id: 'dc-1' },
+      data: { isActive: false },
+    });
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: 'UPDATE',
+        entity: 'discountCode',
+        entityId: 'dc-1',
+        details: { code: 'PROMO10', isActive: false },
+      }),
+    });
+  });
+
+  it('retorna 404 si el codi no existeix', async () => {
+    mockPrisma.discountCode.findUnique.mockResolvedValueOnce(null);
+
+    const result = await setAdminDiscountCodeActive({ id: 'missing', isActive: true });
+
+    expect(result.status).toBe(404);
+    expect(mockPrisma.discountCode.update).not.toHaveBeenCalled();
+    expect(mockPrisma.adminLog.create).not.toHaveBeenCalled();
   });
 });
 

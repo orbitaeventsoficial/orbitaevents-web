@@ -1764,27 +1764,6 @@ html.admin-mode .ap-ledger-budget-row--total {
 html.admin-mode .ap-ledger-budget-row--total > span { font-family: var(--ui); font-size: var(--o-text-md); font-weight: var(--o-fw-semi); color: var(--t); }
 html.admin-mode .ap-ledger-budget-row--total > strong { font-size: var(--o-text-2xl); font-weight: var(--o-fw-xbold); color: var(--gold); line-height: 1; }
 html.admin-mode .ap-ledger-budget-row--travel > strong { color: var(--gold); }
-html.admin-mode .ap-ledger-budget-row--season {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--o-space-2);
-    padding: var(--o-space-15) var(--o-space-2);
-    border: 1px solid color-mix(in oklab, var(--gold) 18%, var(--line));
-    border-radius: var(--o-r-sm);
-    background: color-mix(in oklab, var(--gold) 5%, transparent);
-    text-align: left;
-  }
-html.admin-mode .ap-ledger-budget-row--season > span {
-    align-items: flex-start;
-    text-align: left;
-  }
-html.admin-mode .ap-ledger-budget-row--season > strong {
-    order: 0;
-    color: var(--gold);
-    font-size: var(--o-text-md);
-  }
   /* ── REPARTIMENT de la ruta: <details> plegable i discret (rediseny #1377) ── */
 html.admin-mode .ap-ledger-route-settlement {
   grid-column: 1 / -1;
@@ -2341,8 +2320,8 @@ html.admin-mode .ap-leads-pipelead[data-stage="perdut"]:hover { opacity: 0.85; }
 
 /* ── PEÇA 5b: Llista ───────────────────────────────────────────────────── */
 
-html.admin-mode .ap-leads-list { border: 1px solid var(--line); border-radius: var(--o-r-sm); overflow: hidden; background: var(--panel); }
-html.admin-mode .ap-leads-listtbl { width: 100%; border-collapse: collapse; font-size: var(--o-text-sm); }
+html.admin-mode .ap-leads-list { border: 1px solid var(--line); border-radius: var(--o-r-sm); overflow-x: auto; overflow-y: hidden; background: var(--panel); -webkit-overflow-scrolling: touch; }
+html.admin-mode .ap-leads-listtbl { width: 100%; min-width: 760px; border-collapse: collapse; font-size: var(--o-text-sm); }
 html.admin-mode .ap-leads-listtbl thead th { padding: var(--o-space-3) var(--o-space-4); text-align: left; font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.14em; text-transform: uppercase; color: var(--t3); border-bottom: 1px solid var(--line2); }
 html.admin-mode .ap-leads-listtbl thead th.ap-leads-listnum { text-align: right; }
 html.admin-mode .ap-leads-listrow { cursor: pointer; border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent); transition: background 120ms ease; }

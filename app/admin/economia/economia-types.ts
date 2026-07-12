@@ -11,6 +11,7 @@ import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type Tab = 'resum' | 'cobraments' | 'rendibilitat' | 'tresoreria' | 'previsions' | 'config';
+export type TabIcon = 'dashboard' | 'banknote' | 'trend' | 'wallet' | 'forecast' | 'settings';
 
 export interface PaymentRow {
   id: string;
@@ -215,13 +216,13 @@ export function packMarginBadge(marginPct: number, targetMarginPct: number) {
 
 // ─── Tabs ───────────────────────────────────────────────────────────────────
 
-export const TABS: { id: Tab; label: string; icon: string; mobileLabel: string }[] = [
-  { id: 'resum', label: 'Resum general', icon: '📊', mobileLabel: 'Resum' },
-  { id: 'cobraments', label: 'Cobraments', icon: '💶', mobileLabel: 'Cobrar' },
-  { id: 'rendibilitat', label: 'Rendibilitat', icon: '📈', mobileLabel: 'Marge' },
-  { id: 'tresoreria', label: 'Tresoreria', icon: '💰', mobileLabel: 'Caixa' },
-  { id: 'previsions', label: 'Previsions', icon: '🔮', mobileLabel: 'Previsió' },
-  { id: 'config', label: 'Configuració', icon: '⚙️', mobileLabel: 'Config' },
+export const TABS: { id: Tab; label: string; icon: TabIcon; mobileLabel: string }[] = [
+  { id: 'resum', label: 'Resum general', icon: 'dashboard', mobileLabel: 'Resum' },
+  { id: 'cobraments', label: 'Cobraments', icon: 'banknote', mobileLabel: 'Cobrar' },
+  { id: 'rendibilitat', label: 'Rendibilitat', icon: 'trend', mobileLabel: 'Marge' },
+  { id: 'tresoreria', label: 'Tresoreria', icon: 'wallet', mobileLabel: 'Caixa' },
+  { id: 'previsions', label: 'Previsions', icon: 'forecast', mobileLabel: 'Previsió' },
+  { id: 'config', label: 'Configuració', icon: 'settings', mobileLabel: 'Config' },
 ];
 
 export type { ProfitabilityConfig, PackPricingModelConfig };

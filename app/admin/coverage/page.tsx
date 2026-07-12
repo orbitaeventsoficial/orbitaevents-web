@@ -6,6 +6,12 @@ import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { COVERAGE_PROVINCES, type CoverageArea } from '@/lib/coverage';
+import {
+  getCoverageAreaMutationKey,
+  isCoverageAreaMutationPending,
+  readCoverageApiError,
+  type CoverageAreaMutationKey,
+} from './coverage-utils';
 
 
 
@@ -13,9 +19,11 @@ export default function CoveragePage() {
   const [areas, setAreas] = useState<CoverageArea[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [mutationError, setMutationError] = useState<string | null>(null);
   const [newCity, setNewCity] = useState('');
   const [newProvince, setNewProvince] = useState('Barcelona');
   const [adding, setAdding] = useState(false);
+  const [pendingAreaMutation, setPendingAreaMutation] = useState<CoverageAreaMutationKey | null>(null);
   const { confirm, dialogProps } = useConfirmDialog();
 
   useEffect(() => {
@@ -29,9 +37,11 @@ export default function CoveragePage() {
     try {
       const res = await fetchWithCsrf('/api/admin/coverage', { signal: controller.signal });
       const data = await res.json();
-      if (data.ok) {
-        setAreas(data.areas);
+      if (!res.ok || !data?.ok) {
+        setFetchError(readCoverageApiError(data, 'Error carregant cobertura.'));
+        return;
       }
+      setAreas(Array.isArray(data.areas) ? data.areas : []);
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') {
         setFetchError('La connexió ha trigat massa. Reintenta.');
@@ -49,6 +59,7 @@ export default function CoveragePage() {
     if (!newCity.trim()) return;
 
     setAdding(true);
+    setMutationError(null);
     try {
       const res = await fetchWithCsrf('/api/admin/coverage', {
         method: 'POST',
@@ -61,11 +72,14 @@ export default function CoveragePage() {
       });
 
       const data = await res.json();
-      if (data.ok) {
-        setAreas(data.areas);
-        setNewCity('');
+      if (!res.ok || !data?.ok) {
+        setMutationError(readCoverageApiError(data, 'No s\'ha pogut afegir la ciutat.'));
+        return;
       }
+      setAreas(Array.isArray(data.areas) ? data.areas : []);
+      setNewCity('');
     } catch (error) {
+      setMutationError('No s\'ha pogut afegir la ciutat.');
       log.error('Error adding area:', error);
     } finally {
       setAdding(false);
@@ -73,9 +87,13 @@ export default function CoveragePage() {
   }
 
   async function removeArea(city: string) {
+    if (pendingAreaMutation) return;
     const ok = await confirm({ title: 'Eliminar ciutat', message: `Segur que vols eliminar ${city}?`, confirmLabel: 'Eliminar', variant: 'danger' });
     if (!ok) return;
 
+    const mutationKey = getCoverageAreaMutationKey('remove', city);
+    setPendingAreaMutation(mutationKey);
+    setMutationError(null);
     try {
       const res = await fetchWithCsrf('/api/admin/coverage', {
         method: 'POST',
@@ -84,15 +102,24 @@ export default function CoveragePage() {
       });
 
       const data = await res.json();
-      if (data.ok) {
-        setAreas(data.areas);
+      if (!res.ok || !data?.ok) {
+        setMutationError(readCoverageApiError(data, 'No s\'ha pogut eliminar la ciutat.'));
+        return;
       }
+      setAreas(Array.isArray(data.areas) ? data.areas : []);
     } catch (error) {
+      setMutationError('No s\'ha pogut eliminar la ciutat.');
       log.error('Error removing area:', error);
+    } finally {
+      setPendingAreaMutation(current => (current === mutationKey ? null : current));
     }
   }
 
   async function toggleArea(city: string, enabled: boolean) {
+    if (pendingAreaMutation) return;
+    const mutationKey = getCoverageAreaMutationKey('toggle', city);
+    setPendingAreaMutation(mutationKey);
+    setMutationError(null);
     try {
       const res = await fetchWithCsrf('/api/admin/coverage', {
         method: 'POST',
@@ -101,11 +128,16 @@ export default function CoveragePage() {
       });
 
       const data = await res.json();
-      if (data.ok) {
-        setAreas(data.areas);
+      if (!res.ok || !data?.ok) {
+        setMutationError(readCoverageApiError(data, 'No s\'ha pogut actualitzar la ciutat.'));
+        return;
       }
+      setAreas(Array.isArray(data.areas) ? data.areas : []);
     } catch (error) {
+      setMutationError('No s\'ha pogut actualitzar la ciutat.');
       log.error('Error toggling area:', error);
+    } finally {
+      setPendingAreaMutation(current => (current === mutationKey ? null : current));
     }
   }
 
@@ -160,6 +192,11 @@ export default function CoveragePage() {
       {/* Add Area Form */}
       <div className="ap-card p-6">
         <h2 className="ap-h2 mb-4">Afegir Ciutat</h2>
+        {mutationError && (
+          <div role="alert" className="mb-4 rounded-[var(--o-r-md)] border admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger p-3 text-sm">
+            {mutationError}
+          </div>
+        )}
         <div className="flex gap-3">
           <input
             type="text"
@@ -181,7 +218,7 @@ export default function CoveragePage() {
           </select>
           <button
             onClick={addArea}
-            disabled={adding || !newCity.trim()}
+            disabled={adding || pendingAreaMutation !== null || !newCity.trim()}
             type="button"
             aria-busy={adding}
             className="ap-btn ap-btn--primary"
@@ -199,32 +236,43 @@ export default function CoveragePage() {
             <div className="space-y-2">
               {areas
                 .filter(a => a.province === province)
-                .map(area => (
-                  <div
-                    key={area.city}
-                    className="ap-card p-3 flex items-center justify-between"
-                  >
-                    <span className={`font-medium ${area.enabled ? 'text-[var(--t)]' : 'text-[var(--t3)]'}`}>
-                      {area.city}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => toggleArea(area.city, !area.enabled)}
-                        type="button"
-                        className={`ap-btn ap-btn--xs `}
-                      >
-                        {area.enabled ? '✓ Activa' : '✕ Desactivada'}
-                      </button>
-                      <button
-                        onClick={() => removeArea(area.city)}
-                        type="button"
-                        className="ap-btn ap-btn--xs"
-                      >
-                        Eliminar
-                      </button>
+                .map(area => {
+                  const isToggling = isCoverageAreaMutationPending(pendingAreaMutation, 'toggle', area.city);
+                  const isRemoving = isCoverageAreaMutationPending(pendingAreaMutation, 'remove', area.city);
+                  const isAreaActionsDisabled = pendingAreaMutation !== null;
+
+                  return (
+                    <div
+                      key={area.city}
+                      className="ap-card p-3 flex items-center justify-between"
+                      aria-busy={isToggling || isRemoving}
+                    >
+                      <span className={`font-medium ${area.enabled ? 'text-[var(--t)]' : 'text-[var(--t3)]'}`}>
+                        {area.city}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleArea(area.city, !area.enabled)}
+                          type="button"
+                          disabled={isAreaActionsDisabled}
+                          aria-busy={isToggling}
+                          className={`ap-btn ap-btn--xs `}
+                        >
+                          {isToggling ? 'Actualitzant...' : area.enabled ? '✓ Activa' : '✕ Desactivada'}
+                        </button>
+                        <button
+                          onClick={() => removeArea(area.city)}
+                          type="button"
+                          disabled={isAreaActionsDisabled}
+                          aria-busy={isRemoving}
+                          className="ap-btn ap-btn--xs"
+                        >
+                          {isRemoving ? 'Eliminant...' : 'Eliminar'}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
             </div>
           </div>
         ))}
@@ -233,9 +281,6 @@ export default function CoveragePage() {
     </AdminPage>
   );
 }
-
-
-
 
 
 

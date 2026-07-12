@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 import { loadPostEventPlaybook, type PlaybookActionStatus, type PlaybookPriority } from '@/lib/services/postEventPlaybookService';
 import { formatDate, getEventLabel } from '@/lib/constants';
+import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildSocialWorkspaceHref } from '@/lib/admin/socialWorkspaceHref';
 import { buildPostEventNextActionHref, buildPreparedPostEventAction } from '../../lib/post-event-actions';
@@ -78,7 +79,7 @@ export default async function PlaybookPage() {
             <p className="text-4xl">🎉</p>
             <p className="mt-3 text-sm font-semibold opacity-80">No hi ha events recents per gestionar</p>
             <p className="mt-1 text-xs opacity-50">
-              Les reserves completades dels últims 90 dies apareixen aquí per fer-ne seguiment.
+              Les reserves completades dels darrers {POST_EVENT_WORKFLOW.catchupWindowDays} dies apareixen aquí per fer-ne seguiment.
             </p>
           </div>
         ) : (
@@ -111,7 +112,7 @@ export default async function PlaybookPage() {
                     </div>
                     <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                       <Link
-                        href={buildBookingHref(item.bookingId)}
+                        href={buildBookingHref(item.bookingId, 'sec-post-event')}
                         className="text-sm font-semibold hover:admin-tone-text-cyan transition-colors"
                       >
                         {item.clientName}

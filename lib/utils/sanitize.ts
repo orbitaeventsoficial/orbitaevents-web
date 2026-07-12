@@ -40,16 +40,6 @@ export function sanitizeEmail(email: string): string {
 }
 
 /**
- * Sanitiza un número de teléfono eliminando espacios y caracteres no numéricos
- *
- * @param phone - Teléfono a sanitizar
- * @returns Teléfono sanitizado
- */
-export function sanitizePhone(phone: string): string {
-  return phone.replace(/[^\d+]/g, '');
-}
-
-/**
  * Trunca un string a una longitud máxima
  *
  * @param text - Texto a truncar

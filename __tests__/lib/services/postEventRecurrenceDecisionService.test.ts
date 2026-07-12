@@ -84,6 +84,16 @@ describe('recordPostEventRecurrenceDecision', () => {
     });
 
     expect(result.status).toBe(201);
+    expect(mockPrisma.socialPost.findFirst).toHaveBeenCalledWith({
+      where: {
+        status: { not: 'PUBLISHED' },
+        OR: [
+          { bookingId: 'book-1' },
+          { originType: 'BOOKING', originId: 'book-1' },
+        ],
+      },
+      select: { id: true, status: true },
+    });
     expect(mockPrisma.socialPost.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         title: 'Post-event OE-2026-001 · Anna Garcia',
@@ -94,6 +104,9 @@ describe('recordPostEventRecurrenceDecision', () => {
         category: 'EVENT_SHOWCASE',
         publishedAt: null,
         booking: { connect: { id: 'book-1' } },
+        originType: 'BOOKING',
+        originId: 'book-1',
+        originLabel: 'OE-2026-001 · Anna Garcia',
       }),
       select: { id: true, status: true },
     });

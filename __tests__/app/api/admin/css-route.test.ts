@@ -36,7 +36,7 @@ describe('/api/admin/css route', () => {
     mockRequirePermission.mockReturnValue(null);
     mockVerifyCsrf.mockReturnValue(null);
     mockGetAdminCustomCss.mockResolvedValue('html.admin-mode { color: red; }');
-    mockSaveAdminCustomCss.mockResolvedValue({ hadForbiddenRules: false });
+    mockSaveAdminCustomCss.mockResolvedValue({ css: 'body {}', hadForbiddenRules: false });
   });
 
   it('GET retorna CSS sense validar CSRF', async () => {
@@ -72,10 +72,14 @@ describe('/api/admin/css route', () => {
   });
 
   it('PUT desa CSS i retorna si ha sanititzat regles prohibides', async () => {
-    mockSaveAdminCustomCss.mockResolvedValueOnce({ hadForbiddenRules: true });
+    mockSaveAdminCustomCss.mockResolvedValueOnce({ css: 'html.admin-mode .x { color: red; }', hadForbiddenRules: true });
     const res = await PUT(req('PUT', { css: 'html.admin-mode .x { color: red; }' }));
     expect(res.status).toBe(200);
-    await expect(res.json()).resolves.toEqual({ ok: true, sanitized: true });
+    await expect(res.json()).resolves.toEqual({
+      ok: true,
+      css: 'html.admin-mode .x { color: red; }',
+      sanitized: true,
+    });
     expect(mockRequirePermission).toHaveBeenCalledWith(expect.any(NextRequest), 'mutate');
     expect(mockVerifyCsrf).toHaveBeenCalledTimes(1);
     expect(mockSaveAdminCustomCss).toHaveBeenCalledWith('html.admin-mode .x { color: red; }');

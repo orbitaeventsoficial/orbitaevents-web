@@ -39,6 +39,8 @@ const HUB: CustomerHubDTO = {
       total: 1200,
       createdAt: '2026-04-10T10:00:00.000Z',
       sentAt: '2026-04-11T10:00:00.000Z',
+      pdfUrl: '/api/uploads/proposals/prop-1/P-2026-001.pdf',
+      pdfKey: 'proposals/prop-1/P-2026-001.pdf',
       snapshot: {
         quoteSnapshot: { version: 1, reference: 'P-2026-001' },
         contractSnapshot: { version: 1, contractReference: 'CTR-2026-001' },
@@ -90,6 +92,12 @@ describe('ProposalsPanel', () => {
     expect(screen.getByText('Foto documental')).toBeInTheDocument();
     expect(screen.getByText('Pressupost congelat')).toBeInTheDocument();
     expect(screen.getByText('Contracte congelat')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /PDF enviat/ })).toHaveAttribute(
+      'href',
+      '/api/uploads/proposals/prop-1/P-2026-001.pdf',
+    );
+    expect(screen.getByRole('link', { name: /PDF enviat/ })).toHaveAttribute('target', '_blank');
+    expect(screen.getByRole('link', { name: /PDF enviat/ })).toHaveAttribute('rel', 'noopener noreferrer');
     expect(screen.getByRole('link', { name: 'Obrir document →' })).toHaveAttribute(
       'href',
       '/admin/presupuestos?customerId=cust-1&proposalId=prop-1'
@@ -131,5 +139,153 @@ describe('ProposalsPanel', () => {
       'href',
       'https://cdn.test/contracte-signat.pdf',
     );
+    expect(screen.getByRole('link', { name: 'Obrir PDF signat →' })).toHaveAttribute('target', '_blank');
+    expect(screen.getByRole('link', { name: 'Obrir PDF signat →' })).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('fa accionable el PDF de contracte enviat pendent de signatura dins el hub', () => {
+    render(
+      <ProposalsPanel
+        data={{
+          ...HUB,
+          proposals: [
+            {
+              ...HUB.proposals[0],
+              status: 'ACCEPTED',
+              acceptedAt: '2026-04-13T10:00:00.000Z',
+              contractStatus: 'SENT',
+              contractPdfUrl: 'https://cdn.test/contracte-pendent.pdf',
+            },
+          ],
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Històric/ }));
+
+    expect(screen.getByRole('link', { name: /PDF contracte/ })).toHaveAttribute(
+      'href',
+      'https://cdn.test/contracte-pendent.pdf',
+    );
+    expect(screen.getByRole('link', { name: /PDF contracte/ })).toHaveAttribute('target', '_blank');
+    expect(screen.getByRole('link', { name: /PDF contracte/ })).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(screen.getByRole('button', { name: '✍️ Marcar signat' })).toBeInTheDocument();
+  });
+
+  it('no mostra enviar contracte si el DRAFT encara no té referència', () => {
+    render(
+      <ProposalsPanel
+        data={{
+          ...HUB,
+          proposals: [
+            {
+              ...HUB.proposals[0],
+              status: 'ACCEPTED',
+              acceptedAt: '2026-04-13T10:00:00.000Z',
+              contractStatus: 'DRAFT',
+              contractReference: null,
+              contractSentAt: null,
+            },
+          ],
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Històric/ }));
+
+    expect(screen.getByRole('button', { name: '📄 Generar contracte' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '📧 Enviar contracte' })).not.toBeInTheDocument();
+  });
+
+  it('mostra enviar contracte quan el DRAFT ja té referència', () => {
+    render(
+      <ProposalsPanel
+        data={{
+          ...HUB,
+          proposals: [
+            {
+              ...HUB.proposals[0],
+              status: 'ACCEPTED',
+              acceptedAt: '2026-04-13T10:00:00.000Z',
+              contractStatus: 'DRAFT',
+              contractReference: 'CTR-2026-001',
+              contractSentAt: null,
+            },
+          ],
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Històric/ }));
+
+    expect(screen.getByRole('button', { name: '📧 Enviar contracte' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '📄 Generar contracte' })).not.toBeInTheDocument();
+  });
+
+  it('no deixa marcar acceptat un SENT sense PDF canònic i ofereix reparació', () => {
+    render(
+      <ProposalsPanel
+        data={{
+          ...HUB,
+          proposals: [
+            {
+              ...HUB.proposals[0],
+              pdfUrl: null,
+              pdfKey: null,
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: /Acceptat/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /PDF enviat/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '📄 Reparar PDF' })).toBeInTheDocument();
+  });
+
+  it('no deixa marcar acceptat un VIEWED sense PDF canònic i ofereix reparació', () => {
+    render(
+      <ProposalsPanel
+        data={{
+          ...HUB,
+          proposals: [
+            {
+              ...HUB.proposals[0],
+              status: 'VIEWED',
+              pdfUrl: null,
+              pdfKey: null,
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: /Acceptat/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /PDF enviat/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '📄 Reparar PDF' })).toBeInTheDocument();
+  });
+
+  it('permet tancar un VIEWED amb PDF canònic igual que un enviat', () => {
+    render(
+      <ProposalsPanel
+        data={{
+          ...HUB,
+          proposals: [
+            {
+              ...HUB.proposals[0],
+              status: 'VIEWED',
+              sentAt: '2026-04-11T10:00:00.000Z',
+              pdfUrl: '/api/uploads/proposals/prop-1/P-2026-001.pdf',
+              pdfKey: 'proposals/prop-1/P-2026-001.pdf',
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByRole('link', { name: /PDF enviat/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '✅ Acceptat' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '⏰ Caducat' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '❌ Rebutjat' })).toBeInTheDocument();
   });
 });

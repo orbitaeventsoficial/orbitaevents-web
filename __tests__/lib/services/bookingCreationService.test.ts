@@ -6,6 +6,7 @@ const { mockPrisma, mockCalculateGoogleMapsDistance, mockGetFuelCostPerKmReferen
     lead: { findUnique: vi.fn(), update: vi.fn() },
     customer: { findUnique: vi.fn() },
     collaborator: { findUnique: vi.fn(), findFirst: vi.fn() },
+    proposal: { findUnique: vi.fn(), update: vi.fn() },
     pack: { findUnique: vi.fn(), create: vi.fn() },
     extra: { findUnique: vi.fn(), create: vi.fn() },
     packInventory: { findMany: vi.fn() },
@@ -31,7 +32,7 @@ vi.mock('@/lib/services/googleMapsDistance', () => ({
   calculateGoogleMapsDistance: mockCalculateGoogleMapsDistance,
 }));
 vi.mock('@/lib/services/fuelReferenceService', () => ({
-  getFuelCostPerKmReference: mockGetFuelCostPerKmReference,
+  getEffectiveVehicleCostPerKm: mockGetFuelCostPerKmReference,
 }));
 
 import { createBookingFromInput } from '@/lib/services/bookingCreationService';
@@ -76,6 +77,8 @@ function setupDefaults() {
   });
   mockPrisma.customer.findUnique.mockResolvedValue(null);
   mockPrisma.collaborator.findUnique.mockResolvedValue(null);
+  mockPrisma.proposal.findUnique.mockResolvedValue(null);
+  mockPrisma.proposal.update.mockResolvedValue({});
   mockPrisma.lead.findUnique.mockResolvedValue(null);
   mockPrisma.lead.update.mockResolvedValue({});
   mockPrisma.extra.findUnique.mockResolvedValue(null);
@@ -119,6 +122,95 @@ describe('createBookingFromInput', () => {
     expect(mockPrisma.booking.create).toHaveBeenCalledOnce();
   });
 
+  it('crea reserva des de pressupost i el vincula com a bookingId', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'proposal-1',
+      customerId: 'cust-proposal',
+      leadId: null,
+      bookingId: null,
+      total: 834,
+      vatRate: 21,
+      acceptedAt: null,
+      contractStatus: null,
+    });
+
+    const result = await createBookingFromInput({
+      ...BASE_INPUT,
+      proposalId: 'proposal-1',
+    });
+
+    expect(result.status).toBe(200);
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.customerId).toBe('cust-proposal');
+    expect(createCall.data.invoiceRequired).toBe(true);
+    expect(createCall.data.total).toBe(834);
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
+      where: { id: 'proposal-1' },
+      data: expect.objectContaining({
+        bookingId: 'booking-1',
+        status: 'ACCEPTED',
+        contractStatus: 'DRAFT',
+        contractSentAt: null,
+      }),
+    });
+  });
+
+  it('no reobre contracte existent quan vincula pressupost a reserva', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'proposal-1',
+      customerId: 'cust-proposal',
+      leadId: null,
+      bookingId: null,
+      total: 834,
+      vatRate: 21,
+      acceptedAt: new Date('2026-07-01'),
+      contractStatus: 'SENT',
+    });
+
+    const result = await createBookingFromInput({
+      ...BASE_INPUT,
+      proposalId: 'proposal-1',
+    });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
+      where: { id: 'proposal-1' },
+      data: expect.not.objectContaining({
+        contractStatus: 'DRAFT',
+        contractSentAt: null,
+      }),
+    });
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
+      where: { id: 'proposal-1' },
+      data: expect.objectContaining({
+        bookingId: 'booking-1',
+        status: 'ACCEPTED',
+      }),
+    });
+  });
+
+  it('bloqueja crear una altra reserva si el pressupost ja esta vinculat', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'proposal-1',
+      customerId: 'cust-proposal',
+      leadId: null,
+      bookingId: 'booking-existing',
+      total: 834,
+      vatRate: 21,
+      acceptedAt: new Date('2026-07-01'),
+      contractStatus: null,
+    });
+
+    const result = await createBookingFromInput({
+      ...BASE_INPUT,
+      proposalId: 'proposal-1',
+    });
+
+    expect(result.status).toBe(409);
+    expect(result.body.bookingId).toBe('booking-existing');
+    expect(mockPrisma.booking.create).not.toHaveBeenCalled();
+  });
+
   it('crea reserves noves amb transferència com a canal de cobrament per defecte', async () => {
     await createBookingFromInput({ ...BASE_INPUT, invoiceRequired: false });
 
@@ -126,6 +218,32 @@ describe('createBookingFromInput', () => {
     expect(createCall.data.paymentMethod).toBe('TRANSFER');
     expect(createCall.data.invoiceRequired).toBe(false);
     expect(createCall.data.vatRate).toBe(0);
+  });
+
+  it('autoassigna inventari del pack només contra conflictes del mateix dia', async () => {
+    mockPrisma.packInventory.findMany.mockResolvedValueOnce([
+      { itemId: 'item-1', quantity: 1, item: { condition: 'GOOD' } },
+    ]);
+
+    await createBookingFromInput(BASE_INPUT);
+
+    expect(mockPrisma.bookingInventory.groupBy).toHaveBeenCalledWith({
+      by: ['itemId'],
+      where: expect.objectContaining({
+        itemId: { in: ['item-1'] },
+        booking: expect.objectContaining({
+          id: { not: 'booking-1' },
+          status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] },
+          eventDate: {
+            gte: new Date('2026-09-15T00:00:00.000Z'),
+            lt: new Date('2026-09-16T00:00:00.000Z'),
+          },
+        }),
+      }),
+    });
+    expect(mockPrisma.bookingInventory.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      where: { bookingId_itemId: { bookingId: 'booking-1', itemId: 'item-1' } },
+    }));
   });
 
   it('genera referència OE-YYYY-001 sense reserves prèvies', async () => {
@@ -141,6 +259,9 @@ describe('createBookingFromInput', () => {
     expect(mockSendBookingConfirmationEmail).toHaveBeenCalledOnce();
     const arg = mockSendBookingConfirmationEmail.mock.calls[0][0];
     expect(arg.to).toBe('joan@example.com');
+    expect(arg.bookingId).toBe('booking-1');
+    expect(arg.leadId).toBeNull();
+    expect(arg.customerId).toBeNull();
     expect(arg.reference).toMatch(/^OE-\d{4}-001$/);
     expect(arg.total).toBeGreaterThan(0);
     expect(arg.depositAmount).toBeGreaterThan(0);

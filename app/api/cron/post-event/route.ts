@@ -6,6 +6,7 @@ import { log } from '@/lib/logger';
 import { getRequestId } from '@/lib/request-context';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
 import { listPendingPostEventBookings, sendPostEventEmailForBooking, type PostEventDispatchResult } from '@/lib/services/postEventDispatchService';
+import { ADMIN_POST_EVENT_CRON_STATUS_PREFIX } from '@/lib/constants/admin';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -73,14 +74,14 @@ export async function GET(request: NextRequest) {
       errors: results.filter((r) => r.status === 'error').length,
     };
 
-    await saveCronRunStatus({ prefix: 'automation.postEvent', status: 'ok', summary });
+    await saveCronRunStatus({ prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX, status: 'ok', summary });
     return NextResponse.json({ ok: true, timestamp: now.toISOString(), summary, results });
   } catch (error) {
     log.error('Error en cron post-event:', error, {
       context: { requestId, endpoint: 'cron/post-event:GET' },
     });
     await saveCronRunStatus({
-      prefix: 'automation.postEvent',
+      prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX,
       status: 'error',
       summary: {},
       message: error instanceof Error ? error.message : 'Error desconegut',

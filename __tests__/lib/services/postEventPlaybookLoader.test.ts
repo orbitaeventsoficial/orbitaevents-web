@@ -6,12 +6,14 @@ const { mockPrisma } = vi.hoisted(() => ({
     customerTestimonial: { findMany: vi.fn() },
     socialPost: { findMany: vi.fn() },
     task: { findMany: vi.fn() },
+    customerActivity: { findMany: vi.fn() },
   },
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 
 import { loadPostEventPlaybook } from '@/lib/services/postEventPlaybookService';
+import { POST_EVENT_DAY_MS, POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
 
 const NOW = new Date('2026-04-10T12:00:00.000Z');
 const EVENT_DATE = new Date('2026-04-04T12:00:00.000Z');
@@ -35,6 +37,23 @@ describe('loadPostEventPlaybook', () => {
     mockPrisma.customerTestimonial.findMany.mockResolvedValue([]);
     mockPrisma.socialPost.findMany.mockResolvedValue([]);
     mockPrisma.task.findMany.mockResolvedValue([]);
+    mockPrisma.customerActivity.findMany.mockResolvedValue([]);
+  });
+
+  it('carrega bookings dins la finestra canonica de catch-up post-event', async () => {
+    await loadPostEventPlaybook(NOW);
+
+    expect(mockPrisma.booking.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: {
+        status: 'COMPLETED',
+        eventDate: {
+          gte: new Date(NOW.getTime() - POST_EVENT_WORKFLOW.catchupWindowDays * POST_EVENT_DAY_MS),
+          lte: NOW,
+        },
+      },
+      orderBy: { eventDate: 'desc' },
+      take: POST_EVENT_WORKFLOW.playbookTake,
+    }));
   });
 
   it('nomes compta testimonis aprovats com a accio post-event feta', async () => {

@@ -2,7 +2,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import NextImage from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  Banknote,
+  CheckCircle2,
+  Languages,
+  SlidersHorizontal,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { DEFAULT_EXPECTED_LIFE_HOURS, SUPPORTED_LOCALES, formatCurrency, formatCurrencyExact } from '@/lib/constants';
 import { ADMIN_PACK_EDITOR_TABS, type PackEditorTab } from '@/lib/constants/admin';
@@ -83,6 +90,25 @@ type RawBundleResponse = {
 type ComposerMode = 'base' | 'pro';
 
 const TABS = ADMIN_PACK_EDITOR_TABS;
+const TAB_ICON = 'h-4 w-4 shrink-0';
+const TAB_ICON_MAP: Record<(typeof ADMIN_PACK_EDITOR_TABS)[number]['icon'], LucideIcon> = {
+  banknote: Banknote,
+  sliders: SlidersHorizontal,
+  languages: Languages,
+  check: CheckCircle2,
+};
+
+function resolvePackEditorTab(value?: string | null): EditorTab {
+  switch (value) {
+    case 'economic':
+    case 'content':
+    case 'texts':
+    case 'publish':
+      return value;
+    default:
+      return 'economic';
+  }
+}
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const calcCostHour = (price: number | null, life: number | null) =>
@@ -133,7 +159,9 @@ export default function EditPackForm({
   pricingModel: PricingModel;
 }) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<EditorTab>('economic');
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get('tab');
+  const [activeTab, setActiveTab] = useState<EditorTab>(() => resolvePackEditorTab(tabParam));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
@@ -220,6 +248,10 @@ export default function EditPackForm({
     }),
     []
   );
+
+  useEffect(() => {
+    setActiveTab(resolvePackEditorTab(tabParam));
+  }, [tabParam]);
 
   useEffect(() => {
     if (!autoPricing) return;
@@ -416,10 +448,29 @@ export default function EditPackForm({
       <section className="rounded-2xl border border-[var(--line)] p-5">
         <h2 className="text-xl font-bold">Editor pro de pack</h2>
         <p className="mt-1 text-sm">Drag & drop d'inventari dins/fora + autocalcul de preus recomanats.</p>
-        <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`ap-tab ${activeTab === t.id ? 'ap-tab--active' : 'ap-tab--idle'}`}>{t.icon} {t.label}</button>)}</div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-4">
+          {TABS.map((t) => {
+            const Icon = TAB_ICON_MAP[t.icon];
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setActiveTab(t.id)}
+                className={`ap-tab justify-center ${activeTab === t.id ? 'ap-tab--active' : 'ap-tab--idle'}`}
+              >
+                <Icon className={TAB_ICON} aria-hidden="true" />
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
       </section>
 
-      {error && <div className="ap-card p-4 text-sm">Error: {error}</div>}
+      {error && (
+        <div className="ap-card p-4 text-sm" role="alert" aria-live="assertive">
+          Error: {error}
+        </div>
+      )}
 
       <AdminHelpPanel
         title="Com treballar aquest pack"
@@ -439,8 +490,16 @@ export default function EditPackForm({
           },
         ]}
       />
-      {info && <div className="ap-card p-4 text-sm">Info: {info}</div>}
-      {success && <div className="ap-card p-4 text-sm">Pack actualitzat correctament</div>}
+      {info && (
+        <div className="ap-card p-4 text-sm" role="status" aria-live="polite">
+          Info: {info}
+        </div>
+      )}
+      {success && (
+        <div className="ap-card p-4 text-sm" role="status" aria-live="polite">
+          Pack actualitzat correctament
+        </div>
+      )}
 
       {activeTab === 'economic' && (
         <section className="ap-card p-6">
@@ -492,6 +551,7 @@ export default function EditPackForm({
               <div className="mt-2 flex items-center gap-2">
                 <button
                   type="button"
+                  aria-label="Reduir hores DJ"
                   onClick={() => setFormData((prev) => ({ ...prev, djHours: Math.max(1, Number(prev.djHours) - 1) }))}
                   className="h-8 w-8 rounded-xl border"
                 >
@@ -500,6 +560,7 @@ export default function EditPackForm({
                 <div className="min-w-[64px] text-center text-lg font-semibold">{formData.djHours}h</div>
                 <button
                   type="button"
+                  aria-label="Augmentar hores DJ"
                   onClick={() => setFormData((prev) => ({ ...prev, djHours: Math.min(24, Number(prev.djHours) + 1) }))}
                   className="h-8 w-8 rounded-xl border"
                 >
@@ -508,8 +569,11 @@ export default function EditPackForm({
               </div>
             </div>
             <div className="ap-card p-3">
-              <p className="text-xs">Aforament max</p>
+              <label htmlFor="pack-editor-max-guests" className="text-xs">
+                Aforament max
+              </label>
               <input
+                id="pack-editor-max-guests"
                 type="number"
                 min={0}
                 value={Number(formData.maxGuests || 0)}
@@ -518,8 +582,11 @@ export default function EditPackForm({
               />
             </div>
             <div className="ap-card p-3">
-              <p className="text-xs">Potència so (W)</p>
+              <label htmlFor="pack-editor-sound-watts" className="text-xs">
+                Potència so (W)
+              </label>
               <input
+                id="pack-editor-sound-watts"
                 type="number"
                 min={0}
                 value={Number(formData.soundWatts || 0)}
@@ -537,13 +604,16 @@ export default function EditPackForm({
           <div className="grid gap-4 lg:grid-cols-2">
             <div className={`ap-card p-4 ${packSignal.cardClass}`}>
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-sm font-semibold">PVP pack</p>
+                <label htmlFor="pack-editor-price" className="text-sm font-semibold">
+                  PVP pack
+                </label>
                 <span className="inline-flex items-center gap-2 rounded-full border border-current/40 px-2 py-0.5 text-xs font-semibold">
                   <span className={`h-2 w-2 rounded-full ${packSignal.dotClass}`} />
                   {packSignal.label}
                 </span>
               </div>
               <input
+                id="pack-editor-price"
                 type="number"
                 step="0.01"
                 min={0}
@@ -562,13 +632,16 @@ export default function EditPackForm({
 
             <div className={`ap-card p-4 ${extraSignal.cardClass}`}>
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-sm font-semibold">PVP hora extra</p>
+                <label htmlFor="pack-editor-extra-hour-price" className="text-sm font-semibold">
+                  PVP hora extra
+                </label>
                 <span className="inline-flex items-center gap-2 rounded-full border border-current/40 px-2 py-0.5 text-xs font-semibold">
                   <span className={`h-2 w-2 rounded-full ${extraSignal.dotClass}`} />
                   {extraSignal.label}
                 </span>
               </div>
               <input
+                id="pack-editor-extra-hour-price"
                 type="number"
                 step="0.01"
                 min={0}
@@ -752,9 +825,12 @@ export default function EditPackForm({
           </div>
 
           <div className="mb-3 grid gap-3 sm:grid-cols-3">
-            <input className={input} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cerca element..." />
-            <input className={input} value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="Slug" />
-            <input className={input} value={formData.service} onChange={(e) => setFormData({ ...formData, service: e.target.value })} placeholder="Servei intern" />
+            <label className="sr-only" htmlFor="pack-editor-content-search">Cerca element</label>
+            <input id="pack-editor-content-search" className={input} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cerca element..." />
+            <label className="sr-only" htmlFor="pack-editor-slug">Slug del pack</label>
+            <input id="pack-editor-slug" className={input} value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="Slug" />
+            <label className="sr-only" htmlFor="pack-editor-service">Servei intern del pack</label>
+            <input id="pack-editor-service" className={input} value={formData.service} onChange={(e) => setFormData({ ...formData, service: e.target.value })} placeholder="Servei intern" />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
@@ -821,7 +897,12 @@ export default function EditPackForm({
                         <p className="text-xs">{item.code} · {calcCostHour(item.purchasePrice, item.expectedLifeHours).toFixed(2)}€/h</p>
                         <p className="line-clamp-2 text-xs">{item.description || 'Sense descripció'}</p>
                         <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <label className="sr-only" htmlFor={`pack-editor-quantity-${item.id}`}>
+                            Quantitat de {item.name}
+                          </label>
                           <input
+                            id={`pack-editor-quantity-${item.id}`}
+                            aria-label={`Quantitat de ${item.name}`}
                             type="number"
                             min={1}
                             value={row.quantity}
@@ -870,26 +951,42 @@ export default function EditPackForm({
               return (
                 <div key={locale} className="ap-card p-4">
                   <h4 className="mb-2 text-sm font-semibold">{locale.toUpperCase()}</h4>
+                  <label className="sr-only" htmlFor={`pack-editor-${locale}-name`}>
+                    Nom del pack {locale.toUpperCase()}
+                  </label>
                   <input
+                    id={`pack-editor-${locale}-name`}
                     value={tr.name}
                     onChange={(e) => updateTranslation(locale, 'name', e.target.value)}
                     className={input}
                     placeholder="Nom del pack"
                   />
+                  <label className="sr-only" htmlFor={`pack-editor-${locale}-tagline`}>
+                    Tagline del pack {locale.toUpperCase()}
+                  </label>
                   <input
+                    id={`pack-editor-${locale}-tagline`}
                     value={tr.tagline || ''}
                     onChange={(e) => updateTranslation(locale, 'tagline', e.target.value)}
                     className={`${input} mt-2`}
                     placeholder="Tagline"
                   />
+                  <label className="sr-only" htmlFor={`pack-editor-${locale}-description`}>
+                    Descripció del pack {locale.toUpperCase()}
+                  </label>
                   <textarea
+                    id={`pack-editor-${locale}-description`}
                     rows={3}
                     value={tr.description || ''}
                     onChange={(e) => updateTranslation(locale, 'description', e.target.value)}
                     className={`${input} mt-2`}
                     placeholder="Descripció"
                   />
+                  <label className="sr-only" htmlFor={`pack-editor-${locale}-features`}>
+                    Features del pack {locale.toUpperCase()}
+                  </label>
                   <textarea
+                    id={`pack-editor-${locale}-features`}
                     rows={4}
                     value={featuresValue}
                     onChange={(e) => updateTranslation(locale, 'features', e.target.value.split('\n').map((f) => f.trim()).filter(Boolean))}
@@ -903,7 +1000,28 @@ export default function EditPackForm({
         </section>
       )}
 
-      {activeTab === 'publish' && <section className="ap-card p-6"><h3 className="mb-4 ap-h2">Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
+      {activeTab === 'publish' && (
+        <section className="ap-card p-6">
+          <h3 className="mb-4 ap-h2">Publicació</h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <label className="text-sm">
+              <input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu
+            </label>
+            <label className="text-sm">
+              <input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat
+            </label>
+            <label className="sr-only" htmlFor="pack-editor-order">Ordre de publicació</label>
+            <input
+              id="pack-editor-order"
+              type="number"
+              value={formData.order}
+              onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })}
+              className={input}
+              placeholder="Ordre"
+            />
+          </div>
+        </section>
+      )}
 
       <div className="sticky bottom-2 z-10 flex flex-wrap justify-end gap-3 ap-card p-3 backdrop-blur">
         <Link href="/admin/packs" className="rounded-xl border px-4 py-2 text-sm font-medium">Cancel·lar</Link>

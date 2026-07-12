@@ -219,7 +219,7 @@ export default function TextManagerPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--o-admin-canvas)]">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--o-admin-canvas)]" role="status" aria-live="polite">
         <div className="flex flex-col items-center gap-3">
           <div className="w-6 h-6 rounded-full border-2 border-[var(--line)] border-t-white/70 animate-spin" />
           <p className="text-sm text-[var(--t3)]">Carregant textos...</p>
@@ -230,7 +230,7 @@ export default function TextManagerPage() {
 
   if (error && !Object.keys(esTexts).length) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[var(--o-admin-canvas)]">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[var(--o-admin-canvas)]" role="alert" aria-live="assertive">
         <p className="admin-tone-text-warning text-sm">{error}</p>
         <button type="button" onClick={loadTexts} className="ap-btn ap-btn--xs">Reintentar</button>
       </div>
@@ -303,13 +303,13 @@ export default function TextManagerPage() {
       {(error || success) && (
         <div className="px-4 pt-3">
           {error && (
-            <div className="flex items-center justify-between px-4 py-2.5 rounded-lg border admin-tone-border-danger admin-tone-bg-danger text-sm admin-tone-text-danger">
+            <div role="alert" aria-live="assertive" className="flex items-center justify-between px-4 py-2.5 rounded-lg border admin-tone-border-danger admin-tone-bg-danger text-sm admin-tone-text-danger">
               <span>{error}</span>
               <button onClick={() => setError(null)} className="admin-tone-text-danger opacity-60 hover:opacity-100 ml-4">✕</button>
             </div>
           )}
           {success && (
-            <div className="flex items-center justify-between px-4 py-2.5 rounded-lg border admin-tone-border-success admin-tone-bg-success text-sm admin-tone-text-success">
+            <div role="status" aria-live="polite" className="flex items-center justify-between px-4 py-2.5 rounded-lg border admin-tone-border-success admin-tone-bg-success text-sm admin-tone-text-success">
               <span>{success}</span>
               <button onClick={() => setSuccess(null)} className="admin-tone-text-success opacity-60 hover:opacity-100 ml-4">✕</button>
             </div>

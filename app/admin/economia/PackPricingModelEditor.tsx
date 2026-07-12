@@ -4,6 +4,8 @@ import { useState } from 'react';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { fetchWithCsrf } from '@/lib/csrf';
 
+type Notice = { type: 'success' | 'error'; text: string };
+
 function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;
 }
@@ -20,7 +22,7 @@ function statusBadge(value: number, warn: number, danger: number) {
 export default function PackPricingModelEditor({ initial }: { initial: PackPricingModelConfig }) {
   const [form, setForm] = useState<PackPricingModelConfig>(initial);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
 
   function update<K extends keyof PackPricingModelConfig>(key: K, value: PackPricingModelConfig[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -28,7 +30,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
 
   async function save() {
     setSaving(true);
-    setMsg(null);
+    setNotice(null);
     try {
       const res = await fetchWithCsrf('/api/admin/pricing/model-config', {
         method: 'POST',
@@ -39,9 +41,9 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || 'No s\'ha pogut desar la configuració');
       }
-      setMsg('Configuració de packs desada');
+      setNotice({ type: 'success', text: 'Configuració de packs desada' });
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Error en desar');
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Error en desar' });
     } finally {
       setSaving(false);
     }
@@ -151,7 +153,15 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
             >
               {saving ? 'Desant...' : 'Desar model packs'}
             </button>
-            {msg && <p className="text-sm">{msg}</p>}
+            {notice && (
+              <p
+                role={notice.type === 'error' ? 'alert' : 'status'}
+                aria-live={notice.type === 'error' ? 'assertive' : 'polite'}
+                className={`text-sm ${notice.type === 'error' ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}
+              >
+                {notice.text}
+              </p>
+            )}
           </div>
         </div>
 

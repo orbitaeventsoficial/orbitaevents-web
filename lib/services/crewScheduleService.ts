@@ -338,6 +338,19 @@ export function buildCrewSchedule(
   return { people, overlaps };
 }
 
+/**
+ * Quan un lead ja té reserva vinculada, la font de veritat deixa de ser
+ * LeadServiceLine i passa a BookingServiceLine. Cuadrant i repartiment no poden
+ * comptar les dues fotos del mateix bolo.
+ */
+export function filterSupersededLeadLines(
+  lines: CrewLineInput[],
+  bookedLeadIds: ReadonlySet<string>,
+): CrewLineInput[] {
+  if (bookedLeadIds.size === 0) return lines;
+  return lines.filter((line) => !(line.origin === 'lead' && bookedLeadIds.has(line.parentId)));
+}
+
 // ─── Repartiment (pur) ─────────────────────────────────────────────────────────
 
 export interface PayoutEvent {
@@ -481,19 +494,18 @@ async function loadCrewLines(from: Date, to: Date): Promise<{ lines: CrewLineInp
     prisma.booking.findMany({
       where: { status: { in: [...BOOKING_STATUSES_ACTIVE] }, eventDate: { gte: from, lte: to } },
       select: {
-        id: true, reference: true, clientName: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true,
+        id: true, reference: true, leadId: true, clientName: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true,
         serviceLines: { select: { id: true, collaboratorId: true, kind: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true } },
       },
     }),
   ]);
 
-  const lines: CrewLineInput[] = [];
-  const collaboratorIds = new Set<string>();
+  const rawLines: CrewLineInput[] = [];
+  const bookedLeadIds = new Set<string>();
 
   for (const lead of leads) {
     for (const l of lead.serviceLines) {
-      if (l.collaboratorId) collaboratorIds.add(l.collaboratorId);
-      lines.push({
+      rawLines.push({
         lineId: l.id, origin: 'lead', parentId: lead.id, parentRef: lead.name,
         collaboratorId: l.collaboratorId, kind: l.kind, label: l.label,
         revenueAmount: l.revenueAmount, costAmount: l.costAmount, quantity: l.quantity, hours: l.hours,
@@ -502,15 +514,21 @@ async function loadCrewLines(from: Date, to: Date): Promise<{ lines: CrewLineInp
     }
   }
   for (const bk of bookings) {
+    if (bk.leadId) bookedLeadIds.add(bk.leadId);
     for (const l of bk.serviceLines) {
-      if (l.collaboratorId) collaboratorIds.add(l.collaboratorId);
-      lines.push({
+      rawLines.push({
         lineId: l.id, origin: 'booking', parentId: bk.id, parentRef: bk.clientName || bk.reference,
         collaboratorId: l.collaboratorId, kind: l.kind, label: l.label,
         revenueAmount: l.revenueAmount, costAmount: l.costAmount, quantity: l.quantity, hours: l.hours,
         eventDate: bk.eventDate, eventStartTime: bk.eventStartTime, eventEndTime: bk.eventEndTime, eventLocation: bk.eventLocation,
       });
     }
+  }
+
+  const lines = filterSupersededLeadLines(rawLines, bookedLeadIds);
+  const collaboratorIds = new Set<string>();
+  for (const line of lines) {
+    if (line.collaboratorId) collaboratorIds.add(line.collaboratorId);
   }
 
   const names = new Map<string, string>();

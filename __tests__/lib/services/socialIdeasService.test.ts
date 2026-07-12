@@ -1,8 +1,28 @@
-import { describe, it, expect } from 'vitest';
-import { generateSocialIdeas, type SocialIdeasInput } from '@/lib/services/socialIdeasService';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    booking: { findMany: vi.fn() },
+    customerTestimonial: { findMany: vi.fn() },
+    portfolioEvent: { findMany: vi.fn() },
+    socialPost: { findMany: vi.fn() },
+  },
+}));
+
+vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+
+import { generateSocialIdeas, loadSocialIdeas, type SocialIdeasInput } from '@/lib/services/socialIdeasService';
 
 const NOW = new Date('2026-04-10T12:00:00Z');
 const DAY = 1000 * 60 * 60 * 24;
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockPrisma.booking.findMany.mockResolvedValue([]);
+  mockPrisma.customerTestimonial.findMany.mockResolvedValue([]);
+  mockPrisma.portfolioEvent.findMany.mockResolvedValue([]);
+  mockPrisma.socialPost.findMany.mockResolvedValue([]);
+});
 
 function makeInput(overrides: Partial<SocialIdeasInput> = {}): SocialIdeasInput {
   return {
@@ -133,6 +153,7 @@ describe('generateSocialIdeas', () => {
             categorySlug: 'bodas',
             coverImage: 'https://example.com/cover.jpg',
             createdAt: new Date(NOW.getTime() - 10 * DAY),
+            hasSocialPost: false,
           },
         ],
       })
@@ -154,6 +175,7 @@ describe('generateSocialIdeas', () => {
             categorySlug: 'bodas',
             coverImage: 'x',
             createdAt: new Date(NOW.getTime() - 60 * DAY),
+            hasSocialPost: false,
           },
         ],
       })
@@ -171,6 +193,7 @@ describe('generateSocialIdeas', () => {
             eventDate,
             eventType: 'PARTY',
             venue: 'Masia Can Riera',
+            hasSocialPost: false,
           },
         ],
       })
@@ -194,6 +217,7 @@ describe('generateSocialIdeas', () => {
             eventDate: new Date(NOW.getTime() + 30 * DAY),
             eventType: 'PARTY',
             venue: null,
+            hasSocialPost: false,
           },
         ],
       })
@@ -233,6 +257,7 @@ describe('generateSocialIdeas', () => {
             categorySlug: 'bodas',
             coverImage: 'x',
             createdAt: new Date(NOW.getTime() - 5 * DAY),
+            hasSocialPost: false,
           },
         ],
         upcomingEvents: [
@@ -241,6 +266,7 @@ describe('generateSocialIdeas', () => {
             eventDate: new Date(NOW.getTime() + 5 * DAY),
             eventType: 'PARTY',
             venue: null,
+            hasSocialPost: false,
           },
         ],
       })
@@ -272,5 +298,59 @@ describe('generateSocialIdeas', () => {
     );
     expect(ideas[0].caption).toContain('…');
     expect(ideas[0].caption.length).toBeLessThan(500);
+  });
+});
+
+describe('loadSocialIdeas', () => {
+  it('deduplica idees existents per origen canonic', async () => {
+    mockPrisma.booking.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'booking-1',
+          eventDate: new Date(NOW.getTime() - 5 * DAY),
+          eventType: 'WEDDING',
+          clientName: 'Laura',
+          pack: { slug: 'pack-or' },
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'upcoming-1',
+          eventDate: new Date(NOW.getTime() + 7 * DAY),
+          eventType: 'PARTY',
+          eventLocation: 'Masia',
+        },
+      ]);
+    mockPrisma.customerTestimonial.findMany.mockResolvedValue([
+      {
+        id: 'testimonial-1',
+        text: 'Molt be',
+        rating: 5,
+        eventType: 'WEDDING',
+        photoUrl: null,
+        customer: { name: 'Anna Garcia' },
+      },
+    ]);
+    mockPrisma.portfolioEvent.findMany.mockResolvedValue([
+      {
+        id: 'portfolio-1',
+        slug: 'boda-girona',
+        title: 'Boda Girona',
+        categorySlug: 'bodas',
+        coverImage: '/img/portfolio/bodas/bodas-01.avif',
+        createdAt: new Date(NOW.getTime() - 3 * DAY),
+      },
+    ]);
+    mockPrisma.socialPost.findMany.mockResolvedValue([
+      { bookingId: 'booking-1', originType: 'BOOKING', originId: 'booking-1' },
+      { bookingId: null, originType: 'TESTIMONIAL', originId: 'testimonial-1' },
+      { bookingId: null, originType: 'PORTFOLIO', originId: 'portfolio-1' },
+      { bookingId: null, originType: 'UPCOMING_EVENT', originId: 'upcoming-1' },
+    ]);
+
+    await expect(loadSocialIdeas(NOW)).resolves.toEqual([]);
+    expect(mockPrisma.socialPost.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      select: { bookingId: true, originType: true, originId: true },
+    }));
   });
 });

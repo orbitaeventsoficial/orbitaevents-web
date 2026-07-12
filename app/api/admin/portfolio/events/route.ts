@@ -44,7 +44,25 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { slug, categorySlug, title, subtitle, venue, location, eventDate, guestCount, description, services, coverImage, published } = body;
+    const {
+      slug,
+      categorySlug,
+      title,
+      subtitle,
+      venue,
+      location,
+      eventDate,
+      guestCount,
+      description,
+      services,
+      coverImage,
+      published,
+      originType,
+      sourceBookingId,
+      sourceGalleryPhotoId,
+      sourceTestimonialId,
+      originLabel,
+    } = body;
 
     if (!slug || !categorySlug || !title || !coverImage) {
       return NextResponse.json({ error: 'slug, categorySlug, title i coverImage requerits' }, { status: 400 });
@@ -63,6 +81,11 @@ export async function POST(request: NextRequest) {
       services: services || [],
       coverImage,
       published: published ?? false,
+      originType,
+      sourceBookingId,
+      sourceGalleryPhotoId,
+      sourceTestimonialId,
+      originLabel,
     });
 
     return NextResponse.json({ data: event }, { status: 201 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildLeadCustomerContinuityTarget, buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
+import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 
 describe('buildLeadCustomerHref', () => {
   it('retorna la URL del hub de client quan hi ha customerId (tab per defecte comms)', () => {
@@ -26,21 +26,4 @@ describe('buildLeadCustomerHref', () => {
     expect(href).not.toContain('clientes');
   });
 
-  it('construeix el CTA de continuïtat cap a Fitxa 360 quan el lead ja és client', () => {
-    expect(buildLeadCustomerContinuityTarget({ leadId: 'lead-1', customerId: 'cust-1' })).toEqual({
-      href: '/admin/clientes/cust-1?tab=leads',
-      label: 'Fitxa 360',
-      title: 'Obrir Fitxa 360 del client',
-    });
-  });
-
-  it('manté la fitxa de lead com a CTA quan encara no hi ha client', () => {
-    const target = buildLeadCustomerContinuityTarget({ leadId: 'lead-1', customerId: null });
-
-    expect(target).toMatchObject({
-      label: 'Fitxa lead',
-      title: 'Obrir fitxa del lead',
-    });
-    expect(target.href).toContain('/admin/leads/lead-1');
-  });
 });

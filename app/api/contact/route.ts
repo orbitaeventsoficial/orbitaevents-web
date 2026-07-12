@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { PRIVACY_CONSENT_VERSION } from '@/lib/constants/privacy';
-import { sendEmailWithTimeout } from '@/lib/email';
+import { sendTrackedStandaloneEmailWithTimeout } from '@/lib/email';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { verifyTurnstileToken } from '@/lib/turnstile';
@@ -286,13 +286,17 @@ export async function POST(req: NextRequest) {
       const adminEmail = (recipientsList || SITE_CONFIG.business.email).trim();
       const smtpFrom = (process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
 
-      sendEmailWithTimeout(
+      sendTrackedStandaloneEmailWithTimeout(
         {
+          templateKey: 'public-contact-admin-notification',
           to: adminEmail,
           subject: `${t.adminMailSubjectPrefix}: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice} EUR)` : ''}`,
           html: adminEmailHtml,
+          leadId,
+          locale,
           replyTo: clientEmail || undefined,
           from: `"${t.adminMailFrom}" <${smtpFrom}>`,
+          orbita: { kind: 'lead', id: leadId, origin: 'public-contact-admin-notification' },
         },
         8000
       ).catch((emailError) => {
@@ -370,11 +374,15 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`;
 
-        sendEmailWithTimeout(
+        sendTrackedStandaloneEmailWithTimeout(
           {
+            templateKey: 'public-contact-client-confirmation',
             to: clientEmail,
             subject: `${t.clientMailSubjectPrefix} ${eventLabel} - Orbita Events`,
             html: clientEmailHtml,
+            leadId,
+            locale,
+            orbita: { kind: 'lead', id: leadId, origin: 'public-contact-client-confirmation' },
           },
           8000
         ).catch((clientEmailError) => {

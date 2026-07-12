@@ -1,4 +1,3 @@
-import { getAllPacks } from '@/app/config/packs-config';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 export const ADMIN_SHORTCUT_ROUTES: Record<string, string> = {
@@ -58,7 +57,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1837;
+export const ADMIN_CHANGE_COUNTER = 1997;
 
 export const ADMIN_BOOKING_DEPOSIT_DUE_DAYS = 30;
 export const ADMIN_ECONOMY_PAYMENT_DUE_SOON_DAYS = 7;
@@ -261,6 +260,12 @@ export const ADMIN_ACTIVITY_ACTION_META: Record<string, { label: string; icon: s
   DOCUMENT_CONTRACT_SIGNED: { label: 'Contracte signat', icon: '✍️', tone: 'admin-tone-text-success' },
   DOCUMENT_CONTRACT_CANCELLED: { label: 'Contracte cancel·lat', icon: '⛔', tone: 'admin-tone-text-warning' },
   DOCUMENT_CONTRACT_SIGNED_PDF_GENERATED: { label: 'PDF signat generat', icon: '📎', tone: 'admin-tone-text-success' },
+  DOCUMENT_INVOICE_PDF_GENERATED: { label: 'PDF factura generat', icon: '🧾', tone: 'admin-tone-text-info' },
+  DOCUMENT_DELIVERY_NOTE_CREATED: { label: 'Albarà creat', icon: '📋', tone: 'admin-tone-text-info' },
+  DOCUMENT_DELIVERY_NOTE_DELIVERED: { label: 'Albarà lliurat', icon: '📋', tone: 'admin-tone-text-info' },
+  DOCUMENT_DELIVERY_NOTE_SIGNED: { label: 'Albarà signat', icon: '✍️', tone: 'admin-tone-text-success' },
+  DOCUMENT_DELIVERY_NOTE_CANCELLED: { label: 'Albarà cancel·lat', icon: '⛔', tone: 'admin-tone-text-warning' },
+  DOCUMENT_DELIVERY_NOTE_PDF_GENERATED: { label: 'PDF albarà generat', icon: '📎', tone: 'admin-tone-text-info' },
   CREATE: { label: 'Creat', icon: '➕', tone: 'admin-tone-text-success' },
   UPDATE: { label: 'Actualitzat', icon: '✏️', tone: 'admin-tone-text-info' },
   DELETE: { label: 'Eliminat', icon: '🗑️', tone: 'admin-tone-text-danger' },
@@ -401,6 +406,12 @@ export const ADMIN_ACTIVITY_CATEGORY_MAP: Record<string, string> = {
   DOCUMENT_CONTRACT_SIGNED: 'system',
   DOCUMENT_CONTRACT_CANCELLED: 'system',
   DOCUMENT_CONTRACT_SIGNED_PDF_GENERATED: 'system',
+  DOCUMENT_INVOICE_PDF_GENERATED: 'system',
+  DOCUMENT_DELIVERY_NOTE_CREATED: 'system',
+  DOCUMENT_DELIVERY_NOTE_DELIVERED: 'system',
+  DOCUMENT_DELIVERY_NOTE_SIGNED: 'system',
+  DOCUMENT_DELIVERY_NOTE_CANCELLED: 'system',
+  DOCUMENT_DELIVERY_NOTE_PDF_GENERATED: 'system',
   CREATE: 'crud',
   UPDATE: 'crud',
   DELETE: 'crud',
@@ -710,22 +721,11 @@ export const ADMIN_LEAD_TASK_SELECT = {
   completedAt: true,
 } as const;
 
-export function getAdminLeadPackOptions() {
-  const allPacks = getAllPacks();
-  const manual = { value: 'manual', label: 'Manual / Personalitzat ✍️', price: 0, hours: 0 };
-  const packOptions = allPacks.map((p) => ({
-    value: p.slug,
-    label: `${p.name} (${p.service}) ${p.badge || ''}`.trim(),
-    price: p.priceValue,
-    hours: p.durationHours,
-  }));
-  return [manual, ...packOptions];
-}
-
 export const ADMIN_PDF_STUDIO_SECTION_LABELS = {
   config: 'Configuració',
   client: 'Client i esdeveniment',
   brand: 'Marca i identitat',
+  transport: 'Transport',
   pack: 'Pack i condicions',
   'extras-catalog': 'Extres del catàleg',
   'extras-custom': 'Extres personalitzats',
@@ -733,7 +733,11 @@ export const ADMIN_PDF_STUDIO_SECTION_LABELS = {
 } as const;
 
 export const ADMIN_PDF_STUDIO_DEFAULT_SECTION_ORDER = [
-  'config', 'client', 'brand', 'pack', 'extras-catalog', 'extras-custom', 'contract',
+  'config', 'client', 'transport', 'brand', 'pack', 'extras-catalog', 'extras-custom', 'contract',
+] as const;
+
+export const ADMIN_PDF_STUDIO_DEFAULT_COLLAPSED_SECTIONS = [
+  'brand', 'pack', 'extras-catalog', 'extras-custom', 'contract',
 ] as const;
 
 export const ADMIN_PDF_STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
@@ -787,20 +791,46 @@ export const ADMIN_PDF_STUDIO_SERVICE_LABELS = {
   animacion: 'Animació',
 } as const;
 
+export const ADMIN_POST_EVENT_CRON_STATUS_PREFIX = 'automation.postEvent' as const;
+export const ADMIN_LEGACY_POST_EVENT_CRON_STATUS_PREFIX = 'emails.cron' as const;
+export const ADMIN_POST_EVENT_CRON_SETTING_SUFFIXES = ['lastRun', 'lastStatus', 'lastSummary', 'lastMessage'] as const;
+export type AdminPostEventCronSettingSuffix = typeof ADMIN_POST_EVENT_CRON_SETTING_SUFFIXES[number];
+
+export function getAdminPostEventCronSettingKeys(options: { includeLegacy?: boolean } = {}) {
+  const prefixes = options.includeLegacy === false
+    ? [ADMIN_POST_EVENT_CRON_STATUS_PREFIX]
+    : [ADMIN_POST_EVENT_CRON_STATUS_PREFIX, ADMIN_LEGACY_POST_EVENT_CRON_STATUS_PREFIX];
+
+  return prefixes.flatMap((prefix) =>
+    ADMIN_POST_EVENT_CRON_SETTING_SUFFIXES.map((suffix) => `${prefix}.${suffix}`)
+  );
+}
+
+export function readAdminPostEventCronSetting(
+  settings: Record<string, string | null | undefined>,
+  suffix: AdminPostEventCronSettingSuffix,
+) {
+  return (
+    settings[`${ADMIN_POST_EVENT_CRON_STATUS_PREFIX}.${suffix}`] ||
+    settings[`${ADMIN_LEGACY_POST_EVENT_CRON_STATUS_PREFIX}.${suffix}`] ||
+    null
+  );
+}
+
 export const ADMIN_CRON_PREFIXES = [
-  { id: 'customerLifecycle', label: 'Lifecycle clients CRM', prefix: 'crm.customer-lifecycle', frequency: 'Diari' },
-  { id: 'taskAutomation', label: 'Tasques automàtiques', prefix: 'automation.tasks', frequency: 'Diari' },
-  { id: 'commercial', label: 'Comercial diari', prefix: 'automation.commercial', frequency: 'Diari' },
-  { id: 'fuel', label: 'Preu combustible', prefix: 'automation.fuel', frequency: 'Diari' },
-  { id: 'invoiceSync', label: 'Sync factures', prefix: 'automation.invoiceSync', frequency: 'Diari' },
-  { id: 'packPricing', label: 'Revisió preus packs', prefix: 'automation.packPricing', frequency: 'Diari' },
-  { id: 'postEvent', label: 'Emails post-event', prefix: 'automation.postEvent', frequency: 'Diari' },
-  { id: 'reviewsSync', label: 'Ressenyes Google', prefix: 'automation.reviewsSync', frequency: 'Diari' },
-  { id: 'weeklyBenchmark', label: 'Benchmark setmanal', prefix: 'benchmark.weekly', frequency: 'Setmanal (dl)' },
-  { id: 'urgentFollowUpAlerts', label: 'Alertes follow-up urgents', prefix: 'alerts.urgentFollowUp', frequency: '4x diari' },
-  { id: 'leadReengagement', label: 'Reengagement leads dormants', prefix: 'automation.leadReengagement', frequency: 'Diari' },
-  { id: 'dossierTrashPurge', label: 'Purga paperera dossiers', prefix: 'dossier.trash-purge', frequency: 'Diari' },
-  { id: 'calendarSync', label: 'Google Calendar complet', prefix: 'automation.calendarSync', frequency: 'Cada 15 min' },
+  { id: 'customerLifecycle', label: 'Lifecycle clients CRM', prefix: 'crm.customer-lifecycle', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'taskAutomation', label: 'Tasques automàtiques', prefix: 'automation.tasks', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'commercial', label: 'Comercial diari', prefix: 'automation.commercial', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'fuel', label: 'Preu combustible', prefix: 'automation.fuel', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'invoiceSync', label: 'Sync factures', prefix: 'automation.invoiceSync', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'packPricing', label: 'Revisió preus packs', prefix: 'automation.packPricing', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'postEvent', label: 'Emails post-event', prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX, frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'reviewsSync', label: 'Ressenyes Google', prefix: 'automation.reviewsSync', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'weeklyBenchmark', label: 'Benchmark setmanal', prefix: 'benchmark.weekly', frequency: 'Setmanal (dl)', maxAgeHours: 192 },
+  { id: 'urgentFollowUpAlerts', label: 'Alertes follow-up urgents', prefix: 'alerts.urgentFollowUp', frequency: '4x diari', maxAgeHours: 8 },
+  { id: 'leadReengagement', label: 'Reengagement leads dormants', prefix: 'automation.leadReengagement', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'dossierTrashPurge', label: 'Purga paperera dossiers', prefix: 'dossier.trash-purge', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'calendarSync', label: 'Google Calendar complet', prefix: 'automation.calendarSync', frequency: 'Cada 15 min', maxAgeHours: 2 },
 ] as const;
 
 export const ADMIN_HEALTH_ACTIVE_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
@@ -839,12 +869,13 @@ export const ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS = [
 // ─── Pack Editor Tabs ────────────────────────────────────────────────────
 
 export type PackEditorTab = 'economic' | 'content' | 'texts' | 'publish';
+export type PackEditorTabIcon = 'banknote' | 'sliders' | 'languages' | 'check';
 
-export const ADMIN_PACK_EDITOR_TABS: ReadonlyArray<{ id: PackEditorTab; label: string; icon: string }> = [
-  { id: 'economic', label: 'Economia', icon: '💰' },
-  { id: 'content', label: 'Contingut', icon: '🎛️' },
-  { id: 'texts', label: 'Textos', icon: '🌐' },
-  { id: 'publish', label: 'Publicació', icon: '✅' },
+export const ADMIN_PACK_EDITOR_TABS: ReadonlyArray<{ id: PackEditorTab; label: string; icon: PackEditorTabIcon }> = [
+  { id: 'economic', label: 'Economia', icon: 'banknote' },
+  { id: 'content', label: 'Contingut', icon: 'sliders' },
+  { id: 'texts', label: 'Textos', icon: 'languages' },
+  { id: 'publish', label: 'Publicació', icon: 'check' },
 ] as const;
 
 // ─── PDF Studio Defaults ────────────────────────────────────────────────
@@ -863,7 +894,7 @@ export const ADMIN_PDF_STUDIO_DEFAULTS: Record<string, string> = {
 export const ADMIN_DASHBOARD_PILOT_STEPS = [
   { id: 'leads', step: 'Pas 1', title: 'Respondre entrades', href: '/admin/leads', cta: 'Anar a entrades' },
   { id: 'tasks', step: 'Pas 2', title: 'Executar tasques', href: '/admin/tasks', cta: 'Veure tasques' },
-  { id: 'postevent', step: 'Pas 3', title: 'Tancar post-esdeveniment', href: '/admin/emails', cta: 'Gestionar' },
+  { id: 'postevent', step: 'Pas 3', title: 'Tancar post-esdeveniment', href: '/admin/post-event', cta: 'Gestionar' },
   { id: 'bookings', step: 'Pas 4', title: 'Preparar reserves', href: '/admin/bookings', cta: 'Veure reserves' },
 ] as const;
 
@@ -879,13 +910,14 @@ export const ADMIN_DASHBOARD_INSIGHT_COLORS: Record<string, string> = {
 // ─── Pricing Tabs ───────────────────────────────────────────────────────
 
 export type PricingTab = 'overview' | 'tarifes' | 'extras' | 'packs' | 'inventory';
+export type PricingTabIcon = 'chart' | 'target' | 'sparkles' | 'package' | 'wrench';
 
-export const ADMIN_PRICING_TABS: ReadonlyArray<{ key: PricingTab; label: string; icon: string }> = [
-  { key: 'overview',  label: 'Resum',     icon: '📊' },
-  { key: 'tarifes',   label: 'Tarifes',   icon: '🎯' },
-  { key: 'extras',    label: 'Extras',    icon: '✨' },
-  { key: 'packs',     label: 'Packs',     icon: '📦' },
-  { key: 'inventory', label: 'Inventari', icon: '🔧' },
+export const ADMIN_PRICING_TABS: ReadonlyArray<{ key: PricingTab; label: string; icon: PricingTabIcon }> = [
+  { key: 'overview',  label: 'Resum',     icon: 'chart' },
+  { key: 'tarifes',   label: 'Tarifes',   icon: 'target' },
+  { key: 'extras',    label: 'Extras',    icon: 'sparkles' },
+  { key: 'packs',     label: 'Packs',     icon: 'package' },
+  { key: 'inventory', label: 'Inventari', icon: 'wrench' },
 ] as const;
 
 // ─── Health Status Visual Mapping (semàfor compartit) ───────────────────

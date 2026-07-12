@@ -1,7 +1,7 @@
 import { Prisma, type CustomerDiscountCode, type Proposal, type Task } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { findTaskLinkByTaskOrLegacyId } from '@/lib/services/tasks/leadScopedTaskService';
+import { findTaskLinkByTaskId } from '@/lib/services/tasks/leadScopedTaskService';
 import { readCustomerActivityLog, type CustomerActivityLogEntry } from '@/lib/services/customerActivityService';
 
 export type CustomerHubCustomer = Prisma.CustomerGetPayload<{
@@ -39,7 +39,52 @@ export type CustomerHubLead = Prisma.LeadGetPayload<{
 }>;
 
 export type CustomerHubBooking = Prisma.BookingGetPayload<{
-  include: { pack: { include: { translations: true } } };
+  include: {
+    pack: { include: { translations: true } };
+    invoices: {
+      select: {
+        id: true;
+        reference: true;
+        status: true;
+        total: true;
+        pdfUrl: true;
+        holdedInvoiceUrl: true;
+        createdAt: true;
+      };
+    };
+    deliveryNotes: {
+      select: {
+        id: true;
+        reference: true;
+        status: true;
+        pdfUrl: true;
+        deliveredAt: true;
+        signedAt: true;
+        createdAt: true;
+      };
+    };
+    postEventReport: {
+      select: {
+        id: true;
+        status: true;
+        completedAt: true;
+        createdAt: true;
+        soundQuality: true;
+        maxDancefloor: true;
+        hadIncidents: true;
+      };
+    };
+    clientSurvey: {
+      select: {
+        id: true;
+        submittedAt: true;
+        overallRating: true;
+        npsScore: true;
+        testimonialPermission: true;
+        createdTestimonialId: true;
+      };
+    };
+  };
 }>;
 
 export type CustomerHubActivityLite = CustomerActivityLogEntry;
@@ -118,7 +163,7 @@ export async function resolveCustomerHubCustomerId(entityId: string): Promise<st
     if (invoiceBookingCustomerId) return invoiceBookingCustomerId;
   }
 
-  const taskLink = await safeQuery(() => findTaskLinkByTaskOrLegacyId(entityId), null);
+  const taskLink = await safeQuery(() => findTaskLinkByTaskId(entityId), null);
   if (taskLink?.customerId) return taskLink.customerId;
 
   const [leadActivity, leadDocument] = await Promise.all([
@@ -211,7 +256,54 @@ export async function fetchCustomerHubCollections(customerId: string, leadIds: s
         where: customerOrLeadWhere,
         orderBy: { createdAt: 'desc' },
         take: 80,
-        include: { pack: { include: { translations: true } } },
+        include: {
+          pack: { include: { translations: true } },
+          invoices: {
+            orderBy: { createdAt: 'desc' },
+            select: {
+              id: true,
+              reference: true,
+              status: true,
+              total: true,
+              pdfUrl: true,
+              holdedInvoiceUrl: true,
+              createdAt: true,
+            },
+          },
+          deliveryNotes: {
+            orderBy: [{ signedAt: 'desc' }, { createdAt: 'desc' }],
+            select: {
+              id: true,
+              reference: true,
+              status: true,
+              pdfUrl: true,
+              deliveredAt: true,
+              signedAt: true,
+              createdAt: true,
+            },
+          },
+          postEventReport: {
+            select: {
+              id: true,
+              status: true,
+              completedAt: true,
+              createdAt: true,
+              soundQuality: true,
+              maxDancefloor: true,
+              hadIncidents: true,
+            },
+          },
+          clientSurvey: {
+            select: {
+              id: true,
+              submittedAt: true,
+              overallRating: true,
+              npsScore: true,
+              testimonialPermission: true,
+              createdTestimonialId: true,
+            },
+          },
+        },
       }),
     []
   );

@@ -3,7 +3,22 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, Banknote, BarChart3, ShieldAlert, TrendingUp, WalletCards } from 'lucide-react';
+import {
+  ArrowRight,
+  Banknote,
+  BarChart3,
+  ChartBar,
+  Clock3,
+  LayoutDashboard,
+  Settings,
+  ShieldAlert,
+  TrendingDown,
+  TrendingUp,
+  TriangleAlert,
+  Trophy,
+  WalletCards,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
 import { ADMIN_ECONOMY_HELP, helpAttrs } from '../components/adminHelpContent';
@@ -34,6 +49,18 @@ const VALID_TABS: Tab[] = ['resum', 'cobraments', 'rendibilitat', 'tresoreria', 
 type ExecutiveTone = 'success' | 'warning' | 'danger';
 
 const EXECUTIVE_ICON = 'h-4 w-4 shrink-0';
+const TAB_ICON = 'h-4 w-4 shrink-0';
+const CARD_ICON = 'h-4 w-4 shrink-0';
+const ALERT_CARD_ICON = 'h-5 w-5 shrink-0';
+const PROFITABILITY_EVENT_TITLE = 'text-sm font-semibold leading-snug break-words transition-colors sm:truncate';
+const TAB_ICON_MAP: Record<(typeof TABS)[number]['icon'], LucideIcon> = {
+  dashboard: LayoutDashboard,
+  banknote: Banknote,
+  trend: TrendingUp,
+  wallet: WalletCards,
+  forecast: BarChart3,
+  settings: Settings,
+};
 
 function executiveToneClass(tone: ExecutiveTone) {
   if (tone === 'danger') return 'admin-tone-border-danger';
@@ -246,6 +273,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === 'cobraments' && props.atRiskRows.length > 0;
+          const TabIcon = TAB_ICON_MAP[tab.icon];
           return (
             <button
               key={tab.id}
@@ -256,7 +284,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 isActive ? 'ap-tab--active' : 'ap-tab--idle'
               }`}
             >
-              <span aria-hidden="true">{tab.icon}</span>
+              <TabIcon className={TAB_ICON} aria-hidden="true" />
               <span className="hidden sm:inline">{tab.label}</span>
               <span className="sm:hidden">{tab.mobileLabel}</span>
               {showBadge && (
@@ -411,7 +439,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     >
                       <div className="flex items-start gap-3">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg">
-                          ⚠️
+                          <TriangleAlert className={ALERT_CARD_ICON} aria-hidden="true" />
                         </span>
                         <div className="flex-1">
                           <h2 className="text-base font-bold">Cobraments vençuts</h2>
@@ -437,7 +465,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     >
                       <div className="flex items-start gap-3">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg">
-                          📉
+                          <TrendingDown className={ALERT_CARD_ICON} aria-hidden="true" />
                         </span>
                         <div className="flex-1">
                           <h2 className="text-base font-bold">Esdeveniments amb marge baix</h2>
@@ -485,7 +513,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           {i + 1}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold truncate transition-colors">
+                          <p className={PROFITABILITY_EVENT_TITLE}>
                             {row.reference} &middot; {row.clientName}
                           </p>
                           <p className="text-xs">
@@ -531,7 +559,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               <section className="ap-card p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⚠️</span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                      <TriangleAlert className={CARD_ICON} aria-hidden="true" />
+                    </span>
                     <h2 className="ap-h2">Fora de termini</h2>
                     {props.atRiskRows.length > 0 && (
                       <span className="rounded-full px-2 py-0.5 text-xs font-bold">
@@ -630,7 +660,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               {/* Pròxims */}
               <section className="ap-card p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⏰</span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                    <Clock3 className={CARD_ICON} aria-hidden="true" />
+                  </span>
                   <h2 className="ap-h2">Venciments en 7 dies</h2>
                   {props.upcomingDueRows.length > 0 && (
                     <span className="rounded-full px-2 py-0.5 text-xs font-bold">
@@ -695,7 +727,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <div className="grid gap-5 xl:grid-cols-2">
                     <section className="ap-card p-5" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">🏆</span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                          <Trophy className={CARD_ICON} aria-hidden="true" />
+                        </span>
                         <h2 className="text-base font-bold">Top esdeveniments per marge</h2>
                       </div>
                       <div className="space-y-2">
@@ -712,7 +746,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                                 {i + 1}
                               </span>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold truncate transition-colors">
+                                <p className={PROFITABILITY_EVENT_TITLE}>
                                   {row.reference} &middot; {row.clientName}
                                 </p>
                                 <p className="text-xs">{formatDateSimple(row.eventDate)} &middot; {row.source}</p>
@@ -734,7 +768,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
                     <section className="ap-card p-5" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⚠️</span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                          <TriangleAlert className={CARD_ICON} aria-hidden="true" />
+                        </span>
                         <h2 className="text-base font-bold">Esdeveniments en risc</h2>
                         {props.riskProfitability.length > 0 && (
                           <span className="rounded-full px-2 py-0.5 text-xs font-bold">
@@ -755,9 +791,11 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               href={buildBookingHref(row.id)}
                               className="flex items-center gap-3 ap-card p-3 transition-colors group"
                             >
-                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs">📉</span>
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs">
+                                <TrendingDown className={CARD_ICON} aria-hidden="true" />
+                              </span>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold truncate transition-colors">
+                                <p className={PROFITABILITY_EVENT_TITLE}>
                                   {row.reference} &middot; {row.clientName}
                                 </p>
                                 <p className="text-xs">{formatDateSimple(row.eventDate)} &middot; {row.source}</p>
@@ -776,10 +814,47 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   {/* Taula per canal */}
                   <section className="ap-card p-5" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}>
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">📊</span>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                        <ChartBar className={CARD_ICON} aria-hidden="true" />
+                      </span>
                       <h2 className="text-base font-bold">Rendibilitat per canal d&apos;adquisició</h2>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="grid gap-2 md:hidden">
+                      {props.bySource.map((row) => (
+                        <div key={row.source} className="rounded-xl border border-[var(--line)] p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-xs uppercase tracking-wider">Canal</p>
+                              <p className="text-sm font-bold break-words">{row.source}</p>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <p className={`text-lg font-bold ${marginColor(row.avgMarginPct)}`}>
+                                {pct(row.avgMarginPct)}
+                              </p>
+                              <p className="text-xs uppercase tracking-wider">marge</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                              <p className="uppercase tracking-wider">Bolos</p>
+                              <p className="mt-1 font-bold">{row.bookings}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Ingressos</p>
+                              <p className="mt-1 font-bold">{money(row.revenue)}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Marge net</p>
+                              <p className="mt-1 font-bold">{money(row.netMargin)}</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 h-1.5 w-full rounded-full bg-[var(--raised)] overflow-hidden">
+                            <div className={`h-full rounded-full ${marginBg(row.avgMarginPct)}`} style={{ width: `${Math.min(row.avgMarginPct * 100, 100)}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="hidden overflow-x-auto md:block">
                       <table className="min-w-full text-sm" aria-label="Rendibilitat per canal">
                         <thead>
                           <tr className="border-b border-[var(--line)] text-left text-xs uppercase tracking-wider">
@@ -824,33 +899,69 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <p className="text-xs mb-4">Projecció mensual d'ingressos i costos basada en reserves confirmades.</p>
 
                 {props.cashFlow && props.cashFlow.length > 0 ? (
-                  <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
-                    <table className="min-w-[700px] w-full text-sm" aria-label="Projecció de tresoreria">
-                      <thead>
-                        <tr className="text-left text-xs uppercase tracking-wider">
-                          <th scope="col" className="px-3 py-2">Mes</th>
-                          <th scope="col" className="px-3 py-2 text-right">Ingressos previstos</th>
-                          <th scope="col" className="px-3 py-2 text-right">Costos estimats</th>
-                          <th scope="col" className="px-3 py-2 text-right">Flux net</th>
-                          <th scope="col" className="px-3 py-2 text-right">Acumulat</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/10">
-                        {props.cashFlow.map((row) => (
-                          <tr key={row.month} className="adm-row-hover">
-                            <td className="px-3 py-2 font-medium">{row.month}</td>
-                            <td className="px-3 py-2 text-right">{money(row.income)}</td>
-                            <td className="px-3 py-2 text-right">{money(row.costs)}</td>
-                            <td className={`px-3 py-2 text-right font-semibold ${row.netFlow >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
-                              {money(row.netFlow)}
-                            </td>
-                            <td className={`px-3 py-2 text-right font-bold ${row.cumulative >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
-                              {money(row.cumulative)}
-                            </td>
+                  <div>
+                    <div className="grid gap-2 md:hidden" aria-label="Projecció de tresoreria en format mòbil">
+                      {props.cashFlow.map((row) => (
+                        <div key={row.month} className="rounded-xl border border-[var(--line)] p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-xs uppercase tracking-wider">Mes</p>
+                              <p className="text-sm font-bold">{row.month}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs uppercase tracking-wider">Acumulat</p>
+                              <p className={`text-sm font-bold ${row.cumulative >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                                {money(row.cumulative)}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                              <p className="uppercase tracking-wider">Ingressos</p>
+                              <p className="mt-1 font-bold">{money(row.income)}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Costos</p>
+                              <p className="mt-1 font-bold">{money(row.costs)}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Flux net</p>
+                              <p className={`mt-1 font-bold ${row.netFlow >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                                {money(row.netFlow)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="hidden overflow-x-auto rounded-xl border border-[var(--line)] md:block">
+                      <table className="min-w-[700px] w-full text-sm" aria-label="Projecció de tresoreria">
+                        <thead>
+                          <tr className="text-left text-xs uppercase tracking-wider">
+                            <th scope="col" className="px-3 py-2">Mes</th>
+                            <th scope="col" className="px-3 py-2 text-right">Ingressos previstos</th>
+                            <th scope="col" className="px-3 py-2 text-right">Costos estimats</th>
+                            <th scope="col" className="px-3 py-2 text-right">Flux net</th>
+                            <th scope="col" className="px-3 py-2 text-right">Acumulat</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/10">
+                          {props.cashFlow.map((row) => (
+                            <tr key={row.month} className="adm-row-hover">
+                              <td className="px-3 py-2 font-medium">{row.month}</td>
+                              <td className="px-3 py-2 text-right">{money(row.income)}</td>
+                              <td className="px-3 py-2 text-right">{money(row.costs)}</td>
+                              <td className={`px-3 py-2 text-right font-semibold ${row.netFlow >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                                {money(row.netFlow)}
+                              </td>
+                              <td className={`px-3 py-2 text-right font-bold ${row.cumulative >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                                {money(row.cumulative)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 ) : (
                   <p className="text-sm">Sense dades de tresoreria. Les reserves confirmades amb dates futures apareixeran aquí.</p>
@@ -872,73 +983,145 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </p>
 
                 {props.forecast_pipeline && props.forecast_pipeline.length > 0 ? (
-                  <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
-                    <table className="min-w-[1080px] w-full text-sm" aria-label="Previsió de vendes">
-                      <thead>
-                        <tr className="text-left text-xs uppercase tracking-wider">
-                          <th scope="col" className="px-3 py-2">Mes</th>
-                          <th scope="col" className="px-3 py-2 text-right">Mitjana històrica</th>
-                          <th scope="col" className="px-3 py-2 text-right">Pipeline ponderat</th>
-                          <th scope="col" className="px-3 py-2 text-right">Previsió combinada</th>
-                          <th scope="col" className="px-3 py-2 text-right">Rang ±1σ</th>
-                          <th scope="col" className="px-3 py-2 text-right">YoY (any anterior)</th>
-                          <th scope="col" className="px-3 py-2 text-right">Confirmades</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/10">
-                        {props.forecast_pipeline.map((row) => {
-                          const hasBand = row.combinedHigh > row.combinedLow;
-                          const yoyDelta = row.previousYearActual > 0
-                            ? (row.combined - row.previousYearActual) / row.previousYearActual
-                            : null;
-                          const yoyToneClass = yoyDelta == null
-                            ? 'opacity-50'
-                            : yoyDelta >= 0.1
-                              ? 'admin-tone-text-success'
-                              : yoyDelta <= -0.1
-                                ? 'admin-tone-text-danger'
-                                : 'opacity-70';
-                          return (
-                            <tr key={row.month} className="adm-row-hover">
-                              <td className="px-3 py-2 font-medium">{row.month}</td>
-                              <td className="px-3 py-2 text-right">{money(row.historicalAvg)}</td>
-                              <td className="px-3 py-2 text-right">{money(row.pipeline)}</td>
-                              <td className="px-3 py-2 text-right font-bold">{money(row.combined)}</td>
-                              <td className="px-3 py-2 text-right text-xs">
-                                {hasBand ? (
-                                  <span className="font-mono">{money(row.combinedLow)} – {money(row.combinedHigh)}</span>
-                                ) : (
-                                  <span className="opacity-50">—</span>
-                                )}
-                              </td>
-                              <td className={`px-3 py-2 text-right text-xs ${yoyToneClass}`}>
-                                {row.previousYearActual > 0 ? (
-                                  <span className="font-mono">
-                                    {money(row.previousYearActual)}
-                                    {yoyDelta != null && (
-                                      <span className="ml-1">
-                                        ({yoyDelta >= 0 ? '+' : ''}{Math.round(yoyDelta * 100)}%)
-                                      </span>
-                                    )}
-                                  </span>
-                                ) : (
-                                  <span>—</span>
-                                )}
-                              </td>
-                              <td className="px-3 py-2 text-right text-xs">
-                                {row.confirmedBookings > 0 ? (
-                                  <span className="font-mono">
-                                    {row.confirmedBookings} · {money(row.confirmedRevenue)}
-                                  </span>
-                                ) : (
-                                  <span className="opacity-50">—</span>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                  <div>
+                    <div className="grid gap-2 md:hidden" aria-label="Previsió de vendes en format mòbil">
+                      {props.forecast_pipeline.map((row) => {
+                        const hasBand = row.combinedHigh > row.combinedLow;
+                        const yoyDelta = row.previousYearActual > 0
+                          ? (row.combined - row.previousYearActual) / row.previousYearActual
+                          : null;
+                        const yoyToneClass = yoyDelta == null
+                          ? 'opacity-50'
+                          : yoyDelta >= 0.1
+                            ? 'admin-tone-text-success'
+                            : yoyDelta <= -0.1
+                              ? 'admin-tone-text-danger'
+                              : 'opacity-70';
+                        return (
+                          <div key={row.month} className="rounded-xl border border-[var(--line)] p-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="text-xs uppercase tracking-wider">Mes</p>
+                                <p className="text-sm font-bold">{row.month}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-xs uppercase tracking-wider">Combinada</p>
+                                <p className="text-sm font-bold">{money(row.combined)}</p>
+                              </div>
+                            </div>
+                            <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <p className="uppercase tracking-wider">Històrica</p>
+                                <p className="mt-1 font-bold">{money(row.historicalAvg)}</p>
+                              </div>
+                              <div>
+                                <p className="uppercase tracking-wider">Pipeline</p>
+                                <p className="mt-1 font-bold">{money(row.pipeline)}</p>
+                              </div>
+                              <div>
+                                <p className="uppercase tracking-wider">Rang ±1σ</p>
+                                <p className="mt-1 font-mono font-bold">
+                                  {hasBand ? `${money(row.combinedLow)} – ${money(row.combinedHigh)}` : '—'}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="uppercase tracking-wider">YoY</p>
+                                <p className={`mt-1 font-mono font-bold ${yoyToneClass}`}>
+                                  {row.previousYearActual > 0 ? (
+                                    <>
+                                      {money(row.previousYearActual)}
+                                      {yoyDelta != null && (
+                                        <span className="ml-1">
+                                          ({yoyDelta >= 0 ? '+' : ''}{Math.round(yoyDelta * 100)}%)
+                                        </span>
+                                      )}
+                                    </>
+                                  ) : (
+                                    '—'
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="mt-3 text-xs">
+                              Confirmades:{' '}
+                              <span className="font-mono font-bold">
+                                {row.confirmedBookings > 0
+                                  ? `${row.confirmedBookings} · ${money(row.confirmedRevenue)}`
+                                  : '—'}
+                              </span>
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="hidden overflow-x-auto rounded-xl border border-[var(--line)] md:block">
+                      <table className="min-w-[1080px] w-full text-sm" aria-label="Previsió de vendes">
+                        <thead>
+                          <tr className="text-left text-xs uppercase tracking-wider">
+                            <th scope="col" className="px-3 py-2">Mes</th>
+                            <th scope="col" className="px-3 py-2 text-right">Mitjana històrica</th>
+                            <th scope="col" className="px-3 py-2 text-right">Pipeline ponderat</th>
+                            <th scope="col" className="px-3 py-2 text-right">Previsió combinada</th>
+                            <th scope="col" className="px-3 py-2 text-right">Rang ±1σ</th>
+                            <th scope="col" className="px-3 py-2 text-right">YoY (any anterior)</th>
+                            <th scope="col" className="px-3 py-2 text-right">Confirmades</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/10">
+                          {props.forecast_pipeline.map((row) => {
+                            const hasBand = row.combinedHigh > row.combinedLow;
+                            const yoyDelta = row.previousYearActual > 0
+                              ? (row.combined - row.previousYearActual) / row.previousYearActual
+                              : null;
+                            const yoyToneClass = yoyDelta == null
+                              ? 'opacity-50'
+                              : yoyDelta >= 0.1
+                                ? 'admin-tone-text-success'
+                                : yoyDelta <= -0.1
+                                  ? 'admin-tone-text-danger'
+                                  : 'opacity-70';
+                            return (
+                              <tr key={row.month} className="adm-row-hover">
+                                <td className="px-3 py-2 font-medium">{row.month}</td>
+                                <td className="px-3 py-2 text-right">{money(row.historicalAvg)}</td>
+                                <td className="px-3 py-2 text-right">{money(row.pipeline)}</td>
+                                <td className="px-3 py-2 text-right font-bold">{money(row.combined)}</td>
+                                <td className="px-3 py-2 text-right text-xs">
+                                  {hasBand ? (
+                                    <span className="font-mono">{money(row.combinedLow)} – {money(row.combinedHigh)}</span>
+                                  ) : (
+                                    <span className="opacity-50">—</span>
+                                  )}
+                                </td>
+                                <td className={`px-3 py-2 text-right text-xs ${yoyToneClass}`}>
+                                  {row.previousYearActual > 0 ? (
+                                    <span className="font-mono">
+                                      {money(row.previousYearActual)}
+                                      {yoyDelta != null && (
+                                        <span className="ml-1">
+                                          ({yoyDelta >= 0 ? '+' : ''}{Math.round(yoyDelta * 100)}%)
+                                        </span>
+                                      )}
+                                    </span>
+                                  ) : (
+                                    <span>—</span>
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 text-right text-xs">
+                                  {row.confirmedBookings > 0 ? (
+                                    <span className="font-mono">
+                                      {row.confirmedBookings} · {money(row.confirmedRevenue)}
+                                    </span>
+                                  ) : (
+                                    <span className="opacity-50">—</span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 ) : (
                   <p className="text-sm">Sense dades de previsió. Necessitem leads actius i/o reserves passades per generar previsions.</p>
@@ -954,35 +1137,79 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <h2 className="ap-h2 mb-1">CAC per canal</h2>
                   <p className="text-xs mb-4">Cost d'adquisició de client real vs estimat, derivat de dades.</p>
 
-                  <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
-                    <table className="min-w-[600px] w-full text-sm" aria-label="CAC per canal">
-                      <thead>
-                        <tr className="text-left text-xs uppercase tracking-wider">
-                          <th scope="col" className="px-3 py-2">Canal</th>
-                          <th scope="col" className="px-3 py-2 text-right">Leads</th>
-                          <th scope="col" className="px-3 py-2 text-right">Guanyats</th>
-                          <th scope="col" className="px-3 py-2 text-right">Conversió</th>
-                          <th scope="col" className="px-3 py-2 text-right">Despesa</th>
-                          <th scope="col" className="px-3 py-2 text-right">CAC estimat</th>
-                          <th scope="col" className="px-3 py-2 text-right">CAC real</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/10">
-                        {props.cacByChannel.map((row) => (
-                          <tr key={row.channel} className="adm-row-hover">
-                            <td className="px-3 py-2 font-medium">{row.channel}</td>
-                            <td className="px-3 py-2 text-right">{row.totalLeads}</td>
-                            <td className="px-3 py-2 text-right">{row.wonLeads}</td>
-                            <td className="px-3 py-2 text-right">{(row.conversionRate * 100).toFixed(1)}%</td>
-                            <td className="px-3 py-2 text-right">{row.realSpend !== null ? money(row.realSpend) : '—'}</td>
-                            <td className="px-3 py-2 text-right">{money(row.estimatedCac)}</td>
-                            <td className="px-3 py-2 text-right font-semibold">
-                              {row.realCac !== null ? money(row.realCac) : <span title="Carrega despesa del canal per veure el CAC real">est.</span>}
-                            </td>
+                  <div>
+                    <div className="grid gap-2 md:hidden" aria-label="CAC per canal en format mòbil">
+                      {props.cacByChannel.map((row) => (
+                        <div key={row.channel} className="rounded-xl border border-[var(--line)] p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-xs uppercase tracking-wider">Canal</p>
+                              <p className="text-sm font-bold break-words">{row.channel}</p>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <p className="text-xs uppercase tracking-wider">Conversió</p>
+                              <p className="text-sm font-bold">{(row.conversionRate * 100).toFixed(1)}%</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                              <p className="uppercase tracking-wider">Leads</p>
+                              <p className="mt-1 font-bold">{row.totalLeads}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Guanyats</p>
+                              <p className="mt-1 font-bold">{row.wonLeads}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Despesa</p>
+                              <p className="mt-1 font-bold">{row.realSpend !== null ? money(row.realSpend) : '—'}</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                              <p className="uppercase tracking-wider">CAC estimat</p>
+                              <p className="mt-1 font-bold">{money(row.estimatedCac)}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">CAC real</p>
+                              <p className="mt-1 font-bold">
+                                {row.realCac !== null ? money(row.realCac) : <span title="Carrega despesa del canal per veure el CAC real">est.</span>}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="hidden overflow-x-auto rounded-xl border border-[var(--line)] md:block">
+                      <table className="min-w-[600px] w-full text-sm" aria-label="CAC per canal">
+                        <thead>
+                          <tr className="text-left text-xs uppercase tracking-wider">
+                            <th scope="col" className="px-3 py-2">Canal</th>
+                            <th scope="col" className="px-3 py-2 text-right">Leads</th>
+                            <th scope="col" className="px-3 py-2 text-right">Guanyats</th>
+                            <th scope="col" className="px-3 py-2 text-right">Conversió</th>
+                            <th scope="col" className="px-3 py-2 text-right">Despesa</th>
+                            <th scope="col" className="px-3 py-2 text-right">CAC estimat</th>
+                            <th scope="col" className="px-3 py-2 text-right">CAC real</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/10">
+                          {props.cacByChannel.map((row) => (
+                            <tr key={row.channel} className="adm-row-hover">
+                              <td className="px-3 py-2 font-medium">{row.channel}</td>
+                              <td className="px-3 py-2 text-right">{row.totalLeads}</td>
+                              <td className="px-3 py-2 text-right">{row.wonLeads}</td>
+                              <td className="px-3 py-2 text-right">{(row.conversionRate * 100).toFixed(1)}%</td>
+                              <td className="px-3 py-2 text-right">{row.realSpend !== null ? money(row.realSpend) : '—'}</td>
+                              <td className="px-3 py-2 text-right">{money(row.estimatedCac)}</td>
+                              <td className="px-3 py-2 text-right font-semibold">
+                                {row.realCac !== null ? money(row.realCac) : <span title="Carrega despesa del canal per veure el CAC real">est.</span>}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </section>
               )}
@@ -1020,7 +1247,67 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   </article>
                 </div>
 
-                <div className="mt-4 overflow-x-auto rounded-xl border border-[var(--line)]">
+                <div className="mt-4 grid gap-2 xl:grid-cols-2 2xl:hidden" aria-label="Rendibilitat per pack en format compacte">
+                  {props.packPricingRows.map((row) => {
+                    const badge = packMarginBadge(row.marginPct, props.packPricingConfig.marginTargetPct);
+                    return (
+                      <article key={row.id} className="rounded-xl border border-[var(--line)] p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <Link href={buildPackHref(row.id)} className="text-sm font-bold leading-snug break-words">
+                              {row.name}
+                            </Link>
+                            <p className="text-xs">{row.slug} · {row.service}</p>
+                          </div>
+                          <span className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${badge.cls}`}>
+                            <span className={`inline-block h-2 w-2 rounded-full ${badge.dot}`} />
+                            {badge.label}
+                          </span>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                          <div>
+                            <p className="uppercase tracking-wider">PVP</p>
+                            <p className="mt-1 font-bold">{money(row.price)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Recomanat</p>
+                            <p className="mt-1 font-bold">{money(row.recommendedPrice)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Cost</p>
+                            <p className="mt-1 font-bold">{money(row.directCost)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Marge</p>
+                            <p className="mt-1 font-bold">{pct(row.marginPct)}</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-2 border-t border-[var(--line)] pt-3 text-xs sm:grid-cols-4">
+                          <div>
+                            <p className="uppercase tracking-wider">Benefici</p>
+                            <p className={`mt-1 font-bold ${row.profit >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                              {money(row.profit)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Hora extra</p>
+                            <p className="mt-1 font-bold">{money(row.extraHourPrice)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">H. extra recom.</p>
+                            <p className="mt-1 font-bold">{money(row.recommendedExtraHourPrice)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Marge h extra</p>
+                            <p className="mt-1 font-bold">{pct(row.extraHourMarginPct)}</p>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 hidden overflow-x-auto rounded-xl border border-[var(--line)] 2xl:block">
                   <table className="min-w-[1450px] w-full text-sm" aria-label="Rendibilitat per pack">
                     <thead className="">
                       <tr className="text-left text-xs uppercase tracking-wider">

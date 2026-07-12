@@ -1,0 +1,13 @@
+{
+  "textMarkers": [
+    "@example.test",
+    "zenit e2e",
+    "zenit.e2e"
+  ],
+  "prefixMarkers": [
+    "zenit whatsapp",
+    "zenit mail",
+    "zenit config",
+    "zenit admin"
+  ]
+}

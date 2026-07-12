@@ -5,6 +5,7 @@ import type { TimelineEventDTO } from '@/lib/customer-hub/dto';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildDossierStoredPreviewHref } from '@/lib/admin/dossierWorkspaceHref';
 
 export type CanonicalTimelineEvent = {
   id: string;
@@ -116,10 +117,25 @@ function labelCustomerAction(action: string, metadata?: TimelineMetadata): strin
   if (action === 'PROPOSAL_SENT') return 'Pressupost enviat';
   if (action === 'BOOKING_CONFIRMED') return 'Reserva confirmada';
   if (action === 'POST_EVENT_RECURRENCE_DECIDED') return labelPostEventDecision(metadata);
+  if (action === 'TESTIMONIAL_APPROVED') return 'Testimoni aprovat';
+  if (action === 'TESTIMONIAL_HIDDEN') return 'Testimoni amagat';
+  if (action === 'TESTIMONIAL_DELETED') return 'Testimoni eliminat';
+  if (action === 'REFERRAL_ASK_PREPARED') return 'Referral preparat';
+  if (action === 'REACTIVATION_PREPARED') return 'Reactivacio preparada';
   return action;
 }
 
 function describeCustomerActivity(action: string, metadata?: TimelineMetadata): string | undefined {
+  if (action === 'TESTIMONIAL_APPROVED' || action === 'TESTIMONIAL_HIDDEN' || action === 'TESTIMONIAL_DELETED') {
+    const rating = typeof metadata?.rating === 'number' ? `${metadata.rating}/5` : undefined;
+    const eventType = getMetadataValue(metadata, 'eventType');
+    const textPreview = getMetadataValue(metadata, 'textPreview');
+    return [rating, eventType, textPreview ? truncateTimelineText(textPreview) : null].filter(Boolean).join(' · ') || undefined;
+  }
+  if (action === 'REFERRAL_ASK_PREPARED' || action === 'REACTIVATION_PREPARED') {
+    const note = getMetadataValue(metadata, 'note');
+    return note ? truncateTimelineText(note) : undefined;
+  }
   if (action !== 'POST_EVENT_RECURRENCE_DECIDED') return undefined;
   const bookingRef = getMetadataValue(metadata, 'bookingRef');
   const safety = getMetadataValue(metadata, 'safety');
@@ -293,6 +309,24 @@ function isProposalDocumentLog(log: AdminLogLike, metadata: TimelineMetadata): b
 }
 
 function buildAdminLogLink(log: AdminLogLike, metadata: TimelineMetadata): CanonicalTimelineEvent['link'] {
+  if (log.entity === 'dossier') {
+    const dossierId = log.entityId || getMetadataValue(metadata, 'dossierId');
+    return dossierId
+      ? { label: 'Obrir dossier', href: buildDossierStoredPreviewHref(dossierId) }
+      : { label: 'Obrir dossiers', href: '/admin/dossiers' };
+  }
+  if (log.entity === 'invoice') {
+    const pdfUrl = getMetadataValue(metadata, 'pdfUrl');
+    if (pdfUrl) return { label: 'Obrir factura', href: pdfUrl };
+    const bookingId = getMetadataValue(metadata, 'bookingId');
+    return bookingId ? { label: 'Veure documents', href: buildBookingHref(bookingId, 'sec-documents') } : undefined;
+  }
+  if (log.entity === 'deliveryNote') {
+    const pdfUrl = getMetadataValue(metadata, 'pdfUrl');
+    if (pdfUrl) return { label: 'Obrir albarà', href: pdfUrl };
+    const bookingId = getMetadataValue(metadata, 'bookingId');
+    return bookingId ? { label: 'Veure documents', href: buildBookingHref(bookingId, 'sec-documents') } : undefined;
+  }
   if (!log.entityId) return undefined;
   if (log.entity === 'booking') return { label: 'Veure reserva', href: buildBookingHref(log.entityId) };
   if (log.entity === 'lead') return { label: 'Veure entrada', href: buildLeadWorkspaceHref(log.entityId) };
@@ -306,7 +340,6 @@ function buildAdminLogLink(log: AdminLogLike, metadata: TimelineMetadata): Canon
     }
     return { label: 'Obrir', href: `/admin/presupuestos?proposalId=${log.entityId}` };
   }
-  if (log.entity === 'dossier') return { label: 'Obrir dossiers', href: '/admin/dossiers' };
   return undefined;
 }
 
@@ -860,8 +893,8 @@ export async function fetchCanonicalEventsForBooking(
 
   const leadId = booking?.leadId ?? null;
 
-  // Parallel: booking adminLogs + inventory adminLogs + lead activities (if lead exists)
-  const [bookingLogs, inventoryLogs, leadActivities] = await Promise.all([
+  // Parallel: booking adminLogs + document adminLogs + inventory adminLogs + lead activities (if lead exists)
+  const [bookingLogs, inventoryLogs, documentLogs, leadActivities] = await Promise.all([
     safeFetch(
       () =>
         prisma.adminLog.findMany({
@@ -884,6 +917,21 @@ export async function fetchCanonicalEventsForBooking(
         }),
       [],
       'fetchCanonicalEventsForBooking:inventoryLog'
+    ),
+    safeFetch(
+      () =>
+        prisma.adminLog.findMany({
+          where: {
+            OR: [
+              { entity: 'invoice', details: { path: ['bookingId'], equals: bookingId } },
+              { entity: 'deliveryNote', details: { path: ['bookingId'], equals: bookingId } },
+            ],
+          },
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+        }),
+      [],
+      'fetchCanonicalEventsForBooking:documentLog'
     ),
     leadId
       ? safeFetch(
@@ -912,6 +960,17 @@ export async function fetchCanonicalEventsForBooking(
       })
     ),
     ...inventoryLogs.map((logRow) =>
+      mapAdminLogToCanonicalEvent({
+        id: logRow.id,
+        action: logRow.action,
+        entity: logRow.entity,
+        entityId: logRow.entityId ?? null,
+        details: logRow.details ?? undefined,
+        createdAt: logRow.createdAt,
+        userId: logRow.userId ?? null,
+      })
+    ),
+    ...documentLogs.map((logRow) =>
       mapAdminLogToCanonicalEvent({
         id: logRow.id,
         action: logRow.action,

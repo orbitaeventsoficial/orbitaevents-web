@@ -349,7 +349,15 @@ const DETECTORS = [
 ];
 
 function scanFile(filePath) {
-  const lines = fs.readFileSync(filePath, 'utf8').split(/\r?\n/);
+  if (!fs.existsSync(filePath)) return [];
+  let content;
+  try {
+    content = fs.readFileSync(filePath, 'utf8');
+  } catch (error) {
+    if (error && error.code === 'ENOENT') return [];
+    throw error;
+  }
+  const lines = content.split(/\r?\n/);
   const findings = [];
   for (const detector of DETECTORS) findings.push(...detector(lines));
   return findings;

@@ -1,5 +1,9 @@
 import type { BriefAction } from '@/lib/services/dailyBriefService';
+import type { ContractWorkflowSuggestion } from '@/lib/services/contractWorkflowSuggestionService';
+import type { DossierDraftSuggestion } from '@/lib/services/dossierDraftSuggestionService';
 import type { NBADomain, NBAUrgency, NextBestAction } from '@/lib/services/nextBestActionService';
+import type { ProposalBookingConversionSuggestion } from '@/lib/services/proposalBookingConversionSuggestionService';
+import type { ProposalDraftSuggestion } from '@/lib/services/proposalDraftSuggestionService';
 import { formatCurrency } from '@/lib/constants';
 import { DASHBOARD_ECONOMIC_RISK_WINDOW_DAYS } from './next-event-economics';
 
@@ -10,7 +14,7 @@ export type AdminTodayAction = {
   detail: string;
   badge: string | null;
   badgeClass: string;
-  source: 'nba' | 'brief' | 'postEvent' | 'economic';
+  source: 'nba' | 'brief' | 'postEvent' | 'economic' | 'document';
   sourceId: string;
   queuePriority: number;
 };
@@ -94,6 +98,69 @@ const POST_EVENT_QUEUE_PRIORITY: Record<'ALTA' | 'MITJANA' | 'BAIXA' | 'DONE', n
   DONE: 0,
 };
 
+const DOSSIER_DRAFT_BADGE: Record<DossierDraftSuggestion['band'], string> = {
+  ALTA: 'ap-badge ap-badge--danger',
+  MITJANA: 'ap-badge ap-badge--warning',
+  BAIXA: 'ap-badge ap-badge--info',
+};
+
+const DOSSIER_DRAFT_QUEUE_PRIORITY: Record<DossierDraftSuggestion['band'], number> = {
+  ALTA: 100,
+  MITJANA: 70,
+  BAIXA: 40,
+};
+
+const CONTRACT_WORKFLOW_BADGE: Record<ContractWorkflowSuggestion['band'], string> = {
+  ALTA: 'ap-badge ap-badge--danger',
+  MITJANA: 'ap-badge ap-badge--warning',
+  BAIXA: 'ap-badge ap-badge--info',
+};
+
+const CONTRACT_WORKFLOW_QUEUE_PRIORITY: Record<ContractWorkflowSuggestion['band'], number> = {
+  ALTA: 115,
+  MITJANA: 80,
+  BAIXA: 45,
+};
+
+const PROPOSAL_BOOKING_BADGE: Record<ProposalBookingConversionSuggestion['band'], string> = {
+  ALTA: 'ap-badge ap-badge--danger',
+  MITJANA: 'ap-badge ap-badge--warning',
+  BAIXA: 'ap-badge ap-badge--info',
+};
+
+const PROPOSAL_BOOKING_QUEUE_PRIORITY: Record<ProposalBookingConversionSuggestion['band'], number> = {
+  ALTA: 130,
+  MITJANA: 92,
+  BAIXA: 55,
+};
+
+const PROPOSAL_DRAFT_BADGE: Record<ProposalDraftSuggestion['band'], string> = {
+  ALTA: 'ap-badge ap-badge--danger',
+  MITJANA: 'ap-badge ap-badge--warning',
+  BAIXA: 'ap-badge ap-badge--info',
+};
+
+const PROPOSAL_DRAFT_QUEUE_PRIORITY: Record<ProposalDraftSuggestion['band'], number> = {
+  ALTA: 105,
+  MITJANA: 75,
+  BAIXA: 42,
+};
+
+function formatDossierDraftTimeframe(daysUntilEvent: number | null): string | null {
+  if (daysUntilEvent === null) return null;
+  if (daysUntilEvent === 0) return 'data avui';
+  if (daysUntilEvent === 1) return 'data demà';
+  return `data en ${daysUntilEvent} dies`;
+}
+
+function formatContractActionLabel(action: ContractWorkflowSuggestion['action'], name: string): string {
+  switch (action) {
+    case 'GENERATE_CONTRACT': return `Generar contracte: ${name}`;
+    case 'SEND_CONTRACT': return `Enviar contracte: ${name}`;
+    case 'FOLLOW_SIGNATURE': return `Seguir signatura: ${name}`;
+  }
+}
+
 export function projectPostEventTodayAction(input: {
   bookingId: string;
   href: string;
@@ -112,6 +179,86 @@ export function projectPostEventTodayAction(input: {
     source: 'postEvent',
     sourceId: input.bookingId,
     queuePriority: POST_EVENT_QUEUE_PRIORITY[input.priority],
+  };
+}
+
+export function projectDossierDraftTodayAction(input: DossierDraftSuggestion): AdminTodayAction {
+  const signals = [
+    ...input.reasons.slice(0, 3),
+    formatDossierDraftTimeframe(input.daysUntilEvent),
+    input.serviceLinesCount > 0 ? `${input.serviceLinesCount} línies de bolo` : null,
+  ].filter((signal): signal is string => Boolean(signal));
+
+  return {
+    id: `document-dossier-${input.leadId}`,
+    href: input.href,
+    label: `Preparar dossier: ${input.name}`,
+    detail: signals.join(' · ') || 'Lead obert sense dossier actiu',
+    badge: `Document · ${input.band}`,
+    badgeClass: DOSSIER_DRAFT_BADGE[input.band],
+    source: 'document',
+    sourceId: input.leadId,
+    queuePriority: Math.max(input.score, DOSSIER_DRAFT_QUEUE_PRIORITY[input.band]),
+  };
+}
+
+export function projectContractWorkflowTodayAction(input: ContractWorkflowSuggestion): AdminTodayAction {
+  const signals = [
+    ...input.reasons.slice(0, 3),
+    formatDossierDraftTimeframe(input.daysUntilEvent),
+    formatCurrency(input.total),
+  ].filter((signal): signal is string => Boolean(signal));
+
+  return {
+    id: `document-contract-${input.proposalId}`,
+    href: input.href,
+    label: formatContractActionLabel(input.action, input.name),
+    detail: signals.join(' · ') || input.reference,
+    badge: `Contracte · ${input.band}`,
+    badgeClass: CONTRACT_WORKFLOW_BADGE[input.band],
+    source: 'document',
+    sourceId: input.proposalId,
+    queuePriority: Math.max(input.score, CONTRACT_WORKFLOW_QUEUE_PRIORITY[input.band]),
+  };
+}
+
+export function projectProposalBookingConversionTodayAction(input: ProposalBookingConversionSuggestion): AdminTodayAction {
+  const signals = [
+    ...input.reasons.slice(0, 3),
+    formatDossierDraftTimeframe(input.daysUntilEvent),
+    formatCurrency(input.total),
+  ].filter((signal): signal is string => Boolean(signal));
+
+  return {
+    id: `document-proposal-booking-${input.proposalId}`,
+    href: input.href,
+    label: `Crear reserva: ${input.name}`,
+    detail: signals.join(' · ') || input.reference,
+    badge: `Reserva · ${input.band}`,
+    badgeClass: PROPOSAL_BOOKING_BADGE[input.band],
+    source: 'document',
+    sourceId: input.proposalId,
+    queuePriority: Math.max(input.score, PROPOSAL_BOOKING_QUEUE_PRIORITY[input.band]),
+  };
+}
+
+export function projectProposalDraftTodayAction(input: ProposalDraftSuggestion): AdminTodayAction {
+  const signals = [
+    ...input.reasons.slice(0, 3),
+    formatDossierDraftTimeframe(input.daysUntilEvent),
+    formatCurrency(input.total),
+  ].filter((signal): signal is string => Boolean(signal));
+
+  return {
+    id: `document-proposal-${input.proposalId}`,
+    href: input.href,
+    label: `Revisar pressupost: ${input.name}`,
+    detail: signals.join(' · ') || input.reference,
+    badge: `Pressupost · ${input.band}`,
+    badgeClass: PROPOSAL_DRAFT_BADGE[input.band],
+    source: 'document',
+    sourceId: input.proposalId,
+    queuePriority: Math.max(input.score, PROPOSAL_DRAFT_QUEUE_PRIORITY[input.band]),
   };
 }
 

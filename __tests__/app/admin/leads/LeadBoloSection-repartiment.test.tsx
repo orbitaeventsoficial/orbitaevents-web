@@ -283,7 +283,7 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.queryByText('peatges no informats')).not.toBeInTheDocument();
   });
 
-  it('aplica el recàrrec de temporada al total client sense tocar la liquidació del col·laborador', async () => {
+  it('no aplica cap recàrrec automàtic per temporada a la base neta del bolo', async () => {
     render(
       <LeadBoloSection
         leadId="lead-1"
@@ -295,15 +295,16 @@ describe('LeadBoloSection repartiment', () => {
       expect(screen.getByText('Cost col·laborador')).toBeInTheDocument();
     });
 
-    const budget = screen.getByLabelText('Resum del pressupost');
+    const budget = screen.getByLabelText('Resum net del bolo');
     expect(budget.textContent).toContain('Serveis');
     expect(budget.textContent).toContain('240');
-    expect(budget.textContent).toContain('Recàrrec alta temporada');
-    expect(budget.textContent).toContain('+15% sobre serveis');
-    expect(budget.textContent).toContain('36');
-    expect(budget.textContent).toContain('Total client');
-    expect(budget.textContent).toContain('276');
-    expect(screen.getByLabelText('Cost col·laborador al lead').textContent).not.toContain('36');
+    expect(budget.textContent).not.toContain('Recàrrec');
+    expect(budget.textContent).not.toContain('temporada');
+    expect(budget.textContent).not.toContain('+15%');
+    expect(budget.textContent).toContain('Base neta');
+    expect(budget.textContent).toContain('abans d\'IVA');
+    expect(budget.textContent).not.toContain('Total client');
+    expect(budget.textContent).toContain('240');
   });
 
   it('obre accions solidàries amb el generador de dossiers des del lead', async () => {

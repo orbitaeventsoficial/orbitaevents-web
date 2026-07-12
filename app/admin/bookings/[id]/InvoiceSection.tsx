@@ -15,6 +15,7 @@ interface InvoiceData {
   total: number;
   holdedInvoiceUrl?: string | null;
   holdedSyncError?: string | null;
+  pdfUrl?: string | null;
   createdAt: string;
 }
 
@@ -166,6 +167,11 @@ export default function InvoiceSection({
           )}
 
           <div className="flex flex-wrap gap-2" {...helpAttrs(ADMIN_BOOKING_HELP_2.invoice.actions)}>
+            {activeInvoice.pdfUrl && (
+              <a href={activeInvoice.pdfUrl} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--secondary text-xs">
+                Obrir PDF
+              </a>
+            )}
             {activeInvoice.holdedInvoiceUrl && (
               <a href={activeInvoice.holdedInvoiceUrl} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--secondary text-xs">
                 Veure a Holded

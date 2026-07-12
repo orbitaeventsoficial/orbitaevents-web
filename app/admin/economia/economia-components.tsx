@@ -375,7 +375,11 @@ export function CobramentFiltersSection({
           >
             Netejar selecció
           </button>
-          {bulkError && <p className="text-xs">{bulkError}</p>}
+          {bulkError && (
+            <p role="alert" className="text-xs admin-tone-text-danger">
+              {bulkError}
+            </p>
+          )}
         </section>
       )}
 

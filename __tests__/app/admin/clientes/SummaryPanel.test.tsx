@@ -236,6 +236,32 @@ describe('SummaryPanel', () => {
     expect(within(quickActionsCard).getAllByText('Desencallar per WhatsApp')).toHaveLength(1);
   });
 
+  it('tracta un pressupost VIEWED com a pendent de resposta al resum', () => {
+    render(
+      <SummaryPanel
+        data={{
+          ...HUB,
+          proposals: [
+            {
+              id: 'proposal-viewed',
+              reference: 'PRE-2026-VIEWED',
+              customerId: 'cust-1',
+              status: 'VIEWED',
+              total: 1250,
+              createdAt: '2026-04-12T10:00:00.000Z',
+              sentAt: '2026-04-12T11:00:00.000Z',
+              pdfUrl: '/api/uploads/proposals/proposal-viewed/PRE-2026-VIEWED.pdf',
+              pdfKey: 'proposals/proposal-viewed/PRE-2026-VIEWED.pdf',
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByText(/1 pressupost pendent de resposta/)).toBeInTheDocument();
+    expect(screen.getByText('Enviar recordatori')).toBeInTheDocument();
+  });
+
   it('mostra accés directe a la reserva quan la lead prioritària ja està convertida', () => {
     const soonDate = new Date();
     soonDate.setDate(soonDate.getDate() + 7);

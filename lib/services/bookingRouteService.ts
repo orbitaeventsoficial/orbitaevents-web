@@ -3,14 +3,15 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { BookingStatus, EventType } from '@prisma/client';
 import { DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
-import { computeBoloTransport } from '@/lib/services/travelLaborCost';
-import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
+import { computeBoloTransport, withTravelHeadcountNote } from '@/lib/services/travelLaborCost';
+import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { applyBookingStatusSideEffects, type ManagedBookingStatus } from '@/lib/services/bookingStatusTransitionService';
 import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 import { mapAdminLogToCanonicalEvent } from '@/lib/services/timelineQueryService';
 import { VAT_RATE_INVOICE, VAT_RATE_NO_INVOICE, calcDeposit, roundMoney } from '@/lib/constants/pricing';
 import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
+import { refreshBookingAvailabilityDate, syncBookingAvailabilityForState } from '@/lib/services/bookingAvailabilitySyncService';
 
 type ExistingBookingRecord = {
   id: string;
@@ -26,6 +27,7 @@ type ExistingBookingRecord = {
   fuelCostPerKm: number | null;
   guestCount: number | null;
   eventType: EventType;
+  eventDate: Date;
   eventLocation: string;
   eventVenue: string | null;
   eventStartTime: string | null;
@@ -50,6 +52,7 @@ type BookingServiceLinePatchInput = {
   quantity?: number | null;
   hours?: number | null;
   notes?: string | null;
+  travelHeadcount?: number | null;
 };
 
 function sanitizeMoney(value?: number | null): number | null {
@@ -85,7 +88,7 @@ function normalizeServiceLines(lines: BookingServiceLinePatchInput[]) {
       costAmount: sanitizeServiceLineCostAmount({ kind: line.kind || 'OTHER', label: line.label, costAmount: line.costAmount }),
       quantity: typeof line.quantity === 'number' && line.quantity > 0 ? Math.floor(line.quantity) : null,
       hours: typeof line.hours === 'number' && line.hours > 0 ? Math.round(line.hours * 100) / 100 : null,
-      notes: line.notes?.trim() || null,
+      notes: withTravelHeadcountNote(line.notes, line.travelHeadcount),
     }))
     .filter((line) => Boolean(line.label));
 }
@@ -145,7 +148,6 @@ export async function getBookingDetail(id: string) {
       },
       postEventReport: true,
       clientSurvey: true,
-      clientFeedback: true,
     },
   });
 
@@ -236,13 +238,13 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
 
   const travelFieldTouched = Object.prototype.hasOwnProperty.call(body, 'distanceKm') || Object.prototype.hasOwnProperty.call(body, 'fuelCostPerKm') || Object.prototype.hasOwnProperty.call(body, 'travelCost') || Object.prototype.hasOwnProperty.call(body, 'tollsEur');
   if (travelFieldTouched) {
-    const fuelReference = await getFuelCostPerKmReference();
+    const vehicleCostReference = await getEffectiveVehicleCostPerKm();
     const distanceKm = Object.prototype.hasOwnProperty.call(body, 'distanceKm')
       ? sanitizeNonNegative(body.distanceKm as number, 0)
       : sanitizeNonNegative(existing.distanceKm ?? 0, 0);
     const fuelCostPerKm = Object.prototype.hasOwnProperty.call(body, 'fuelCostPerKm')
-      ? sanitizeNonNegative(body.fuelCostPerKm as number, fuelReference.costPerKm)
-      : sanitizeNonNegative(existing.fuelCostPerKm ?? fuelReference.costPerKm, DEFAULT_VEHICLE_COST_PER_KM);
+      ? sanitizeNonNegative(body.fuelCostPerKm as number, vehicleCostReference.costPerKm)
+      : sanitizeNonNegative(existing.fuelCostPerKm ?? vehicleCostReference.costPerKm, DEFAULT_VEHICLE_COST_PER_KM);
     const tollsEur = Object.prototype.hasOwnProperty.call(body, 'tollsEur')
       ? sanitizeNonNegative(body.tollsEur as number, 0)
       : sanitizeNonNegative(existing.tollsEur ?? 0, 0);
@@ -250,8 +252,8 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
     // Transport (#1369, monocapa): UNA crida al cervell (aplica franquícia + peatges).
     // El headcount surt de les línies del bolo (input si venen, si no les de la reserva).
     const headcountLines = Array.isArray(input.serviceLines)
-      ? (input.serviceLines as Array<{ kind?: string | null; label?: string | null; revenueAmount?: number | null; costAmount?: number | null; collaboratorId?: string | null; quantity?: number | null }>)
-      : await prisma.bookingServiceLine.findMany({ where: { bookingId: existing.id }, select: { kind: true, label: true, revenueAmount: true, costAmount: true, collaboratorId: true, quantity: true } });
+      ? (input.serviceLines as Array<{ kind?: string | null; label?: string | null; revenueAmount?: number | null; costAmount?: number | null; collaboratorId?: string | null; quantity?: number | null; notes?: string | null; travelHeadcount?: number | null }>)
+      : await prisma.bookingServiceLine.findMany({ where: { bookingId: existing.id }, select: { kind: true, label: true, revenueAmount: true, costAmount: true, collaboratorId: true, quantity: true, notes: true } });
     const transport = computeBoloTransport({ roundTripKm: distanceKm, serviceLines: headcountLines, tollsEur, vehicleCostPerKm: fuelCostPerKm });
     const oldTransport = computeBoloTransport({ roundTripKm: existing.distanceKm || 0, serviceLines: headcountLines, tollsEur: existing.tollsEur ?? 0, vehicleCostPerKm: fuelCostPerKm });
 
@@ -292,6 +294,7 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
         existing: {
           guestCount: existing.guestCount || 0,
           eventType: existing.eventType,
+          eventDate: existing.eventDate,
           eventLocation: existing.eventLocation,
           eventStartTime: existing.eventStartTime,
           eventEndTime: existing.eventEndTime,
@@ -321,6 +324,17 @@ export async function updateBookingDetail(id: string, input: Record<string, unkn
     where: { id },
     data: prepared.body,
   });
+
+  if (Object.prototype.hasOwnProperty.call(prepared.body, 'eventDate') || prepared.newStatus) {
+    await syncBookingAvailabilityForState({
+      bookingId: id,
+      reference: existing.reference,
+      clientName: typeof prepared.body.clientName === 'string' ? prepared.body.clientName : existing.clientName,
+      previousEventDate: existing.eventDate,
+      nextEventDate: (prepared.body.eventDate as Date | string | undefined) ?? existing.eventDate,
+      nextStatus: prepared.newStatus ?? existing.status,
+    });
+  }
 
   if (Array.isArray(input.serviceLines)) {
     const serviceLines = normalizeServiceLines(input.serviceLines as BookingServiceLinePatchInput[]);
@@ -420,6 +434,7 @@ export async function changeBookingStatus(id: string, status: ManagedBookingStat
     existing: {
       guestCount: existing.guestCount || 0,
       eventType: existing.eventType,
+      eventDate: existing.eventDate,
       eventLocation: existing.eventLocation,
       eventStartTime: existing.eventStartTime,
       eventEndTime: existing.eventEndTime,
@@ -432,6 +447,14 @@ export async function changeBookingStatus(id: string, status: ManagedBookingStat
   });
 
   const booking = await prisma.booking.update({ where: { id }, data: { status } });
+  await syncBookingAvailabilityForState({
+    bookingId: id,
+    reference: existing.reference,
+    clientName: existing.clientName,
+    previousEventDate: existing.eventDate,
+    nextEventDate: existing.eventDate,
+    nextStatus: status,
+  });
   const calendarSync = await syncBookingToGoogleCalendar(id);
 
   await prisma.adminLog.create({
@@ -446,12 +469,12 @@ export async function changeBookingStatus(id: string, status: ManagedBookingStat
   return { status: 200, body: { ok: true, booking, previousStatus: oldStatus, newStatus: status, statsUpdated, calendarSync } };
 }
 
-export async function deleteBookingIfAllowed(existing: Pick<ExistingBookingRecord, 'id' | 'status' | 'reference'>) {
+export async function deleteBookingIfAllowed(existing: Pick<ExistingBookingRecord, 'id' | 'status' | 'reference'> & { eventDate?: Date | string | null }) {
   if (existing.status !== BookingStatus.PENDING && existing.status !== BookingStatus.CANCELLED) {
     return { ok: false as const, status: 400, body: { error: 'Només es poden eliminar reserves pendents o cancel·lades' } };
   }
 
-  await prisma.availability.updateMany({ where: { bookingId: existing.id }, data: { status: 'AVAILABLE', bookingId: null } });
+  await refreshBookingAvailabilityDate(existing.eventDate ?? null, existing.id);
   await prisma.bookingExtra.deleteMany({ where: { bookingId: existing.id } });
   await prisma.booking.delete({ where: { id: existing.id } });
   await prisma.adminLog.create({ data: { action: 'DELETE', entity: 'booking', entityId: existing.id, details: { reference: existing.reference } } });

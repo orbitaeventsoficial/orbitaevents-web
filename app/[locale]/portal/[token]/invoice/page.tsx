@@ -13,6 +13,7 @@ import {
   type ClientPortalLocale,
 } from '@/lib/clientPortalMessages';
 import {
+  getClientPortalDeliveryNoteDocument,
   getClientPortalInvoiceSummary,
 } from '@/lib/clientPortalInvoice';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
@@ -53,7 +54,8 @@ export default async function ClientPortalInvoicePage({
 
   const booking = access.booking;
   const proposals = access.booking.proposals;
-  const summary = getClientPortalInvoiceSummary(booking, proposals);
+  const summary = getClientPortalInvoiceSummary(booking, proposals, access.booking.invoices ?? []);
+  const deliveryNoteDocument = getClientPortalDeliveryNoteDocument(booking.deliveryNotes ?? []);
 
   function formatDate(d: Date | null): string | null {
     if (!d) return null;
@@ -152,21 +154,51 @@ export default async function ClientPortalInvoicePage({
           </div>
         </div>
 
-        {/* PDF download */}
-        {summary.pdfUrl && (
-          <a
-            href={summary.pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
-            style={{ borderColor: accentBorder, backgroundColor: accentBg }}
-          >
-            {t.invoiceDownloadPdf}
-            <span className="sr-only"> ({t.opensInNewTab})</span>
-            {summary.proposalReference && (
-              <span className="text-white/30 ml-1">({summary.proposalReference})</span>
+        {/* Documents */}
+        {(summary.pdfUrl || deliveryNoteDocument) && (
+          <div className="grid gap-2">
+            {summary.pdfUrl && (
+              <a
+                href={summary.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm text-white/75 hover:text-white transition-all"
+                style={{ borderColor: accentBorder, backgroundColor: accentBg }}
+              >
+                <span className="min-w-0">
+                  <span className="block font-medium">
+                    {summary.documentType === 'INVOICE' ? t.invoiceDownloadInvoicePdf : t.invoiceDownloadPdf}
+                  </span>
+                  {summary.documentReference && (
+                    <span className="block truncate text-xs text-white/35">{summary.documentReference}</span>
+                  )}
+                </span>
+                <span className="sr-only"> ({t.opensInNewTab})</span>
+              </a>
             )}
-          </a>
+            {deliveryNoteDocument && (
+              <a
+                href={deliveryNoteDocument.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm text-white/75 hover:text-white transition-all"
+                style={{ borderColor: accentBorder, backgroundColor: accentBg }}
+              >
+                <span className="min-w-0">
+                  <span className="block font-medium">{t.deliveryNoteDownloadPdf}</span>
+                  <span className="block text-xs text-white/35">
+                    {deliveryNoteDocument.reference}
+                    {deliveryNoteDocument.signedAt ? (
+                      <span className={clientPortalPaymentTone(true)}>
+                        {' '}· {t.deliveryNoteStatusSigned} · {formatDate(deliveryNoteDocument.signedAt)}
+                      </span>
+                    ) : null}
+                  </span>
+                </span>
+                <span className="sr-only"> ({t.opensInNewTab})</span>
+              </a>
+            )}
+          </div>
         )}
 
         <footer className="mt-10 text-center">

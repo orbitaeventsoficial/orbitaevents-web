@@ -3,9 +3,11 @@ import dynamicImport from 'next/dynamic';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/constants';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
+import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import ProposalsList from './ProposalsList';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
+import { inferStudioServiceFromLead } from './studio-utils';
 
 const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'), {
   ssr: false,
@@ -41,30 +43,43 @@ export default async function PresupuestosPage({
   const leadId = searchParams?.leadId || '';
   const proposalId = searchParams?.proposalId || '';
   const statusFilter = searchParams?.statusFilter || '';
+  const explicitProposalId = proposalId;
 
   // If we have customerId or proposalId, show the editor
   const showEditor = Boolean(customerId || proposalId || leadId);
 
-  const customer = customerId
+  const proposalForEditor = proposalId
+    ? await prisma.proposal.findUnique({
+        where: { id: proposalId },
+        select: { customerId: true, leadId: true },
+      })
+    : null;
+  const resolvedCustomerId = customerId || proposalForEditor?.customerId || '';
+  const resolvedLeadId = leadId || proposalForEditor?.leadId || '';
+
+  const customer = resolvedCustomerId
     ? await prisma.customer.findUnique({
-        where: { id: customerId },
+        where: { id: resolvedCustomerId },
         select: { id: true, name: true, email: true, phone: true, preferredLocale: true },
       })
     : null;
 
-  const leadForEditor = leadId
+  const leadForEditor = resolvedLeadId
     ? await prisma.lead.findUnique({
-        where: { id: leadId },
+        where: { id: resolvedLeadId },
         select: {
           id: true,
           name: true,
           email: true,
           phone: true,
           eventDate: true,
+          eventType: true,
           eventStartTime: true,
           eventEndTime: true,
           eventLocation: true,
           eventAddress: true,
+          distanceKm: true,
+          tollsEur: true,
           guestCount: true,
           preferredLocale: true,
           customer: {
@@ -76,9 +91,32 @@ export default async function PresupuestosPage({
               preferredLocale: true,
             },
           },
+          serviceLines: {
+            orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+            select: {
+              id: true,
+              collaboratorId: true,
+              kind: true,
+              label: true,
+              revenueAmount: true,
+              costAmount: true,
+              quantity: true,
+              hours: true,
+              notes: true,
+            },
+          },
         },
       })
     : null;
+  const implicitLeadDraft = !explicitProposalId && resolvedLeadId
+    ? await prisma.proposal.findFirst({
+        where: { leadId: resolvedLeadId, status: 'DRAFT' },
+        orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }],
+        select: { id: true },
+      })
+    : null;
+  const editorProposalId = explicitProposalId || implicitLeadDraft?.id || '';
+  const preferLeadPrefill = Boolean(!explicitProposalId && resolvedLeadId);
 
   const brandSettingsRows = await prisma.setting.findMany({
     where: {
@@ -96,58 +134,45 @@ export default async function PresupuestosPage({
     select: { key: true, value: true },
   });
   const brandSettings = Object.fromEntries(brandSettingsRows.map((row) => [row.key, row.value]));
+  const editorCustomer = customer || leadForEditor?.customer || null;
+  const initialEventType = inferStudioServiceFromLead({
+    eventType: leadForEditor?.eventType,
+    serviceLines: leadForEditor?.serviceLines || [],
+  });
+  const vehicleCostReference = await getEffectiveVehicleCostPerKm().catch(() => null);
+  const initialVehicleCostPerKm = vehicleCostReference && vehicleCostReference.costPerKm > 0
+    ? vehicleCostReference.costPerKm
+    : undefined;
 
-  // Always load proposals for the list
-  const [proposals, quotes] = await Promise.all([
-    prisma.proposal.findMany({
-      where: leadId ? { leadId } : {},
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-      select: {
-        id: true,
-        reference: true,
-        status: true,
-        total: true,
-        createdAt: true,
-        sentAt: true,
-        customerId: true,
-        leadId: true,
-        bookingId: true,
-        customer: {
-          select: { name: true, email: true },
-        },
+  // Always load canonical proposals for the list. Legacy LeadDocument quotes are
+  // historical audit traces and must not appear as live budgets here.
+  const proposals = await prisma.proposal.findMany({
+    where: resolvedLeadId ? { leadId: resolvedLeadId } : {},
+    orderBy: { createdAt: 'desc' },
+    take: 100,
+    select: {
+      id: true,
+      reference: true,
+      status: true,
+      total: true,
+      createdAt: true,
+      sentAt: true,
+      pdfUrl: true,
+      pdfKey: true,
+      customerId: true,
+      leadId: true,
+      bookingId: true,
+      customer: {
+        select: { name: true, email: true },
       },
-    }),
-    prisma.leadDocument.findMany({
-      where: {
-        type: 'QUOTE',
-        ...(leadId ? { leadId } : {}),
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 20,
-      select: {
-        id: true,
-        title: true,
-        fileUrl: true,
-        createdAt: true,
-        leadId: true,
-        lead: {
-          select: { name: true, email: true },
-        },
-      },
-    }),
-  ]);
+    },
+  });
 
   // Serialize dates for client component
   const serializedProposals = proposals.map((p) => ({
     ...p,
     createdAt: p.createdAt.toISOString(),
     sentAt: p.sentAt?.toISOString() || null,
-  }));
-
-  const serializedQuotes = quotes.map((q) => ({
-    ...q,
-    createdAt: q.createdAt.toISOString(),
   }));
 
   if (!showEditor) {
@@ -211,10 +236,6 @@ export default async function PresupuestosPage({
     if (counts.draft > 0) {
       systemItems.push(`${counts.draft} esborranys vius`);
     }
-    if (quotes.length > 0) {
-      systemItems.push(`${quotes.length} pressupostos antics (LeadDocument) encara vinculats`);
-    }
-
     const manualItems: string[] = [];
     if (sentStale > 0) {
       manualItems.push(`${sentStale} propostes enviades sense resposta fa ${SENT_STALE_DAYS}+ dies`);
@@ -249,7 +270,6 @@ export default async function PresupuestosPage({
       >
         <ProposalsList
           proposals={serializedProposals}
-          quotes={serializedQuotes}
           initialStatusFilter={statusFilter}
         />
       </AdminPage>
@@ -261,36 +281,46 @@ export default async function PresupuestosPage({
     <AdminPage
       back={{ href: '/admin/presupuestos', label: 'Pressupostos' }}
       eyebrow="Comercial · Editor PDF"
-      title={proposalId ? 'Editar pressupost' : 'Nou pressupost'}
+      title={editorProposalId ? 'Editar pressupost' : 'Nou pressupost'}
       subtitle={
-        customer ? (
+        editorCustomer ? (
           <span>
-            Client: <Link href={buildCustomerHubHref(customer.id)} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
+            Client: <Link href={buildCustomerHubHref(editorCustomer.id)} className="hover:underline"><strong>{editorCustomer.name}</strong></Link> ({editorCustomer.email})
+          </span>
+        ) : leadForEditor ? (
+          <span>
+            Lead: <strong>{leadForEditor.name}</strong> ({leadForEditor.email})
           </span>
         ) : (
           'Selecciona un client per començar'
         )
       }
       actions={
-        customer ? (
-          <Link href={buildCustomerHubHref(customer.id)} className="ap-btn ap-btn--secondary">
+        editorCustomer ? (
+          <Link href={buildCustomerHubHref(editorCustomer.id)} className="ap-btn ap-btn--secondary">
             Fitxa client
           </Link>
         ) : undefined
       }
     >
       <PresupuestoPdfStudio
-        initialCustomerId={customer?.id || leadForEditor?.customer?.id || ''}
-        initialCustomerName={customer?.name || leadForEditor?.customer?.name || leadForEditor?.name || ''}
-        initialCustomerEmail={customer?.email || leadForEditor?.customer?.email || leadForEditor?.email || ''}
-        initialCustomerPhone={customer?.phone || leadForEditor?.customer?.phone || leadForEditor?.phone || ''}
+        initialCustomerId={editorCustomer?.id || ''}
+        initialCustomerName={editorCustomer?.name || leadForEditor?.name || ''}
+        initialCustomerEmail={editorCustomer?.email || leadForEditor?.email || ''}
+        initialCustomerPhone={editorCustomer?.phone || leadForEditor?.phone || ''}
+        initialEventType={initialEventType}
         initialEventDate={toDateInputValue(leadForEditor?.eventDate)}
         initialEventSchedule={buildSchedule(leadForEditor?.eventStartTime, leadForEditor?.eventEndTime)}
         initialEventLocation={leadForEditor?.eventAddress || leadForEditor?.eventLocation || ''}
+        initialDistanceKm={leadForEditor?.distanceKm ?? undefined}
+        initialTollsEur={leadForEditor?.tollsEur ?? undefined}
+        initialVehicleCostPerKm={initialVehicleCostPerKm}
         initialGuests={leadForEditor?.guestCount || 80}
-        initialLeadId={leadId}
-        initialProposalId={proposalId}
-        initialPreferredLocale={customer?.preferredLocale || leadForEditor?.customer?.preferredLocale || leadForEditor?.preferredLocale || 'ca'}
+        initialLeadId={resolvedLeadId}
+        initialLeadServiceLines={leadForEditor?.serviceLines || []}
+        initialProposalId={editorProposalId}
+        initialPreferLeadPrefill={preferLeadPrefill}
+        initialPreferredLocale={editorCustomer?.preferredLocale || leadForEditor?.preferredLocale || 'ca'}
         initialBrandName={String(brandSettings['quotes.brandName'] || ADMIN_PDF_STUDIO_DEFAULTS.brandName)}
         initialBrandWebsite={String(brandSettings['quotes.brandWebsite'] || ADMIN_PDF_STUDIO_DEFAULTS.brandWebsite)}
         initialBrandEmail={String(brandSettings['quotes.brandEmail'] || '')}

@@ -84,18 +84,6 @@ export async function listPortfolioMedia(slug: string) {
   });
 }
 
-export async function getPortfolioMediaCounts() {
-  const counts = await prisma.portfolioMedia.groupBy({
-    by: ['slug'],
-    _count: { id: true },
-  });
-  const map: Record<string, number> = {};
-  for (const c of counts) {
-    map[c.slug] = c._count.id;
-  }
-  return map;
-}
-
 export async function updatePortfolioMedia(
   mediaId: string,
   data: { caption?: string | null; sortOrder?: number; eventId?: string | null }

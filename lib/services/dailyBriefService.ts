@@ -12,6 +12,7 @@ import { deriveLeadResponseState, loadPendingFollowUps } from '@/lib/services/re
 import { loadPipelineSuggestions } from '@/lib/services/leadPipelineSuggestionsService';
 import { loadSocialContentPulse } from '@/lib/services/socialContentPulseService';
 import { bookingOutstandingAmount } from '@/lib/payment-status';
+import { buildPendingPostEventEmailBookingWhere } from '@/lib/services/postEventPendingService';
 
 // Wrapper de la font canònica `parseBudgetAmount` (lib/constants); retorna 0 en
 // comptes de null per als consumidors que sumen el valor.
@@ -495,7 +496,7 @@ export async function loadDailyBrief(now: Date = new Date()): Promise<DailyBrief
     }),
     prisma.lead.count({ where: { status: 'NEW', createdAt: { lte: new Date(now.getTime() - 24 * 60 * 60 * 1000) } } }),
     prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED'] }, updatedAt: { lt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } } }),
-    prisma.booking.count({ where: { status: 'COMPLETED', postEventEmailSent: false, eventDate: { lt: todayStart } } }),
+    prisma.booking.count({ where: buildPendingPostEventEmailBookingWhere(now) }),
     prisma.customer.count({ where: { lifecycleStage: 'DORMANT' } }),
     prisma.customer.count({ where: { healthScore: { lte: 40 } } }),
     prisma.lead.findMany({

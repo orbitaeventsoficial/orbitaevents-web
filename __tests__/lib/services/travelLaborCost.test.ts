@@ -3,9 +3,12 @@ import {
   buildTravelMealAllowanceLines,
   calculateTravelCostBreakdown,
   computeBoloTransport,
+  deriveTravelHeadcount,
   estimateRoundTripHours,
   TRAVEL_COST_LINE_MARKER,
+  withTravelHeadcountNote,
 } from '@/lib/services/travelLaborCost';
+import { BINGO_ASSISTANT_LINE_LABEL, BINGO_ASSISTANT_LINE_NOTE } from '@/lib/constants/orbita-services';
 
 describe('travelLaborCost', () => {
   it('estima hores de ruta a partir dels km anada+tornada', () => {
@@ -101,6 +104,18 @@ describe('travelLaborCost', () => {
     // El client i qui posa el cotxe comparteixen la base de 50 km inclosos.
   });
 
+  it('aplica un mínim comercial de vehicle si hi ha km facturables però el cost és microscòpic', () => {
+    const r = computeBoloTransport({
+      roundTripKm: 56,
+      vehicleCostPerKm: 0.26,
+      headcountOverride: 2,
+    });
+
+    expect(r.breakdown.vehicleCost).toBe(1.56);
+    expect(r.vehicleClientCharge).toBe(10);
+    expect(r.clientCharge).toBe(10);
+  });
+
   it('aplica dieta quan la ruta supera 150 km', () => {
     const r = computeBoloTransport({
       roundTripKm: 160,
@@ -130,5 +145,27 @@ describe('travelLaborCost', () => {
       expect.objectContaining({ label: 'Dieta desplaçament · Masquerade x2', costAmount: 60, collaboratorId: 'masquerade' }),
     ]);
     expect(lines.every((line) => line.notes.includes(TRAVEL_COST_LINE_MARKER))).toBe(true);
+  });
+
+  it('compta l’assistent de Bingo +70 com a persona física de ruta', () => {
+    expect(deriveTravelHeadcount([
+      { collaboratorId: 'masquerade', kind: 'PROVIDER_SERVICE', label: 'Bingo Musical (Masquerade)', quantity: 1 },
+      { collaboratorId: 'masquerade', kind: 'SOUND_TECH', label: 'Tècnic de so inclòs · 1,5 h', costAmount: 0, quantity: 1 },
+      { kind: 'OTHER', label: BINGO_ASSISTANT_LINE_LABEL, notes: BINGO_ASSISTANT_LINE_NOTE, quantity: 1 },
+    ])).toBe(3);
+  });
+
+  it('compta productes de proveïdor amb crew de 2 sense doblar el preu per quantity', () => {
+    expect(deriveTravelHeadcount([
+      { collaboratorId: 'masquerade', kind: 'PROVIDER_SERVICE', label: 'Animació amb personatge', quantity: 1, travelHeadcount: 2 },
+    ])).toBe(2);
+  });
+
+  it('recupera el crew de ruta persistit a notes', () => {
+    const notes = withTravelHeadcountNote('Producte de catàleg: animacio-doble', 2);
+
+    expect(deriveTravelHeadcount([
+      { collaboratorId: 'masquerade', kind: 'PROVIDER_SERVICE', label: 'Animació amb personatge', quantity: 1, notes },
+    ])).toBe(2);
   });
 });

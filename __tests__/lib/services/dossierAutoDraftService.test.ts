@@ -58,7 +58,6 @@ describe('composeDossierDraftFromLead', () => {
       travelKm: 422,
       travelTollsEur: 18.5,
       travelLocation: 'Andorra',
-      eventDate: '2026-09-05',
       products: [
         expect.objectContaining({ id: DOSSIER_DJ_PRODUCT_ID, priceFrom: 350, durada: '3h' }),
         expect.objectContaining({ id: 'collab:masq-bingo', nom: 'Bingo Musical' }),

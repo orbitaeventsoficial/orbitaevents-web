@@ -30,11 +30,12 @@ function humaniseExtraLabel(name?: string | null, slug?: string | null, id?: str
 
 interface UseNewBookingInitialDataOptions {
   leadId: string | null;
+  customerId?: string | null;
   dateParam: string | null;
   forceLeadPrefill?: boolean;
 }
 
-export function useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill = false }: UseNewBookingInitialDataOptions) {
+export function useNewBookingInitialData({ leadId, customerId = null, dateParam, forceLeadPrefill = false }: UseNewBookingInitialDataOptions) {
   const [form, setForm] = useState<BookingFormData>(INITIAL_BOOKING_FORM);
   const [packs, setPacks] = useState<BookingPack[]>([]);
   const [extras, setExtras] = useState<BookingExtra[]>([]);
@@ -109,7 +110,23 @@ export function useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill =
         // prefill del lead: l'esborrany ja conté el que l'usuari estava omplint
         // (incloent el que va venir del lead la primera vegada). Evita la cursa
         // prefill↔restore. Igualment carreguem leadData per a la resta de la UI.
-        const hasDraft = !forceLeadPrefill && hasFormAutosaveDraft(bookingAutosaveKey(leadId, null));
+        const hasDraft = !forceLeadPrefill && hasFormAutosaveDraft(bookingAutosaveKey(leadId, customerId));
+        if (customerId && !leadId && !hasDraft) {
+          const customerRes = await fetchWithCsrf(`/api/admin/customers/${customerId}`);
+          if (customerRes.ok) {
+            const customerData = await customerRes.json();
+            const customer = customerData.customer || customerData.data;
+            if (customer) {
+              setForm((prev) => ({
+                ...prev,
+                clientName: customer.name || prev.clientName,
+                clientEmail: customer.email || prev.clientEmail,
+                clientPhone: customer.phone || prev.clientPhone,
+              }));
+            }
+          }
+        }
+
         if (leadId) {
           const leadRes = await fetchWithCsrf(`/api/admin/leads/${leadId}`);
           if (leadRes.ok) {
@@ -160,7 +177,7 @@ export function useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill =
     }
 
     load();
-  }, [dateParam, forceLeadPrefill, leadId]);
+  }, [customerId, dateParam, forceLeadPrefill, leadId]);
 
   return {
     form,

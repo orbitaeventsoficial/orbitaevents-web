@@ -8,6 +8,8 @@
 import { prisma } from '@/lib/prisma';
 import { OPEN_TASK_STATUSES, TASK_DEDUPE_KEY } from '@/lib/constants';
 import { TASK_AUTOMATION_THRESHOLDS } from '@/lib/constants/automationThresholds';
+import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
+import { buildPendingPostEventEmailBookingWhere } from '@/lib/services/postEventPendingService';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -212,9 +214,9 @@ export async function runTaskAutomation(now: Date = new Date()): Promise<AutoTas
       take: 20,
     }),
     prisma.booking.findMany({
-      where: { status: 'COMPLETED', postEventEmailSent: false, eventDate: { lt: todayStart } },
+      where: buildPendingPostEventEmailBookingWhere(now),
       select: { id: true, eventLocation: true, customerId: true },
-      take: 20,
+      take: POST_EVENT_WORKFLOW.automationTake,
     }),
     prisma.customer.findMany({
       where: { healthScore: { lte: TASK_AUTOMATION_THRESHOLDS.atRiskHealthScoreMax } },

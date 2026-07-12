@@ -4,6 +4,7 @@ import {
   SOCIAL_CATEGORIES,
   SOCIAL_CONTENT_TYPES,
   SOCIAL_PLATFORMS,
+  SOCIAL_POST_ORIGIN_TYPES,
   SOCIAL_POST_STATUSES,
 } from '@/lib/constants';
 import { buildSocialWorkspaceHref } from '@/lib/admin/socialWorkspaceHref';
@@ -37,6 +38,10 @@ function isAllowedActionKey(actionKey: PlaybookActionKey): actionKey is PostEven
 
 function buildSocialDraftTitle(booking: { reference: string; clientName: string }): string {
   return `Post-event ${booking.reference} · ${booking.clientName}`.slice(0, 200);
+}
+
+function buildSocialOriginLabel(booking: { reference: string; clientName: string }): string {
+  return `${booking.reference} · ${booking.clientName}`.slice(0, 200);
 }
 
 export async function recordPostEventRecurrenceDecision(input: PostEventRecurrenceDecisionInput) {
@@ -87,8 +92,11 @@ export async function recordPostEventRecurrenceDecision(input: PostEventRecurren
   const socialDraft = input.actionKey === 'social_post'
     ? await prisma.socialPost.findFirst({
         where: {
-          bookingId: booking.id,
           status: { not: SOCIAL_POST_STATUSES.PUBLISHED },
+          OR: [
+            { bookingId: booking.id },
+            { originType: SOCIAL_POST_ORIGIN_TYPES.BOOKING, originId: booking.id },
+          ],
         },
         select: { id: true, status: true },
       })
@@ -108,6 +116,9 @@ export async function recordPostEventRecurrenceDecision(input: PostEventRecurren
           publishedAt: null,
           mediaUrls: [],
           booking: { connect: { id: booking.id } },
+          originType: SOCIAL_POST_ORIGIN_TYPES.BOOKING,
+          originId: booking.id,
+          originLabel: buildSocialOriginLabel(booking),
           notes: 'Creat des del playbook post-event. Revisar consentiment, imatges i dades personals abans de publicar. No publicat automaticament.',
         },
         select: { id: true, status: true },

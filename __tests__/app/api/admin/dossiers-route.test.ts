@@ -52,25 +52,22 @@ describe('POST /api/admin/dossiers', () => {
     expect(mockCreateDossier).not.toHaveBeenCalled();
   });
 
-  it('valida nom requerit abans de crear', async () => {
+  it('retira la creacio directa sense leadId', async () => {
     const res = await POST(makeReq({ nom: ' ', productIds: ['p1'] }));
-    expect(res.status).toBe(400);
-    await expect(res.json()).resolves.toEqual({ error: 'Nom requerit' });
+    expect(res.status).toBe(410);
+    await expect(res.json()).resolves.toMatchObject({
+      error: expect.stringContaining('requereix leadId'),
+      canonicalRoute: '/admin/dossiers?leadId=...',
+    });
     expect(mockCreateDossier).not.toHaveBeenCalled();
+    expect(mockCreateDossierDraftFromLead).not.toHaveBeenCalled();
   });
 
-  it('valida productes requerits abans de crear', async () => {
-    const res = await POST(makeReq({ nom: 'Dossier', productIds: [] }));
-    expect(res.status).toBe(400);
-    await expect(res.json()).resolves.toEqual({ error: 'Cal seleccionar almenys un producte' });
-    expect(mockCreateDossier).not.toHaveBeenCalled();
-  });
-
-  it('crea dossier amb CSRF valid', async () => {
+  it('no crea dossier directe encara que el payload antic sigui valid', async () => {
     const res = await POST(makeReq({ nom: 'Dossier', productIds: ['p1'] }));
-    expect(res.status).toBe(201);
-    await expect(res.json()).resolves.toEqual({ id: 'dos-1', nom: 'Dossier' });
-    expect(mockCreateDossier).toHaveBeenCalledWith({ nom: 'Dossier', productIds: ['p1'] });
+    expect(res.status).toBe(410);
+    await expect(res.json()).resolves.toMatchObject({ canonicalRoute: '/admin/dossiers?leadId=...' });
+    expect(mockCreateDossier).not.toHaveBeenCalled();
     expect(mockCreateDossierDraftFromLead).not.toHaveBeenCalled();
   });
 

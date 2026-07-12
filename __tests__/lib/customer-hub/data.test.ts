@@ -18,7 +18,7 @@ const { mockPrisma, mockReadCustomerActivityLog } = vi.hoisted(() => ({
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/services/tasks/leadScopedTaskService', () => ({
-  findTaskLinkByTaskOrLegacyId: vi.fn().mockResolvedValue(null),
+  findTaskLinkByTaskId: vi.fn().mockResolvedValue(null),
 }));
 vi.mock('@/lib/services/customerActivityService', () => ({
   readCustomerActivityLog: mockReadCustomerActivityLog,
@@ -144,6 +144,24 @@ describe('fetchCustomerHubCollections', () => {
     }));
     expect(mockPrisma.booking.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expectedWhere,
+      include: expect.objectContaining({
+        invoices: expect.objectContaining({
+          select: expect.objectContaining({
+            reference: true,
+            pdfUrl: true,
+            holdedInvoiceUrl: true,
+          }),
+        }),
+        deliveryNotes: expect.objectContaining({
+          select: expect.objectContaining({
+            reference: true,
+            pdfUrl: true,
+            signedAt: true,
+          }),
+        }),
+        postEventReport: expect.any(Object),
+        clientSurvey: expect.any(Object),
+      }),
     }));
   });
 

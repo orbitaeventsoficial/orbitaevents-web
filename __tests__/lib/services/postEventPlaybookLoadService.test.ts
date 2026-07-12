@@ -60,6 +60,64 @@ describe('loadPostEventPlaybook', () => {
     expect(referral?.note).toBe('Programat');
   });
 
+  it('reconeix una task de referral nomes si esta vinculada a la reserva exacta', async () => {
+    mockPrisma.task.findMany.mockResolvedValueOnce([
+      { customerId: 'cust-1', bookingId: 'book-1' },
+    ]);
+
+    const result = await loadPostEventPlaybook(NOW);
+    const referral = result.items[0].actions.find((action) => action.key === 'referral_ask');
+
+    expect(mockPrisma.task.findMany).toHaveBeenCalledWith({
+      where: {
+        customerId: { in: ['cust-1'] },
+        status: { not: 'CANCELLED' },
+        OR: [
+          { title: { contains: 'referral', mode: 'insensitive' } },
+          { description: { contains: 'referral', mode: 'insensitive' } },
+        ],
+      },
+      select: { customerId: true, bookingId: true },
+    });
+    expect(referral?.status).toBe('DONE');
+    expect(referral?.note).toBe('Programat');
+  });
+
+  it('reconeix un social publicat per origen canonic de reserva', async () => {
+    mockPrisma.socialPost.findMany.mockResolvedValueOnce([
+      { bookingId: null, originId: 'book-1' },
+    ]);
+
+    const result = await loadPostEventPlaybook(NOW);
+    const social = result.items[0].actions.find((action) => action.key === 'social_post');
+
+    expect(mockPrisma.socialPost.findMany).toHaveBeenCalledWith({
+      where: {
+        status: 'PUBLISHED',
+        OR: [
+          { bookingId: { in: ['book-1'] } },
+          { originType: 'BOOKING', originId: { in: ['book-1'] } },
+        ],
+      },
+      select: { bookingId: true, originId: true },
+    });
+    expect(social?.status).toBe('DONE');
+    expect(social?.note).toBe('Publicat');
+  });
+
+  it('no deixa que una task de referral generica del client tanqui qualsevol reserva', async () => {
+    mockPrisma.task.findMany.mockResolvedValueOnce([
+      { customerId: 'cust-1', bookingId: null },
+      { customerId: 'cust-1', bookingId: 'book-altre' },
+    ]);
+
+    const result = await loadPostEventPlaybook(NOW);
+    const referral = result.items[0].actions.find((action) => action.key === 'referral_ask');
+
+    expect(referral?.status).toBe('PENDING');
+    expect(referral?.note).toBeNull();
+  });
+
   it('reconeix una peticio de testimoni registrada com a customerActivity post-event', async () => {
     mockPrisma.customerActivity.findMany.mockResolvedValueOnce([
       {

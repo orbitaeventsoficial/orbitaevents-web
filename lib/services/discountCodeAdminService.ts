@@ -14,6 +14,11 @@ type DiscountCodeCreateInput = {
   sourceType?: string;
 };
 
+type DiscountCodeActiveInput = {
+  id: string;
+  isActive: boolean;
+};
+
 export async function listAdminDiscountCodes() {
   const codes = await prisma.discountCode.findMany({
     orderBy: { createdAt: 'desc' },
@@ -61,6 +66,32 @@ export async function createAdminDiscountCode(data: DiscountCodeCreateInput) {
       entity: 'discountCode',
       entityId: code.id,
       details: { code: normalizedCode, type: data.type, value: data.value },
+    },
+  });
+
+  return { status: 200, body: { ok: true, code } };
+}
+
+export async function setAdminDiscountCodeActive(data: DiscountCodeActiveInput) {
+  const existing = await prisma.discountCode.findUnique({
+    where: { id: data.id },
+  });
+
+  if (!existing) {
+    return { status: 404, body: { error: 'Codi de descompte no trobat' } };
+  }
+
+  const code = await prisma.discountCode.update({
+    where: { id: data.id },
+    data: { isActive: data.isActive },
+  });
+
+  await prisma.adminLog.create({
+    data: {
+      action: 'UPDATE',
+      entity: 'discountCode',
+      entityId: code.id,
+      details: { code: existing.code, isActive: data.isActive },
     },
   });
 

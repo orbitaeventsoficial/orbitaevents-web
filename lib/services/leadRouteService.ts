@@ -117,6 +117,16 @@ export async function updateLeadFromInput(id: string, input: LeadPatchInput): Pr
     body.eventDate = parsedDate;
   }
 
+  if (body.status === 'WON' && existing.status !== 'WON' && !existing.booking?.id) {
+    return {
+      status: 409,
+      body: {
+        error: 'No es pot marcar un lead com a guanyat sense reserva vinculada. Crea la reserva des del lead perquè Booking sigui la veritat operativa.',
+        nextAction: `/admin/bookings/new?leadId=${encodeURIComponent(id)}&prefill=lead`,
+      },
+    };
+  }
+
   if (body.status === 'WON' && existing.status !== 'WON') {
     body.convertedAt = new Date();
   }

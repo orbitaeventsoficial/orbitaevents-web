@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 // Pàgina de gestió de packs
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { Cloud, Info, Mic, Music, Package, Pencil, Star, Users, Volume2 } from 'lucide-react';
 import SyncButton from './SyncButton';
 import PackPriceQuickEditor from './PackPriceQuickEditor';
 import { getAllPacks } from '@/config/packs-config';
@@ -20,6 +21,8 @@ export const metadata = {
 };
 
 type PackFocus = 'alert' | 'critical-margin' | 'missing-capacity' | 'partial-cost' | 'without-inventory';
+
+const PACK_ICON = 'h-3.5 w-3.5 shrink-0';
 
 function renderPackInventoryPreview(pack: Awaited<ReturnType<typeof getPacks>>[number]) {
   if (pack.inventory.length === 0) {
@@ -251,7 +254,8 @@ export default async function PacksPage({
           )}
           {!packsInSync && (
             <span className="mt-2 inline-flex items-center gap-2 rounded-md px-3 py-1 text-sm border">
-              ℹ️ Packs en BD: {packs.length} · Packs al config (seed): {configPacks.length}
+              <Info className={PACK_ICON} aria-hidden="true" />
+              Packs en BD: {packs.length} · Packs al config (seed): {configPacks.length}
             </span>
           )}
         </>
@@ -349,8 +353,9 @@ export default async function PacksPage({
                       </div>
                       <div className="flex gap-1">
                         {pack.isFeatured && (
-                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium">
-                            ⭐ Destacat
+                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium">
+                            <Star className={PACK_ICON} aria-hidden="true" />
+                            Destacat
                           </span>
                         )}
                         {!pack.isActive && (
@@ -411,30 +416,31 @@ export default async function PacksPage({
 
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <span>🎵</span>
+                        <Music className={PACK_ICON} aria-hidden="true" />
                         <span>{pack.djHours}h DJ</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span>🔊</span>
+                        <Volume2 className={PACK_ICON} aria-hidden="true" />
                         <span>{pack.soundWatts}W</span>
                       </div>
                       {pack.includesFog && (
                         <div className="flex items-center gap-2">
-                          <span>🌫️</span>
+                          <Cloud className={PACK_ICON} aria-hidden="true" />
                           <span>Fum inclòs</span>
                         </div>
                       )}
                       {pack.includesMic && (
                         <div className="flex items-center gap-2">
-                          <span>🎤</span>
+                          <Mic className={PACK_ICON} aria-hidden="true" />
                           <span>Micro inclòs</span>
                         </div>
                       )}
                     </div>
 
                     {(pack.minGuests || pack.maxGuests) && (
-                      <div className="text-sm">
-                        👥 {pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className={PACK_ICON} aria-hidden="true" />
+                        <span>{pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats</span>
                       </div>
                     )}
 
@@ -460,13 +466,15 @@ export default async function PacksPage({
                       href={buildPackHref(pack.id)}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
-                      ✏️ Editar
+                      <Pencil className={PACK_ICON} aria-hidden="true" />
+                      Editar
                     </Link>
                     <Link
                       href={buildPackHref(pack.id, 'content')}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
-                      📦 Equip
+                      <Package className={PACK_ICON} aria-hidden="true" />
+                      Equip
                     </Link>
                   </div>
                 </div>
@@ -513,8 +521,9 @@ export default async function PacksPage({
                       </div>
                       <div className="flex gap-1">
                         {pack.isFeatured && (
-                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium">
-                            ⭐ Destacat
+                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium">
+                            <Star className={PACK_ICON} aria-hidden="true" />
+                            Destacat
                           </span>
                         )}
                         {!pack.isActive && (
@@ -575,30 +584,31 @@ export default async function PacksPage({
 
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <span>🎵</span>
+                        <Music className={PACK_ICON} aria-hidden="true" />
                         <span>{pack.djHours}h DJ</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span>🔊</span>
+                        <Volume2 className={PACK_ICON} aria-hidden="true" />
                         <span>{pack.soundWatts}W</span>
                       </div>
                       {pack.includesFog && (
                         <div className="flex items-center gap-2">
-                          <span>🌫️</span>
+                          <Cloud className={PACK_ICON} aria-hidden="true" />
                           <span>Fum inclòs</span>
                         </div>
                       )}
                       {pack.includesMic && (
                         <div className="flex items-center gap-2">
-                          <span>🎤</span>
+                          <Mic className={PACK_ICON} aria-hidden="true" />
                           <span>Micro inclòs</span>
                         </div>
                       )}
                     </div>
 
                     {(pack.minGuests || pack.maxGuests) && (
-                      <div className="text-sm">
-                        👥 {pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className={PACK_ICON} aria-hidden="true" />
+                        <span>{pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats</span>
                       </div>
                     )}
 
@@ -624,13 +634,15 @@ export default async function PacksPage({
                       href={buildPackHref(pack.id)}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
-                      ✏️ Editar
+                      <Pencil className={PACK_ICON} aria-hidden="true" />
+                      Editar
                     </Link>
                     <Link
                       href={buildPackHref(pack.id, 'content')}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
-                      📦 Equip
+                      <Package className={PACK_ICON} aria-hidden="true" />
+                      Equip
                     </Link>
                   </div>
                 </div>
@@ -642,7 +654,7 @@ export default async function PacksPage({
 
       {filteredPacks.length === 0 && (
         <div className="ap-card p-12 text-center">
-          <span className="text-4xl">📦</span>
+          <Package className="mx-auto h-10 w-10" aria-hidden="true" />
           <p className="mt-4">{activeFocusLabel ? 'No hi ha packs dins d’aquest focus' : 'No hi ha packs configurats'}</p>
           <p className="text-sm">{activeFocusLabel ? 'Canvia el focus o torna a la vista completa.' : 'Executa el seed per carregar dades inicials'}</p>
         </div>

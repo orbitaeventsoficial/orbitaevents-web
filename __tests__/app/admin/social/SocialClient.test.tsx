@@ -61,6 +61,9 @@ const draftPost = {
   publishedAt: null,
   mediaUrls: [],
   bookingId: 'booking-1',
+  originType: 'BOOKING',
+  originId: 'booking-1',
+  originLabel: 'OE-2026-001',
   notes: 'Creat des del playbook post-event. Revisar consentiment, imatges i dades personals abans de publicar. No publicat automaticament.',
   createdAt: '2026-07-01T10:00:00.000Z',
   updatedAt: '2026-07-01T10:00:00.000Z',
@@ -232,5 +235,75 @@ describe('SocialClient', () => {
     expect(body.notes).toContain('Revisió post-event resolta');
     expect(body.notes).not.toContain('Revisar consentiment');
     expect(body.notes).not.toContain('No publicat automaticament');
+  });
+
+  it('crea post des d una idea de testimoni amb origen canonic', async () => {
+    const fetchMock = vi.mocked(fetchWithCsrf);
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        ok: true,
+        post: {
+          id: 'sp-testimonial',
+          title: 'Testimoni de Anna',
+          caption: 'Molt be',
+          hashtags: ['OrbitaEvents'],
+          platforms: ['INSTAGRAM'],
+          status: 'DRAFT',
+          contentType: 'TEXT',
+          category: 'TESTIMONIAL',
+          scheduledAt: null,
+          publishedAt: null,
+          mediaUrls: [],
+          bookingId: null,
+          originType: 'TESTIMONIAL',
+          originId: 'testimonial-1',
+          originLabel: 'Anna Garcia',
+          notes: null,
+          createdAt: '2026-07-03T10:00:00.000Z',
+          updatedAt: '2026-07-03T10:00:00.000Z',
+        },
+      }),
+    } as Response);
+
+    render(
+      <SocialClient
+        initialPosts={[]}
+        initialCounts={counts}
+        initialIdeas={[
+          {
+            id: 'testimonial:testimonial-1',
+            source: 'testimonial',
+            title: 'Testimoni de Anna',
+            caption: 'Molt be',
+            hashtags: ['OrbitaEvents'],
+            platforms: ['INSTAGRAM'],
+            contentType: 'TEXT',
+            category: 'TESTIMONIAL',
+            scheduledAt: null,
+            mediaUrl: null,
+            sourceRef: { type: 'testimonial', id: 'testimonial-1', label: 'Anna Garcia' },
+            reason: 'Testimoni 5★ aprovat sense publicar',
+          },
+        ]}
+        initialContentPulse={activePulse}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Usar aquesta idea' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Crear publicació' }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
+      '/api/admin/social-posts',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.any(String),
+      }),
+    ));
+    const body = JSON.parse(String(fetchMock.mock.calls[0][1]?.body));
+    expect(body.originType).toBe('TESTIMONIAL');
+    expect(body.originId).toBe('testimonial-1');
+    expect(body.originLabel).toBe('Anna Garcia');
+    expect(body.bookingId).toBeUndefined();
   });
 });

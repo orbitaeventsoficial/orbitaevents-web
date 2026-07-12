@@ -6,7 +6,8 @@ import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-ht
 import { sendEmail } from '@/lib/email';
 import { EMAIL_CONTACT } from '@/lib/constants/email';
 import { getEventLabel } from '@/lib/constants';
-import { recordEmailSend } from '@/lib/services/emailTrackingService';
+import { getAppBaseUrl } from '@/lib/site';
+import { recordEmailSend, updateEmailSendResult, wrapLinksForTracking } from '@/lib/services/emailTrackingService';
 import {
   collaboratorProductToAnimacioProduct,
   getDossierCollaboratorProductsByIds,
@@ -56,7 +57,6 @@ export type DossierOutputTransport = {
   travelKm?: number;
   travelTollsEur?: number;
   travelLocation?: string;
-  eventDate?: string;
 };
 
 export type BuildDossierHtmlForDossierOptions = {
@@ -65,6 +65,14 @@ export type BuildDossierHtmlForDossierOptions = {
   locale?: string;
   assetBaseUrl?: string;
 };
+
+const DOSSIER_EMAIL_TEMPLATE_KEY = 'dossier';
+
+function buildTrackedDossierHtml(html: string, trackingToken: string): string {
+  const baseUrl = getAppBaseUrl().replace(/\/+$/, '');
+  const trackedHtml = wrapLinksForTracking(html, trackingToken, baseUrl);
+  return `${trackedHtml}<img src="${baseUrl}/api/tracking/open/${trackingToken}" width="1" height="1" alt="" style="display:none" />`;
+}
 
 function formatLeadIsoDate(date: Date | null): string {
   return date ? date.toISOString().slice(0, 10) : '';
@@ -177,10 +185,14 @@ export async function resolveDossierTraceOrigin(leadId?: string | null): Promise
 }
 
 export async function createDossier(input: CreateDossierInput) {
+  const leadId = typeof input.leadId === 'string' ? input.leadId.trim() : '';
+  if (!leadId) {
+    throw new Error('El dossier canònic requereix leadId. Crea o vincula un lead abans de desar-lo.');
+  }
   const lineSnapshot = parseDossierLineSnapshot(input.lineSnapshot);
   return prisma.dossier.create({
     data: {
-      leadId: input.leadId || null,
+      leadId,
       nom: input.nom,
       empresa: input.empresa || null,
       telefon: input.telefon || null,
@@ -202,28 +214,19 @@ export async function resolveDossierTransportOutput(input: {
   let travelKm: number | undefined = snapshotTransport.travelKm;
   let travelTollsEur: number | undefined = snapshotTransport.travelTollsEur;
   let travelLocation: string | undefined = snapshotTransport.travelLocation;
-  let eventDate: string | undefined = snapshotTransport.eventDate;
   const fallbackLeadId = input.leadId ?? null;
 
-  if (fallbackLeadId && (travelKm == null || travelTollsEur == null || !travelLocation || !eventDate)) {
+  if (fallbackLeadId && (travelKm == null || travelTollsEur == null || !travelLocation)) {
     const lead = await prisma.lead.findUnique({
       where: { id: fallbackLeadId },
-      select: { distanceKm: true, tollsEur: true, eventLocation: true, eventDate: true },
+      select: { distanceKm: true, tollsEur: true, eventLocation: true },
     });
     if (travelKm == null && lead?.distanceKm != null && lead.distanceKm > 0) travelKm = lead.distanceKm;
     if (travelTollsEur == null && lead?.tollsEur != null && lead.tollsEur > 0) travelTollsEur = lead.tollsEur;
     if (!travelLocation && lead?.eventLocation) travelLocation = lead.eventLocation;
-    if (!eventDate && lead?.eventDate) eventDate = formatLeadIsoDate(lead.eventDate);
   }
 
-  return { travelKm, travelTollsEur, travelLocation, eventDate };
-}
-
-export async function getDossiersByLead(leadId: string) {
-  return prisma.dossier.findMany({
-    where: { leadId },
-    orderBy: { createdAt: 'desc' },
-  });
+  return { travelKm, travelTollsEur, travelLocation };
 }
 
 export async function getAllDossiers(limit = 50) {
@@ -304,7 +307,6 @@ export async function buildDossierHtmlForDossier(id: string, options: BuildDossi
     travelKm: payload.transport.travelKm,
     travelTollsEur: payload.transport.travelTollsEur,
     location: payload.transport.travelLocation,
-    eventDate: payload.transport.eventDate,
     assetBaseUrl: options.assetBaseUrl,
   });
   return { ...payload, html };
@@ -343,11 +345,6 @@ export async function purgeExpiredDossiers(cutoff: Date): Promise<number> {
   return count;
 }
 
-/** @deprecated Usar softDeleteDossier */
-export async function deleteDossier(id: string) {
-  return softDeleteDossier(id);
-}
-
 export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; error?: string }> {
   const render = await buildDossierHtmlForDossier(id, { locale: 'ca-ES' });
   if (!render) return { ok: false, error: 'Dossier no trobat' };
@@ -366,10 +363,23 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
       ? { kind: 'lead' as const, id: dossier.leadId, origin: `dossier-${id}` }
       : { kind: 'dossier' as const, id, origin: `dossier-${id}` };
 
+    const tracking = await recordEmailSend({
+      templateKey: DOSSIER_EMAIL_TEMPLATE_KEY,
+      to: recipientEmail,
+      subject,
+      leadId: dossier.leadId || null,
+      customerId: origin.customerId,
+      locale: 'ca-ES',
+      htmlBody: html,
+      orbitaKind: orbitaCtx.kind,
+      orbitaId: orbitaCtx.id ?? null,
+      orbitaOrigin: orbitaCtx.origin ?? null,
+    });
+
     const sendResult = await sendEmail({
       to: recipientEmail,
       subject,
-      html,
+      html: buildTrackedDossierHtml(html, tracking.trackingToken),
       text: `Hola ${dossier.nom},\n\nT'enviem el dossier amb les nostres propostes: ${productsLabel}.\n\nQualsevol dubte, contacta'ns al ${EMAIL_CONTACT.phone} o ${EMAIL_CONTACT.email}\n\nÒrbita Events`,
       orbita: orbitaCtx,
     });
@@ -380,30 +390,16 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
       data: { sentAt: now, sentTo: recipientEmail },
     });
 
-    const tracking = await recordEmailSend({
-      templateKey: 'dossier',
-      to: recipientEmail,
-      subject,
-      leadId: dossier.leadId || null,
-      htmlBody: html,
-      orbitaKind: orbitaCtx.kind,
-      orbitaId: orbitaCtx.id ?? null,
-      orbitaOrigin: orbitaCtx.origin ?? null,
-    }).catch(() => null);
-
-    if (tracking?.id) {
-      const { updateEmailSendResult } = await import('@/lib/services/emailTrackingService');
-      await updateEmailSendResult(tracking.id, {
-        smtpAccepted: sendResult.smtp.accepted,
-        smtpRejected: sendResult.smtp.rejected,
-        smtpResponse: sendResult.smtp.response,
-        smtpMessageId: sendResult.smtp.messageId,
-        imapAppendOk: sendResult.imapSent.attempted ? sendResult.imapSent.ok : null,
-        imapSentFolder: sendResult.imapSent.folder,
-        imapSentUid: sendResult.imapSent.uid ?? null,
-        imapError: sendResult.imapSent.error ?? null,
-      });
-    }
+    await updateEmailSendResult(tracking.id, {
+      smtpAccepted: sendResult.smtp.accepted,
+      smtpRejected: sendResult.smtp.rejected,
+      smtpResponse: sendResult.smtp.response,
+      smtpMessageId: sendResult.smtp.messageId,
+      imapAppendOk: sendResult.imapSent.attempted ? sendResult.imapSent.ok : null,
+      imapSentFolder: sendResult.imapSent.folder,
+      imapSentUid: sendResult.imapSent.uid ?? null,
+      imapError: sendResult.imapSent.error ?? null,
+    }).catch(() => undefined);
 
     await recordDocumentAdminLog({
       action: DOCUMENT_ADMIN_LOG_ACTIONS.DOSSIER_SENT,
@@ -422,7 +418,8 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
         subject,
         productIds: dossier.productIds,
         productCount: products.length,
-        emailSendId: tracking?.id ?? null,
+        emailSendId: tracking.id,
+        emailSnapshot: 'EmailSend.htmlBody',
         orbitaKind: orbitaCtx.kind,
         orbitaId: orbitaCtx.id,
         orbitaOrigin: orbitaCtx.origin,

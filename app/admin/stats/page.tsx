@@ -1,6 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import {
+  CalendarDays,
+  PartyPopper,
+  Sparkles,
+  Star,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 import { log } from '@/lib/logger';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
@@ -17,6 +25,27 @@ interface Stat {
   fallback: number;
   calculated: number;
   isManual: boolean;
+}
+
+const STAT_ICON_MAP: Record<string, LucideIcon> = {
+  party: PartyPopper,
+  people: Users,
+  calendar: CalendarDays,
+  star: Star,
+  sparkle: Sparkles,
+};
+
+function StatIcon({ icon }: { icon: string }) {
+  const Icon = STAT_ICON_MAP[icon] ?? Sparkles;
+  return (
+    <span
+      aria-hidden="true"
+      data-stat-icon={icon}
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--raised)]"
+    >
+      <Icon className="h-5 w-5" strokeWidth={1.8} />
+    </span>
+  );
 }
 
 export default function StatsPage() {
@@ -235,7 +264,7 @@ export default function StatsPage() {
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-start gap-3">
-                <span className="text-3xl">{stat.icon}</span>
+                <StatIcon icon={stat.icon} />
                 <div>
                   <h3 className="font-semibold">{stat.label}</h3>
                   <p className="text-sm mt-0.5">{stat.description}</p>
@@ -332,6 +361,5 @@ export default function StatsPage() {
     </AdminPage>
   );
 }
-
 
 

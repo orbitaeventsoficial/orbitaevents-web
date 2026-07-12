@@ -3,6 +3,12 @@ import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { BOOKING_COMMUNICATION_COPY, toIntlLocale, formatCurrencyExact } from '@/lib/constants';
 import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
+import { getAppBaseUrl } from '@/lib/site';
+import {
+  recordEmailSend,
+  updateEmailSendResult,
+  wrapLinksForTracking,
+} from '@/lib/services/emailTrackingService';
 
 export type BookingCommAction = 'send_email' | 'send_whatsapp' | 'log_sent' | 'mark_responded';
 export type BookingCommChannel = 'email' | 'whatsapp';
@@ -64,11 +70,25 @@ function buildEmailContent(flow: BookingCommFlow, booking: {
   return { subject: t.subject(booking.reference), html };
 }
 
+const BOOKING_COMM_TEMPLATE_KEY = 'booking-communication';
+const BOOKING_COMM_ORBITA_ORIGIN = 'booking-communication';
+
+function buildTrackedBookingCommHtml(html: string, trackingToken: string, baseUrl: string): string {
+  const trackedHtml = wrapLinksForTracking(html, trackingToken, baseUrl);
+  const pixel = `<img src="${baseUrl}/api/tracking/open/${trackingToken}" width="1" height="1" alt="" style="display:none" />`;
+  if (/<\/body>/i.test(trackedHtml)) {
+    return trackedHtml.replace(/<\/body>/i, `${pixel}</body>`);
+  }
+  return `${trackedHtml}${pixel}`;
+}
+
 async function getBookingCommunicationTarget(bookingId: string) {
   return prisma.booking.findUnique({
     where: { id: bookingId },
     select: {
       id: true,
+      leadId: true,
+      customerId: true,
       reference: true,
       clientName: true,
       clientEmail: true,
@@ -87,11 +107,53 @@ export async function executeBookingCommunication(bookingId: string, payload: { 
 
   if (payload.action === 'send_email') {
     const content = buildEmailContent(payload.flow, booking);
-    await sendEmail({ to: booking.clientEmail, subject: content.subject, html: content.html });
+    const baseUrl = getAppBaseUrl().replace(/\/+$/, '');
+    const orbita = booking.leadId
+      ? { kind: 'lead' as const, id: booking.leadId, origin: BOOKING_COMM_ORBITA_ORIGIN }
+      : booking.customerId
+        ? { kind: 'customer' as const, id: booking.customerId, origin: BOOKING_COMM_ORBITA_ORIGIN }
+        : { kind: 'booking' as const, id: booking.id, origin: BOOKING_COMM_ORBITA_ORIGIN };
+    const trackingRecord = await recordEmailSend({
+      templateKey: BOOKING_COMM_TEMPLATE_KEY,
+      to: booking.clientEmail,
+      subject: content.subject,
+      leadId: booking.leadId ?? null,
+      customerId: booking.customerId ?? null,
+      locale: normalizeCommLocale(booking.preferredLocale),
+      htmlBody: content.html,
+      orbitaKind: orbita.kind,
+      orbitaId: orbita.id,
+      orbitaOrigin: orbita.origin,
+    });
+    const sendResult = await sendEmail({
+      to: booking.clientEmail,
+      subject: content.subject,
+      html: buildTrackedBookingCommHtml(content.html, trackingRecord.trackingToken, baseUrl),
+      orbita,
+    });
+    await updateEmailSendResult(trackingRecord.id, {
+      smtpAccepted: sendResult.smtp.accepted,
+      smtpRejected: sendResult.smtp.rejected,
+      smtpResponse: sendResult.smtp.response,
+      smtpMessageId: sendResult.smtp.messageId,
+      imapAppendOk: sendResult.imapSent.attempted ? sendResult.imapSent.ok : null,
+      imapSentFolder: sendResult.imapSent.folder,
+      imapSentUid: sendResult.imapSent.uid ?? null,
+      imapError: sendResult.imapSent.error ?? null,
+    }).catch(() => undefined);
     await recordBookingCommunicationLog({
       action: 'COMM_SENT',
       bookingId: booking.id,
-      details: { flow: payload.flow, channel: 'email', to: booking.clientEmail },
+      details: {
+        flow: payload.flow,
+        channel: 'email',
+        to: booking.clientEmail,
+        emailSendId: trackingRecord.id,
+        emailSnapshot: 'EmailSend.htmlBody',
+        orbitaKind: orbita.kind,
+        orbitaId: orbita.id,
+        orbitaOrigin: orbita.origin,
+      },
     });
     return { ok: true as const, status: 200, body: { ok: true } };
   }

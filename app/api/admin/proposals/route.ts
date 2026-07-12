@@ -5,7 +5,12 @@ import { verifyCsrf } from '@/lib/csrf';
 import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
 import { z } from 'zod';
-import { createAdminProposal, getProposalFinancialConsistencyIssues, listAdminProposals } from '@/lib/services/proposalAdminService';
+import {
+  createAdminProposal,
+  getProposalFinancialConsistencyIssues,
+  listAdminProposals,
+  ProposalCanonicalDispatchError,
+} from '@/lib/services/proposalAdminService';
 import { VAT_RATE_INVOICE } from '@/lib/constants/pricing';
 
 function addFinancialConsistencyIssues(
@@ -82,6 +87,9 @@ export async function POST(req: NextRequest) {
     const result = await createAdminProposal(parsed.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
+    if (error instanceof ProposalCanonicalDispatchError) {
+      return NextResponse.json(error.body, { status: error.status });
+    }
     log.error('Error creant pressupost', error, {
       context: { requestId, endpoint: 'admin/proposals:POST', customerId: customerIdForLog },
     });

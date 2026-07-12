@@ -7503,8 +7503,7 @@
       "travelBreakdownPeople": "{headcount} operaris en ruta · {hours} h",
       "travelBreakdownTolls": "Peatges de ruta",
       "travelBreakdownMeals": "Dietes de ruta llarga",
-      "seasonDetail": "+{pct}% sobre {base} de serveis per la data de l'esdeveniment.",
-      "vatNote": "Preus orientatius. L'IVA i els ajustos finals es tanquen a la proposta definitiva."
+      "vatNote": "Preus sense IVA. El pressupost definitiu desglossa IVA, transport i total final."
     },
     "cta": {
       "label": "Qualsevol dubte o per mirar dates, escriviu-nos quan vulgueu"

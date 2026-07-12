@@ -1,11 +1,11 @@
-import { EventType } from '@prisma/client';
+import { ContractStatus, EventType, ProposalStatus } from '@prisma/client';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { CUSTOMER_ACTIVITY_ACTIONS, TASK_SOURCE } from '@/lib/constants';
 import { recordCustomerBookingCreated } from '@/lib/services/customerActivityService';
 import { DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
-import { computeBoloTransport } from '@/lib/services/travelLaborCost';
-import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
+import { computeBoloTransport, withTravelHeadcountNote } from '@/lib/services/travelLaborCost';
+import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
 import { calcVatRate, calcDeposit, roundMoney, CUSTOM_BOOKING_PACK_SLUG, CUSTOM_BOOKING_PACK_MARKER } from '@/lib/constants/pricing';
@@ -14,6 +14,8 @@ import { SOUND_RENTAL } from '@/lib/constants/inventory';
 import { sendBookingConfirmationEmail } from '@/lib/services/bookingConfirmationEmailService';
 import { DEFAULT_BOOKING_PAYMENT_METHOD } from '@/lib/constants/booking-payment';
 import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
+import { buildBookingInventoryConflictBookingWhere } from '@/lib/services/bookingInventoryAvailability';
+import { syncBookingAvailabilityForState } from '@/lib/services/bookingAvailabilitySyncService';
 
 /**
  * Imputa el so d'Isma com a cost inclos dins el DJ. No es factura a part i no
@@ -127,9 +129,11 @@ type BookingServiceLineInput = {
   quantity?: number | null;
   hours?: number | null;
   notes?: string | null;
+  travelHeadcount?: number | null;
 };
 
 type BookingCreateInput = {
+  proposalId?: string;
   leadId?: string;
   customerId?: string;
   sourceCollaboratorId?: string | null;
@@ -290,7 +294,7 @@ function normalizeServiceLines(lines?: BookingServiceLineInput[]) {
       costAmount: sanitizeServiceLineCostAmount({ kind: line.kind || 'OTHER', label: line.label, costAmount: line.costAmount }),
       quantity: typeof line.quantity === 'number' && line.quantity > 0 ? Math.floor(line.quantity) : null,
       hours: typeof line.hours === 'number' && line.hours > 0 ? Math.round(line.hours * 100) / 100 : null,
-      notes: line.notes?.trim() || null,
+      notes: withTravelHeadcountNote(line.notes, line.travelHeadcount),
     }))
     .filter((line) => Boolean(line.label));
 }
@@ -303,7 +307,7 @@ async function resolveBilledPartner(id?: string | null) {
   });
 }
 
-async function assignPackInventory(bookingId: string, packId: string) {
+async function assignPackInventory(bookingId: string, packId: string, eventDate?: Date | string | null) {
   try {
     const packInventory = await prisma.packInventory.findMany({
       where: { packId },
@@ -319,8 +323,11 @@ async function assignPackInventory(bookingId: string, packId: string) {
       by: ['itemId'],
       where: {
         itemId: { in: itemIds },
-        bookingId: { not: bookingId },
-        booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
+        booking: buildBookingInventoryConflictBookingWhere({
+          bookingId,
+          eventDate,
+          statuses: ACTIVE_BOOKING_STATUSES,
+        }),
       },
     });
     const busyItemIds = new Set(overlappingItems.map((o) => o.itemId));
@@ -355,15 +362,53 @@ async function assignPackInventory(bookingId: string, packId: string) {
 }
 
 export async function createBookingFromInput(data: BookingCreateInput): Promise<BookingCreationResult> {
-  let linkedCustomerId: string | null = data.customerId || null;
+  const linkedProposal = data.proposalId
+    ? await prisma.proposal.findUnique({
+        where: { id: data.proposalId },
+        select: {
+          id: true,
+          customerId: true,
+          leadId: true,
+          bookingId: true,
+          total: true,
+          vatRate: true,
+          acceptedAt: true,
+          contractStatus: true,
+        },
+      })
+    : null;
+
+  if (data.proposalId && !linkedProposal) {
+    return { status: 404, body: { error: 'Pressupost no trobat' } };
+  }
+  if (linkedProposal?.bookingId) {
+    return { status: 409, body: { error: 'Aquest pressupost ja té una reserva vinculada', bookingId: linkedProposal.bookingId } };
+  }
+  if (linkedProposal?.leadId && data.leadId && linkedProposal.leadId !== data.leadId) {
+    return { status: 400, body: { error: 'El lead de la reserva no coincideix amb el pressupost' } };
+  }
+  if (linkedProposal?.customerId && data.customerId && linkedProposal.customerId !== data.customerId) {
+    return { status: 400, body: { error: 'El client de la reserva no coincideix amb el pressupost' } };
+  }
+
+  const effectiveLeadId = data.leadId || linkedProposal?.leadId || undefined;
+  const effectiveCustomerId = data.customerId || linkedProposal?.customerId || undefined;
+  const effectiveManualTotalPrice = data.manualTotalPrice ?? (
+    linkedProposal && linkedProposal.total > 0 ? linkedProposal.total : undefined
+  );
+  const effectiveInvoiceRequired = data.invoiceRequired ?? (
+    linkedProposal ? linkedProposal.vatRate > 0 : undefined
+  );
+
+  let linkedCustomerId: string | null = effectiveCustomerId || null;
   let sourceCollaboratorId: string | null = data.sourceCollaboratorId || null;
   const billedPartner = await resolveBilledPartner(data.billedCollaboratorId || null);
   const billedCollaboratorId = billedPartner?.id || null;
 
   let leadBoloLines: BookingServiceLineInput[] = [];
-  if (data.leadId) {
+  if (effectiveLeadId) {
     const lead = await prisma.lead.findUnique({
-      where: { id: data.leadId },
+      where: { id: effectiveLeadId },
       select: {
         customerId: true,
         sourceCollaboratorId: true,
@@ -470,9 +515,9 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     }
   }
 
-  const fuelReference = await getFuelCostPerKmReference();
+  const vehicleCostReference = await getEffectiveVehicleCostPerKm();
   const fuelCostPerKm = sanitizeNonNegative(
-    data.fuelCostPerKm ?? fuelReference.costPerKm,
+    data.fuelCostPerKm ?? vehicleCostReference.costPerKm,
     DEFAULT_VEHICLE_COST_PER_KM
   );
   // Peatges: manual (data.tollsEur) prioritari; si no, els automàtics de Google (#1373).
@@ -487,10 +532,10 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const travelCharge = transport ? transport.clientCharge : 0;
   const subtotalCalculated = subtotalBase + travelCharge;
   const discount = sanitizeMoney(data.discount) ?? 0;
-  const invoiceRequired = Boolean(data.invoiceRequired);
+  const invoiceRequired = Boolean(effectiveInvoiceRequired);
   const vatRate = calcVatRate(invoiceRequired);
-  const manualTotal = data.manualTotalPrice != null && data.manualTotalPrice > 0
-    ? roundMoney(data.manualTotalPrice)
+  const manualTotal = effectiveManualTotalPrice != null && effectiveManualTotalPrice > 0
+    ? roundMoney(effectiveManualTotalPrice)
     : null;
   const subtotal = manualTotal !== null
     ? invoiceRequired
@@ -513,7 +558,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const booking = await prisma.booking.create({
     data: {
       reference,
-      leadId: data.leadId,
+      leadId: effectiveLeadId,
       customerId: linkedCustomerId,
       sourceCollaboratorId,
       billedCollaboratorId,
@@ -553,7 +598,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     },
   });
 
-  await assignPackInventory(booking.id, booking.packId);
+  await assignPackInventory(booking.id, booking.packId, booking.eventDate);
 
   if (linkedCustomerId) {
     await recordCustomerBookingCreated({
@@ -572,7 +617,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       data: {
         customerId: linkedCustomerId,
         bookingId: booking.id,
-        leadId: data.leadId || null,
+        leadId: effectiveLeadId || null,
         title: `Preparar reserva ${booking.reference}`,
         description: 'Revisa horaris, ubicació, inventari, extres i confirmació final amb client.',
         dueDate: prepDueDate,
@@ -584,9 +629,9 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     });
   }
 
-  if (data.leadId) {
+  if (effectiveLeadId) {
     await prisma.lead.update({
-      where: { id: data.leadId },
+      where: { id: effectiveLeadId },
       data: {
         status: 'WON',
         convertedAt: new Date(),
@@ -595,17 +640,12 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     });
   }
 
-  await prisma.availability.upsert({
-    where: { date: eventDate },
-    create: {
-      date: eventDate,
-      status: 'BOOKED',
-      bookingId: booking.id,
-    },
-    update: {
-      status: 'BOOKED',
-      bookingId: booking.id,
-    },
+  await syncBookingAvailabilityForState({
+    bookingId: booking.id,
+    reference: booking.reference,
+    clientName: booking.clientName,
+    nextEventDate: booking.eventDate,
+    nextStatus: booking.status,
   });
 
   await prisma.adminLog.create({
@@ -613,9 +653,22 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       action: 'CREATE',
       entity: 'booking',
       entityId: booking.id,
-      details: { reference, clientName: data.clientName, total },
+      details: { reference, clientName: data.clientName, total, proposalId: linkedProposal?.id || null },
     },
   });
+
+  if (linkedProposal) {
+    const shouldQueueContract = !linkedProposal.contractStatus || linkedProposal.contractStatus === ContractStatus.DRAFT;
+    await prisma.proposal.update({
+      where: { id: linkedProposal.id },
+      data: {
+        bookingId: booking.id,
+        status: ProposalStatus.ACCEPTED,
+        acceptedAt: linkedProposal.acceptedAt ?? new Date(),
+        ...(shouldQueueContract ? { contractStatus: ContractStatus.DRAFT, contractSentAt: null } : {}),
+      },
+    });
+  }
 
   // Confirmació al client (plantilla editable booking_confirmation). No bloqueja la
   // creació si l'enviament falla: la reserva ja està desada.
@@ -624,6 +677,9 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     const sent = await sendBookingConfirmationEmail({
       to: confirmationEmail,
       locale: null,
+      bookingId: booking.id,
+      leadId: effectiveLeadId || null,
+      customerId: linkedCustomerId || null,
       reference: booking.reference,
       clientName: data.clientName,
       eventDate,
@@ -634,7 +690,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       total,
       depositAmount,
     });
-    if (!sent.ok) {
+    if (!sent.ok && sent.skipped !== 'smtp_not_configured') {
       log.error('Confirmació de reserva no enviada', undefined, {
         context: { reference: booking.reference, reason: sent.error },
       });

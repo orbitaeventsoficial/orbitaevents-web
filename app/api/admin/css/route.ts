@@ -24,7 +24,7 @@ export async function PUT(req: NextRequest) {
   if (csrfError) return csrfError;
 
   const body = await req.json().catch(() => null) as { css?: string } | null;
-  const { hadForbiddenRules } = await saveAdminCustomCss(typeof body?.css === 'string' ? body.css : '');
+  const { css, hadForbiddenRules } = await saveAdminCustomCss(typeof body?.css === 'string' ? body.css : '');
 
-  return NextResponse.json({ ok: true, sanitized: hadForbiddenRules });
+  return NextResponse.json({ ok: true, css, sanitized: hadForbiddenRules });
 }

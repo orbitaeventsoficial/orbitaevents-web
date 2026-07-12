@@ -3,8 +3,10 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { ReactivationCandidate, ReactivationPriority } from '@/lib/services/reactivationService';
-import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildCustomerComposeHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { formatCurrency } from '@/lib/constants';
+import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants/customer-crm';
+import { fetchWithCsrf } from '@/lib/csrf';
 import { AdminEmptyState } from '../../components/AdminPage';
 
 type Props = { initialCandidates: ReactivationCandidate[] };
@@ -26,6 +28,33 @@ const CHANNEL_ICON: Record<string, string> = {
   email: '✉️',
   instagram: '📷',
 };
+
+function buildReactivationActivityNote(candidate: ReactivationCandidate, channel: string): string {
+  return [
+    `Canal: ${channel}`,
+    `Motiu: ${candidate.reasonLabel}`,
+    `Prioritat: ${candidate.priority}`,
+    `Dies des de l'últim event: ${candidate.daysSinceLastEvent ?? 'sense dada'}`,
+    `Assumpte: ${candidate.suggestedSubject}`,
+    '',
+    candidate.suggestedMessage,
+  ].join('\n');
+}
+
+async function recordReactivationActivity(candidate: ReactivationCandidate, channel: string) {
+  const res = await fetchWithCsrf(`/api/admin/customers/${candidate.customerId}/activities`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: CUSTOMER_ACTIVITY_ACTIONS.REACTIVATION_PREPARED,
+      note: buildReactivationActivityNote(candidate, channel),
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error('No s ha pogut registrar la reactivacio al Customer Hub');
+  }
+}
 
 export default function ReactivationClient({ initialCandidates }: Props) {
   const [filter, setFilter] = useState<'ALL' | ReactivationPriority>('ALL');
@@ -68,6 +97,7 @@ export default function ReactivationClient({ initialCandidates }: Props) {
     setCopyError(null);
     try {
       await navigator.clipboard.writeText(candidate.suggestedMessage);
+      await recordReactivationActivity(candidate, 'clipboard');
       setCopied(candidate.customerId);
       setTimeout(() => setCopied(null), 2000);
     } catch (error) {
@@ -77,9 +107,21 @@ export default function ReactivationClient({ initialCandidates }: Props) {
       });
       setCopyError({
         customerId: candidate.customerId,
-        message: 'No s\'ha pogut copiar el missatge.',
+        message: error instanceof Error && error.message.includes('Customer Hub')
+          ? 'Missatge copiat, però no s\'ha pogut registrar al Customer Hub.'
+          : 'No s\'ha pogut copiar el missatge.',
       });
     }
+  }
+
+  function recordReactivationLaunch(candidate: ReactivationCandidate, channel: string) {
+    void recordReactivationActivity(candidate, channel).catch((error) => {
+      console.error('[ReactivationClient] Error registrant activitat de reactivacio', {
+        customerId: candidate.customerId,
+        channel,
+        error,
+      });
+    });
   }
 
   return (
@@ -202,14 +244,19 @@ export default function ReactivationClient({ initialCandidates }: Props) {
                     href={c.whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => recordReactivationLaunch(c, 'whatsapp')}
                     className="ap-btn ap-btn--xs flex-1 sm:flex-none"
                   >
                     💬 WhatsApp
                   </a>
                 )}
-                <a href={c.mailtoUrl} className="ap-btn ap-btn--xs flex-1 sm:flex-none">
+                <Link
+                  href={buildCustomerComposeHref(c.customerId, 'reactivacio')}
+                  onClick={() => recordReactivationLaunch(c, 'inbox')}
+                  className="ap-btn ap-btn--xs flex-1 sm:flex-none"
+                >
                   ✉️ Email
-                </a>
+                </Link>
                 <button
                   type="button"
                   onClick={() => handleCopyMessage(c)}

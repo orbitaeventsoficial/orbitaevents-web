@@ -620,7 +620,6 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         travelKm: Number.isFinite(km) && km > 0 ? km : undefined,
         travelTollsEur: Number.isFinite(tolls) && tolls > 0 ? tolls : undefined,
         location: travelLocation.trim() || undefined,
-        eventDate: eventDate || undefined,
         assetBaseUrl: window.location.origin,
       });
       const blob = new Blob([html], { type: 'text/html;charset=utf-8' });

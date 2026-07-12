@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockSendEmail } = vi.hoisted(() => ({
-  mockSendEmail: vi.fn(),
+const { mockSendTrackedStandaloneEmail } = vi.hoisted(() => ({
+  mockSendTrackedStandaloneEmail: vi.fn(),
 }));
 
-vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
+vi.mock('@/lib/email', () => ({ sendTrackedStandaloneEmail: mockSendTrackedStandaloneEmail }));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() } }));
 vi.mock('@/lib/services/notificationRecipientsService', () => ({
   getRecipientsAsString: vi.fn().mockResolvedValue('alerts@orbitaevents.com'),
@@ -47,7 +47,7 @@ const BASE_LEAD = {
 describe('notifyNewLead', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSendEmail.mockResolvedValue(undefined);
+    mockSendTrackedStandaloneEmail.mockResolvedValue(undefined);
     // Reset env vars
     vi.stubEnv('SMTP_HOST', 'smtp.test.com');
     vi.stubEnv('SMTP_USER', 'user@test.com');
@@ -59,11 +59,14 @@ describe('notifyNewLead', () => {
     const emailResult = results.find(r => r.channel === 'email');
     expect(emailResult).toBeDefined();
     expect(emailResult!.success).toBe(true);
-    expect(mockSendEmail).toHaveBeenCalledOnce();
-    expect(mockSendEmail).toHaveBeenCalledWith(
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledOnce();
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(
       expect.objectContaining({
+        templateKey: 'new-lead-admin-notification',
+        leadId: 'lead-1',
         subject: expect.stringContaining('Joan Garcia'),
         html: expect.stringContaining('Joan Garcia'),
+        orbita: expect.objectContaining({ kind: 'lead', id: 'lead-1' }),
       }),
     );
   });
@@ -71,7 +74,7 @@ describe('notifyNewLead', () => {
   it('inclou replyTo si email és real (no temp)', async () => {
     await notifyNewLead(BASE_LEAD);
 
-    expect(mockSendEmail).toHaveBeenCalledWith(
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         replyTo: 'joan@example.com',
       }),
@@ -84,7 +87,7 @@ describe('notifyNewLead', () => {
       email: 'temp-12345@leads.orbitaevents.local',
     });
 
-    expect(mockSendEmail).toHaveBeenCalledWith(
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         replyTo: undefined,
       }),
@@ -100,11 +103,11 @@ describe('notifyNewLead', () => {
     const emailResult = results.find(r => r.channel === 'email');
     expect(emailResult!.success).toBe(false);
     expect(emailResult!.error).toContain('SMTP');
-    expect(mockSendEmail).not.toHaveBeenCalled();
+    expect(mockSendTrackedStandaloneEmail).not.toHaveBeenCalled();
   });
 
-  it('retorna error email si sendEmail falla', async () => {
-    mockSendEmail.mockRejectedValue(new Error('SMTP timeout'));
+  it('retorna error email si el helper tracked falla', async () => {
+    mockSendTrackedStandaloneEmail.mockRejectedValue(new Error('SMTP timeout'));
 
     const results = await notifyNewLead(BASE_LEAD);
 
@@ -114,7 +117,7 @@ describe('notifyNewLead', () => {
   });
 
   it('intenta WhatsApp si email falla', async () => {
-    mockSendEmail.mockRejectedValue(new Error('fail'));
+    mockSendTrackedStandaloneEmail.mockRejectedValue(new Error('fail'));
 
     const results = await notifyNewLead(BASE_LEAD);
 
@@ -208,7 +211,7 @@ describe('notifyNewLead', () => {
   it('subject inclou preu estimat si disponible', async () => {
     await notifyNewLead(BASE_LEAD);
 
-    expect(mockSendEmail).toHaveBeenCalledWith(
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         subject: expect.stringContaining('1500€'),
       }),
@@ -218,7 +221,7 @@ describe('notifyNewLead', () => {
   it('subject sense preu si no disponible', async () => {
     await notifyNewLead({ ...BASE_LEAD, estimatedPrice: null });
 
-    const call = mockSendEmail.mock.calls[0][0];
+    const call = mockSendTrackedStandaloneEmail.mock.calls[0][0];
     expect(call.subject).not.toContain('null');
     expect(call.subject).toContain('Joan Garcia');
   });
@@ -226,7 +229,7 @@ describe('notifyNewLead', () => {
   it('email HTML inclou pack i missatge', async () => {
     await notifyNewLead(BASE_LEAD);
 
-    const call = mockSendEmail.mock.calls[0][0];
+    const call = mockSendTrackedStandaloneEmail.mock.calls[0][0];
     expect(call.html).toContain('Premium'); // packName
     expect(call.html).toContain('Vull DJ per la boda'); // message
     expect(call.html).toContain('admin/leads/lead-1'); // admin link

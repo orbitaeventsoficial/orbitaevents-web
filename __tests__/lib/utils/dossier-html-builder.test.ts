@@ -64,8 +64,7 @@ const copy: DossierCopy = {
     travelBreakdownPeople: '{headcount} operaris en ruta · {hours} h',
     travelBreakdownTolls: 'Peatges de ruta',
     travelBreakdownMeals: 'Dietes de ruta llarga',
-    seasonDetail: '+{pct}% sobre {base} de serveis per la data de l\'esdeveniment.',
-    vatNote: "Preus orientatius; l'IVA es tanca a la proposta.",
+    vatNote: 'Preus sense IVA. El pressupost definitiu desglossa IVA, transport i total final.',
   },
   cta: { label: 'Per confirmar disponibilitat o per a qualsevol dubte' },
 };
@@ -73,7 +72,7 @@ const copy: DossierCopy = {
 function build(
   c: DossierClientInfo,
   products: AnimacioProduct[],
-  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string; eventDate?: string; assetBaseUrl?: string },
+  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string; assetBaseUrl?: string },
 ): string {
   return buildDossierHtml(c, products, copy, { locale: 'ca-ES', ...options });
 }
@@ -117,6 +116,11 @@ describe('buildDossierHtml', () => {
   it('inclou el nom del producte', () => {
     const html = build(client, [productWithTrams]);
     expect(html).toContain('Bingo Musical');
+  });
+
+  it('indica que els preus del dossier no inclouen IVA', () => {
+    const html = build(client, [productWithTrams]);
+    expect(html).toContain('Preus sense IVA');
   });
 
   it('pinta la imatge del producte quan el catàleg en porta una', () => {
@@ -334,23 +338,24 @@ describe('buildDossierHtml', () => {
     expect(html.match(/class="resum-page"/g)?.length).toBe(1);
   });
 
-  it('mostra el recàrrec de temporada al dossier quan la data del lead l’aplica', () => {
+  it('no mostra cap recàrrec de temporada al dossier encara que hi hagi data', () => {
     const a: AnimacioProduct = {
       id: 'orbita:dj-base', nom: 'DJ base', descripcio: ['Servei base de DJ.'], inclou: ['DJ professional'], priceFrom: 250,
     };
     const b: AnimacioProduct = {
       id: 'orbita:bingo', nom: 'Bingo Musical', descripcio: ['Bingo animat.'], inclou: ['Animador'], priceFrom: 240,
     };
-    const html = build(client, [a, b], { eventDate: '2026-07-17' });
+    const html = build(client, [a, b]);
 
-    expect(html).toContain('class="bud-season"');
-    expect(html).toContain('Recàrrec alta temporada');
-    expect(html).toContain('+15% sobre');
-    expect(html).toContain('490');
-    expect(html).toContain('74');
+    expect(html).not.toContain('class="bud-season"');
+    expect(html).not.toContain('Recàrrec alta temporada');
+    expect(html).not.toContain('+15% sobre');
+    expect(html).toContain('250');
+    expect(html).toContain('240');
+    expect(html).not.toContain('490');
   });
 
-  it('no mostra cap recàrrec de temporada si el dossier no té data', () => {
+  it('no conserva cap classe de recàrrec de temporada al dossier base', () => {
     const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 150 };
     const html = build(client, [a]);
 

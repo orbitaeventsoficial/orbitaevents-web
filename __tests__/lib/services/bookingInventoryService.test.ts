@@ -29,6 +29,7 @@ vi.mock('@/lib/services/inventoryBundles', () => ({
 
 import {
   assignBookingInventory,
+  getBookingInventoryView,
   updateBookingInventoryAssignment,
   removeBookingInventoryAssignment,
 } from '@/lib/services/bookingInventoryService';
@@ -77,13 +78,26 @@ describe('assignBookingInventory', () => {
   });
 
   it('assigna correctament (single)', async () => {
-    mockPrisma.booking.findUnique.mockResolvedValue({ id: 'b1', packId: 'p1', status: 'CONFIRMED', reference: 'REF001' });
+    mockPrisma.booking.findUnique.mockResolvedValue({ id: 'b1', packId: 'p1', status: 'CONFIRMED', reference: 'REF001', eventDate: new Date('2026-08-18T20:00:00.000Z') });
     mockPrisma.inventoryItem.findUnique.mockResolvedValue({ id: 'item-1', code: 'AUD01', name: 'Altaveu', condition: 'GOOD' });
     mockPrisma.bookingInventory.count.mockResolvedValue(0);
 
     const result = await assignBookingInventory('b1', { itemId: 'item-1', mode: 'single' });
 
     expect(result.status).toBe(200);
+    expect(mockPrisma.bookingInventory.count).toHaveBeenCalledWith({
+      where: expect.objectContaining({
+        itemId: 'item-1',
+        booking: expect.objectContaining({
+          id: { not: 'b1' },
+          status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] },
+          eventDate: {
+            gte: new Date('2026-08-18T00:00:00.000Z'),
+            lt: new Date('2026-08-19T00:00:00.000Z'),
+          },
+        }),
+      }),
+    });
     expect(mockPrisma.bookingInventory.create).toHaveBeenCalled();
     expect(mockPrisma.inventoryItem.update).toHaveBeenCalledWith({
       where: { id: 'item-1' },
@@ -96,6 +110,37 @@ describe('assignBookingInventory', () => {
 
     const result = await assignBookingInventory('b1', { mode: 'single' });
     expect(result.status).toBe(400);
+  });
+});
+
+describe('getBookingInventoryView', () => {
+  it('mostra disponibles filtrant conflictes pel dia del bolo', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      id: 'b1',
+      packId: 'p1',
+      eventDate: new Date('2026-08-18T20:00:00.000Z'),
+      pack: { slug: 'pack-1', inventory: [] },
+    });
+
+    const result = await getBookingInventoryView('b1', 'http://localhost/admin/bookings/b1/inventory');
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.inventoryItem.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        bookingItems: {
+          none: {
+            booking: expect.objectContaining({
+              id: { not: 'b1' },
+              status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] },
+              eventDate: {
+                gte: new Date('2026-08-18T00:00:00.000Z'),
+                lt: new Date('2026-08-19T00:00:00.000Z'),
+              },
+            }),
+          },
+        },
+      }),
+    }));
   });
 });
 

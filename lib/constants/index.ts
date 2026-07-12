@@ -96,6 +96,17 @@ export const INVOICE_STATUS_LABELS: Record<string, string> = Object.fromEntries(
   Object.entries(INVOICE_STATUS_DISPLAY).map(([status, display]) => [status, display.label])
 ) as Record<string, string>;
 
+export const DELIVERY_NOTE_STATUS_DISPLAY: Record<string, { label: string; className: string; icon: string }> = {
+  DRAFT: { label: 'Esborrany', className: 'ap-badge', icon: '📝' },
+  DELIVERED: { label: 'Lliurat', className: 'ap-badge ap-badge--info', icon: '✓' },
+  SIGNED: { label: 'Signat', className: 'ap-badge ap-badge--success', icon: '✓' },
+  CANCELLED: { label: 'Cancel·lat', className: 'ap-badge', icon: '✕' },
+};
+
+export const DELIVERY_NOTE_STATUS_LABELS: Record<string, string> = Object.fromEntries(
+  Object.entries(DELIVERY_NOTE_STATUS_DISPLAY).map(([status, display]) => [status, display.label])
+) as Record<string, string>;
+
 // ---------------------------------------------------------------------------
 // EVENT TYPES
 // ---------------------------------------------------------------------------
@@ -683,6 +694,14 @@ export function getInvoiceStatusLabel(status: string) {
   return getInvoiceStatusDisplay(status).label;
 }
 
+export function getDeliveryNoteStatusDisplay(status: string) {
+  return DELIVERY_NOTE_STATUS_DISPLAY[status] || { label: status, className: 'ap-badge', icon: '📋' };
+}
+
+export function getDeliveryNoteStatusLabel(status: string) {
+  return getDeliveryNoteStatusDisplay(status).label;
+}
+
 export function getBookingStatusLabel(status: string) {
   return getBookingStatusDisplay(status).label;
 }
@@ -699,6 +718,7 @@ export function getLeadStatusAnalyticsDisplay(status: string) {
 }
 
 export const PROPOSAL_FILTERABLE_STATUSES = ['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED'] as const;
+export const SENT_LIKE_PROPOSAL_STATUSES = ['SENT', 'VIEWED'] as const;
 
 export const EVENT_TYPE_OPTIONS = Object.entries(EVENT_TYPE_PLAIN).map(([value, label]) => ({
   value,
@@ -1382,6 +1402,17 @@ export const PUBLIC_EXTRA_REGISTRY: Record<string, PublicExtraMeta> = {
       ca: { name: 'Llums extra', description: 'Més caps mòbils per més impacte' },
       es: { name: 'Luces extra', description: 'Más cabezas móviles para más impacto' },
       en: { name: 'Extra lights', description: 'More moving heads for more impact' },
+    },
+  },
+  'wireless-microphone': {
+    aliases: ['micro-inalambric'],
+    icon: '🎤',
+    category: 'sound',
+    compatibleWith: PUBLIC_EXTRA_DEFAULT_COMPATIBILITY,
+    translations: {
+      ca: { name: 'Micròfon sense fils', description: 'Per a discursos, speeches o cerimònia' },
+      es: { name: 'Micrófono inalámbrico', description: 'Para discursos, speeches o ceremonia' },
+      en: { name: 'Wireless microphone', description: 'For speeches, talks or ceremony' },
     },
   },
   karaoke: {

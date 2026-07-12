@@ -107,6 +107,19 @@ function buildAtlas(): MasterAtlas {
       'lib/payment-status.ts',
       'lib/services/dayCollisionService.ts',
       'lib/services/collaboratorAccountService.ts',
+      'lib/services/postEventPlaybookService.ts',
+      'lib/services/postEventPendingService.ts',
+      'lib/services/postEventDispatchService.ts',
+      'lib/services/postEventRecurrenceDecisionService.ts',
+      'lib/socialPostReviewGuard.ts',
+      'lib/services/postEventReportAdminService.ts',
+      'lib/services/portfolioEventService.ts',
+      'lib/services/testimonialAdminService.ts',
+      'lib/services/reviewsSyncService.ts',
+      'lib/services/referralsService.ts',
+      'app/admin/post-event/reports/EnsurePortfolioEventButton.tsx',
+      'app/api/admin/post-event/portfolio-event/route.ts',
+      'app/admin/post-event/feedback/page.tsx',
       'app/admin/docs/electric-atlas/page.tsx',
       'docs/TESI-MAQUINA-full-de-ruta-2026-07.md',
       'docs/TESI-ZENIT-MAQUINA-ORBITA-2026-07-04.md',
@@ -156,6 +169,46 @@ describe('masterAtlasService', () => {
     expect(reserves?.files.some((f) => f.path === 'lib/services/dayCollisionService.ts')).toBe(true);
     expect(reserves?.sourceOfTruth).toContain('dayCollisionService');
     expect(reserves?.nextMoves.find((move) => move.label.includes('dissabtes'))?.status).toBe('FET');
+  });
+
+  it('manté el mòdul post-event alineat amb cues, dispatch i flag canònic', () => {
+    const atlas = buildAtlas();
+    const postEvent = atlas.modules.find((m) => m.id === 'post-event');
+
+    expect(postEvent?.routes).toContain('/admin/post-event/feedback');
+    expect(postEvent?.routes).toContain('/admin/portfolio');
+    expect(postEvent?.sourceOfTruth).toEqual(expect.arrayContaining([
+      'postEventPlaybookService',
+      'postEventPendingService',
+      'postEventDispatchService',
+      'postEventRecurrenceDecisionService',
+      'socialPostReviewGuard',
+      'portfolioEventService',
+      'Booking.postEventEmailSent',
+      'PortfolioEvent',
+      'CustomerTestimonial',
+      'SocialPost',
+    ]));
+    expect(postEvent?.sourceOfTruth).not.toContain('ClientFeedback');
+    expect(postEvent?.operations).toContain('Enviar email post-event amb enquesta');
+    expect(postEvent?.operations).toContain('Crear esborrany social revisable');
+    expect(postEvent?.operations).toContain('Crear draft de portfolio des d informe completat');
+    expect(postEvent?.risks).toContain('Mirar ClientFeedback com a estat del post-event');
+    expect(postEvent?.risks).toContain('Publicar esborrany social sense revisió');
+    expect(postEvent?.risks).toContain('Publicar portfolio sense media marcada ni revisió');
+    expect(postEvent?.nextMoves.find((move) => move.label === 'Auto-esborrany post-event amb revisió')?.status).toBe('FET');
+    expect(postEvent?.nextMoves.find((move) => move.label === 'Portfolio/testimoni des de bolo completat')?.status).toBe('FET');
+    expect(postEvent?.files.map((f) => f.path)).toEqual(expect.arrayContaining([
+      'lib/services/postEventDispatchService.ts',
+      'lib/services/postEventPendingService.ts',
+      'lib/services/postEventPlaybookService.ts',
+      'lib/services/postEventRecurrenceDecisionService.ts',
+      'lib/socialPostReviewGuard.ts',
+      'lib/services/portfolioEventService.ts',
+      'app/admin/post-event/reports/EnsurePortfolioEventButton.tsx',
+      'app/api/admin/post-event/portfolio-event/route.ts',
+      'app/admin/post-event/feedback/page.tsx',
+    ]));
   });
 
   it('incorpora la capa executiva #1426 al mòdul d economia', () => {

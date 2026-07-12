@@ -22,8 +22,10 @@ import { loadDossierDraftSuggestions } from '@/lib/services/dossierDraftSuggesti
 import { formatDateShort } from '@/lib/constants';
 import Link from 'next/link';
 import { DossierListActions } from './DossierListActions';
+import { DossierSavedList, type DossierSavedListItem } from './DossierSavedList';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { isAdminTestArtifactFromParts, isAdminTestArtifactText } from '@/lib/admin/testArtifacts';
 import {
   hydrateDossierSnapshotProductImages,
   productsFromDossierLineSnapshot,
@@ -43,6 +45,7 @@ interface PageProps {
     eventDesc?: string;
     productIds?: string;
     action?: string;
+    showTestDossiers?: string;
   };
 }
 
@@ -65,6 +68,35 @@ type DossierRow = {
   lineSnapshot?: unknown;
   lead?: { id: string; name: string; status: string; customerId?: string | null; customerName?: string | null } | null;
 };
+
+function isTestDossierArtifact(dossier: DossierRow): boolean {
+  return isAdminTestArtifactFromParts([
+    dossier.nom,
+    dossier.email,
+    dossier.eventDesc,
+    dossier.sentTo,
+    dossier.lead?.name,
+    dossier.lead?.customerName,
+  ]);
+}
+
+function isTestDraftSuggestionArtifact(suggestion: { name: string }): boolean {
+  return isAdminTestArtifactText(suggestion.name);
+}
+
+function buildDossierListVisibilityHref(searchParams: PageProps['searchParams'], showTestDossiers: boolean): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams ?? {})) {
+    if (value !== undefined) params.set(key, value);
+  }
+  if (showTestDossiers) {
+    params.set('showTestDossiers', '1');
+  } else {
+    params.delete('showTestDossiers');
+  }
+  const query = params.toString();
+  return query ? `/admin/dossiers?${query}` : '/admin/dossiers';
+}
 
 function resolveInitialProductIds(explicitProductIds?: string): string | undefined {
   if (explicitProductIds?.trim()) return explicitProductIds;
@@ -96,7 +128,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
     getOrbitaDossierProducts('ca'),
     getDossierCopy('ca'),
     getDossierLeadInitialData(searchParams?.leadId),
-    loadDossierDraftSuggestions(3),
+    loadDossierDraftSuggestions(12),
   ]) as [
     DossierRow[],
     DossierRow[],
@@ -119,20 +151,51 @@ export default async function DossiersPage({ searchParams }: PageProps) {
     ...generatorProducts,
     ...legacyAnimacioProducts,
   ];
+  const showTestDossiers = searchParams?.showTestDossiers === '1';
+  const savedDossiers = showTestDossiers ? dossiers : dossiers.filter((d) => !isTestDossierArtifact(d));
+  const hiddenTestDossiers = dossiers.length - savedDossiers.length;
+  const nonTestDraftSuggestions = draftSuggestions.filter((suggestion) => !isTestDraftSuggestionArtifact(suggestion));
+  const visibleDraftSuggestions = (showTestDossiers ? draftSuggestions : nonTestDraftSuggestions).slice(0, 3);
+  const hiddenTestDraftSuggestions = showTestDossiers ? 0 : draftSuggestions.length - nonTestDraftSuggestions.length;
+  const hiddenTestArtifacts = hiddenTestDossiers + hiddenTestDraftSuggestions;
+  const savedDossierItems: DossierSavedListItem[] = savedDossiers.map((d) => {
+    const snapshotProducts = hydrateDossierSnapshotProductImages(productsFromDossierLineSnapshot(d.lineSnapshot), lookupProducts);
+    const resolvedProducts = orderDossierProductsForDossier(snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id)));
+    const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
+    return {
+      id: d.id,
+      nom: d.nom,
+      title: `${d.nom}${d.empresa ? ` — ${d.empresa}` : ''}`,
+      productLine: `${productNames || 'Sense productes'} · ${formatDateShort(typeof d.createdAt === 'string' ? d.createdAt : d.createdAt.toISOString())}`,
+      sentLabel: d.sentAt
+        ? `Enviat ${formatDateShort(typeof d.sentAt === 'string' ? d.sentAt : d.sentAt.toISOString())} → ${d.sentTo}`
+        : null,
+      draftLabel: d.mode === 'DRAFT' && !d.sentAt ? ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.draftBadge : null,
+      leadOrigin: d.lead
+        ? { href: buildLeadWorkspaceHref(d.lead.id), label: `Entrada: ${d.lead.name} (${d.lead.status})` }
+        : null,
+      customerOrigin: d.lead?.customerId
+        ? { href: buildCustomerHubHref(d.lead.customerId), label: `Client: ${d.lead.customerName || d.nom}` }
+        : null,
+      leadId: d.lead?.id ?? null,
+      email: d.email ?? null,
+      alreadySent: Boolean(d.sentAt),
+    };
+  });
 
   return (
     <AdminPage
       title="Dossiers"
       subtitle="Genera i gestiona els dossiers comercials per als clients."
     >
-      {draftSuggestions.length > 0 && (
+      {visibleDraftSuggestions.length > 0 && (
         <AdminSection
           title={ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.title}
           description={ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.description}
           actions={<span className="ap-badge">{ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.rail}</span>}
         >
           <div className="grid gap-2 lg:grid-cols-3">
-            {draftSuggestions.map((suggestion) => (
+            {visibleDraftSuggestions.map((suggestion) => (
               <div key={suggestion.leadId} className={`ap-card ap-card-body flex flex-col gap-3 border ${DRAFT_SUGGESTION_TONE[suggestion.band]}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -183,7 +246,16 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           <div className="flex flex-wrap items-center justify-end gap-2" aria-label="Estat del generador">
             <span className="ap-badge">{ADMIN_DOSSIER_GENERATOR_COPY.page.railCustomer}</span>
             <span className="ap-badge">{generatorProducts.length} {ADMIN_DOSSIER_GENERATOR_COPY.page.railCatalog}</span>
-            <span className="ap-badge">{dossiers.length} {ADMIN_DOSSIER_GENERATOR_COPY.page.railSaved}</span>
+            <span className="ap-badge">{savedDossiers.length} {ADMIN_DOSSIER_GENERATOR_COPY.page.railSaved}</span>
+            {hiddenTestArtifacts > 0 && <span className="ap-badge">{hiddenTestArtifacts} elements de prova ocults</span>}
+            {hiddenTestArtifacts > 0 && (
+              <Link
+                href={buildDossierListVisibilityHref(searchParams, !showTestDossiers)}
+                className="ap-btn ap-btn--secondary ap-btn--xs"
+              >
+                {showTestDossiers ? 'Ocultar prova' : 'Mostrar prova'}
+              </Link>
+            )}
           </div>
         }
       >
@@ -207,57 +279,24 @@ export default async function DossiersPage({ searchParams }: PageProps) {
       </AdminSection>
 
       {/* Llista de dossiers desats */}
-      {dossiers.length > 0 && (
-        <AdminSection title={`Dossiers desats (${dossiers.length})`}>
-          <div className="flex flex-col gap-2">
-            {dossiers.map((d) => {
-              const snapshotProducts = hydrateDossierSnapshotProductImages(productsFromDossierLineSnapshot(d.lineSnapshot), lookupProducts);
-              const resolvedProducts = orderDossierProductsForDossier(snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id)));
-              const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
-              return (
-                <article key={d.id} className="ap-card ap-card-body grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="text-base font-semibold leading-snug text-[var(--t)] sm:truncate">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
-                    <span className="line-clamp-2 break-words text-xs leading-relaxed text-[var(--t3)]">
-                      {productNames || 'Sense productes'}
-                      {' · '}
-                      {formatDateShort(typeof d.createdAt === 'string' ? d.createdAt : d.createdAt.toISOString())}
-                    </span>
-                    {d.sentAt && (
-                      <span className="line-clamp-1 text-xs text-[var(--gold-bright)]">
-                        Enviat {formatDateShort(typeof d.sentAt === 'string' ? d.sentAt : d.sentAt.toISOString())} → {d.sentTo}
-                      </span>
-                    )}
-                    {d.mode === 'DRAFT' && !d.sentAt && (
-                      <span className="text-xs text-[var(--gold-bright)]">
-                        {ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.draftBadge}
-                      </span>
-                    )}
-                    {d.lead && (
-                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
-                        <span className="font-semibold uppercase tracking-[0.08em] text-[var(--t3)]">Origen</span>
-                        <Link href={buildLeadWorkspaceHref(d.lead.id)} className="rounded-full border border-[var(--o-admin-line)] bg-[var(--sunk)] px-2 py-0.5 font-semibold text-[var(--t2)] no-underline transition-colors hover:text-[var(--gold-bright)]">
-                          Entrada: {d.lead.name} ({d.lead.status})
-                        </Link>
-                        {d.lead.customerId && (
-                          <Link href={buildCustomerHubHref(d.lead.customerId)} className="rounded-full border border-[var(--o-admin-line)] bg-[var(--sunk)] px-2 py-0.5 font-semibold text-[var(--t2)] no-underline transition-colors hover:text-[var(--gold-bright)]">
-                            Client: {d.lead.customerName || d.nom}
-                          </Link>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <DossierListActions
-                    dossierId={d.id}
-                    leadId={d.lead?.id ?? undefined}
-                    email={d.email ?? undefined}
-                    nom={d.nom}
-                    alreadySent={!!d.sentAt}
-                  />
-                </article>
-              );
-            })}
-          </div>
+      {(savedDossiers.length > 0 || hiddenTestDossiers > 0) && (
+        <AdminSection
+          title={`Dossiers desats (${savedDossiers.length})`}
+          description={hiddenTestDossiers > 0 ? `${hiddenTestDossiers} dossiers de prova ocults per mantenir neta la feina real.` : undefined}
+          actions={hiddenTestDossiers > 0 || showTestDossiers ? (
+            <Link
+              href={buildDossierListVisibilityHref(searchParams, !showTestDossiers)}
+              className="ap-btn ap-btn--secondary ap-btn--xs"
+            >
+              {showTestDossiers ? 'Ocultar dossiers de prova' : 'Mostrar dossiers de prova'}
+            </Link>
+          ) : undefined}
+        >
+          {savedDossiers.length > 0 ? (
+            <DossierSavedList items={savedDossierItems} />
+          ) : (
+            <p className="text-sm text-[var(--t3)]">Només hi ha dossiers de prova ocults en aquesta vista.</p>
+          )}
         </AdminSection>
       )}
 

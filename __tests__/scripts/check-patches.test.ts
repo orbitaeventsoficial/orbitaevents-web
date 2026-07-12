@@ -152,6 +152,30 @@ describe('check-patches', () => {
     expect(result.status).toBe(0);
   });
 
+  it('skips files that disappear between collection and read', () => {
+    const cwd = writeFixture({
+      'app/vanishes.ts': 'export const value = 1;\n',
+    });
+    const preload = path.join(cwd, 'preload.cjs');
+    writeFileSync(preload, [
+      "const fs = require('node:fs');",
+      'const original = fs.readFileSync;',
+      'fs.readFileSync = function patchedReadFileSync(file, ...args) {',
+      "  if (String(file).replace(/\\\\/g, '/').endsWith('/app/vanishes.ts')) {",
+      "    const error = new Error(`ENOENT: no such file or directory, open '${file}'`);",
+      "    error.code = 'ENOENT';",
+      "    throw error;",
+      '  }',
+      '  return original.call(this, file, ...args);',
+      '};',
+    ].join('\n'), 'utf8');
+
+    const result = spawnSync(process.execPath, ['-r', preload, scriptPath], { cwd, encoding: 'utf8' });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('Patch-smell scan clean');
+  });
+
   it('flags eval() calls', () => {
     const result = runGuard({
       'lib/services/eval-call.ts': 'const result = eval(userInput);\n',

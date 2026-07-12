@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { Eye, FileText, RotateCcw, Send, Trash2, XCircle } from 'lucide-react';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { buildDossierCompositePdfHref, buildDossierPreviewHref, buildDossierStoredPreviewHref } from '@/lib/admin/dossierWorkspaceHref';
+import { buildDossierCompositePdfHref, buildDossierStoredPreviewHref } from '@/lib/admin/dossierWorkspaceHref';
 
 const ACTIONS_WRAP = 'grid w-full grid-cols-2 gap-2 sm:grid-cols-4 md:flex md:w-auto md:flex-wrap md:items-center md:justify-end';
 const ACTION_BTN = 'ap-btn ap-btn--xs min-h-10 justify-center gap-1.5';
 const ACTION_ICON = 'h-3.5 w-3.5 shrink-0';
 
-async function readDossierListActionError(response: Response, fallback: string): Promise<string> {
+export async function readDossierListActionError(response: Response, fallback: string): Promise<string> {
   try {
     const payload = await response.json() as { error?: string; message?: string };
     return payload.error || payload.message || fallback;
@@ -38,8 +38,7 @@ export function DossierListActions({ dossierId, leadId, email, nom, alreadySent,
   const [purging, setPurging] = useState(false);
 
   function preview() {
-    const href = leadId ? buildDossierPreviewHref(leadId) : buildDossierStoredPreviewHref(dossierId);
-    window.open(href, '_blank', 'noopener,noreferrer');
+    window.open(buildDossierStoredPreviewHref(dossierId), '_blank', 'noopener,noreferrer');
   }
 
   function openCompositePdf() {

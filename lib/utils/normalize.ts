@@ -80,32 +80,6 @@ export function normalizePhone(phone: string, defaultCountryCode = '+34'): strin
   return digits;
 }
 
-/**
- * Formata un telèfon per mostrar
- * +34612345678 -> +34 612 345 678
- */
-export function formatPhone(phone: string): string {
-  const normalized = normalizePhone(phone);
-  if (!normalized) return '';
-
-  // Format espanyol
-  if (normalized.startsWith('+34') && normalized.length === 12) {
-    const number = normalized.slice(3);
-    return `+34 ${number.slice(0, 3)} ${number.slice(3, 6)} ${number.slice(6)}`;
-  }
-
-  return normalized;
-}
-
-/**
- * Valida format de telèfon (mínim 9 dígits sense prefix)
- */
-export function isValidPhone(phone: string): boolean {
-  const normalized = normalizePhone(phone);
-  // Mínim: +XX + 9 dígits
-  return normalized.length >= 11;
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
 // NOM
 // ═══════════════════════════════════════════════════════════════════════════
@@ -210,25 +184,6 @@ export function normalizeInstagram(instagram: string): string {
   return handle;
 }
 
-/**
- * Valida un handle d'Instagram
- */
-export function isValidInstagram(instagram: string): boolean {
-  const normalized = normalizeInstagram(instagram);
-  // Instagram: 1-30 caràcters, només a-z, 0-9, . i _
-  const regex = /^[a-z0-9._]{1,30}$/;
-  return regex.test(normalized);
-}
-
-/**
- * Genera URL d'Instagram
- */
-export function getInstagramUrl(instagram: string): string {
-  const normalized = normalizeInstagram(instagram);
-  if (!normalized) return '';
-  return `https://instagram.com/${normalized}`;
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
 // DNI / NIF / NIE
 // ═══════════════════════════════════════════════════════════════════════════
@@ -243,129 +198,4 @@ export function getInstagramUrl(instagram: string): string {
 export function normalizeDni(dni: string): string {
   if (!dni) return '';
   return dni.toUpperCase().replace(/[\s.\-]/g, '').trim();
-}
-
-/**
- * Valida un DNI/NIF espanyol (8 dígits + lletra)
- * o NIE (X/Y/Z + 7 dígits + lletra)
- */
-export function isValidDni(dni: string): boolean {
-  const normalized = normalizeDni(dni);
-  if (!normalized) return false;
-  // NIF: 8 dígits + lletra
-  if (/^\d{8}[A-Z]$/.test(normalized)) {
-    const number = parseInt(normalized.slice(0, 8), 10);
-    const letters = 'TRWAGMYFPDXBNJZSQVHLCKE';
-    return normalized[8] === letters[number % 23];
-  }
-  // NIE: X/Y/Z + 7 dígits + lletra
-  if (/^[XYZ]\d{7}[A-Z]$/.test(normalized)) {
-    const prefix = normalized[0] === 'X' ? '0' : normalized[0] === 'Y' ? '1' : '2';
-    const number = parseInt(prefix + normalized.slice(1, 8), 10);
-    const letters = 'TRWAGMYFPDXBNJZSQVHLCKE';
-    return normalized[8] === letters[number % 23];
-  }
-  return false;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// CODIS DE DESCOMPTE
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Genera un codi de descompte únic
- * Format: ORBITA-XXXX (on XXXX són 4 caràcters alfanumèrics)
- */
-export function generateDiscountCode(prefix = 'ORBITA'): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Sense I, O, 0, 1 per evitar confusions
-  let code = '';
-  for (let i = 0; i < 4; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return `${prefix}-${code}`;
-}
-
-/**
- * Genera un codi de descompte personalitzat amb el nom del client
- * "Joan Garcia" -> "JOAN10"
- */
-export function generatePersonalizedCode(name: string, discountPercent = 10): string {
-  const firstName = getFirstName(name).toUpperCase();
-  // Limitar a 8 caràcters
-  const shortName = firstName.slice(0, 8);
-  return `${shortName}${discountPercent}`;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// UTILITATS GENERALS
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Normalitza totes les dades d'un client
- */
-export interface CustomerData {
-  email: string;
-  phone?: string;
-  name: string;
-  instagram?: string;
-  dni?: string;
-}
-
-export interface NormalizedCustomerData extends CustomerData {
-  emailNormalized: string;
-  phoneNormalized: string | null;
-  nameNormalized: string;
-  instagramNormalized: string | null;
-  dniNormalized: string | null;
-  nameCleaned: string; // Nom capitalitzat correctament
-}
-
-export function normalizeCustomerData(data: CustomerData): NormalizedCustomerData {
-  return {
-    email: data.email.trim(),
-    emailNormalized: normalizeEmail(data.email),
-    phone: data.phone?.trim() || undefined,
-    phoneNormalized: data.phone ? normalizePhone(data.phone) : null,
-    name: data.name.trim(),
-    nameNormalized: normalizeName(data.name),
-    nameCleaned: capitalizeName(data.name),
-    instagram: data.instagram?.trim() || undefined,
-    instagramNormalized: data.instagram ? normalizeInstagram(data.instagram) : null,
-    dni: data.dni?.trim() || undefined,
-    dniNormalized: data.dni ? normalizeDni(data.dni) : null,
-  };
-}
-
-/**
- * Compara dos clients per veure si són el mateix
- * Retorna un score de 0-100
- */
-export function compareCustomers(a: NormalizedCustomerData, b: NormalizedCustomerData): number {
-  let score = 0;
-
-  // Email idèntic = 100% match
-  if (a.emailNormalized === b.emailNormalized) {
-    return 100;
-  }
-
-  // Telèfon idèntic = 90% match
-  if (a.phoneNormalized && b.phoneNormalized && a.phoneNormalized === b.phoneNormalized) {
-    score = Math.max(score, 90);
-  }
-
-  // Instagram idèntic = 85% match
-  if (a.instagramNormalized && b.instagramNormalized && a.instagramNormalized === b.instagramNormalized) {
-    score = Math.max(score, 85);
-  }
-
-  // Nom molt similar + mateix domini d'email = 70% match
-  if (a.nameNormalized === b.nameNormalized) {
-    const domainA = a.email.split('@')[1];
-    const domainB = b.email.split('@')[1];
-    if (domainA === domainB) {
-      score = Math.max(score, 70);
-    }
-  }
-
-  return score;
 }

@@ -158,7 +158,7 @@ export async function findPortalAccessByRawToken(token: string) {
           pack: { include: { translations: true } },
           extras: { include: { extra: { include: { translations: true } } } },
           inventory: { include: { item: true } },
-          serviceLines: { select: { kind: true, label: true, revenueAmount: true, costAmount: true, collaboratorId: true, quantity: true } },
+          serviceLines: { select: { kind: true, label: true, revenueAmount: true, costAmount: true, collaboratorId: true, quantity: true, notes: true } },
           proposals: {
             orderBy: { createdAt: 'desc' },
             select: {
@@ -175,7 +175,25 @@ export async function findPortalAccessByRawToken(token: string) {
             },
           },
           postEventReport: { select: { id: true } },
-          clientFeedback: { select: { id: true } },
+          deliveryNotes: {
+            orderBy: [{ signedAt: 'desc' }, { createdAt: 'desc' }],
+            select: {
+              reference: true,
+              status: true,
+              pdfUrl: true,
+              signedAt: true,
+              createdAt: true,
+            },
+          },
+          invoices: {
+            orderBy: { createdAt: 'desc' },
+            select: {
+              reference: true,
+              status: true,
+              pdfUrl: true,
+              createdAt: true,
+            },
+          },
           customer: true,
           lead: true,
         },

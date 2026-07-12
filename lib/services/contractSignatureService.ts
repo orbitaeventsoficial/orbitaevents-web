@@ -37,7 +37,6 @@ export async function signContractOnline(input: {
               contractStatus: true,
               contractSignedAt: true,
               contractPdfUrl: true,
-              pdfUrl: true,
             },
             orderBy: { createdAt: 'desc' },
             take: 1,
@@ -61,7 +60,7 @@ export async function signContractOnline(input: {
   if (proposal.contractStatus !== 'SENT') {
     return { ok: false, reason: 'NOT_SIGNABLE' };
   }
-  if (!proposal.contractPdfUrl && !proposal.pdfUrl) {
+  if (!proposal.contractPdfUrl) {
     return { ok: false, reason: 'NOT_SIGNABLE' };
   }
 

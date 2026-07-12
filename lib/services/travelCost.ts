@@ -53,10 +53,9 @@ export function calculateTravelCost(
   return round2(safeTotalKm * rate);
 }
 
-// `calculateTravelCharge` (fórmula de trams, 0,50 €/km) ELIMINADA (#1369). El càrrec de
-// transport al client és font única a `computeBoloTransport` (travelLaborCost.ts) — cost
-// real de dues potes. `calculateTravelBlocks`/`calculateBillableTravelKm` es mantenen
-// només per a textos informatius de km (no per calcular el càrrec).
+// El càrrec de transport al client és font única a `computeBoloTransport`
+// (travelLaborCost.ts). Els trams es mantenen com a mínim comercial quan hi ha
+// km facturables però el cost real del vehicle seria microscòpic.
 
 /**
  * Calcula el cost efectiu per km del vehicle a partir de:
@@ -77,4 +76,3 @@ export function calculateEffectiveVehicleCostPerKm(
   const fuelComponent = (safeFuel * safeConsumption) / 100;
   return round2(fuelComponent + safeMaintenance);
 }
-

@@ -8,7 +8,10 @@ import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmD
 import { getProposalStatusDisplay, PROPOSAL_FILTERABLE_STATUSES, formatDate, formatCurrency } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildCustomerProposalHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
-import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildProposalBookingCreateHref, buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
+import { isAdminTestArtifactFromParts } from '@/lib/admin/testArtifacts';
+import { isSentLikeProposalStatus } from '@/lib/proposals/status';
 import { AdminEmptyState } from '@/app/admin/components/AdminPage';
 
 type ProposalItem = {
@@ -18,18 +21,12 @@ type ProposalItem = {
   total: number;
   createdAt: string;
   sentAt: string | null;
+  pdfUrl: string | null;
+  pdfKey: string | null;
   customerId: string | null;
   leadId: string | null;
+  bookingId: string | null;
   customer: { name: string; email: string } | null;
-};
-
-type QuoteItem = {
-  id: string;
-  title: string;
-  fileUrl: string;
-  createdAt: string;
-  leadId: string;
-  lead: { name: string; email: string } | null;
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -51,13 +48,29 @@ function relativeDate(dateStr: string): string {
   return formatDate(dateStr);
 }
 
+function isProposalTestArtifact(proposal: ProposalItem): boolean {
+  return isAdminTestArtifactFromParts([
+    proposal.reference,
+    proposal.customer?.name,
+    proposal.customer?.email,
+  ]);
+}
+
+function hasCanonicalSentProposalArtifact(proposal: ProposalItem): boolean {
+  return Boolean(proposal.sentAt && proposal.pdfUrl?.trim() && proposal.pdfKey?.trim());
+}
+
+function matchesProposalStatusFilter(proposal: ProposalItem, statusFilter: string): boolean {
+  if (!statusFilter) return true;
+  if (statusFilter === 'SENT') return isSentLikeProposalStatus(proposal.status);
+  return proposal.status === statusFilter;
+}
+
 export default function ProposalsList({
   proposals,
-  quotes,
   initialStatusFilter = '',
 }: {
   proposals: ProposalItem[];
-  quotes: QuoteItem[];
   initialStatusFilter?: string;
 }) {
   const router = useRouter();
@@ -66,10 +79,17 @@ export default function ProposalsList({
   const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showTestProposals, setShowTestProposals] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const { confirm, dialogProps } = useConfirmDialog();
 
-  const filtered = proposals.filter((proposal) => {
-    if (statusFilter && proposal.status !== statusFilter) return false;
+  const testProposalArtifacts = proposals.filter(isProposalTestArtifact);
+  const visibleProposals = showTestProposals ? proposals : proposals.filter((proposal) => !isProposalTestArtifact(proposal));
+  const hiddenTestProposals = testProposalArtifacts.length;
+
+  const filtered = visibleProposals.filter((proposal) => {
+    if (!matchesProposalStatusFilter(proposal, statusFilter)) return false;
     if (!search) return true;
 
     const query = search.toLowerCase();
@@ -81,22 +101,39 @@ export default function ProposalsList({
   });
 
   const stats = {
-    total: proposals.length,
-    DRAFT: proposals.filter((proposal) => proposal.status === 'DRAFT').length,
-    SENT: proposals.filter((proposal) => proposal.status === 'SENT').length,
-    ACCEPTED: proposals.filter((proposal) => proposal.status === 'ACCEPTED').length,
-    REJECTED: proposals.filter((proposal) => proposal.status === 'REJECTED').length,
+    total: visibleProposals.length,
+    DRAFT: visibleProposals.filter((proposal) => proposal.status === 'DRAFT').length,
+    SENT: visibleProposals.filter((proposal) => isSentLikeProposalStatus(proposal.status)).length,
+    ACCEPTED: visibleProposals.filter((proposal) => proposal.status === 'ACCEPTED').length,
+    REJECTED: visibleProposals.filter((proposal) => proposal.status === 'REJECTED').length,
   };
 
-  const totalValue = proposals
+  const totalValue = visibleProposals
     .filter((proposal) => proposal.status === 'ACCEPTED')
     .reduce((sum, proposal) => sum + proposal.total, 0);
+  const selectedCount = selectedIds.size;
+  const filteredIds = filtered.map((proposal) => proposal.id);
+  const allFilteredSelected = filteredIds.length > 0 && filteredIds.every((id) => selectedIds.has(id));
 
   const getProposalHref = (proposal: ProposalItem) =>
     proposal.customerId
       ? buildCustomerProposalHref(proposal.customerId, proposal.id)
       : buildProposalHref(proposal.id);
   const getProposalDetailHref = (proposal: ProposalItem) => buildProposalHref(proposal.id);
+  const getBookingAction = (proposal: ProposalItem) => {
+    if (proposal.bookingId) {
+      return { href: buildBookingHref(proposal.bookingId), label: 'Reserva' };
+    }
+    if (proposal.status !== 'ACCEPTED' || !hasCanonicalSentProposalArtifact(proposal)) return null;
+    return {
+      href: buildProposalBookingCreateHref({
+        proposalId: proposal.id,
+        leadId: proposal.leadId,
+        customerId: proposal.customerId,
+      }),
+      label: 'Crear reserva',
+    };
+  };
 
   async function handleSend(proposalId: string) {
     setSendingId(proposalId);
@@ -144,6 +181,62 @@ export default function ProposalsList({
     }
   }
 
+  function toggleProposalSelection(proposalId: string) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(proposalId)) next.delete(proposalId);
+      else next.add(proposalId);
+      return next;
+    });
+  }
+
+  function toggleFilteredSelection() {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (allFilteredSelected) {
+        for (const id of filteredIds) next.delete(id);
+      } else {
+        for (const id of filteredIds) next.add(id);
+      }
+      return next;
+    });
+  }
+
+  async function handleBulkDelete() {
+    const ids = [...selectedIds];
+    if (ids.length === 0 || bulkDeleting) return;
+    const ok = await confirm({
+      title: 'Eliminar pressupostos',
+      message: `S'eliminaran ${ids.length} pressupostos seleccionats. Aquesta acció no es pot desfer.`,
+      variant: 'danger',
+      confirmLabel: 'Eliminar seleccionats',
+    });
+    if (!ok) return;
+
+    setBulkDeleting(true);
+    const failed: string[] = [];
+    try {
+      for (const id of ids) {
+        const res = await fetchWithCsrf(`/api/admin/proposals/${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          failed.push(data?.error || 'Error eliminant');
+        }
+      }
+      const deleted = ids.length - failed.length;
+      if (deleted > 0) setActionMsg(`${deleted} pressupostos eliminats`);
+      if (failed.length > 0) setActionMsg(`${failed.length} pressupostos no s'han pogut eliminar`);
+      setSelectedIds(new Set());
+      setTimeout(() => setActionMsg(null), failed.length > 0 ? 4000 : 3000);
+      router.refresh();
+    } catch {
+      setActionMsg('Error de connexió');
+      setTimeout(() => setActionMsg(null), 4000);
+    } finally {
+      setBulkDeleting(false);
+    }
+  }
+
   async function handleStatus(proposalId: string, status: string) {
     try {
       const res = await fetchWithCsrf(`/api/admin/proposals/${proposalId}`, {
@@ -155,6 +248,10 @@ export default function ProposalsList({
         setActionMsg(`Estat canviat a ${getProposalStatusDisplay(status).label}`);
         setTimeout(() => setActionMsg(null), 3000);
         router.refresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setActionMsg(data?.error || 'Error canviant estat');
+        setTimeout(() => setActionMsg(null), 4000);
       }
     } catch {
       setActionMsg('Error canviant estat');
@@ -201,6 +298,24 @@ export default function ProposalsList({
 
       {actionMsg && <div className="ap-alert">{actionMsg}</div>}
 
+      {hiddenTestProposals > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
+          <span className="ap-badge">
+            {showTestProposals ? `${hiddenTestProposals} pressupostos de prova visibles` : `${hiddenTestProposals} pressupostos de prova ocults`}
+          </span>
+          <button
+            type="button"
+            className="ap-btn ap-btn--xs"
+            onClick={() => {
+              setSelectedIds(new Set());
+              setShowTestProposals((value) => !value);
+            }}
+          >
+            {showTestProposals ? 'Ocultar proves' : 'Mostrar proves'}
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <input
           type="search"
@@ -228,6 +343,35 @@ export default function ProposalsList({
         </div>
       </div>
 
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
+        <label className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--t2)]">
+          <input
+            type="checkbox"
+            checked={allFilteredSelected}
+            onChange={toggleFilteredSelection}
+            className="h-4 w-4"
+            aria-label="Seleccionar pressupostos visibles"
+          />
+          Seleccionar visibles
+        </label>
+        <div className="flex flex-wrap items-center gap-2">
+          {selectedCount > 0 && <span className="ap-badge">{selectedCount} seleccionats</span>}
+          {selectedCount > 0 && (
+            <button type="button" className="ap-btn ap-btn--xs" onClick={() => setSelectedIds(new Set())}>
+              Netejar
+            </button>
+          )}
+          <button
+            type="button"
+            className="ap-btn ap-btn--danger ap-btn--xs"
+            onClick={handleBulkDelete}
+            disabled={selectedCount === 0 || bulkDeleting}
+          >
+            {bulkDeleting ? 'Eliminant...' : 'Eliminar seleccionats'}
+          </button>
+        </div>
+      </div>
+
       <div className="grid gap-3 lg:hidden">
         {filtered.length === 0 ? (
           <AdminEmptyState
@@ -241,6 +385,13 @@ export default function ProposalsList({
               className="ap-card adm-row-hover grid gap-3 p-4"
             >
               <div className="flex items-start justify-between gap-3">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(proposal.id)}
+                  onChange={() => toggleProposalSelection(proposal.id)}
+                  className="mt-1 h-4 w-4 shrink-0"
+                  aria-label={`Seleccionar pressupost ${proposal.reference}`}
+                />
                 <div className="min-w-0 flex-1">
                   <Link
                     href={getProposalHref(proposal)}
@@ -282,7 +433,7 @@ export default function ProposalsList({
                     {sendingId === proposal.id ? 'Enviant...' : 'Enviar'}
                   </button>
                 )}
-                {proposal.status === 'SENT' && (
+                {isSentLikeProposalStatus(proposal.status) && hasCanonicalSentProposalArtifact(proposal) && (
                   <>
                     <button
                       onClick={() => handleStatus(proposal.id, 'ACCEPTED')}
@@ -297,6 +448,15 @@ export default function ProposalsList({
                       Rebutjat
                     </button>
                   </>
+                )}
+                {isSentLikeProposalStatus(proposal.status) && !hasCanonicalSentProposalArtifact(proposal) && (
+                  <button
+                    onClick={() => handleSend(proposal.id)}
+                    disabled={sendingId === proposal.id}
+                    className="ap-btn ap-btn--xs"
+                  >
+                    {sendingId === proposal.id ? 'Reparant...' : 'Reparar PDF'}
+                  </button>
                 )}
                 {proposal.customer && proposal.customerId && (
                   <Link
@@ -320,6 +480,14 @@ export default function ProposalsList({
                     Entrada
                   </Link>
                 )}
+                {getBookingAction(proposal) && (
+                  <Link
+                    href={getBookingAction(proposal)!.href}
+                    className="ap-btn ap-btn--primary ap-btn--xs"
+                  >
+                    {getBookingAction(proposal)!.label}
+                  </Link>
+                )}
               </div>
             </article>
           ))
@@ -330,6 +498,15 @@ export default function ProposalsList({
         <table className="ap-table" aria-label="Llistat de pressupostos">
           <thead className="ap-table-head">
             <tr>
+              <th scope="col" className="ap-table-th">
+                <input
+                  type="checkbox"
+                  checked={allFilteredSelected}
+                  onChange={toggleFilteredSelection}
+                  className="h-4 w-4"
+                  aria-label="Seleccionar pressupostos visibles"
+                />
+              </th>
               <th scope="col" className="ap-table-th">Ref.</th>
               <th scope="col" className="ap-table-th">Client</th>
               <th scope="col" className="ap-table-th">Estat</th>
@@ -341,13 +518,22 @@ export default function ProposalsList({
           <tbody className="ap-table-body">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-[var(--t3)]">
+                <td colSpan={7} className="px-4 py-8 text-center text-[var(--t3)]">
                   {search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
                 </td>
               </tr>
             ) : (
               filtered.map((proposal) => (
                 <tr key={proposal.id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(proposal.id)}
+                      onChange={() => toggleProposalSelection(proposal.id)}
+                      className="h-4 w-4"
+                      aria-label={`Seleccionar pressupost ${proposal.reference}`}
+                    />
+                  </td>
                   <td>
                     <Link
                       href={getProposalHref(proposal)}
@@ -397,6 +583,15 @@ export default function ProposalsList({
                           Client
                         </Link>
                       )}
+                      {getBookingAction(proposal) && (
+                        <Link
+                          href={getBookingAction(proposal)!.href}
+                          className="ap-btn ap-btn--primary ap-btn--xs"
+                          title={getBookingAction(proposal)!.label}
+                        >
+                          {getBookingAction(proposal)!.label}
+                        </Link>
+                      )}
                       {proposal.status === 'DRAFT' && (
                         <button
                           onClick={() => handleSend(proposal.id)}
@@ -423,37 +618,6 @@ export default function ProposalsList({
           </tbody>
         </table>
       </div>
-
-      {quotes.length > 0 && (
-        <details className="ap-card ap-card-body">
-          <summary className="cursor-pointer font-bold text-[var(--t2)]">
-            Pressupostos antics (LeadDocument) — {quotes.length}
-          </summary>
-          <div className="mt-3 grid gap-2">
-            {quotes.map((quote) => (
-              <div
-                key={quote.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3"
-              >
-                <div className="min-w-0">
-                  <a href={quote.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
-                    {quote.title}
-                  </a>
-                  <p className="text-xs text-[var(--t3)]">
-                    {quote.lead?.name || 'Lead'} · {relativeDate(quote.createdAt)}
-                  </p>
-                </div>
-                <Link
-                  href={buildLeadWorkspaceHref(quote.leadId)}
-                  className="ap-btn ap-btn--xs"
-                >
-                  Veure lead
-                </Link>
-              </div>
-            ))}
-          </div>
-        </details>
-      )}
       <ConfirmDialog {...dialogProps} />
     </section>
   );

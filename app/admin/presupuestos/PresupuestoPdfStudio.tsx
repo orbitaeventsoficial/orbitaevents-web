@@ -1,12 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Download, ExternalLink, Eye, Printer, Send, Trash2 } from 'lucide-react';
 import { EXTRAS, getPacksByService } from '@/app/config/packs-config';
 import { generateQuotePDF, generateContractPDF } from '@/lib/pdf-utils';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
 import { computeBoloTransport } from '@/lib/services/travelLaborCost';
-import { applyDatePricing } from '@/lib/services/pricing/datePricingService';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
 import { DEPOSIT_PERCENT, roundMoney, calcVatAmount, calcVatRate } from '@/lib/constants/pricing';
@@ -18,11 +18,12 @@ import { buildProposalCommercialGuard } from './commercial-guard';
 import {
   type DocMode, type SectionId, type Locale, type CustomExtra,
   type PricingCatalogState, type PricingCatalogPack, type PricingCatalogExtra,
-  type PricingCatalogResponse, type PricingCatalogCustomer, type ProfitabilityConfigResponse, type StudioProps, type ExtraDefinition, type ServiceSlug,
-  SECTION_LABELS, DEFAULT_SECTION_ORDER, STUDIO_DRAFT_KEY, CUSTOM_PACK_ID,
+  type PricingCatalogResponse, type PricingCatalogCustomer, type ProfitabilityConfigResponse, type StudioProps, type StudioLeadServiceLine, type ExtraDefinition, type ServiceSlug,
+  SECTION_LABELS, DEFAULT_SECTION_ORDER, DEFAULT_COLLAPSED_SECTIONS, STUDIO_DRAFT_KEY, CUSTOM_PACK_ID,
   OPERATOR_PDF_EXTRA_ID, STUDIO_COPY, SERVICE_LABEL, ALL_SERVICES,
   quoteStudioSchema, normalizeStudioLocale, formatEUR, toFeatureLines,
-  buildPackFromForm, translateBatchForPdf,
+  buildPackFromForm, translateBatchForPdf, buildCustomExtrasFromLeadServiceLines,
+  buildLeadServiceFeatureLines, deriveStudioDurationHours, leadServiceLinesForTransport,
 } from './studio-utils';
 
 const CUSTOMER_SEARCH_ERROR = 'No s’ha pogut consultar clients. Torna-ho a provar abans de generar el pressupost.';
@@ -33,10 +34,70 @@ type StudioMutationPayload = {
   message?: unknown;
 };
 
+type StudioSnapshotLike = {
+  event?: {
+    date?: unknown;
+    schedule?: unknown;
+    location?: unknown;
+    guests?: unknown;
+  };
+  pricing?: {
+    travelKm?: unknown;
+    travelTollsEur?: unknown;
+    discount?: unknown;
+    discountReason?: unknown;
+    invoiceRequired?: unknown;
+  };
+  extras?: {
+    preset?: unknown;
+    custom?: unknown;
+  };
+};
+
+type StudioProposalLeadPayload = {
+  id?: string | null;
+  eventDate?: string | null;
+  eventStartTime?: string | null;
+  eventEndTime?: string | null;
+  eventLocation?: string | null;
+  eventAddress?: string | null;
+  distanceKm?: number | null;
+  tollsEur?: number | null;
+  guestCount?: number | null;
+  serviceLines?: StudioLeadServiceLine[];
+};
+
 function readStudioMutationError(data: StudioMutationPayload, fallback: string) {
   if (typeof data.error === 'string' && data.error.trim()) return data.error;
   if (typeof data.message === 'string' && data.message.trim()) return data.message;
   return fallback;
+}
+
+function nonEmptyString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0 ? value : null;
+}
+
+function positiveNumber(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null;
+}
+
+function dateInputFromPayload(value: unknown): string | null {
+  const text = nonEmptyString(value);
+  return text ? text.slice(0, 10) : null;
+}
+
+function scheduleFromLeadPayload(lead: StudioProposalLeadPayload | null | undefined): string | null {
+  const start = nonEmptyString(lead?.eventStartTime);
+  const end = nonEmptyString(lead?.eventEndTime);
+  if (start && end) return `${start}-${end}`;
+  return start || end;
+}
+
+function hasSnapshotExtras(snapshot: StudioSnapshotLike | null | undefined): boolean {
+  return Boolean(
+    (Array.isArray(snapshot?.extras?.preset) && snapshot.extras.preset.length > 0) ||
+    (Array.isArray(snapshot?.extras?.custom) && snapshot.extras.custom.length > 0)
+  );
 }
 
 export default function PresupuestoPdfStudio({
@@ -44,12 +105,18 @@ export default function PresupuestoPdfStudio({
   initialCustomerName = '',
   initialCustomerEmail = '',
   initialCustomerPhone = '',
+  initialEventType = 'bodas',
   initialEventDate = '',
   initialEventSchedule = '',
   initialEventLocation = '',
+  initialDistanceKm = 0,
+  initialTollsEur = 0,
+  initialVehicleCostPerKm = 0,
   initialGuests = 80,
   initialLeadId = '',
+  initialLeadServiceLines = [],
   initialProposalId = '',
+  initialPreferLeadPrefill = false,
   initialPreferredLocale = 'ca',
   initialBrandName = ADMIN_PDF_STUDIO_DEFAULTS.brandName,
   initialBrandWebsite = ADMIN_PDF_STUDIO_DEFAULTS.brandWebsite,
@@ -60,8 +127,8 @@ export default function PresupuestoPdfStudio({
 }: StudioProps) {
   const [locale, setLocale] = useState<Locale>(normalizeStudioLocale(initialPreferredLocale));
   const studioText = STUDIO_COPY[locale];
-  const [eventType, setEventType] = useState<ServiceSlug>('bodas');
-  const [packId, setPackId] = useState<string>(() => getPacksByService('bodas')[0]?.id || '');
+  const [eventType, setEventType] = useState<ServiceSlug>(initialEventType);
+  const [packId, setPackId] = useState<string>(() => getPacksByService(initialEventType)[0]?.id || '');
   const [clientContact, setClientContact] = useState('');
   const [clientName, setClientName] = useState(initialCustomerName || STUDIO_COPY.ca.defaultClientName);
   const [clientEmail, setClientEmail] = useState(initialCustomerEmail || '');
@@ -78,10 +145,11 @@ export default function PresupuestoPdfStudio({
   const [eventDate, setEventDate] = useState(initialEventDate || '');
   const [eventSchedule, setEventSchedule] = useState(initialEventSchedule || '');
   const [eventLocation, setEventLocation] = useState(initialEventLocation || '');
-  const [travelKm, setTravelKm] = useState(0);
+  const [travelKm, setTravelKm] = useState(() => Math.max(0, Number(initialDistanceKm) || 0));
+  const [travelTollsEur, setTravelTollsEur] = useState(() => Math.max(0, Number(initialTollsEur) || 0));
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
   const [calculatingDistance, setCalculatingDistance] = useState(false);
-  const lastDistanceDestinationRef = useRef('');
+  const lastDistanceDestinationRef = useRef(initialDistanceKm > 0 ? (initialEventLocation || '').trim() : '');
   const [guests, setGuests] = useState(initialGuests);
   const [validityDays, setValidityDays] = useState(15);
   const [conditionsText, setConditionsText] = useState(ADMIN_PDF_STUDIO_DEFAULTS.conditionsText);
@@ -93,6 +161,9 @@ export default function PresupuestoPdfStudio({
   const [customExtraName, setCustomExtraName] = useState('');
   const [customExtraPrice, setCustomExtraPrice] = useState(0);
   const [generating, setGenerating] = useState(false);
+  const [previewGenerating, setPreviewGenerating] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState('');
+  const pdfPreviewUrlRef = useRef('');
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [brandName, setBrandName] = useState(initialBrandName || ADMIN_PDF_STUDIO_DEFAULTS.brandName);
@@ -123,7 +194,13 @@ export default function PresupuestoPdfStudio({
   const [cancellationPolicy, setCancellationPolicy] = useState(ADMIN_PDF_STUDIO_DEFAULTS.cancellationPolicy);
   const [additionalClauses, setAdditionalClauses] = useState('');
   const [sectionOrder, setSectionOrder] = useState<SectionId[]>(DEFAULT_SECTION_ORDER);
-  const [collapsedSections, setCollapsedSections] = useState<Set<SectionId>>(new Set());
+  const [collapsedSections, setCollapsedSections] = useState<Set<SectionId>>(
+    () => new Set(
+      initialLeadId && initialLeadServiceLines.length > 0 && (!initialProposalId || initialPreferLeadPrefill)
+        ? DEFAULT_COLLAPSED_SECTIONS.filter((id) => id !== 'pack' && id !== 'extras-custom')
+        : DEFAULT_COLLAPSED_SECTIONS
+    )
+  );
   const toggleCollapse = useCallback((id: SectionId) => {
     setCollapsedSections((prev) => {
       const next = new Set(prev);
@@ -138,6 +215,12 @@ export default function PresupuestoPdfStudio({
   });
   const [profitabilityConfig, setProfitabilityConfig] = useState<ProfitabilityConfigResponse['config'] | null>(null);
   const isCustomerScoped = Boolean(customerId);
+
+  useEffect(() => {
+    return () => {
+      if (pdfPreviewUrlRef.current) URL.revokeObjectURL(pdfPreviewUrlRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isCustomerScoped || !draftLoaded) return;
@@ -273,6 +356,18 @@ export default function PresupuestoPdfStudio({
     () => compatibleExtras.filter((extra) => selectedExtras.includes(extra.id)),
     [compatibleExtras, selectedExtras]
   );
+  const leadCustomExtras = useMemo(
+    () => buildCustomExtrasFromLeadServiceLines(initialLeadServiceLines),
+    [initialLeadServiceLines],
+  );
+  const leadTransportLines = useMemo(
+    () => leadServiceLinesForTransport(initialLeadServiceLines),
+    [initialLeadServiceLines],
+  );
+  const leadFeatureLines = useMemo(
+    () => buildLeadServiceFeatureLines(initialLeadServiceLines),
+    [initialLeadServiceLines],
+  );
 
   const extrasPrice = useMemo(() => {
     const base = mappedSelectedExtras.reduce((sum, extra) => sum + (extra.price || 0), 0);
@@ -283,20 +378,22 @@ export default function PresupuestoPdfStudio({
   // Càrrec de transport (#1369, monocapa): UNA crida al cervell econòmic. Aquest editor
   // de pre-venda no té les línies del bolo estructurades, així que assumeix un bolo típic
   // de 2 persones; quan el pressupost ve d'un lead/reserva, el transport real ja hi és.
-  const travelCharge = useMemo(
-    () => computeBoloTransport({ roundTripKm: travelKm, headcountOverride: 2 }).clientCharge,
-    [travelKm]
+  const transportBudget = useMemo(
+    () => computeBoloTransport({
+      roundTripKm: travelKm,
+      ...(leadTransportLines.length > 0
+        ? { serviceLines: leadTransportLines, hasOrbitaPack: packId !== CUSTOM_PACK_ID && basePrice > 0 }
+        : { headcountOverride: 2 }),
+      tollsEur: travelTollsEur,
+      vehicleCostPerKm: initialVehicleCostPerKm || undefined,
+    }),
+    [travelKm, travelTollsEur, leadTransportLines, packId, basePrice, initialVehicleCostPerKm]
   );
-
-  const datePricing = useMemo(
-    () => applyDatePricing(basePrice, eventDate || null, locale),
-    [basePrice, eventDate, locale],
-  );
-  const seasonSurcharge = datePricing.surchargeEur;
+  const travelCharge = transportBudget.clientCharge;
 
   const subtotal = useMemo(() => {
-    return Math.max(0, basePrice + seasonSurcharge + extrasPrice + travelCharge);
-  }, [basePrice, seasonSurcharge, extrasPrice, travelCharge]);
+    return Math.max(0, basePrice + extrasPrice + travelCharge);
+  }, [basePrice, extrasPrice, travelCharge]);
   const discountSafe = useMemo(() => Math.max(0, discount), [discount]);
   const taxableBase = useMemo(() => Math.max(0, subtotal - discountSafe), [subtotal, discountSafe]);
   const vatRate = useMemo(() => calcVatRate(invoiceRequired), [invoiceRequired]);
@@ -306,8 +403,8 @@ export default function PresupuestoPdfStudio({
   }, [taxableBase, vatAmount]);
 
   const commercialTotal = useMemo(() => {
-    return Math.max(0, basePrice + seasonSurcharge + extrasPrice + travelCharge - Math.max(0, discount));
-  }, [basePrice, seasonSurcharge, extrasPrice, travelCharge, discount]);
+    return Math.max(0, basePrice + extrasPrice + travelCharge - Math.max(0, discount));
+  }, [basePrice, extrasPrice, travelCharge, discount]);
 
   const financialSummary = useMemo(() => {
     if (!profitabilityConfig) return null;
@@ -332,7 +429,6 @@ export default function PresupuestoPdfStudio({
   useEffect(() => {
     const destination = eventLocation.trim();
     if (destination.length < 3) {
-      setTravelKm(0);
       setDistanceMessage(null);
       lastDistanceDestinationRef.current = '';
       return;
@@ -357,8 +453,7 @@ export default function PresupuestoPdfStudio({
         lastDistanceDestinationRef.current = destination;
       } catch (error) {
         log.error('Error calculating distance', error);
-        setTravelKm(0);
-        setDistanceMessage('No s\'ha pogut calcular la ruta. Cost de desplaçament: 0 €.');
+        setDistanceMessage('No s\'ha pogut calcular la ruta. Revisa o edita els km manualment.');
       } finally {
         setCalculatingDistance(false);
       }
@@ -390,6 +485,8 @@ export default function PresupuestoPdfStudio({
       if (typeof draft.eventDate === 'string') setEventDate(draft.eventDate);
       if (typeof draft.eventSchedule === 'string') setEventSchedule(draft.eventSchedule);
       if (typeof draft.eventLocation === 'string') setEventLocation(draft.eventLocation);
+      if (typeof draft.travelKm === 'number') setTravelKm(draft.travelKm);
+      if (typeof draft.travelTollsEur === 'number') setTravelTollsEur(draft.travelTollsEur);
       if (typeof draft.guests === 'number') setGuests(draft.guests);
       if (typeof draft.validityDays === 'number') setValidityDays(draft.validityDays);
       if (typeof draft.conditionsText === 'string') setConditionsText(draft.conditionsText);
@@ -432,9 +529,25 @@ export default function PresupuestoPdfStudio({
     }
   }, [draftLoaded, initialLeadId, initialProposalId]);
 
+  useEffect(() => {
+    if (!draftLoaded || !initialLeadId || (!initialPreferLeadPrefill && initialProposalId) || leadCustomExtras.length === 0) return;
+    setEventType(initialEventType);
+    setPackId(CUSTOM_PACK_ID);
+    setPackName('Bolo configurat al lead');
+    setBasePrice(0);
+    setDurationHours(deriveStudioDurationHours({
+      eventSchedule: initialEventSchedule,
+      lines: initialLeadServiceLines,
+      fallback: selectedPack?.durationHours || 4,
+    }));
+    setFeaturesText(leadFeatureLines.join('\n'));
+    setSelectedExtras([]);
+    setCustomExtras(leadCustomExtras);
+  }, [draftLoaded, initialLeadId, initialProposalId, initialPreferLeadPrefill, initialEventType, initialEventSchedule, initialLeadServiceLines, leadCustomExtras, leadFeatureLines, selectedPack?.durationHours]);
+
   // Load existing proposal from API when opened with proposalId
   useEffect(() => {
-    if (!initialProposalId || !draftLoaded) return;
+    if (!initialProposalId || !draftLoaded || initialPreferLeadPrefill) return;
     let cancelled = false;
 
     async function loadProposal() {
@@ -442,8 +555,29 @@ export default function PresupuestoPdfStudio({
         const res = await fetchWithCsrf(`/api/admin/proposals/${initialProposalId}`);
         if (!res.ok || cancelled) return;
         const data = await res.json();
-        const snap = data?.proposal?.snapshot;
+        const snap = data?.proposal?.snapshot as (StudioSnapshotLike & Record<string, any>) | null | undefined;
         if (!snap || cancelled) return;
+        const proposalLead = data?.proposal?.lead as StudioProposalLeadPayload | null | undefined;
+        const apiLeadLines = Array.isArray(proposalLead?.serviceLines) ? proposalLead.serviceLines : [];
+        const resolvedLeadLines = initialLeadServiceLines.length > 0 ? initialLeadServiceLines : apiLeadLines;
+        const resolvedLeadCustomExtras = leadCustomExtras.length > 0
+          ? leadCustomExtras
+          : buildCustomExtrasFromLeadServiceLines(apiLeadLines);
+        const resolvedLeadFeatureLines = leadFeatureLines.length > 0
+          ? leadFeatureLines
+          : buildLeadServiceFeatureLines(apiLeadLines);
+        const linkedLeadId = initialLeadId || nonEmptyString(data?.proposal?.leadId) || nonEmptyString(proposalLead?.id) || '';
+        const leadDistanceKm = initialDistanceKm > 0 ? initialDistanceKm : (positiveNumber(proposalLead?.distanceKm) || 0);
+        const leadTollsEur = initialTollsEur > 0 ? initialTollsEur : (positiveNumber(proposalLead?.tollsEur) || 0);
+        const leadEventDate = initialEventDate || dateInputFromPayload(proposalLead?.eventDate) || '';
+        const leadEventSchedule = initialEventSchedule || scheduleFromLeadPayload(proposalLead) || '';
+        const leadEventLocation =
+          initialEventLocation ||
+          nonEmptyString(proposalLead?.eventAddress) ||
+          nonEmptyString(proposalLead?.eventLocation) ||
+          '';
+        const leadGuests = positiveNumber(proposalLead?.guestCount) || (initialGuests > 0 ? initialGuests : 0);
+        const shouldHydrateLeadLines = Boolean(linkedLeadId && resolvedLeadCustomExtras.length > 0 && !hasSnapshotExtras(snap));
 
         // Restore all state from snapshot
         if (snap.locale) setLocale(snap.locale as Locale);
@@ -455,6 +589,17 @@ export default function PresupuestoPdfStudio({
         if (Array.isArray(snap.features)) setFeaturesText(snap.features.join('\n'));
         if (Array.isArray(snap.conditions)) setConditionsText(snap.conditions.join('\n'));
         if (snap.whyChooseUs) setWhyChooseUs(snap.whyChooseUs);
+        if (shouldHydrateLeadLines) {
+          setPackId(CUSTOM_PACK_ID);
+          setPackName('Bolo configurat al lead');
+          setBasePrice(0);
+          setDurationHours(deriveStudioDurationHours({
+            eventSchedule: leadEventSchedule || nonEmptyString(snap.event?.schedule),
+            lines: resolvedLeadLines,
+            fallback: selectedPack?.durationHours || 4,
+          }));
+          setFeaturesText(resolvedLeadFeatureLines.join('\n'));
+        }
 
         // Customer
         if (snap.customer) {
@@ -466,18 +611,35 @@ export default function PresupuestoPdfStudio({
         }
 
         // Event
-        if (snap.event) {
-          if (snap.event.date) setEventDate(snap.event.date);
-          if (snap.event.schedule) setEventSchedule(snap.event.schedule);
-          if (snap.event.location) setEventLocation(snap.event.location);
-          if (typeof snap.event.guests === 'number') setGuests(snap.event.guests);
-        }
+        const snapEvent = snap.event || {};
+        const snapEventDate = nonEmptyString(snapEvent.date);
+        const snapEventSchedule = nonEmptyString(snapEvent.schedule);
+        const snapEventLocation = nonEmptyString(snapEvent.location);
+        const snapGuests = positiveNumber(snapEvent.guests);
+        if (snapEventDate) setEventDate(snapEventDate);
+        else if (leadEventDate) setEventDate(leadEventDate);
+        if (snapEventSchedule) setEventSchedule(snapEventSchedule);
+        else if (leadEventSchedule) setEventSchedule(leadEventSchedule);
+        if (snapEventLocation) setEventLocation(snapEventLocation);
+        else if (leadEventLocation) setEventLocation(leadEventLocation);
+        if (shouldHydrateLeadLines && leadGuests > 0) setGuests(leadGuests);
+        else if (snapGuests !== null) setGuests(snapGuests);
+        else if (leadGuests > 0) setGuests(leadGuests);
 
         // Pricing
         if (snap.pricing) {
-          if (typeof snap.pricing.travelKm === 'number') setTravelKm(snap.pricing.travelKm);
+          const snapTravelKm = positiveNumber(snap.pricing.travelKm);
+          const snapTravelTolls = positiveNumber(snap.pricing.travelTollsEur);
+          if (snapTravelKm !== null) setTravelKm(snapTravelKm);
+          else if (leadDistanceKm > 0) setTravelKm(Math.max(0, Number(leadDistanceKm) || 0));
+          if (snapTravelTolls !== null) setTravelTollsEur(snapTravelTolls);
+          else if (leadTollsEur > 0) setTravelTollsEur(Math.max(0, Number(leadTollsEur) || 0));
+          else if (typeof snap.pricing.travelTollsEur === 'number') setTravelTollsEur(Math.max(0, snap.pricing.travelTollsEur));
           if (typeof snap.pricing.discount === 'number') setDiscount(snap.pricing.discount);
-          if (snap.pricing.discountReason) setDiscountReason(snap.pricing.discountReason);
+          {
+            const snapDiscountReason = nonEmptyString(snap.pricing.discountReason);
+            if (snapDiscountReason) setDiscountReason(snapDiscountReason);
+          }
           if (typeof snap.pricing.invoiceRequired === 'boolean') {
             setInvoiceRequired(snap.pricing.invoiceRequired);
           } else if (typeof data.proposal?.vatRate === 'number') {
@@ -488,15 +650,20 @@ export default function PresupuestoPdfStudio({
         }
 
         // Extras
-        if (snap.extras) {
-          if (Array.isArray(snap.extras.preset)) {
-            setSelectedExtras(snap.extras.preset.map((e: { id: string }) => e.id));
-          }
-          if (Array.isArray(snap.extras.custom)) {
-            setCustomExtras(snap.extras.custom.map((e: { id: string; name: string; price: number }) => ({
-              id: e.id, name: e.name, price: e.price,
-            })));
-          }
+        const snapPresetExtras = Array.isArray(snap.extras?.preset) ? snap.extras.preset : null;
+        const snapCustomExtras = Array.isArray(snap.extras?.custom) ? snap.extras.custom : null;
+        if (snapPresetExtras) {
+          setSelectedExtras(snapPresetExtras.map((e: { id: string }) => e.id));
+        }
+        if (snapCustomExtras && snapCustomExtras.length > 0) {
+          setCustomExtras(snapCustomExtras.map((e: { id: string; name: string; price: number }) => ({
+            id: e.id, name: e.name, price: e.price,
+          })));
+        } else if (shouldHydrateLeadLines) {
+          setSelectedExtras([]);
+          setCustomExtras(resolvedLeadCustomExtras);
+        } else if (snapCustomExtras) {
+          setCustomExtras([]);
         }
 
         // Brand
@@ -518,7 +685,7 @@ export default function PresupuestoPdfStudio({
     void loadProposal();
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- proposal loader must run only for initial id and draft hydration
-  }, [initialProposalId, draftLoaded]);
+  }, [initialProposalId, draftLoaded, initialPreferLeadPrefill]);
 
   useEffect(() => {
     if (packId === CUSTOM_PACK_ID || !selectedPack) return;
@@ -546,6 +713,8 @@ export default function PresupuestoPdfStudio({
         eventDate,
         eventSchedule,
         eventLocation,
+        travelKm,
+        travelTollsEur,
         guests,
         validityDays,
         conditionsText,
@@ -582,6 +751,8 @@ export default function PresupuestoPdfStudio({
     eventDate,
     eventSchedule,
     eventLocation,
+    travelKm,
+    travelTollsEur,
     guests,
     validityDays,
     conditionsText,
@@ -689,8 +860,9 @@ export default function PresupuestoPdfStudio({
     const eventWarn = !eventDate ? 'Indica la data de l\'esdeveniment' :
       guests <= 0 ? 'Indica el nombre de convidats' : null;
 
-    const packOk = basePrice > 0 && packName.trim().length > 0;
-    const packWarn = basePrice <= 0 ? 'Indica el preu base' :
+    const hasCommercialAmount = basePrice > 0 || extrasPrice > 0;
+    const packOk = hasCommercialAmount && packName.trim().length > 0;
+    const packWarn = !hasCommercialAmount ? 'Indica preu o serveis' :
       !packName.trim() ? 'Indica el nom del pack' : null;
 
     const brandOk = brandName.trim().length > 0 && brandEmail.trim().includes('@');
@@ -700,7 +872,20 @@ export default function PresupuestoPdfStudio({
     const allOk = clientOk && eventOk && packOk;
 
     return { clientOk, clientWarn, eventOk, eventWarn, packOk, packWarn, brandOk, brandWarn, allOk };
-  }, [customerId, clientName, eventDate, guests, basePrice, packName, brandName, brandEmail]);
+  }, [customerId, clientName, eventDate, guests, basePrice, extrasPrice, packName, brandName, brandEmail]);
+  const canGenerateDocument = Boolean(selectedPack && sectionStatus.allOk);
+  const previewActionLabel = previewGenerating
+    ? 'Preparant...'
+    : pdfPreviewUrl
+      ? 'Actualitzar preview'
+      : 'Previsualitzar PDF';
+  const documentMessageIsPositive = Boolean(
+    message &&
+    (message.includes('correctament') ||
+      message.includes('generat') ||
+      message.includes('preparat') ||
+      message.includes('actualitzada'))
+  );
 
   function reloadPackValues(nextPackId: string, nextService?: ServiceSlug) {
     const service = nextService || eventType;
@@ -777,10 +962,8 @@ export default function PresupuestoPdfStudio({
       pricing: {
         extrasPrice,
         travelKm,
+        travelTollsEur,
         travelCharge,
-        seasonSurcharge,
-        seasonLabel: datePricing.appliedRule?.label,
-        seasonPct: datePricing.appliedRule ? datePricing.surchargePct : undefined,
         invoiceRequired,
         taxableBase,
         vatRate,
@@ -820,6 +1003,7 @@ export default function PresupuestoPdfStudio({
     guests,
     extrasPrice,
     travelKm,
+    travelTollsEur,
     travelCharge,
     discount,
     discountReason,
@@ -829,9 +1013,6 @@ export default function PresupuestoPdfStudio({
     brandEmail,
     brandPhone,
     brandTagline,
-    seasonSurcharge,
-    datePricing.appliedRule,
-    datePricing.surchargePct,
     invoiceRequired,
     taxableBase,
     vatRate,
@@ -984,9 +1165,6 @@ export default function PresupuestoPdfStudio({
         extrasPrice,
         travelCharge,
         travelKm,
-        seasonSurcharge,
-        seasonLabel: datePricing.appliedRule?.label,
-        seasonPct: datePricing.appliedRule ? datePricing.surchargePct : undefined,
         discount: Math.max(0, Number(discount) || 0),
         discountReason: discountReason.trim(),
         vatRate,
@@ -1023,7 +1201,8 @@ export default function PresupuestoPdfStudio({
       ...customExtras.map((e) => ({ name: e.name, price: e.price, quantity: 1 })),
     ];
     if (travelCharge > 0) {
-      contractExtras.push({ name: `Desplaçament (${travelKm.toFixed(0)} km)`, price: travelCharge, quantity: 1 });
+      const tollsSuffix = travelTollsEur > 0 ? ` · peatges ${formatEUR(travelTollsEur)}` : '';
+      contractExtras.push({ name: `Desplaçament (${travelKm.toFixed(0)} km${tollsSuffix})`, price: travelCharge, quantity: 1 });
     }
 
     const depositDue = new Date(now);
@@ -1117,6 +1296,32 @@ export default function PresupuestoPdfStudio({
     }
   }
 
+  async function previewPdf() {
+    if (!selectedPack || !sectionStatus.allOk) {
+      const message = sectionStatus.clientWarn || sectionStatus.eventWarn || sectionStatus.packWarn || 'Revisa el pressupost abans de previsualitzar.';
+      setValidationError(message);
+      setMessage(message);
+      return;
+    }
+    if (!validateBeforeGenerate(false)) return;
+    setPreviewGenerating(true);
+    setMessage(null);
+    try {
+      const doc = docMode === 'contract' ? await buildContract() : await buildPdf();
+      if (!doc) throw new Error('No s\'ha pogut generar la previsualització');
+      const blob = doc.output('blob') as Blob;
+      const nextUrl = URL.createObjectURL(blob);
+      if (pdfPreviewUrlRef.current) URL.revokeObjectURL(pdfPreviewUrlRef.current);
+      pdfPreviewUrlRef.current = nextUrl;
+      setPdfPreviewUrl(nextUrl);
+      setMessage('Previsualització PDF actualitzada.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No s\'ha pogut previsualitzar el PDF');
+    } finally {
+      setPreviewGenerating(false);
+    }
+  }
+
   async function sendQuoteEmail() {
     if (!validateBeforeGenerate(true)) return;
     if (!clientEmail.trim()) {
@@ -1127,64 +1332,16 @@ export default function PresupuestoPdfStudio({
     setSending(true);
     setMessage(null);
     try {
-      const payloadExtras = [
-        ...mappedSelectedExtras.map((extra) => ({
-          name: extra.name,
-          description: extra.description,
-          price: extra.price || 0,
-          quantity: 1,
-        })),
-        ...customExtras.map((extra) => ({
-          name: extra.name,
-          description: studioText.customExtraDescription,
-          price: extra.price,
-          quantity: 1,
-        })),
-      ];
-      if (travelCharge > 0) {
-        payloadExtras.push({
-          name: `Desplaçament (${travelKm.toFixed(0)} km)`,
-          description: `Desplaçament calculat per ruta i equip`,
-          price: travelCharge,
-          quantity: 1,
-        });
-      }
-
-      const response = await fetchWithCsrf('/api/admin/emails/quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerId: customerId || undefined,
-          to: clientEmail.trim(),
-          customerName: clientName.trim(),
-          customerPhone: clientPhone.trim() || undefined,
-          eventType,
-          eventDate: eventDate || undefined,
-          eventSchedule: eventSchedule.trim() || undefined,
-          eventLocation: eventLocation.trim() || undefined,
-          guestCount: guests,
-          packId: packId || 'custom',
-          price: total,
-          extras: payloadExtras,
-          notes: toFeatureLines(conditionsText).join('\n'),
-          customMessage: whyChooseUs.trim(),
-          locale,
-        }),
-      });
-
-      const data = await response.json().catch(() => ({})) as StudioMutationPayload;
-      if (!response.ok) {
-        throw new Error(readStudioMutationError(data, 'No s\'ha pogut enviar el pressupost'));
-      }
-
-      const savedProposalId = await saveProposalDraft('SENT');
+      const savedProposalId = await saveProposalDraft('DRAFT');
       const targetProposalId = savedProposalId || proposalId;
-      if (targetProposalId) {
-        const markSentResponse = await fetchWithCsrf(`/api/admin/proposals/${targetProposalId}/send`, { method: 'POST' });
-        const markSentData = await markSentResponse.json().catch(() => ({})) as StudioMutationPayload;
-        if (!markSentResponse.ok || markSentData.ok === false) {
-          throw new Error(readStudioMutationError(markSentData, "No s'ha pogut marcar la proposta com enviada"));
-        }
+      if (!targetProposalId) {
+        throw new Error('No s\'ha pogut desar el pressupost abans d\'enviar-lo');
+      }
+
+      const sendResponse = await fetchWithCsrf(`/api/admin/proposals/${targetProposalId}/send`, { method: 'POST' });
+      const sendData = await sendResponse.json().catch(() => ({})) as StudioMutationPayload;
+      if (!sendResponse.ok || sendData.ok === false) {
+        throw new Error(readStudioMutationError(sendData, 'No s\'ha pogut enviar el pressupost canònic'));
       }
 
       setMessage(`Pressupost enviat correctament a ${clientEmail.trim()}.`);
@@ -1326,7 +1483,6 @@ export default function PresupuestoPdfStudio({
               </div>
             )}
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="text-sm md:col-span-2">Logotip (PNG/JPG)<input className={inputClass} type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => onLogoChange(e.target.files?.[0] || null)} disabled={isCustomerScoped && !allowBrandOverride} /></label>
               <label className="text-sm">Persona de contacte<input className={inputClass} value={clientContact} onChange={(e) => setClientContact(e.target.value)} readOnly={isCustomerScoped} /></label>
               <label className="text-sm">Nom del client<input className={inputClass} value={clientName} onChange={(e) => setClientName(e.target.value)} readOnly={isCustomerScoped} /></label>
               <label className="text-sm">Correu del client<input className={inputClass} type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} readOnly={isCustomerScoped} /></label>
@@ -1351,6 +1507,7 @@ export default function PresupuestoPdfStudio({
               {sectionStatus.brandOk ? (<span className="rounded-full px-2 py-0.5 text-xs">OK</span>) : sectionStatus.brandWarn ? (<span className="rounded-full px-2 py-0.5 text-xs">{sectionStatus.brandWarn}</span>) : null}
             </div>
             <div className="grid gap-4 md:grid-cols-2">
+              <label className="text-sm md:col-span-2">Logotip (PNG/JPG)<input className={inputClass} type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => onLogoChange(e.target.files?.[0] || null)} disabled={isCustomerScoped && !allowBrandOverride} /></label>
               <label className="text-sm">Marca / Empresa<input className={inputClass} value={brandName} onChange={(e) => setBrandName(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
               <label className="text-sm">Web de la marca<input className={inputClass} value={brandWebsite} onChange={(e) => setBrandWebsite(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
               <label className="text-sm">Correu de la marca<input className={inputClass} value={brandEmail} onChange={(e) => setBrandEmail(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
@@ -1358,6 +1515,51 @@ export default function PresupuestoPdfStudio({
               <label className="text-sm md:col-span-2">Eslògan del peu<input className={inputClass} value={brandTagline} onChange={(e) => setBrandTagline(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
             </div>
           </>
+        );
+
+      case 'transport':
+        return (
+          <div className="space-y-3">
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="text-sm">
+                Km anada+tornada
+                <input
+                  className={inputClass}
+                  type="number"
+                  min={0}
+                  step="0.1"
+                  value={travelKm}
+                  onChange={(e) => setTravelKm(Math.max(0, Number(e.target.value) || 0))}
+                />
+              </label>
+              <label className="text-sm">
+                Peatges
+                <input
+                  className={inputClass}
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={travelTollsEur}
+                  onChange={(e) => setTravelTollsEur(Math.max(0, Number(e.target.value) || 0))}
+                />
+              </label>
+            </div>
+            <div className="rounded-xl border p-3 text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-semibold">Transport al client</span>
+                <strong className="font-mono">{formatEUR(travelCharge)}</strong>
+              </div>
+              <p className="mt-1 text-xs">
+                {calculatingDistance
+                  ? 'Calculant ruta automàticament...'
+                  : distanceMessage || 'Pots editar els km manualment si la ruta no s’ha pogut calcular.'}
+              </p>
+              <p className="mt-1 text-xs">
+                {transportBudget.headcount} persones · {transportBudget.routeHours.toFixed(1)} h de ruta · {transportBudget.chargeableHours.toFixed(1)} h facturables
+                {travelTollsEur > 0 ? ` · peatges ${formatEUR(travelTollsEur)}` : ''}
+              </p>
+            </div>
+          </div>
         );
 
       case 'pack':
@@ -1373,11 +1575,11 @@ export default function PresupuestoPdfStudio({
               <label className="text-sm">Preu base (€)<input className={inputClass} type="number" min={0} value={basePrice} onChange={(e) => setBasePrice(Math.max(0, Number(e.target.value) || 0))} /></label>
               <label className="text-sm">Descompte (€)<input className={inputClass} type="number" min={0} value={discount} onChange={(e) => setDiscount(Math.max(0, Number(e.target.value) || 0))} /></label>
               <label className="text-sm">Motiu del descompte<input className={inputClass} value={discountReason} onChange={(e) => setDiscountReason(e.target.value)} /></label>
-              <label className="text-sm md:col-span-3">Característiques del pack (una per línia)<textarea rows={6} className={inputClass} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} /></label>
-              <label className="text-sm md:col-span-3">Condicions (una per línia)<textarea rows={4} className={inputClass} value={conditionsText} onChange={(e) => setConditionsText(e.target.value)} /></label>
+              <label className="text-sm md:col-span-3">Característiques del pack (una per línia)<textarea rows={4} className={inputClass} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} /></label>
+              <label className="text-sm md:col-span-3">Condicions (una per línia)<textarea rows={3} className={inputClass} value={conditionsText} onChange={(e) => setConditionsText(e.target.value)} /></label>
               <div className="md:col-span-3">
                 <label className="text-sm">Explicació comercial: per què triar-nos
-                  <textarea rows={3} className={inputClass} value={whyChooseUs} onChange={(e) => setWhyChooseUs(e.target.value)} />
+                  <textarea rows={2} className={inputClass} value={whyChooseUs} onChange={(e) => setWhyChooseUs(e.target.value)} />
                 </label>
                 <AiCopySuggestionsInline
                   type="quote-why-us"
@@ -1461,7 +1663,7 @@ export default function PresupuestoPdfStudio({
 
   return (
     <section className="admin-quote-studio grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-      <div className="admin-quote-studio-form space-y-5 rounded-2xl border p-5">
+      <div className="admin-quote-studio-form order-2 space-y-5 rounded-2xl border p-5 xl:order-1">
         {isCustomerScoped && (
           <div className="rounded-xl border px-3 py-2 text-xs">
             Mode client actiu. Aquest pressupost es guarda automàticament a la fitxa del client.
@@ -1528,86 +1730,138 @@ export default function PresupuestoPdfStudio({
               </div>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={downloadPdf}
-            disabled={generating || sending || !selectedPack}
-            className="admin-quote-action rounded-xl border px-5 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
-          >
-            {generating ? 'Generant PDF...' : 'Descarregar PDF'}
-          </button>
-          <button
-            type="button"
-            onClick={printPdf}
-            disabled={generating || sending || !selectedPack}
-            className="admin-quote-action rounded-xl border px-5 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
-          >
-            {generating ? 'Generant PDF...' : 'Imprimir PDF'}
-          </button>
-          <button
-            type="button"
-            onClick={sendQuoteEmail}
-            disabled={generating || sending || !selectedPack || !clientEmail.trim()}
-            className="admin-quote-action rounded-xl border px-5 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
-          >
-            {sending ? studioText.sendingQuote : studioText.sendQuote}
-          </button>
-          <button
-            type="button"
-            onClick={clearDraft}
-            className="admin-quote-action rounded-xl border px-4 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2"
-          >
-            Netejar esborrany
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={clearDraft}
+              className="admin-quote-action inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2"
+            >
+              <Trash2 size={16} aria-hidden="true" />
+              Netejar esborrany
+            </button>
           </div>
-          {validationError && <p className="mt-2 text-sm">{validationError}</p>}
-          {message && (
-            <p className={`mt-2 text-sm ${message.includes('correctament') || message.includes('generat') || message.includes('preparat') ? 'text-emerald-400' : 'text-amber-400'}`}>
-              {message}
-            </p>
-          )}
         </div>
       </div>
 
-      <StudioPreview
-        brandName={brandName}
-        brandWebsite={brandWebsite}
-        brandEmail={brandEmail}
-        brandPhone={brandPhone}
-        clientName={clientName}
-        clientContact={clientContact}
-        clientEmail={clientEmail}
-        clientPhone={clientPhone}
-        eventType={eventType}
-        eventDate={eventDate}
-        guests={guests}
-        eventSchedule={eventSchedule}
-        eventLocation={eventLocation}
-        validityDays={validityDays}
-        whyChooseUs={whyChooseUs}
-        packName={packName}
-        selectedPackName={selectedPack?.name}
-        durationHours={durationHours}
-        basePrice={basePrice}
-        extrasPrice={extrasPrice}
-        travelCharge={travelCharge}
-        travelKm={travelKm}
-        seasonSurcharge={seasonSurcharge}
-        seasonLabel={datePricing.appliedRule?.label}
-        seasonPct={datePricing.appliedRule ? datePricing.surchargePct : undefined}
-        discount={discount}
-        taxableBase={taxableBase}
-        vatRate={vatRate}
-        vatAmount={vatAmount}
-        total={total}
-        directCost={financialSummary?.directCost}
-        netMargin={financialSummary?.netMargin}
-        marginPct={financialSummary?.marginPct}
-        marginTone={financialSummary?.marginTone.tone}
-        acquisitionCost={financialSummary?.acquisitionCost}
-        locale={locale}
-      />
+      <div className="admin-quote-studio-side order-1 space-y-4 xl:sticky xl:top-4 xl:order-2 xl:self-start">
+        <aside className="admin-quote-pdf-preview rounded-2xl border p-5">
+          <div>
+            <div>
+              <h2 className="ap-h2">Previsualització PDF</h2>
+              <p className="mt-1 text-sm">Document final abans de descarregar o enviar.</p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={previewPdf}
+              disabled={previewGenerating || generating || sending || !canGenerateDocument}
+              className="admin-quote-action inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
+            >
+              <Eye size={16} aria-hidden="true" />
+              {previewActionLabel}
+            </button>
+            {pdfPreviewUrl ? (
+              <a
+                href={pdfPreviewUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="admin-quote-action inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2"
+              >
+                <ExternalLink size={16} aria-hidden="true" />
+                Obrir en pestanya
+              </a>
+            ) : null}
+            <button
+              type="button"
+              onClick={downloadPdf}
+              disabled={generating || sending || !canGenerateDocument}
+              className="admin-quote-action inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
+            >
+              <Download size={16} aria-hidden="true" />
+              {generating ? 'Generant PDF...' : 'Descarregar PDF'}
+            </button>
+            <button
+              type="button"
+              onClick={printPdf}
+              disabled={generating || sending || !canGenerateDocument}
+              className="admin-quote-action inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
+            >
+              <Printer size={16} aria-hidden="true" />
+              {generating ? 'Generant PDF...' : 'Imprimir PDF'}
+            </button>
+            <button
+              type="button"
+              onClick={sendQuoteEmail}
+              disabled={generating || sending || !canGenerateDocument || !clientEmail.trim()}
+              className="admin-quote-action inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
+            >
+              <Send size={16} aria-hidden="true" />
+              {sending ? studioText.sendingQuote : studioText.sendQuote}
+            </button>
+          </div>
+          {validationError && <p className="mt-3 text-sm">{validationError}</p>}
+          {message && (
+            <p className={`mt-3 text-sm ${documentMessageIsPositive ? 'text-emerald-400' : 'text-amber-400'}`}>
+              {message}
+            </p>
+          )}
+
+          {pdfPreviewUrl ? (
+            <iframe
+              src={pdfPreviewUrl}
+              title="Previsualització PDF del pressupost"
+              className="mt-4 h-[min(76vh,48rem)] w-full rounded-xl border"
+            />
+          ) : (
+            <div className="mt-4 flex min-h-40 items-center justify-center rounded-xl border p-6 text-center text-sm sm:min-h-64">
+              Encara no hi ha cap PDF carregat. Prem «Previsualitzar PDF» i comprova el document final amb transport i IVA.
+            </div>
+          )}
+        </aside>
+
+        <StudioPreview
+          brandName={brandName}
+          brandWebsite={brandWebsite}
+          brandEmail={brandEmail}
+          brandPhone={brandPhone}
+          clientName={clientName}
+          clientContact={clientContact}
+          clientEmail={clientEmail}
+          clientPhone={clientPhone}
+          eventType={eventType}
+          eventDate={eventDate}
+          guests={guests}
+          eventSchedule={eventSchedule}
+          eventLocation={eventLocation}
+          validityDays={validityDays}
+          whyChooseUs={whyChooseUs}
+          packName={packName}
+          selectedPackName={selectedPack?.name}
+          serviceItems={[
+            ...mappedSelectedExtras.map((extra) => extra.name),
+            ...customExtras.map((extra) => extra.name),
+          ]}
+          durationHours={durationHours}
+          basePrice={basePrice}
+          extrasPrice={extrasPrice}
+          travelCharge={travelCharge}
+          travelKm={travelKm}
+          travelTollsEur={travelTollsEur}
+          discount={discount}
+          taxableBase={taxableBase}
+          vatRate={vatRate}
+          vatAmount={vatAmount}
+          total={total}
+          directCost={financialSummary?.directCost}
+          netMargin={financialSummary?.netMargin}
+          marginPct={financialSummary?.marginPct}
+          marginTone={financialSummary?.marginTone.tone}
+          acquisitionCost={financialSummary?.acquisitionCost}
+          locale={locale}
+        />
+      </div>
     </section>
   );
 }

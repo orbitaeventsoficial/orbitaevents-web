@@ -60,14 +60,11 @@ describe('generateQuotePDF', () => {
     expect(output.byteLength).toBeGreaterThan(500);
   });
 
-  it('inclou descompte i recàrrec de temporada', async () => {
+  it('inclou descompte sense cap recàrrec de temporada', async () => {
     const doc = await generateQuotePDF(makeQuoteData({
       discount: 100,
       discountReason: 'Promo especial',
-      seasonSurcharge: 200,
-      seasonLabel: 'Recàrrec alta temporada',
-      seasonPct: 10,
-      total: 1300,
+      total: 1100,
     }));
     const output = doc.output('arraybuffer');
     expect(output).toBeInstanceOf(ArrayBuffer);

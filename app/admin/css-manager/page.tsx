@@ -357,11 +357,22 @@ html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--purple {
 }`;
 }
 
+function readCssApiError(payload: unknown, fallback: string): string {
+  if (payload && typeof payload === 'object') {
+    const record = payload as Record<string, unknown>;
+    if (typeof record.error === 'string' && record.error.trim()) return record.error;
+    if (typeof record.message === 'string' && record.message.trim()) return record.message;
+  }
+
+  return fallback;
+}
+
 export default function AdminCssManagerPage() {
   const [css, setCss] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const cssLines = css.trim() ? css.split('\n').length : 0;
   const cssChars = css.length;
   const hasCustomCss = css.trim().length > 0;
@@ -394,21 +405,30 @@ export default function AdminCssManagerPage() {
     if (globalStyle) globalStyle.textContent = nextCss;
   }
 
+  async function loadCss(isCancelled: () => boolean = () => false) {
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const res = await fetchWithCsrf('/api/admin/css', { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) throw new Error(readCssApiError(data, 'No s’ha pogut carregar el CSS.'));
+      if (isCancelled()) return;
+      const loadedCss = typeof data?.css === 'string' ? data.css : '';
+      setCss(loadedCss);
+      applyLiveCss(loadedCss);
+    } catch (error) {
+      if (isCancelled()) return;
+      const message = error instanceof Error ? error.message : 'No s’ha pogut carregar el CSS.';
+      setLoadError(message);
+      setMsg(message);
+    } finally {
+      if (!isCancelled()) setLoading(false);
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetchWithCsrf('/api/admin/css', { cache: 'no-store' });
-        const data = await res.json().catch(() => ({}));
-        if (!cancelled) {
-          const loadedCss = typeof data?.css === 'string' ? data.css : '';
-          setCss(loadedCss);
-          applyLiveCss(loadedCss);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
+    loadCss(() => cancelled);
     return () => {
       cancelled = true;
     };
@@ -428,10 +448,13 @@ export default function AdminCssManagerPage() {
         body: JSON.stringify({ css }),
       });
       if (!res.ok) throw new Error('No s’ha pogut desar el CSS');
-      setMsg('CSS desat i aplicat al panell admin.');
-      applyLiveCss(css);
+      const data = await res.json().catch(() => ({}));
+      const savedCss = typeof data?.css === 'string' ? data.css : css;
+      setCss(savedCss);
+      setMsg(data?.sanitized ? 'CSS desat i aplicat. S’han neutralitzat regles no permeses.' : 'CSS desat i aplicat al panell admin.');
+      applyLiveCss(savedCss);
       if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('admin-css-updated', { detail: { css } }));
+        window.dispatchEvent(new CustomEvent('admin-css-updated', { detail: { css: savedCss } }));
       }
     } catch (error) {
       setMsg(error instanceof Error ? error.message : 'Error desant CSS');
@@ -483,6 +506,21 @@ export default function AdminCssManagerPage() {
         }}
         className="mb-6"
       />
+
+      {loadError && (
+        <div role="alert" className="admin-css-panel mb-4 rounded-2xl border admin-tone-border-danger admin-tone-bg-danger p-4">
+          <p className="text-sm font-semibold">No s'ha pogut carregar el CSS actual.</p>
+          <p className="mt-1 text-sm">{loadError}</p>
+          <button
+            type="button"
+            onClick={() => loadCss()}
+            disabled={loading}
+            className="admin-keep-colors admin-css-btn admin-css-btn--neutral mt-3 rounded-xl border px-3 py-1.5 text-xs disabled:opacity-60"
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
 
       <section className="admin-css-panel rounded-2xl border p-5">
         <div className="mb-3 flex items-center justify-between">

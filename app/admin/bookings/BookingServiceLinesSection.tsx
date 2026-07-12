@@ -8,11 +8,12 @@
 ============================================================================ */
 
 import { useEffect, useState } from 'react';
-import { ORBITA_SERVICES, SOUND_TECH_PRICE, SOUND_TECH_DURATION, partnerProductRequiresSoundTech } from '@/lib/constants/orbita-services';
+import { ORBITA_SERVICES, SOUND_TECH_PRICE, SOUND_TECH_DURATION, countProductCrewMembers, partnerProductRequiresSoundTech } from '@/lib/constants/orbita-services';
 import { CUSTOM_BOOKING_PACK_SLUG } from '@/lib/constants/pricing';
 import { AdminSection } from '../components/AdminPage';
 import { NB_HINT, NB_NUM_BARE } from './booking-form-classes';
 import type { BookingServiceLineFormInput, BookingPack } from './booking-form.types';
+import { syncBingoAssistantForGuests } from './bingoAssistantRule';
 
 interface PartnerProductOption {
   id: string;
@@ -43,6 +44,7 @@ interface BookingServiceLinesSectionProps {
   onCustomPackPriceChange?: (value: string) => void;
   /** Interessos del lead (interestedExtras) com a pista informativa. */
   leadHints?: string[];
+  guestCount?: string | number | null;
   /** Encastat dins un altre panell (ex. fitxa del lead): sense panell ni capçalera pròpia. */
   embedded?: boolean;
 }
@@ -75,18 +77,6 @@ function packLabel(pack: BookingPack): string {
   return pack.translations?.[0]?.name || pack.slug;
 }
 
-function countCrewMembers(crew?: string | null): number {
-  if (!crew) return 1;
-  return crew
-    .split('+')
-    .map((part) => part.trim().toLowerCase())
-    .filter((part) => part && !/equip|decoraci[oó]|material|propi/.test(part))
-    .reduce((total, part) => {
-      const explicit = part.match(/\b(\d+)\b/);
-      return total + (explicit ? Number(explicit[1]) : 1);
-    }, 0) || 1;
-}
-
 function orbitaServiceHeadcount(id: string): number {
   if (id === 'dj-primera-hora') return 1;
   if (id === 'tecnic-so') return 1;
@@ -108,6 +98,7 @@ export default function BookingServiceLinesSection({
   customPackPrice = '',
   onCustomPackPriceChange,
   leadHints,
+  guestCount,
   embedded = false,
 }: BookingServiceLinesSectionProps) {
   const packsEnabled = !!onPackSelect;
@@ -140,6 +131,11 @@ export default function BookingServiceLinesSection({
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    const next = syncBingoAssistantForGuests(lines, guestCount);
+    if (next !== lines) onChange(next);
+  }, [guestCount, lines, onChange]);
 
   const update = (idx: number, patch: Partial<BookingServiceLineFormInput>) => {
     onChange(lines.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
@@ -193,7 +189,7 @@ export default function BookingServiceLinesSection({
     //   El client sempre paga el mateix (el tècnic no és ingrés de client, és liquidació
     //   entre Masquerade i Òrbita). Per defecte el fa el proveïdor (cost 0).
     const hasTech = partnerProductRequiresSoundTech({ name: p.name, crew: p.crew });
-    const crewMembers = countCrewMembers(p.crew);
+    const crewMembers = countProductCrewMembers(p.crew);
     const productCost = p.costPrice;
     // Una línia de lloguer de material (col·laborador EQUIPMENT_RENTAL, p.ex. Tino)
     // és `EQUIPMENT`: això activa el transport d'anar a buscar-lo al càlcul del bolo.

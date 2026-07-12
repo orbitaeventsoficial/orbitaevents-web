@@ -147,10 +147,10 @@ export default async function MensajesPage() {
             <p className="font-medium">Primer contacte</p>
             <p className="mt-1 text-xs admin-tone-text-neutral">Resposta inicial a una entrada nova</p>
           </button>
-          <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
-            <p className="font-medium">Envia pressupost</p>
-            <p className="mt-1 text-xs admin-tone-text-neutral">Acompanyament de pressupost</p>
-          </button>
+          <Link href="/admin/presupuestos" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
+            <p className="font-medium">Obrir pressupostos</p>
+            <p className="mt-1 text-xs admin-tone-text-neutral">Proposta canònica i PDF final</p>
+          </Link>
           <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
             <p className="font-medium">Seguiment</p>
             <p className="mt-1 text-xs admin-tone-text-neutral">Recordatori després de dies</p>
@@ -237,4 +237,3 @@ export default async function MensajesPage() {
     </AdminPage>
   );
 }
-

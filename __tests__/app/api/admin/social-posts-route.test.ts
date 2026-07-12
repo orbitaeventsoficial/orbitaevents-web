@@ -125,6 +125,22 @@ describe('/api/admin/social-posts', () => {
     await expect(res.json()).resolves.toEqual({ ok: true, post: { id: 'sp_1', ...validPayload } });
   });
 
+  it('crea publicacio derivada amb origen canonic', async () => {
+    const payload = {
+      ...validPayload,
+      originType: 'TESTIMONIAL',
+      originId: 'testimonial-1',
+      originLabel: 'Anna Garcia',
+    };
+
+    const res = await collectionRoute.POST(
+      makeReq('POST', 'http://localhost/api/admin/social-posts', payload)
+    );
+
+    expect(res.status).toBe(200);
+    expect(mockCreateSocialPost).toHaveBeenCalledWith(payload);
+  });
+
   it('rebutja CSRF abans de llegir body o actualitzar en PATCH', async () => {
     mockVerifyCsrf.mockReturnValueOnce(new Response('{}', { status: 403 }));
     const req = makeReq('PATCH', 'http://localhost/api/admin/social-posts/sp_1', { title: 'Actualitzat' });

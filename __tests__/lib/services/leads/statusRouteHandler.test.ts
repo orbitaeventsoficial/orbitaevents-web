@@ -168,6 +168,7 @@ describe('handleLeadStatusPatch', () => {
       convertedAt: null,
       name: 'Maria',
       eventType: 'WEDDING',
+      booking: { id: 'b1' },
     });
 
     await handleLeadStatusPatch(makeRequest({ status: 'WON' }), 'l1');
@@ -180,6 +181,47 @@ describe('handleLeadStatusPatch', () => {
         }),
       })
     );
+  });
+
+  it('rebutja passar a WON si el lead encara no té reserva', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'l1',
+      status: 'NEGOTIATING',
+      email: 'maria@test.com',
+      customerId: 'cust1',
+      contactedAt: new Date(),
+      convertedAt: null,
+      booking: null,
+    });
+
+    const result = await handleLeadStatusPatch(makeRequest({ status: 'WON' }), 'l1');
+    const body = await result.json();
+
+    expect(result.status).toBe(409);
+    expect(body).toMatchObject({
+      error: expect.stringContaining('sense reserva vinculada'),
+      nextAction: '/admin/bookings/new?leadId=l1&prefill=lead',
+    });
+    expect(mockPrisma.lead.update).not.toHaveBeenCalled();
+    expect(mockPrisma.customerActivity.create).not.toHaveBeenCalled();
+    expect(mockRecordLeadStatusChanged).not.toHaveBeenCalled();
+  });
+
+  it('permet reescriure un històric que ja era WON sense crear un nou bloqueig', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'l1',
+      status: 'WON',
+      email: 'maria@test.com',
+      customerId: 'cust1',
+      contactedAt: new Date(),
+      convertedAt: new Date(),
+      booking: null,
+    });
+
+    const result = await handleLeadStatusPatch(makeRequest({ status: 'WON' }), 'l1');
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.lead.update).toHaveBeenCalled();
   });
 
   describe('canonical LOST path (Canvi #368)', () => {

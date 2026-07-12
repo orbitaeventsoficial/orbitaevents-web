@@ -64,6 +64,29 @@ describe('ProtocolValidationToggle', () => {
     });
   });
 
+  it('manté el botó bloquejat mentre guarda per evitar doble mutació', async () => {
+    let resolveResponse!: (response: Response) => void;
+    mockFetchWithCsrf.mockReturnValueOnce(
+      new Promise<Response>((resolve) => {
+        resolveResponse = resolve;
+      }),
+    );
+
+    render(<ProtocolValidationToggle canviN={468} validation={null} />);
+
+    const button = screen.getByRole('button', { name: /marcar validació humana/i });
+    fireEvent.click(button);
+
+    expect(await screen.findByRole('button', { name: /guardant/i })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: /guardant/i }));
+    expect(mockFetchWithCsrf).toHaveBeenCalledTimes(1);
+
+    resolveResponse(new Response(JSON.stringify({ ok: true, validation: { canviN: 468 } }), { status: 200 }));
+    await waitFor(() => {
+      expect(mockRefresh).toHaveBeenCalled();
+    });
+  });
+
   it('desfà una validació existent', async () => {
     mockFetchWithCsrf.mockResolvedValueOnce(
       new Response(JSON.stringify({ ok: true, removed: true }), { status: 200 }),
@@ -104,7 +127,7 @@ describe('ProtocolValidationToggle', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /marcar validació humana/i }));
 
-    expect(await screen.findByText('forbidden')).toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent('forbidden');
     expect(mockRefresh).not.toHaveBeenCalled();
   });
 
@@ -127,7 +150,7 @@ describe('ProtocolValidationToggle', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /desfer validació/i }));
 
-    expect(await screen.findByText('cannot-delete')).toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent('cannot-delete');
     expect(mockRefresh).not.toHaveBeenCalled();
   });
 });

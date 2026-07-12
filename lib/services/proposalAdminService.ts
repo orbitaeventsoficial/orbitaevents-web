@@ -1,6 +1,7 @@
 import { Prisma, ProposalStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PROPOSAL_FINANCIAL_FIELDS, roundMoney } from '@/lib/constants/pricing';
+import { isSentLikeProposalStatus } from '@/lib/proposals/status';
 
 type ProposalListInput = {
   customerId?: string;
@@ -64,6 +65,84 @@ export class ProposalFinancialConsistencyError extends Error {
     super('Proposta econòmicament incoherent');
     this.name = 'ProposalFinancialConsistencyError';
   }
+}
+
+export class ProposalCanonicalDispatchError extends Error {
+  public readonly status = 410;
+  public readonly body = {
+    ok: false,
+    error: 'Els camps d’enviament del pressupost només es poden escriure des de /api/admin/proposals/:id/send.',
+    canonicalRoute: '/api/admin/proposals/:id/send',
+  };
+
+  constructor() {
+    super('Dispatch canònic de Proposal requerit');
+    this.name = 'ProposalCanonicalDispatchError';
+  }
+}
+
+export class ProposalCanonicalAcceptanceError extends Error {
+  public readonly status = 409;
+  public readonly body = {
+    ok: false,
+    error: 'Només es pot acceptar un pressupost enviat amb PDF arxivat. Envia o repara el pressupost pel flux canònic abans d’acceptar-lo.',
+    canonicalRoute: '/api/admin/proposals/:id/send',
+  };
+
+  constructor() {
+    super('Acceptació canònica de Proposal requerida');
+    this.name = 'ProposalCanonicalAcceptanceError';
+  }
+}
+
+function assertProposalDispatchFieldsNotWritten(data: {
+  status?: ProposalStatus;
+  pdfUrl?: string;
+  pdfKey?: string;
+  sentAt?: string | null;
+}): void {
+  if (isSentLikeProposalStatus(data.status) || data.pdfUrl !== undefined || data.pdfKey !== undefined || data.sentAt !== undefined) {
+    throw new ProposalCanonicalDispatchError();
+  }
+}
+
+function isCanonicalSentProposalArtifact(proposal: {
+  status: string;
+  sentAt: Date | null;
+  pdfUrl: string | null;
+  pdfKey: string | null;
+}): boolean {
+  return (
+    isSentLikeProposalStatus(proposal.status) &&
+    Boolean(proposal.sentAt) &&
+    Boolean(proposal.pdfUrl?.trim()) &&
+    Boolean(proposal.pdfKey?.trim())
+  );
+}
+
+function isAcceptingProposal(data: ProposalUpdateInput): boolean {
+  return data.status === 'ACCEPTED' || Boolean(data.acceptedAt);
+}
+
+async function assertProposalCanBeAccepted(id: string, data: ProposalUpdateInput): Promise<Date | undefined> {
+  if (!isAcceptingProposal(data)) return undefined;
+
+  const existing = await prisma.proposal.findUnique({
+    where: { id },
+    select: {
+      status: true,
+      sentAt: true,
+      pdfUrl: true,
+      pdfKey: true,
+    },
+  });
+
+  if (!existing) return undefined;
+  if (!isCanonicalSentProposalArtifact(existing)) {
+    throw new ProposalCanonicalAcceptanceError();
+  }
+
+  return data.acceptedAt ? new Date(data.acceptedAt) : new Date();
 }
 
 function normalizeProposalSnapshot(
@@ -186,6 +265,10 @@ export async function listAdminProposals(input: ProposalListInput) {
 }
 
 export async function createAdminProposal(data: ProposalCreateInput) {
+  assertProposalDispatchFieldsNotWritten(data);
+  if (data.status && data.status !== 'DRAFT') {
+    throw new ProposalCanonicalDispatchError();
+  }
   assertProposalFinancialConsistency(data);
 
   const reference = await generateProposalReference();
@@ -217,7 +300,7 @@ export async function createAdminProposal(data: ProposalCreateInput) {
       pdfKey: data.pdfKey,
     },
     include: {
-      customer: { select: { id: true, name: true, email: true } },
+      customer: { select: { id: true, name: true, email: true, phone: true } },
     },
   });
 
@@ -229,7 +312,36 @@ export async function getAdminProposalById(id: string) {
     where: { id },
     include: {
       customer: { select: { id: true, name: true, email: true } },
-      lead: { select: { id: true, name: true, email: true } },
+      lead: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          eventDate: true,
+          eventStartTime: true,
+          eventEndTime: true,
+          eventLocation: true,
+          eventAddress: true,
+          distanceKm: true,
+          tollsEur: true,
+          guestCount: true,
+          serviceLines: {
+            orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+            select: {
+              id: true,
+              collaboratorId: true,
+              kind: true,
+              label: true,
+              revenueAmount: true,
+              costAmount: true,
+              quantity: true,
+              hours: true,
+              notes: true,
+            },
+          },
+        },
+      },
       booking: { select: { id: true, reference: true, status: true } },
     },
   });
@@ -242,12 +354,18 @@ export async function getAdminProposalById(id: string) {
 }
 
 export async function updateAdminProposal(id: string, data: ProposalUpdateInput) {
+  assertProposalDispatchFieldsNotWritten(data);
   assertCompleteFinancialUpdate(data);
+  const acceptedAtFromCanonicalTransition = await assertProposalCanBeAccepted(id, data);
+  const resolvedStatus = data.status ?? (data.acceptedAt ? 'ACCEPTED' : undefined);
+  const resolvedAcceptedAt =
+    acceptedAtFromCanonicalTransition ??
+    (data.acceptedAt === undefined ? undefined : data.acceptedAt ? new Date(data.acceptedAt) : null);
 
   const proposal = await prisma.proposal.update({
     where: { id },
     data: {
-      ...(data.status !== undefined ? { status: data.status } : {}),
+      ...(resolvedStatus !== undefined ? { status: resolvedStatus } : {}),
       ...(data.locale !== undefined ? { locale: data.locale } : {}),
       ...(data.currency !== undefined ? { currency: data.currency } : {}),
       ...(data.validityDays !== undefined ? { validityDays: data.validityDays } : {}),
@@ -260,7 +378,7 @@ export async function updateAdminProposal(id: string, data: ProposalUpdateInput)
       ...(data.pdfUrl !== undefined ? { pdfUrl: data.pdfUrl } : {}),
       ...(data.pdfKey !== undefined ? { pdfKey: data.pdfKey } : {}),
       sentAt: data.sentAt === undefined ? undefined : data.sentAt ? new Date(data.sentAt) : null,
-      acceptedAt: data.acceptedAt === undefined ? undefined : data.acceptedAt ? new Date(data.acceptedAt) : null,
+      acceptedAt: resolvedAcceptedAt,
     },
     include: {
       customer: { select: { id: true, name: true, email: true } },

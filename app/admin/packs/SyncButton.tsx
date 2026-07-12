@@ -2,8 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Check, Package, RefreshCw, X } from 'lucide-react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+
+const SYNC_ICON = 'h-4 w-4 shrink-0';
 
 export default function SyncButton() {
   const router = useRouter();
@@ -60,7 +63,8 @@ export default function SyncButton() {
           </>
         ) : (
           <>
-            🔄 Sincronitzar Packs
+            <RefreshCw className={SYNC_ICON} aria-hidden="true" />
+            Sincronitzar Packs
           </>
         )}
       </button>
@@ -74,17 +78,18 @@ export default function SyncButton() {
           }`}
           role={result.ok ? 'status' : 'alert'}
         >
-          <p className={`text-sm font-medium ${result.ok ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
-            {result.message || (result.ok ? '✓ Sincronització completada' : '✗ Error')}
+          <p className={`inline-flex items-center gap-1.5 text-sm font-medium ${result.ok ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+            {result.ok ? <Check className={SYNC_ICON} aria-hidden="true" /> : <X className={SYNC_ICON} aria-hidden="true" />}
+            {result.message || (result.ok ? 'Sincronització completada' : 'Error')}
           </p>
 
           {result.stats && (
             <div className="mt-2 text-sm space-y-1">
-              <p>📦 Total: {result.stats.total}</p>
-              <p>✓ Creats: {result.stats.created}</p>
-              <p>🔄 Actualitzats: {result.stats.updated}</p>
+              <p className="inline-flex items-center gap-1.5"><Package className={SYNC_ICON} aria-hidden="true" /> Total: {result.stats.total}</p>
+              <p className="inline-flex items-center gap-1.5"><Check className={SYNC_ICON} aria-hidden="true" /> Creats: {result.stats.created}</p>
+              <p className="inline-flex items-center gap-1.5"><RefreshCw className={SYNC_ICON} aria-hidden="true" /> Actualitzats: {result.stats.updated}</p>
               {result.stats.errors > 0 && (
-                <p className="">✗ Errors: {result.stats.errors}</p>
+                <p className="inline-flex items-center gap-1.5"><X className={SYNC_ICON} aria-hidden="true" /> Errors: {result.stats.errors}</p>
               )}
             </div>
           )}

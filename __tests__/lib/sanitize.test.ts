@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { escapeHtml, sanitizeEmail, sanitizePhone, truncate } from '@/lib/utils/sanitize';
+import { escapeHtml, sanitizeEmail, truncate } from '@/lib/utils/sanitize';
 
 describe('Sanitization Utilities', () => {
   describe('escapeHtml', () => {
@@ -73,22 +73,6 @@ describe('Sanitization Utilities', () => {
       // Note: sanitizeEmail only trims and lowercases, doesn't validate
       expect(sanitizeEmail('not-an-email')).toBe('not-an-email');
       expect(sanitizeEmail('missing@')).toBe('missing@');
-    });
-  });
-
-  describe('sanitizePhone', () => {
-    it('should extract digits and plus sign from phone numbers', () => {
-      // Note: sanitizePhone keeps + and digits only
-      expect(sanitizePhone('+34 699 12 10 23')).toBe('+34699121023');
-      expect(sanitizePhone('(555) 123-4567')).toBe('5551234567');
-    });
-
-    it('should handle clean numbers', () => {
-      expect(sanitizePhone('699121023')).toBe('699121023');
-    });
-
-    it('should handle empty input', () => {
-      expect(sanitizePhone('')).toBe('');
     });
   });
 

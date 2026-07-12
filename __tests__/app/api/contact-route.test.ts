@@ -5,14 +5,16 @@ const {
   mockCheckRateLimit,
   mockVerifyTurnstileToken,
   mockPersistContactLead,
-  mockSendEmailWithTimeout,
+  mockSendTrackedStandaloneEmailWithTimeout,
   mockGetRecipientsAsString,
+  mockRecordConsent,
 } = vi.hoisted(() => ({
   mockCheckRateLimit: vi.fn(),
   mockVerifyTurnstileToken: vi.fn(),
   mockPersistContactLead: vi.fn(),
-  mockSendEmailWithTimeout: vi.fn(),
+  mockSendTrackedStandaloneEmailWithTimeout: vi.fn(),
   mockGetRecipientsAsString: vi.fn(),
+  mockRecordConsent: vi.fn(),
 }));
 
 vi.mock('@/lib/rate-limit', () => ({
@@ -21,8 +23,11 @@ vi.mock('@/lib/rate-limit', () => ({
 }));
 vi.mock('@/lib/turnstile', () => ({ verifyTurnstileToken: mockVerifyTurnstileToken }));
 vi.mock('@/lib/services/contactLeadCaptureService', () => ({ persistContactLead: mockPersistContactLead }));
-vi.mock('@/lib/email', () => ({ sendEmailWithTimeout: mockSendEmailWithTimeout }));
+vi.mock('@/lib/email', () => ({
+  sendTrackedStandaloneEmailWithTimeout: mockSendTrackedStandaloneEmailWithTimeout,
+}));
 vi.mock('@/lib/services/notificationRecipientsService', () => ({ getRecipientsAsString: mockGetRecipientsAsString }));
+vi.mock('@/lib/services/privacyService', () => ({ recordConsent: mockRecordConsent }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() } }));
 
 import { POST } from '@/app/api/contact/route';
@@ -55,8 +60,9 @@ describe('/api/contact', () => {
     mockCheckRateLimit.mockResolvedValue(null);
     mockVerifyTurnstileToken.mockResolvedValue(true);
     mockPersistContactLead.mockResolvedValue({ leadId: 'lead-real-1' });
-    mockSendEmailWithTimeout.mockResolvedValue(undefined);
+    mockSendTrackedStandaloneEmailWithTimeout.mockResolvedValue(undefined);
     mockGetRecipientsAsString.mockResolvedValue('admin@example.com');
+    mockRecordConsent.mockResolvedValue(undefined);
   });
 
   it('retorna el leadId real guardat, no una referència efímera', async () => {
@@ -71,7 +77,15 @@ describe('/api/contact', () => {
       eventLocation: 'Barcelona',
       preferredLocale: 'ca',
     }));
-    expect(mockSendEmailWithTimeout).toHaveBeenCalledOnce();
+    expect(mockSendTrackedStandaloneEmailWithTimeout).toHaveBeenCalledOnce();
+    expect(mockSendTrackedStandaloneEmailWithTimeout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateKey: 'public-contact-admin-notification',
+        leadId: 'lead-real-1',
+        orbita: expect.objectContaining({ kind: 'lead', id: 'lead-real-1' }),
+      }),
+      8000,
+    );
   });
 
   it('no retorna ok ni envia emails si la persistència no crea cap Lead', async () => {
@@ -83,6 +97,27 @@ describe('/api/contact', () => {
     expect(res.status).toBe(500);
     expect(body.ok).not.toBe(true);
     expect(body.error).toBeTruthy();
-    expect(mockSendEmailWithTimeout).not.toHaveBeenCalled();
+    expect(mockSendTrackedStandaloneEmailWithTimeout).not.toHaveBeenCalled();
+  });
+
+  it('envia confirmació client traçada quan el contacte és email', async () => {
+    const res = await POST(makePostReq({
+      ...VALID_BODY,
+      contact: 'laia@example.com',
+      email: 'laia@example.com',
+      phone: undefined,
+    }));
+
+    expect(res.status).toBe(200);
+    expect(mockSendTrackedStandaloneEmailWithTimeout).toHaveBeenCalledTimes(2);
+    expect(mockSendTrackedStandaloneEmailWithTimeout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateKey: 'public-contact-client-confirmation',
+        to: 'laia@example.com',
+        leadId: 'lead-real-1',
+        orbita: expect.objectContaining({ kind: 'lead', id: 'lead-real-1' }),
+      }),
+      8000,
+    );
   });
 });

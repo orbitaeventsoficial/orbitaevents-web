@@ -12,7 +12,7 @@ import {
 } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
-import { getExecutionPriority } from './customer-utils';
+import { getExecutionPriority, resolveCustomerSegmentFilter } from './customer-utils';
 import { AddCustomerModal, StartProcessModal } from './ClientesModals';
 import { AdminPage } from '../components/AdminPage';
 import {
@@ -162,6 +162,16 @@ export default function AdminContactesPage() {
     const date = searchParams?.get('date');
     setShowAddModal(true);
     if (date) setAddModalNotes(`Origen calendari (${date})`);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const segmentFilters = resolveCustomerSegmentFilter(searchParams?.get('segment'));
+    if (!segmentFilters) return;
+
+    setLifecycleFilter(segmentFilters.lifecycleStage);
+    setTagFilter(segmentFilters.tag);
+    setHealthScoreMax(segmentFilters.healthScoreMax);
+    setMinSpent(segmentFilters.minSpent);
   }, [searchParams]);
 
   useEffect(() => {

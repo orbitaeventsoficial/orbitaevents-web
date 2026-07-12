@@ -1,6 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import {
+  CalendarDays,
+  FileText,
+  Gift,
+  MessageCircle,
+  SlidersHorizontal,
+  Star,
+  type LucideIcon,
+} from 'lucide-react';
 import { log } from '@/lib/logger';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
@@ -12,6 +21,28 @@ interface Feature {
   description: string;
   icon: string;
   enabled: boolean;
+}
+
+const FEATURE_ICON_MAP: Record<string, LucideIcon> = {
+  star: Star,
+  calendar: CalendarDays,
+  gift: Gift,
+  chat: MessageCircle,
+  note: FileText,
+  controls: SlidersHorizontal,
+};
+
+function FeatureIcon({ icon }: { icon: string }) {
+  const Icon = FEATURE_ICON_MAP[icon] ?? SlidersHorizontal;
+  return (
+    <span
+      aria-hidden="true"
+      data-feature-icon={icon}
+      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--raised)]"
+    >
+      <Icon className="h-5 w-5" strokeWidth={1.8} />
+    </span>
+  );
 }
 
 export default function FeaturesPage() {
@@ -128,7 +159,7 @@ export default function FeaturesPage() {
               className="border rounded-xl p-4 flex items-center justify-between"
             >
               <div className="flex items-start gap-3 flex-1">
-                <span className="text-2xl">{feature.icon}</span>
+                <FeatureIcon icon={feature.icon} />
                 <div className="flex-1">
                   <h3 className="font-medium">{feature.label}</h3>
                   <p className="text-sm mt-0.5">{feature.description}</p>
@@ -161,5 +192,4 @@ export default function FeaturesPage() {
     </AdminPage>
   );
 }
-
 

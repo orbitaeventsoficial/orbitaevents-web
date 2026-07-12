@@ -309,12 +309,18 @@ export async function recordCustomerBookingCreated(input: {
 export async function recordCustomerProcessStarted(input: {
   customerId: string;
   processType: string;
+  emailSendId?: string | null;
+  emailSnapshot?: string | null;
 }, writer?: CustomerActivityWriter) {
   return getWriter(writer).customerActivity.create({
     data: {
       customerId: input.customerId,
       action: input.processType,
-      details: { description: `Procés "${input.processType}" iniciat` },
+      details: {
+        description: `Procés "${input.processType}" iniciat`,
+        ...(input.emailSendId ? { emailSendId: input.emailSendId } : {}),
+        ...(input.emailSnapshot ? { emailSnapshot: input.emailSnapshot } : {}),
+      },
     },
   });
 }

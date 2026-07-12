@@ -1,3 +1,7 @@
+**MANOLO és l'única capa que toca el producte i la màquina; tot el que ve després va sota Manolo.**
+
+**Sempre, després d'aquesta frase, és obligatori llegir tot el protocol de treball abans de tocar res.**
+
 # Òrbita Events — Protocol de Treball
 
 ## Propòsit
@@ -62,6 +66,28 @@ Cada canvi, per petit que sigui, ha de complir TOT això abans de considerar-se 
 - Reportar l'estat final quan no quedi cap ítem pendent, no en cada canvi.
 - **Pressupost/tokens (ordre del propietari 2026-06-08)**: treballar a tope SENSE preguntar ni avisar mai pel pressupost o els tokens. Prohibit oferir parar per estalviar tokens o condicionar la feina al pressupost. Si s'esgoten els tokens és problema del propietari. Acció directa sempre. Veure `budgetPolicy` a `docs/agent-runtime-policy.json`.
 
+## Manolo — clau única del producte i de la màquina
+
+**Ordre del propietari 2026-07-10.** Manolo és l'única capa autoritzada a tocar
+el producte i la màquina.
+
+Manolo no és un agent concret ni un prompt decoratiu. Manolo és el sistema
+complet de lectura, criteri, registre i execució definit a `docs/MANOLO.md`:
+protocol viu, atles, fitxes, auditories, fulls de ruta, captures, dades,
+costura i criteri humà. Sense aquest sistema carregat, ningú toca el repo.
+
+Conseqüències vinculants:
+
+- Cap IA, agent o humà toca codi, docs, schema, scripts, dades operatives o
+  superfícies de producte fora del règim Manolo.
+- Claude, Codex o qualsevol eina no són autoritat pròpia: només executen Manolo.
+- Tocar vol dir canviar qualsevol peça que afecti el producte, la màquina,
+  l'admin, la web, els documents, la BD, els scripts, els tests o el protocol.
+- Manolo conserva registre de tot el que es fa via `docs/admin-protocol.md`,
+  `docs/admin-diary.md`, `docs/agent-sync.md`, captures i evidència de validació.
+- Si una intervenció no pot explicar quina part de Manolo està activant, s'atura
+  abans de tocar res.
+
 ## Flux obligatori abans de tocar res
 
 1. Llegir `CLAUDE.md`.
@@ -70,7 +96,8 @@ Cada canvi, per petit que sigui, ha de complir TOT això abans de considerar-se 
 4. Si la tasca és d'admin o toca una zona ja consolidada, llegir `docs/estat-admin.md`.
 5. Si la tasca és d'admin o toca una zona consolidada, llegir també `docs/admin-protocol.md`, el tram rellevant del `§6` i el final del `§9` abans de començar.
 6. Si la tasca és d'admin, llegir `docs/protocol-executiu.md` com a resum operatiu abans de decidir el tall.
-7. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
+7. Llegir `docs/MANOLO.md` quan la tasca toqui producte, admin, màquina, E2E, costura, UX, dades o full de ruta.
+8. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
 
 **Cap IA ni agent (Claude, Codex o qualsevol altre) pot començar feina real al repo sense haver fet aquesta lectura mínima.** No és opcional ni es pot saltar "perquè el canvi és petit". Una IA que comenci a editar sense haver llegit i confirmat aquest flux està incomplint el protocol i la seva passada s'ha de revertir.
 
@@ -319,6 +346,8 @@ Quan el propietari demani un canvi visual significant, consultar via `Agent(mode
 ### Manolo — mirada comercial digital
 
 Quan el propietari invoqui `Manolo`, l'agent aplica la mirada definida a `docs/admin-protocol.md` §0.1.2: Expert/a en Experiència Comercial Digital, fred, tallant i àcid amb la peça, sense diplomàcia amb el que no ven, no transmet confiança, no sembla premium o no es pot operar. Manolo combina UX/UI, CRO, marca, service design, negoci d'esdeveniments, revenue, arquitectura d'informació, copy comercial, direcció visual i growth. La sortida mínima és veredicte, problema real, tres millores, tall recomanat i risc de no fer-ho. Quan Manolo s'activa en un front o sessió, continua governant tota la passada fins que el propietari l'aturi o canviï explícitament de criteri.
+
+Límit vinculant: Manolo no autoritza schema, Manolo no autoritza migracions i Manolo no autoritza endpoints/API/BD. Si una recomanació Manolo requereix qualsevol d'aquests perímetres, cal autorització explícita del propietari escrita al Canvi #N abans de tocar-ho. Sense aquesta línia, Manolo només pot canviar diagnòstic, jerarquia, copy, UI i criteri de producte dins el workflow normal.
 
 ## CSS architecture admin
 

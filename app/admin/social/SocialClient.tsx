@@ -21,6 +21,8 @@ import {
   SOCIAL_POST_STATUSES,
   SOCIAL_CONTENT_TYPES,
   SOCIAL_CATEGORIES,
+  SOCIAL_POST_ORIGIN_LABELS,
+  SOCIAL_POST_ORIGIN_TYPES,
   formatDate as formatDateCanonical,
   formatDateTime as formatDateTimeCanonical,
   formatMonthYearLong,
@@ -28,6 +30,7 @@ import {
   type SocialPostStatus,
   type SocialContentType,
   type SocialCategory,
+  type SocialPostOriginType,
 } from '@/lib/constants';
 
 type SerializedPost = {
@@ -43,6 +46,9 @@ type SerializedPost = {
   publishedAt: string | null;
   mediaUrls: string[];
   bookingId: string | null;
+  originType: string;
+  originId: string | null;
+  originLabel: string | null;
   notes: string | null;
   createdAt: string;
   updatedAt: string;
@@ -86,6 +92,9 @@ type PostSeed = {
   scheduledAt: string | null;
   mediaUrl: string | null;
   bookingId: string | null;
+  originType: SocialPostOriginType;
+  originId: string | null;
+  originLabel: string | null;
 };
 
 type Counts = Record<SocialPostStatus, number>;
@@ -108,6 +117,13 @@ const IDEA_SOURCE_LABEL: Record<SerializedIdea['source'], string> = {
   testimonial: 'Testimoni aprovat',
   portfolio: 'Nou al portfolio',
   'upcoming-event': 'Teaser proper',
+};
+
+const IDEA_SOURCE_ORIGIN_TYPE: Record<SerializedIdea['source'], SocialPostOriginType> = {
+  booking: SOCIAL_POST_ORIGIN_TYPES.BOOKING,
+  testimonial: SOCIAL_POST_ORIGIN_TYPES.TESTIMONIAL,
+  portfolio: SOCIAL_POST_ORIGIN_TYPES.PORTFOLIO,
+  'upcoming-event': SOCIAL_POST_ORIGIN_TYPES.UPCOMING_EVENT,
 };
 
 const STATUS_TONE: Record<string, string> = {
@@ -136,6 +152,14 @@ function formatDate(iso: string | null): string {
 function formatDateTime(iso: string | null): string {
   if (!iso) return '—';
   return formatDateTimeCanonical(iso);
+}
+
+function formatPostOrigin(post: Pick<SerializedPost, 'originType' | 'originId' | 'originLabel' | 'bookingId'>): string | null {
+  const type = post.originType as SocialPostOriginType;
+  if (!type || type === SOCIAL_POST_ORIGIN_TYPES.MANUAL) return null;
+  const label = SOCIAL_POST_ORIGIN_LABELS[type] || type;
+  const value = post.originLabel || post.originId || post.bookingId;
+  return value ? `${label}: ${value}` : label;
 }
 
 async function readSocialMutationPayload(res: Response): Promise<SocialMutationResponse> {
@@ -291,6 +315,7 @@ export default function SocialClient({
   }
 
   function handleUseIdea(idea: SerializedIdea) {
+    const originType = IDEA_SOURCE_ORIGIN_TYPE[idea.source];
     setEditingPost(null);
     setPostSeed({
       title: idea.title,
@@ -302,6 +327,9 @@ export default function SocialClient({
       scheduledAt: idea.scheduledAt,
       mediaUrl: idea.mediaUrl,
       bookingId: idea.source === 'booking' ? idea.sourceRef.id : null,
+      originType,
+      originId: idea.sourceRef.id,
+      originLabel: idea.sourceRef.label,
     });
     setShowCreate(true);
   }
@@ -531,6 +559,10 @@ export default function SocialClient({
                     </div>
                     <p className="mt-1.5 font-semibold text-sm truncate">{post.title}</p>
                     {post.caption && <p className="mt-0.5 text-xs opacity-60 line-clamp-2">{post.caption}</p>}
+                    {(() => {
+                      const origin = formatPostOrigin(post);
+                      return origin ? <p className="mt-1 text-xs opacity-50">{origin}</p> : null;
+                    })()}
                     {post.hashtags.length > 0 && (
                       <p className="mt-1 text-xs admin-tone-text-cyan">{post.hashtags.map((h) => `#${h}`).join(' ')}</p>
                     )}
@@ -662,6 +694,7 @@ export default function SocialClient({
               // Si venia d'una idea, la treiem de la llista
               if (postSeed) {
                 const matchingIdea = ideas.find((i) =>
+                  (postSeed.originType === IDEA_SOURCE_ORIGIN_TYPE[i.source] && i.sourceRef.id === postSeed.originId) ||
                   i.title === postSeed.title ||
                   (postSeed.bookingId && i.sourceRef.id === postSeed.bookingId)
                 );
@@ -741,6 +774,9 @@ function SocialPostModal({
     if (!post && seed) {
       if (seed.bookingId) body.bookingId = seed.bookingId;
       if (seed.mediaUrl) body.mediaUrls = [seed.mediaUrl];
+      body.originType = seed.originType;
+      body.originId = seed.originId;
+      body.originLabel = seed.originLabel;
     }
 
     try {
@@ -763,6 +799,9 @@ function SocialPostModal({
         updatedAt: saved.updatedAt ?? new Date().toISOString(),
         scheduledAt: saved.scheduledAt ?? null,
         publishedAt: saved.publishedAt ?? null,
+        originType: saved.originType ?? post?.originType ?? seed?.originType ?? SOCIAL_POST_ORIGIN_TYPES.MANUAL,
+        originId: saved.originId ?? post?.originId ?? seed?.originId ?? null,
+        originLabel: saved.originLabel ?? post?.originLabel ?? seed?.originLabel ?? null,
       });
     } catch (err) {
       console.error('Error desant publicació social', err);

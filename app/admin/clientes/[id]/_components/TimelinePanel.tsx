@@ -101,6 +101,10 @@ function matchesTimelineFilter(event: TimelineEventDTO, filter: TimelineFilter):
   return CUSTOMER_TIMELINE_EVENT_META[event.type]?.filter === filter;
 }
 
+function shouldOpenTimelineLinkInNewTab(href: string): boolean {
+  return /^https?:\/\//i.test(href) || href.startsWith('/api/');
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
@@ -311,12 +315,7 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
       </div>
 
       {event.link && (
-        <Link
-          href={event.link.href}
-          className="mt-1.5 inline-block max-w-full truncate text-xs text-[var(--gold)] no-underline transition-colors hover:text-[var(--gold-bright)]"
-        >
-          {event.link.label} →
-        </Link>
+        <TimelineEventLink link={event.link} />
       )}
       {event.originLinks && event.originLinks.length > 0 && (
         <div className="mt-1.5 flex flex-wrap items-center gap-1 text-xs">
@@ -333,6 +332,23 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
         </div>
       )}
     </article>
+  );
+}
+
+function TimelineEventLink({ link }: { link: NonNullable<TimelineEventDTO['link']> }) {
+  const opensInNewTab = shouldOpenTimelineLinkInNewTab(link.href);
+  const className = 'mt-1.5 inline-block max-w-full truncate text-xs text-[var(--gold)] no-underline transition-colors hover:text-[var(--gold-bright)]';
+  if (opensInNewTab) {
+    return (
+      <a href={link.href} target="_blank" rel="noopener noreferrer" className={className}>
+        {link.label} →
+      </a>
+    );
+  }
+  return (
+    <Link href={link.href} className={className}>
+      {link.label} →
+    </Link>
   );
 }
 

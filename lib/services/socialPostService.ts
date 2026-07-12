@@ -12,11 +12,13 @@ import {
   SOCIAL_POST_STATUSES,
   SOCIAL_CONTENT_TYPES,
   SOCIAL_CATEGORIES,
+  SOCIAL_POST_ORIGIN_TYPES,
   SOCIAL_VALIDATION_SETS,
   type SocialPlatform,
   type SocialPostStatus,
   type SocialContentType,
   type SocialCategory,
+  type SocialPostOriginType,
 } from '@/lib/constants';
 import { validateSocialPostReviewGate } from '@/lib/socialPostReviewGuard';
 
@@ -36,6 +38,9 @@ export type SocialPostCreateInput = {
   publishedAt?: string | Date | null;
   mediaUrls?: string[];
   bookingId?: string | null;
+  originType?: SocialPostOriginType | null;
+  originId?: string | null;
+  originLabel?: string | null;
   notes?: string | null;
 };
 
@@ -76,10 +81,101 @@ export function validateSocialPostInput(input: SocialPostCreateInput): string | 
   if (input.category && !SOCIAL_VALIDATION_SETS.categories.has(input.category)) {
     return `Categoria invàlida: ${input.category}`;
   }
+  const origin = resolveCreateSocialOrigin(input);
+  if (origin.error) return origin.error;
   if (input.status === SOCIAL_POST_STATUSES.SCHEDULED && !input.scheduledAt) {
     return 'Les publicacions programades requereixen una data';
   }
   return null;
+}
+
+function cleanOriginValue(value: string | null | undefined): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function validateResolvedOrigin(input: {
+  originType: SocialPostOriginType;
+  originId: string | null;
+  bookingId: string | null;
+}): string | null {
+  if (!SOCIAL_VALIDATION_SETS.originTypes.has(input.originType)) {
+    return `Origen social invàlid: ${input.originType}`;
+  }
+  if (input.originType === SOCIAL_POST_ORIGIN_TYPES.MANUAL && input.originId) {
+    return "L'origen manual no pot tenir originId";
+  }
+  if (input.originType !== SOCIAL_POST_ORIGIN_TYPES.MANUAL && !input.originId) {
+    return "Cal originId per a publicacions socials derivades";
+  }
+  if (
+    input.originType === SOCIAL_POST_ORIGIN_TYPES.BOOKING &&
+    input.bookingId &&
+    input.originId &&
+    input.bookingId !== input.originId
+  ) {
+    return 'bookingId i originId no coincideixen per a origen BOOKING';
+  }
+  return null;
+}
+
+function resolveCreateSocialOrigin(input: SocialPostCreateInput): {
+  originType: SocialPostOriginType;
+  originId: string | null;
+  originLabel: string | null;
+  bookingId: string | null;
+  error: string | null;
+} {
+  const inputOriginType = input.originType ?? null;
+  const bookingId = cleanOriginValue(input.bookingId);
+  const originType = inputOriginType ?? (bookingId ? SOCIAL_POST_ORIGIN_TYPES.BOOKING : SOCIAL_POST_ORIGIN_TYPES.MANUAL);
+  const originId = cleanOriginValue(input.originId) ?? (originType === SOCIAL_POST_ORIGIN_TYPES.BOOKING ? bookingId : null);
+  const resolvedBookingId = bookingId ?? (originType === SOCIAL_POST_ORIGIN_TYPES.BOOKING ? originId : null);
+  const originLabel = cleanOriginValue(input.originLabel);
+  const error = validateResolvedOrigin({ originType, originId, bookingId: resolvedBookingId });
+  return { originType, originId, originLabel, bookingId: resolvedBookingId, error };
+}
+
+function resolveUpdateSocialOrigin(
+  existing: SocialPost & {
+    originType?: SocialPostOriginType | null;
+    originId?: string | null;
+    originLabel?: string | null;
+  },
+  input: SocialPostUpdateInput,
+): {
+  changed: boolean;
+  originType: SocialPostOriginType;
+  originId: string | null;
+  originLabel: string | null;
+  error: string | null;
+} {
+  const explicitOriginChange = input.originType !== undefined || input.originId !== undefined || input.originLabel !== undefined;
+  const bookingChanged = input.bookingId !== undefined;
+  const existingOriginType = existing.originType ?? (existing.bookingId ? SOCIAL_POST_ORIGIN_TYPES.BOOKING : SOCIAL_POST_ORIGIN_TYPES.MANUAL);
+  const nextBookingId = bookingChanged ? cleanOriginValue(input.bookingId) : cleanOriginValue(existing.bookingId);
+  const bookingActuallyChanged = bookingChanged && nextBookingId !== cleanOriginValue(existing.bookingId);
+  let originType = input.originType ?? existingOriginType;
+  let originId = input.originId !== undefined ? cleanOriginValue(input.originId) : cleanOriginValue(existing.originId);
+  let originLabel = input.originLabel !== undefined ? cleanOriginValue(input.originLabel) : cleanOriginValue(existing.originLabel);
+
+  if (!explicitOriginChange && bookingActuallyChanged && (existingOriginType === SOCIAL_POST_ORIGIN_TYPES.MANUAL || existingOriginType === SOCIAL_POST_ORIGIN_TYPES.BOOKING)) {
+    originType = nextBookingId ? SOCIAL_POST_ORIGIN_TYPES.BOOKING : SOCIAL_POST_ORIGIN_TYPES.MANUAL;
+    originId = nextBookingId;
+    if (!nextBookingId) originLabel = null;
+  }
+
+  if (originType === SOCIAL_POST_ORIGIN_TYPES.BOOKING && !originId && nextBookingId) {
+    originId = nextBookingId;
+  }
+  if (originType === SOCIAL_POST_ORIGIN_TYPES.MANUAL && input.originType === SOCIAL_POST_ORIGIN_TYPES.MANUAL) {
+    originId = null;
+    originLabel = null;
+  }
+
+  const error = validateResolvedOrigin({ originType, originId, bookingId: nextBookingId });
+  return { changed: explicitOriginChange || bookingActuallyChanged, originType, originId, originLabel, error };
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -89,9 +185,11 @@ export function validateSocialPostInput(input: SocialPostCreateInput): string | 
 export async function createSocialPost(input: SocialPostCreateInput): Promise<SocialPost> {
   const error = validateSocialPostInput(input);
   if (error) throw new Error(error);
+  const origin = resolveCreateSocialOrigin(input);
+  if (origin.error) throw new Error(origin.error);
   const reviewError = validateSocialPostReviewGate({
     status: input.status ?? SOCIAL_POST_STATUSES.IDEA,
-    bookingId: input.bookingId,
+    bookingId: origin.bookingId,
     category: input.category,
     notes: input.notes,
   });
@@ -108,8 +206,11 @@ export async function createSocialPost(input: SocialPostCreateInput): Promise<So
     scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
     publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
     mediaUrls: input.mediaUrls ?? [],
+    originType: origin.originType,
+    originId: origin.originId,
+    originLabel: origin.originLabel,
     notes: input.notes ?? null,
-    ...(input.bookingId ? { booking: { connect: { id: input.bookingId } } } : {}),
+    ...(origin.bookingId ? { booking: { connect: { id: origin.bookingId } } } : {}),
   };
 
   const post = await prisma.socialPost.create({ data });
@@ -178,6 +279,8 @@ export async function updateSocialPost(id: string, input: SocialPostUpdateInput)
     notes: input.notes !== undefined ? input.notes : existing.notes,
   });
   if (reviewError) throw new Error(reviewError);
+  const origin = resolveUpdateSocialOrigin(existing, input);
+  if (origin.error) throw new Error(origin.error);
 
   const data: Prisma.SocialPostUpdateInput = {};
   if (input.title !== undefined) data.title = input.title.trim();
@@ -195,6 +298,11 @@ export async function updateSocialPost(id: string, input: SocialPostUpdateInput)
   }
   if (input.mediaUrls !== undefined) data.mediaUrls = input.mediaUrls;
   if (input.notes !== undefined) data.notes = input.notes;
+  if (origin.changed) {
+    data.originType = origin.originType;
+    data.originId = origin.originId;
+    data.originLabel = origin.originLabel;
+  }
   if (input.bookingId !== undefined) {
     data.booking = input.bookingId
       ? { connect: { id: input.bookingId } }

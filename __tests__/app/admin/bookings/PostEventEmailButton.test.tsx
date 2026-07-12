@@ -31,11 +31,25 @@ describe('PostEventEmailButton', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Envia post-event al client' }));
 
+    expect(mockFetchWithCsrf).not.toHaveBeenCalled();
+    expect(screen.getByRole('status')).toHaveTextContent('email real al client');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar enviament' }));
+
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('SMTP aturat');
     });
 
     expect(screen.getByRole('button', { name: 'Envia post-event al client' })).toHaveAttribute('aria-invalid', 'true');
     expect(mockLogError).toHaveBeenCalled();
+  });
+
+  it('queda bloquejat quan el post-event ja consta enviat', () => {
+    render(<PostEventEmailButton bookingId="booking-1" initiallySent />);
+
+    const button = screen.getByRole('button', { name: '✓ Enviat!' });
+    expect(button).toBeDisabled();
+    fireEvent.click(button);
+    expect(mockFetchWithCsrf).not.toHaveBeenCalled();
   });
 });

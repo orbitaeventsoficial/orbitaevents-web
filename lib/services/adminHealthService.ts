@@ -1,5 +1,10 @@
 import { prisma } from '@/lib/prisma';
-import { ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES, ADMIN_HEALTH_ACTIVE_LEAD_STATUSES } from '@/lib/constants/admin';
+import {
+  ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES,
+  ADMIN_HEALTH_ACTIVE_LEAD_STATUSES,
+  getAdminPostEventCronSettingKeys,
+  readAdminPostEventCronSetting,
+} from '@/lib/constants/admin';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getFinanceAlertsSummary } from '@/lib/services/financeAlertsService';
 import { computePackPricingHealth, getPackPricingModelConfigEditable } from '@/lib/services/packPricingHealth';
@@ -194,7 +199,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       where: {
         key: {
           in: [
-            'emails.cron.lastRun',
+            ...getAdminPostEventCronSettingKeys(),
             'automation.commercial.lastRun',
             'alerts.finance.autofixFailureCount',
             'alerts.system.autofixFailureCount',
@@ -410,7 +415,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
   const catalogItems: AdminHealthItem[] = [];
   const dataItems: AdminHealthItem[] = [];
 
-  const emailCronLastRun = parseIsoDate(settings['emails.cron.lastRun']);
+  const emailCronLastRun = parseIsoDate(readAdminPostEventCronSetting(settings, 'lastRun'));
   if (!emailCronLastRun || emailCronLastRun.getTime() < twoDaysAgo.getTime()) {
     systemItems.push({
       id: 'system-email-cron-stale',
@@ -922,7 +927,6 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     generatedAt: new Date().toISOString(),
   };
 }
-
 
 
 

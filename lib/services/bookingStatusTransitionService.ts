@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { ACTIVE_BOOKING_STATUSES, ACTIVE_INVENTORY_BOOKING_STATUSES } from '@/lib/constants';
 import { calculateEventDuration } from '@/lib/inventory-utils';
 import { tryEnsureCompletedBookingPortalAccess } from '@/lib/services/bookingPortalCompletionService';
+import { buildBookingInventoryConflictBookingWhere } from '@/lib/services/bookingInventoryAvailability';
+import { onBookingConfirmed } from '@/lib/services/automationTriggers';
 
 
 export type ManagedBookingStatus = 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'COMPLETED' | 'CANCELLED';
@@ -15,6 +17,7 @@ export type BookingStatusTransitionInput = {
     guestCount: number;
     eventType: EventType;
     eventLocation: string;
+    eventDate: Date | string;
     eventStartTime?: string | null;
     eventEndTime?: string | null;
     reference: string;
@@ -25,42 +28,89 @@ export type BookingStatusTransitionInput = {
   portalTrigger: string;
 };
 
+async function createCompletionLiveNotificationOnce(input: {
+  bookingId: string;
+  eventType: EventType;
+  eventLocation: string;
+}) {
+  const existingNotification = await prisma.liveNotification.findFirst({
+    where: { bookingId: input.bookingId, isReal: true },
+    select: { id: true },
+  });
+  if (existingNotification) return false;
+
+  await prisma.liveNotification.create({
+    data: {
+      type: input.eventType,
+      location: input.eventLocation,
+      isReal: true,
+      bookingId: input.bookingId,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    },
+  });
+  return true;
+}
+
+async function syncCompletionInventoryUsage(input: {
+  bookingId: string;
+  bookingInv: Array<{ itemId: string }>;
+  eventDuration: number;
+  reference: string;
+}) {
+  const itemIds = input.bookingInv.map((bi) => bi.itemId);
+  if (input.eventDuration <= 0 || itemIds.length === 0) return;
+
+  const notes = `Bolo ${input.reference}`;
+  const existingUsage = await prisma.inventoryUsage.findMany({
+    where: {
+      bookingId: input.bookingId,
+      itemId: { in: itemIds },
+    },
+    select: { itemId: true },
+  });
+  const existingItemIds = new Set(existingUsage.map((usage) => usage.itemId));
+
+  if (existingItemIds.size > 0) {
+    await prisma.inventoryUsage.updateMany({
+      where: {
+        bookingId: input.bookingId,
+        itemId: { in: [...existingItemIds] },
+      },
+      data: {
+        hoursUsed: input.eventDuration,
+        notes,
+      },
+    });
+  }
+
+  const missing = input.bookingInv.filter((bi) => !existingItemIds.has(bi.itemId));
+  if (missing.length === 0) return;
+
+  await prisma.inventoryUsage.createMany({
+    data: missing.map((bi) => ({
+      itemId: bi.itemId,
+      bookingId: input.bookingId,
+      hoursUsed: input.eventDuration,
+      notes,
+    })),
+  });
+}
+
 export async function applyBookingStatusSideEffects(input: BookingStatusTransitionInput) {
   const { bookingId, oldStatus, newStatus, existing, portalTrigger } = input;
   let statsUpdated = false;
 
   if (newStatus === 'COMPLETED' && oldStatus !== 'COMPLETED') {
-    await prisma.$transaction(async (tx) => {
-      await tx.$executeRaw`
-        UPDATE settings
-        SET value = CAST(CAST(value AS INTEGER) + 1 AS TEXT)
-        WHERE key = 'total_events'
-      `;
-
-      const guests = existing.guestCount || 0;
-      if (guests > 0) {
-        await tx.$executeRaw`
-          UPDATE settings
-          SET value = CAST(CAST(value AS INTEGER) + ${guests} AS TEXT)
-          WHERE key = 'total_people'
-        `;
-      }
-
-      await tx.liveNotification.create({
-        data: {
-          type: existing.eventType,
-          location: existing.eventLocation,
-          isReal: true,
-          bookingId,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        },
-      });
+    statsUpdated = await createCompletionLiveNotificationOnce({
+      bookingId,
+      eventType: existing.eventType,
+      eventLocation: existing.eventLocation,
     });
-
-    statsUpdated = true;
   }
 
   if (newStatus === 'CONFIRMED' && oldStatus !== 'CONFIRMED') {
+    await onBookingConfirmed(bookingId, { source: 'booking-status-transition' });
+
     const bookingWithPack = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: {
@@ -71,6 +121,13 @@ export async function applyBookingStatusSideEffects(input: BookingStatusTransiti
 
     if (bookingWithPack?.pack?.inventory) {
       const alreadyAssignedIds = new Set(bookingWithPack.inventory.map((bi) => bi.itemId));
+      if (alreadyAssignedIds.size > 0) {
+        await prisma.inventoryItem.updateMany({
+          where: { id: { in: [...alreadyAssignedIds] } },
+          data: { status: 'IN_USE' },
+        });
+      }
+
       const toAssign = bookingWithPack.pack.inventory.filter((pi) => !alreadyAssignedIds.has(pi.itemId));
 
       if (toAssign.length > 0) {
@@ -79,8 +136,11 @@ export async function applyBookingStatusSideEffects(input: BookingStatusTransiti
           by: ['itemId'],
           where: {
             itemId: { in: toAssign.map((pi) => pi.itemId) },
-            bookingId: { not: bookingId },
-            booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
+            booking: buildBookingInventoryConflictBookingWhere({
+              bookingId,
+              eventDate: existing.eventDate,
+              statuses: ACTIVE_BOOKING_STATUSES,
+            }),
           },
         });
         const busyIds = new Set(overlapping.map((o) => o.itemId));
@@ -114,15 +174,17 @@ export async function applyBookingStatusSideEffects(input: BookingStatusTransiti
 
     const eventDuration = calculateEventDuration(existing.eventStartTime, existing.eventEndTime);
 
-    // Batch: crear registres d'ús
-    if (eventDuration > 0 && bookingInv.length > 0) {
-      await prisma.inventoryUsage.createMany({
-        data: bookingInv.map((bi) => ({
-          itemId: bi.itemId,
-          bookingId,
-          hoursUsed: eventDuration,
-          notes: `Bolo ${existing.reference}`,
-        })),
+    await syncCompletionInventoryUsage({
+      bookingId,
+      bookingInv,
+      eventDuration,
+      reference: existing.reference,
+    });
+
+    if (bookingInv.length > 0) {
+      await prisma.bookingInventory.updateMany({
+        where: { bookingId },
+        data: { checkedOut: true, checkedIn: true },
       });
     }
 

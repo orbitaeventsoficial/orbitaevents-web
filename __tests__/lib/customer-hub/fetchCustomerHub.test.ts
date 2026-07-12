@@ -319,6 +319,135 @@ describe('fetchCustomerHub', () => {
     });
   });
 
+  it('propaga report i enquesta post-event cap al customer hub', async () => {
+    mockFetchCustomerHubCollections.mockResolvedValue({
+      proposals: [],
+      bookingsRows: [
+        {
+          id: 'booking-post-1',
+          reference: 'OE-2026-010',
+          eventDate: new Date('2026-06-20T18:00:00Z'),
+          eventStartTime: '18:00',
+          eventEndTime: '02:00',
+          status: 'COMPLETED',
+          eventLocation: 'Girona',
+          eventVenue: null,
+          distanceKm: null,
+          depositAmount: 300,
+          remainingAmount: 700,
+          total: 1000,
+          cashAmount: 1000,
+          eventType: 'WEDDING',
+          guestCount: 120,
+          depositPaid: true,
+          remainingPaid: true,
+          discountCode: null,
+          pack: null,
+          invoices: [
+            {
+              id: 'inv-1',
+              reference: 'FAC-2026-0001',
+              status: 'PAID',
+              total: 1000,
+              pdfUrl: 'https://cdn.test/fac-1.pdf',
+              holdedInvoiceUrl: null,
+              createdAt: new Date('2026-06-21T09:00:00Z'),
+            },
+          ],
+          deliveryNotes: [
+            {
+              id: 'alb-1',
+              reference: 'ALB-2026-0001',
+              status: 'SIGNED',
+              pdfUrl: 'https://cdn.test/alb-1.pdf',
+              deliveredAt: new Date('2026-06-20T22:00:00Z'),
+              signedAt: new Date('2026-06-21T00:30:00Z'),
+              createdAt: new Date('2026-06-20T21:45:00Z'),
+            },
+          ],
+          postEventReport: {
+            id: 'report-1',
+            status: 'COMPLETED',
+            completedAt: new Date('2026-06-21T10:00:00Z'),
+            createdAt: new Date('2026-06-21T09:55:00Z'),
+            soundQuality: 5,
+            maxDancefloor: 80,
+            hadIncidents: false,
+          },
+          clientSurvey: {
+            id: 'survey-1',
+            submittedAt: new Date('2026-06-21T11:00:00Z'),
+            overallRating: 5,
+            npsScore: 10,
+            testimonialPermission: 'YES_ANONYMOUS',
+            createdTestimonialId: null,
+          },
+        },
+      ],
+      customerTasks: [],
+      activityLog: [],
+      customerDiscountCodes: [],
+    });
+
+    const result = await fetchCustomerHub('cust-1');
+
+    expect(result.bookings[0]).toMatchObject({
+      id: 'booking-post-1',
+      postEventReport: {
+        id: 'report-1',
+        status: 'COMPLETED',
+        completedAt: '2026-06-21T10:00:00.000Z',
+      },
+      clientSurvey: {
+        id: 'survey-1',
+        submittedAt: '2026-06-21T11:00:00.000Z',
+        npsScore: 10,
+      },
+      invoices: [
+        expect.objectContaining({
+          id: 'inv-1',
+          reference: 'FAC-2026-0001',
+          status: 'PAID',
+          total: 1000,
+          pdfUrl: 'https://cdn.test/fac-1.pdf',
+          createdAt: '2026-06-21T09:00:00.000Z',
+        }),
+      ],
+      deliveryNotes: [
+        expect.objectContaining({
+          id: 'alb-1',
+          reference: 'ALB-2026-0001',
+          status: 'SIGNED',
+          pdfUrl: 'https://cdn.test/alb-1.pdf',
+          signedAt: '2026-06-21T00:30:00.000Z',
+        }),
+      ],
+    });
+    expect(mockBuildCustomerBusinessTimelineEvents).toHaveBeenCalledWith(expect.objectContaining({
+      bookings: [
+        expect.objectContaining({
+          id: 'booking-post-1',
+          postEventReport: expect.objectContaining({ id: 'report-1' }),
+          clientSurvey: expect.objectContaining({ id: 'survey-1' }),
+          invoices: [
+            expect.objectContaining({
+              id: 'inv-1',
+              status: 'PAID',
+              pdfUrl: 'https://cdn.test/fac-1.pdf',
+            }),
+          ],
+          deliveryNotes: [
+            expect.objectContaining({
+              id: 'alb-1',
+              status: 'SIGNED',
+              pdfUrl: 'https://cdn.test/alb-1.pdf',
+            }),
+          ],
+        }),
+      ],
+    }));
+  });
+
   it('carrega també la timeline canònica del customer abans de construir la cronologia', async () => {
     mockFetchCustomerHubCollections.mockResolvedValue({
       proposals: [],

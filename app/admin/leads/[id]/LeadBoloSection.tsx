@@ -9,7 +9,6 @@ import BoloTripCard, { CROWDED_TRIP_THRESHOLD } from '@/app/admin/components/Bol
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
 import { buildBoloRepartimentLines, computeBoloRepartiment } from '@/lib/services/repartimentService';
-import { applyDatePricing } from '@/lib/services/pricing/datePricingService';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { SOUND_RENTAL } from '@/lib/constants/inventory';
 import {
@@ -232,6 +231,7 @@ export default function LeadBoloSection({
  eventLocation: documentContext.eventLocation ?? '',
  onDistanceResolved: (km) => { setDistanceKm(km); setDirty(true); },
  onTollsResolved: (t) => { setTollsEur(t); setDirty(true); },
+ enabled: initialDistanceKm == null,
  });
  // Integrants derivats del bolo (#1363): persones FÍSIQUES via la regla canònica
  // (deriveTravelHeadcount) — els rols que fa Òrbita col·lapsen en 1. `baseLines` inclou
@@ -276,7 +276,7 @@ export default function LeadBoloSection({
  }), [distanceKm, tollsEur, vehicleCostPerKm, vehicleOwnerId, travelPeople, travelCollaborators]);
  // TRANSPORT del bolo (#1369/#1386, monocapa): UNA sola crida al cervell `computeBoloTransport`.
  // El lead NO calcula res pel seu compte: cost i càrrec surten de la MATEIXA font, així la dieta
- // (#1386) entra igual als dos i el marge de transport queda break-even (no fals-positiu).
+ // (#1386) entra igual als dos; el vehicle pot aplicar un mínim comercial si hi ha km facturables.
  const km = Number(distanceKm) || 0;
  const transport = useMemo(
    () => (km > 0
@@ -288,6 +288,7 @@ export default function LeadBoloSection({
  const effectiveTravelCost = transport ? transport.cost : internalTravelCost;
  // Càrrec al client: franquícia comercial del cotxe (50 km) + tripulació + dieta + peatges.
  const travelCharge = transport ? transport.clientCharge : internalTravelCost;
+ const vehicleClientCharge = transport ? transport.vehicleClientCharge : travelBreakdown.vehicleCost;
  const tollsValue = Number(tollsEur) || 0;
  const transportLabel = tollsValue > 0 ? 'Transport + peatges' : 'Transport';
  const mealAllowance = transport?.mealAllowance ?? 0;
@@ -297,7 +298,7 @@ export default function LeadBoloSection({
  if (km <= 0) return [];
  const billableKm = Math.max(0, km - INCLUDED_TRAVEL_KM);
  const notes = [
- `Vehicle: ${formatNumber(km, { maximumFractionDigits: 1 })} km - ${formatNumber(INCLUDED_TRAVEL_KM, { maximumFractionDigits: 0 })} inclosos = ${formatNumber(billableKm, { maximumFractionDigits: 1 })} km facturables (${formatCurrencyExact(travelBreakdown.vehicleCost)}).`,
+ `Vehicle: ${formatNumber(km, { maximumFractionDigits: 1 })} km - ${formatNumber(INCLUDED_TRAVEL_KM, { maximumFractionDigits: 0 })} inclosos = ${formatNumber(billableKm, { maximumFractionDigits: 1 })} km facturables (${formatCurrencyExact(vehicleClientCharge)}).`,
  ];
  if (travelBreakdown.chargeableHours > 0) {
  const laborPerPerson = travelBreakdown.chargeableHours * TRAVEL_DRIVER_HOURLY_RATE;
@@ -311,7 +312,7 @@ export default function LeadBoloSection({
  notes.push(`Peatges: ${formatCurrencyExact(tollsValue)} informats a la ruta.`);
  }
  return notes;
- }, [headcount, km, mealAllowance, tollsValue, travelBreakdown.chargeableHours, travelBreakdown.routeHours, travelBreakdown.vehicleCost]);
+ }, [headcount, km, mealAllowance, tollsValue, travelBreakdown.chargeableHours, travelBreakdown.routeHours, vehicleClientCharge]);
  const repartimentInputLines = useMemo(() => buildBoloRepartimentLines({
  serviceLines: visibleLines,
  travelCharge,
@@ -335,12 +336,6 @@ export default function LeadBoloSection({
  const repartiment = useMemo(() => computeBoloRepartiment(repartimentInputLines), [repartimentInputLines]);
  const hasPartner = repartiment.elements.length > 0;
  const serviceEconomics = useMemo(() => computeServiceLineEconomics(economicLines, 0), [economicLines]);
- const datePricing = useMemo(
- () => applyDatePricing(serviceEconomics.revenue, documentContext.eventDate ?? null, 'ca'),
- [documentContext.eventDate, serviceEconomics.revenue],
- );
- const seasonSurcharge = datePricing.surchargeEur;
-
  // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
  // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
  // Cost de cada línia: el cost explícit (partners) o, per a línies pròpies d'Òrbita
@@ -353,9 +348,10 @@ export default function LeadBoloSection({
  // viu al cost fix operatiu; imputar a més un % seria comptar-lo dos cops.
  const { revenue: linesRevenue, cost } = serviceEconomics;
  if (linesRevenue <= 0) return null;
- // El càrrec de desplaçament i el recàrrec de data es REPERCUTEIXEN al client.
- // El recàrrec és comercial d'Òrbita: suma ingrés i marge, però no altera què cobra el partner.
- const revenue = linesRevenue + seasonSurcharge + travelCharge;
+ // El càrrec de desplaçament es repercuteix al client. La data de l'event no
+ // afegeix cap recàrrec automàtic: qualsevol política TA queda fora fins que
+ // el propietari la defineixi explícitament.
+ const revenue = linesRevenue + travelCharge;
  // Cost operatiu real (vegeu docs/bolo-flux.md):
  // - cost fix (desgast + amortització + consumibles) NOMÉS si el bolo porta
  // equip propi d'Òrbita (DJ o material propi); Masquerade sol → 0.
@@ -367,7 +363,7 @@ export default function LeadBoloSection({
  total: revenue,
  packPrice: 0, extrasTotal: 0, extraHours: 0, extraHourPrice: 0,
  distanceKm: Number(distanceKm) || 0, travelCost: effectiveTravelCost, travelRevenue: travelCharge,
- serviceLinesRevenue: linesRevenue + seasonSurcharge, serviceLinesCost: cost + rentalTransport,
+ serviceLinesRevenue: linesRevenue, serviceLinesCost: cost + rentalTransport,
  serviceLines: allLines,
  serviceLinesOwnCostRatio: 0,
  serviceLinesCostAdjustment: rentalTransport,
@@ -377,7 +373,7 @@ export default function LeadBoloSection({
  fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
  });
  return summary;
- }, [economicLines, serviceEconomics, visibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm, travelCharge, seasonSurcharge]);
+ }, [economicLines, serviceEconomics, visibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm, travelCharge]);
 
  // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
  useEffect(() => {
@@ -418,11 +414,11 @@ export default function LeadBoloSection({
  }));
  }, [routeCostLines]);
  const routeSummaryItems = useMemo(() => [
- ...(travelBreakdown.vehicleCost > 0 ? [{ label: 'Vehicle', amount: travelBreakdown.vehicleCost }] : []),
+ ...(vehicleClientCharge > 0 ? [{ label: 'Vehicle', amount: vehicleClientCharge }] : []),
  ...(travelBreakdown.peopleCost > 0 ? [{ label: 'Equip ruta', amount: travelBreakdown.peopleCost }] : []),
  ...(mealAllowance > 0 ? [{ label: 'Dietes', amount: mealAllowance }] : []),
  ...(tollsValue > 0 ? [{ label: 'Peatges', amount: tollsValue }] : []),
- ], [mealAllowance, tollsValue, travelBreakdown.peopleCost, travelBreakdown.vehicleCost]);
+ ], [mealAllowance, tollsValue, travelBreakdown.peopleCost, vehicleClientCharge]);
 
  // Marge → nivell visual reutilitzant els tons existents (.ap-ledger-kpi data-level).
  const netLevel = !economia
@@ -505,12 +501,13 @@ export default function LeadBoloSection({
  baseLines={baseLines}
  lines={lines}
  onChange={onLinesChange}
+ guestCount={documentContext.guestCount}
  />
 
- {/* ── PRESSUPOST: elements + transport → suma + total, exposat abans de contractar (#1348).
- Estirat a tota l'amplada. El transport el paga el CLIENT (línia estipulada que suma al total). ── */}
+ {/* ── BASE NETA DEL BOLO: elements + transport, abans de fiscalitat/IVA.
+ Estirat a tota l'amplada. El transport el paga el CLIENT (línia estipulada que suma a la base). ── */}
  {economia && (
- <div className="ap-ledger-budget" aria-label="Resum del pressupost">
+ <div className="ap-ledger-budget" aria-label="Resum net del bolo">
  {/* ── DESPLAÇAMENT: targeta compartida (#1380). El MATEIX component que la fitxa
  de reserva (canon «un sol dissenyador»). Presentacional; els números del cervell. ── */}
  <BoloTripCard
@@ -541,7 +538,7 @@ export default function LeadBoloSection({
  controlsAlwaysVisible
  />
 
- {/* ── PRESSUPOST: la sortida clau del bolo, panell or destacat a tota l'amplada ── */}
+ {/* ── BASE NETA: la sortida clau del bolo abans d'aplicar IVA al pressupost ── */}
  <div className="ap-ledger-budget-sum">
  <div className="ap-ledger-budget-row">
  <span>Serveis</span>
@@ -552,15 +549,9 @@ export default function LeadBoloSection({
  <span aria-label={transportLabel}>{tollsValue > 0 ? <>Transport<em>inclou peatges {formatCurrency(tollsValue)}</em></> : transportLabel}</span>
  <strong>{formatCurrency(travelCharge)}</strong>
  </div>
- {seasonSurcharge > 0 && datePricing.appliedRule ? (
- <div className="ap-ledger-budget-row ap-ledger-budget-row--season">
- <span>{datePricing.appliedRule.label}<em>+{formatNumber(datePricing.surchargePct, { maximumFractionDigits: 0 })}% sobre serveis</em></span>
- <strong>{formatCurrency(seasonSurcharge)}</strong>
- </div>
- ) : null}
  <span className="ap-ledger-budget-op ap-ledger-budget-op--equals" aria-hidden="true">=</span>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
- <span>Total client</span>
+ <span>Base neta<em>abans d'IVA</em></span>
  <strong>{formatCurrency(economia.total)}</strong>
  </div>
  </div>

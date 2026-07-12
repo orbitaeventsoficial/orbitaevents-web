@@ -251,13 +251,39 @@ describe('findPortalAccessByRawToken', () => {
         include: expect.objectContaining({
           booking: expect.objectContaining({
             include: expect.objectContaining({
-              clientFeedback: { select: { id: true } },
+              deliveryNotes: expect.objectContaining({
+                select: expect.objectContaining({
+                  reference: true,
+                  status: true,
+                  pdfUrl: true,
+                  signedAt: true,
+                }),
+              }),
+              invoices: expect.objectContaining({
+                select: expect.objectContaining({
+                  reference: true,
+                  status: true,
+                  pdfUrl: true,
+                  createdAt: true,
+                }),
+              }),
               postEventReport: { select: { id: true } },
+              serviceLines: {
+                select: expect.objectContaining({
+                  kind: true,
+                  label: true,
+                  quantity: true,
+                  notes: true,
+                }),
+              },
             }),
           }),
         }),
       }),
     );
+    const bookingInclude = mockPrisma.clientPortalAccess.findUnique.mock.calls[0]?.[0]
+      ?.include?.booking?.include;
+    expect(bookingInclude).not.toHaveProperty('clientFeedback');
   });
 });
 

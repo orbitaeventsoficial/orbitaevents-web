@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { buildCustomerHubOperatingSummary, type Customer, type CustomerStats } from '@/app/admin/clientes/customer-utils';
+import {
+  buildCustomerHubOperatingSummary,
+  resolveCustomerSegmentFilter,
+  type Customer,
+  type CustomerStats,
+} from '@/app/admin/clientes/customer-utils';
 
 function customer(overrides: Partial<Customer>): Customer {
   return {
@@ -69,5 +74,33 @@ describe('buildCustomerHubOperatingSummary', () => {
       href: '/admin/clientes?add=1',
       ctaLabel: 'Afegir client',
     });
+  });
+});
+
+describe('resolveCustomerSegmentFilter', () => {
+  it('tradueix el segment entrant als filtres CRM existents', () => {
+    expect(resolveCustomerSegmentFilter('at-risk')).toEqual({
+      lifecycleStage: '',
+      tag: '',
+      healthScoreMax: 40,
+      minSpent: null,
+    });
+    expect(resolveCustomerSegmentFilter('high-value')).toEqual({
+      lifecycleStage: '',
+      tag: '',
+      healthScoreMax: null,
+      minSpent: 2000,
+    });
+    expect(resolveCustomerSegmentFilter('vip')).toEqual({
+      lifecycleStage: 'VIP',
+      tag: '',
+      healthScoreMax: null,
+      minSpent: null,
+    });
+  });
+
+  it('ignora segments desconeguts sense netejar filtres manuals', () => {
+    expect(resolveCustomerSegmentFilter('nope')).toBeNull();
+    expect(resolveCustomerSegmentFilter(null)).toBeNull();
   });
 });

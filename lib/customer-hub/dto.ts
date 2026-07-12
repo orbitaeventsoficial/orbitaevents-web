@@ -21,6 +21,8 @@ export type ProposalDTO = {
   createdAt: string;
   sentAt?: string;
   acceptedAt?: string;
+  pdfUrl?: string | null;
+  pdfKey?: string | null;
   snapshot?: Record<string, unknown>;
   // Contract fields
   contractReference?: string | null;
@@ -50,6 +52,41 @@ export type BookingDTO = {
   depositPaid?: boolean;
   remainingPaid?: boolean;
   discountCode?: string;
+  invoices?: Array<{
+    id: string;
+    reference: string;
+    status: string;
+    total: number;
+    pdfUrl?: string | null;
+    holdedInvoiceUrl?: string | null;
+    createdAt: string;
+  }>;
+  deliveryNotes?: Array<{
+    id: string;
+    reference: string;
+    status: string;
+    pdfUrl?: string | null;
+    deliveredAt?: string | null;
+    signedAt?: string | null;
+    createdAt: string;
+  }>;
+  postEventReport?: {
+    id: string;
+    status: string;
+    completedAt?: string | null;
+    createdAt: string;
+    soundQuality?: number | null;
+    maxDancefloor?: number | null;
+    hadIncidents?: boolean;
+  } | null;
+  clientSurvey?: {
+    id: string;
+    submittedAt: string;
+    overallRating: number;
+    npsScore: number;
+    testimonialPermission: string;
+    createdTestimonialId?: string | null;
+  } | null;
 };
 
 export type DiscountCodeDTO = {

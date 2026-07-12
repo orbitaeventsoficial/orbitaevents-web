@@ -247,17 +247,6 @@ export function classifyBoloLines(lines: BoloLineLike[]): {
   return { hasOwnEquipment, hasEquipmentRental };
 }
 
-/**
- * Km de desplaçament que el marge del bolo pot assumir abans de deixar de
- * guanyar (net = 0). El desplaçament va EN CONTRA del marge a `costPerKm` real
- * (benzina MITECO + consum + manteniment). Retorna km totals (anada+tornada).
- */
-export function computeSupportableTravelKm(netMargin: number, costPerKm: number): number {
-  const rate = costPerKm > 0 ? costPerKm : DEFAULT_VEHICLE_COST_PER_KM;
-  if (netMargin <= 0) return 0;
-  return Math.floor(netMargin / rate);
-}
-
 // ─── Core ───────────────────────────────────────────────────────────────────
 
 /**
@@ -412,34 +401,3 @@ export function computeSimpleMarginPct(
 }
 
 // ─── Col·laboradors ────────────────────────────────────────────────────────
-
-interface CollaboratorCostInput {
-  commissionPct: number;
-  pricingModel: 'NET_PLUS_COMMISSION' | 'DISCOUNT';
-}
-
-/**
- * Calcula el marge NET d'una reserva amb col·laborador.
- * Descompta la comissió del col·laborador del marge.
- */
-export function computeCollaboratorNetMargin(
-  summary: BookingFinancialSummary,
-  collaborator: CollaboratorCostInput,
-): { netMarginAfterCommission: number; commissionAmount: number; collaboratorPrice: number; marginPctAfterCommission: number } {
-  // La comissió es calcula igual als dos models: % sobre el total.
-  // El que difereix entre models és el collaboratorPrice (preu que veu el col·lab):
-  //  - DISCOUNT: el col·lab rep el total MENYS la comissió (preu amb descompte).
-  //  - NET_PLUS_COMMISSION: el col·lab rep el total sencer (la comissió va a part).
-  const commissionAmount = Math.round(summary.total * (collaborator.commissionPct / 100));
-
-  const collaboratorPrice =
-    collaborator.pricingModel === 'DISCOUNT'
-      ? summary.total - commissionAmount
-      : summary.total;
-
-  const netMarginAfterCommission = summary.netMargin - commissionAmount;
-  const marginPctAfterCommission =
-    summary.total > 0 ? (netMarginAfterCommission / summary.total) * 100 : 0;
-
-  return { netMarginAfterCommission, commissionAmount, collaboratorPrice, marginPctAfterCommission };
-}

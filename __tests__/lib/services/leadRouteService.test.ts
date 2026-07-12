@@ -156,13 +156,40 @@ describe('updateLeadFromInput', () => {
   });
 
   it('estableix convertedAt quan WON', async () => {
-    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEGOTIATING', contactedAt: new Date() });
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEGOTIATING', contactedAt: new Date(), booking: { id: 'b1' } });
 
     await updateLeadFromInput('l1', { status: 'WON' });
 
     expect(mockPrisma.lead.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ convertedAt: expect.any(Date) }),
+      })
+    );
+  });
+
+  it('rebutja passar a WON si encara no hi ha reserva vinculada', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEGOTIATING', contactedAt: new Date(), booking: null });
+
+    const result = await updateLeadFromInput('l1', { status: 'WON' });
+
+    expect(result.status).toBe(409);
+    expect(result.body).toMatchObject({
+      error: expect.stringContaining('sense reserva vinculada'),
+      nextAction: '/admin/bookings/new?leadId=l1&prefill=lead',
+    });
+    expect(mockPrisma.lead.update).not.toHaveBeenCalled();
+    expect(mockPrisma.adminLog.create).not.toHaveBeenCalled();
+  });
+
+  it('permet editar un històric que ja era WON encara que encara no tingui reserva', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'WON', contactedAt: new Date(), booking: null });
+
+    const result = await updateLeadFromInput('l1', { status: 'WON', priority: 'HIGH' });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: 'WON', priority: 'HIGH' }),
       })
     );
   });

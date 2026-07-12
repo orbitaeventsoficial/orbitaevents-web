@@ -3,8 +3,10 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { ReferralsSummary, ReferralCandidate } from '@/lib/services/referralsService';
-import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildCustomerComposeHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { formatCurrency } from '@/lib/constants';
+import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants/customer-crm';
+import { fetchWithCsrf } from '@/lib/csrf';
 import { AdminSection, AdminEmptyState } from '../../components/AdminPage';
 
 type Props = { summary: ReferralsSummary };
@@ -17,6 +19,32 @@ const BADGE_TONE: Record<ReferralCandidate['priority'], string> = {
 
 function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`;
+}
+
+function buildReferralActivityNote(candidate: ReferralCandidate, channel: string): string {
+  return [
+    `Canal: ${channel}`,
+    `Motiu: ${candidate.reasonLabel}`,
+    `Prioritat: ${candidate.priority}`,
+    `Assumpte: ${candidate.suggestedSubject}`,
+    '',
+    candidate.suggestedMessage,
+  ].join('\n');
+}
+
+async function recordReferralActivity(candidate: ReferralCandidate, channel: string) {
+  const res = await fetchWithCsrf(`/api/admin/customers/${candidate.id}/activities`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: CUSTOMER_ACTIVITY_ACTIONS.REFERRAL_ASK_PREPARED,
+      note: buildReferralActivityNote(candidate, channel),
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error('No s ha pogut registrar el referral al Customer Hub');
+  }
 }
 
 export default function ReferralsClient({ summary }: Props) {
@@ -45,6 +73,7 @@ export default function ReferralsClient({ summary }: Props) {
     setCopyError(null);
     try {
       await navigator.clipboard.writeText(candidate.suggestedMessage);
+      await recordReferralActivity(candidate, 'clipboard');
       setCopied(candidate.id);
       setTimeout(() => setCopied(null), 2000);
     } catch (error) {
@@ -54,9 +83,21 @@ export default function ReferralsClient({ summary }: Props) {
       });
       setCopyError({
         candidateId: candidate.id,
-        message: 'No s\'ha pogut copiar el missatge.',
+        message: error instanceof Error && error.message.includes('Customer Hub')
+          ? 'Missatge copiat, però no s\'ha pogut registrar al Customer Hub.'
+          : 'No s\'ha pogut copiar el missatge.',
       });
     }
+  }
+
+  function recordReferralLaunch(candidate: ReferralCandidate, channel: string) {
+    void recordReferralActivity(candidate, channel).catch((error) => {
+      console.error('[ReferralsClient] Error registrant activitat de referral', {
+        candidateId: candidate.id,
+        channel,
+        error,
+      });
+    });
   }
 
   return (
@@ -224,14 +265,19 @@ export default function ReferralsClient({ summary }: Props) {
                       href={c.whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => recordReferralLaunch(c, 'whatsapp')}
                       className="ap-btn ap-btn--xs flex-1 sm:flex-none"
                     >
                       💬 WhatsApp
                     </a>
                   )}
-                  <a href={c.mailtoUrl} className="ap-btn ap-btn--xs flex-1 sm:flex-none">
+                  <Link
+                    href={buildCustomerComposeHref(c.id, 'referral')}
+                    onClick={() => recordReferralLaunch(c, 'inbox')}
+                    className="ap-btn ap-btn--xs flex-1 sm:flex-none"
+                  >
                     ✉️ Email
-                  </a>
+                  </Link>
                   <button
                     type="button"
                     onClick={() => handleCopyMessage(c)}

@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 import { buildLeadBookingPrefillHref, buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
+import { getDossierHistoryKindLabel, getLeadDocumentHistoryMeta } from '@/lib/admin/commercialDocumentHistory';
 import LeadBoloSection, { type BoloEconomia } from './LeadBoloSection';
 import CommercialDocumentsHistory, { type CommercialDocumentHistoryItem } from '@/app/admin/components/CommercialDocumentsHistory';
 import { buildLeadWhatsAppHref } from '../leadWhatsApp';
@@ -302,7 +303,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  }),
  ...dossiers.map((d) => ({
  id: `dossier-${d.id}`,
- kindLabel: d.mode === 'quote' ? 'Pressupost dossier' : 'Dossier',
+ kindLabel: getDossierHistoryKindLabel(d.mode),
  title: d.nom,
  statusLabel: d.estat,
  createdAt: d.createdAt,
@@ -310,15 +311,18 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  href: buildDossierCompositePdfHref(d.id),
  targetBlank: true,
  })),
- ...documents.map((doc) => ({
+ ...documents.map((doc) => {
+ const meta = getLeadDocumentHistoryMeta(doc.type, doc.fileUrl);
+ return {
  id: `lead-document-${doc.id}`,
- kindLabel: doc.type === 'QUOTE' ? 'Pressupost antic' : doc.type === 'CONTRACT' ? 'Contracte antic' : 'Document',
+ kindLabel: meta.kindLabel,
  title: doc.title,
- statusLabel: doc.type,
+ statusLabel: meta.statusLabel,
  createdAt: doc.createdAt,
- href: doc.fileUrl,
- targetBlank: true,
- })),
+ href: meta.href,
+ targetBlank: meta.targetBlank,
+ };
+ }),
  ];
 
  const [fields, setFields] = useState(() => editableFieldsFromLeadSource(lead));

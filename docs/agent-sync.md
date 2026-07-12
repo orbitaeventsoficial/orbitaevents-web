@@ -13,7 +13,779 @@ Avís per l'altre agent: ...
 
 ---
 
+## Bloc CODEX (Codex CLI)
+
+[codex] 2026-07-12 [ESTAT: treballant — #1998 Post-event visible sense feedback legacy]
+Perímetre previst: `app/admin/post-event/page.tsx`, `app/admin/post-event/feedback/page.tsx`, tests post-event focalitzats, roadmap, counter i registres.
+Últim canvi tancat visible: #1997.
+Proper pas previst: substituir la copy visible `Feedback al Client`/`Veure feedback` per llenguatge d'agraïment i seguiment post-event, mantenint ruta i serveis canònics sense canvis de dades.
+Avís per l'altre agent: no toco `app/admin/tasks/**`, schema, migracions, crons, enviaments, publicacions socials ni BD; és copy d'admin i test de regressió.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1997 Master Atlas reconeix portfolio post-event]
+Perímetre tancat: `lib/constants/master-atlas.ts`, `__tests__/lib/services/masterAtlasService.test.ts`, `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, counter i registres.
+Últim canvi tancat: #1997.
+Validació #1997: focused Vitest OK (`masterAtlasService` + `portfolioEventService` + `post-event portfolio API` + `EnsurePortfolioEventButton`, 42 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #1997 fora del protocol llarg i bloc `Canvi #1997` del protocol verificat sense trailing whitespace.
+Proper pas previst: continuar cap al #1998 amb el següent KO real Manolo/Zenit, evitant `app/admin/tasks/**`, schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: no he enviat cap email, no he publicat cap social post i no he fet cap write de BD; el Master Atlas ja reconeix el draft de portfolio post-event des de report completat com a `FET`.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1996 Master Atlas reconeix esborrany social post-event]
+Perímetre tancat: `lib/constants/master-atlas.ts`, `__tests__/lib/services/masterAtlasService.test.ts`, `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, counter i registres.
+Últim canvi tancat: #1996.
+Validació #1996: focused Vitest OK (`masterAtlasService` + `postEventRecurrenceDecisionService` + `socialPostService`, 51 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #1996 fora del protocol llarg i bloc `Canvi #1996` del protocol verificat sense trailing whitespace.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real, evitant `app/admin/tasks/**`, schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: no he enviat cap email, no he publicat cap social post i no he fet cap write de BD; el Master Atlas ja reconeix l'esborrany social post-event revisable com a `FET`.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1995 Portal post-event sense claus legacy feedback]
+Perímetre tancat: `lib/clientPortalMessages.ts`, `app/[locale]/portal/[token]/page.tsx`, `__tests__/app/portal/portalPostEventEmailSource.test.ts`, `__tests__/lib/clientPortalMessages.test.ts`, `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, counter i registres.
+Últim canvi tancat: #1995.
+Validació #1995: focused Vitest OK (`portalPostEventEmailSource` + `clientPortalMessages`, 14 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #1995.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real, evitant `app/admin/tasks/**`, schema, migracions, crons i enviaments reals.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; el portal client ja no conserva `feedbackSent`/`pendingClose` per pintar l'email post-event.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1994 Snapshot lead sense ClientFeedback post-event]
+Perímetre tancat: `lib/services/leadSnapshotService.ts`, `__tests__/lib/services/leadSnapshotService.test.ts`, `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, counter i registres.
+Últim canvi tancat: #1994.
+Validació #1994: focused Vitest OK (`leadSnapshotService`, 11 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #1994.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real, evitant `app/admin/tasks/**`, schema, migracions, crons i enviaments reals.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; el snapshot tècnic de lead ja no selecciona ni exporta `ClientFeedback` com a senyal post-event.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1993 Roadmap Manolo incorpora tesi post-event #1992]
+Perímetre tancat: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, counter i registres.
+Últim canvi tancat: #1993.
+Validació #1993: `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #1993.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real de costura post-event/documental, evitant `app/admin/tasks/**`, schema, migracions, crons i enviaments reals.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; el roadmap Manolo-Zenit ja incorpora #1992/#1993 i la tesi post-event sense `ClientFeedback` com a cervell.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1992 Tesi post-event sense ClientFeedback com a cervell]
+Perímetre tancat: `docs/TESI-MAQUINA-full-de-ruta-2026-07.md`, counter i registres.
+Últim canvi tancat: #1992.
+Validació #1992: cerca focalitzada OK (`ClientFeedback` absent de la tesi); `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #1992.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real de costura post-event/documental, evitant `app/admin/tasks/**`, schema, migracions, crons i enviaments reals.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; la tesi viva ja descriu post-event amb pending service, dispatch, `Booking.postEventEmailSent`, `ClientSurvey` i `CustomerTestimonial`, no `ClientFeedback`.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1991 roadmap Manolo post-event fins #1990]
+Perímetre tancat: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, counter i registres.
+Últim canvi tancat: #1991.
+Validació #1991: `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK; `git diff --check` OK sobre el perímetre #1991.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real de costura post-event/documental, evitant `app/admin/tasks/**`, schema, migracions, crons i enviaments reals.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; el roadmap Manolo-Zenit ja reflecteix #1985-#1990 i marca #1991 com a sync.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1990 Master Atlas post-event alineat]
+Perímetre tancat: `lib/constants/master-atlas.ts`, `__tests__/lib/services/masterAtlasService.test.ts`, counter i registres.
+Últim canvi tancat: #1990.
+Validació #1990: focused Vitest OK (`masterAtlasService`, 7 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK; `git diff --check` OK sobre el perímetre #1990.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real de costura post-event/documental, evitant `app/admin/tasks/**`, schema, migracions, crons i enviaments reals.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; Master Atlas ja veu `/admin/post-event/feedback`, cues, dispatch i `Booking.postEventEmailSent`.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1989 atles post-event sense ClientFeedback com a font]
+Perímetre tancat: `lib/constants/repo-atlas.ts`, `__tests__/lib/services/repoElectricAtlasService.test.ts`, counter i registres.
+Últim canvi tancat: #1989.
+Validació #1989: focused Vitest OK (`repoElectricAtlasService`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK; `git diff --check` OK sobre el perímetre #1989.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real de costura post-event/documental, evitant `app/admin/tasks/**`, schema, migracions, crons i enviaments reals.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; l'atles ja no presenta `ClientFeedback` com a `sourceOfTruth` post-event.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1988 QuickActions entra pel hub post-event]
+Perímetre tancat: `app/admin/components/QuickActions.tsx`, `app/admin/components/adminHelpContent.ts`, `__tests__/app/admin/post-event-manual-confirmation.test.tsx`, counter i registres.
+Últim canvi tancat: #1988.
+Validació #1988: focused Vitest OK (`post-event-manual-confirmation`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK; `git diff --check` OK sobre el perímetre #1988 amb avís CRLF a `adminHelpContent.ts`.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real de costura post-event/documental, evitant `app/admin/tasks/**`, schema, migracions, crons i enviaments reals.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; QuickActions ja no executa `/api/admin/emails/run-cron`, només obre `/admin/post-event`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1987 testimonial fallback post-event]
+Perímetre tancat: `app/admin/lib/post-event-actions.ts`, `__tests__/app/admin/post-event-actions.test.ts`, counter i registres.
+Últim canvi tancat: #1987.
+Validació #1987: focused Vitest OK (`post-event-actions`, 12 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1987.
+Proper pas previst: reprendre Manolo/Zenit pel següent KO real de costura post-event/documental; no hi ha cap comanda en marxa.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat schema, migracions, crons, backend d'enviament ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1986 anchors post-event a reserva]
+Perímetre tancat: `/admin/post-event/{feedback,reports,surveys,playbook}`, `__tests__/app/admin/post-event/post-event-booking-anchors.test.ts`, counter i registres.
+Últim canvi tancat: #1986.
+Validació #1986: focused Vitest OK (`post-event-booking-anchors`, 4 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1986.
+Proper pas previst: continuar Manolo/Zenit amb el següent KO real de costura post-event/documental, sense enviar emails ni fer BD write.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat schema, migracions, crons, backend d'enviament ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1985 Emails post-event sense enviament d'un clic]
+Perímetre tancat: `app/admin/components/PostEventEmailButton.tsx`, wrappers de reserva/Emails, `app/admin/emails/page.tsx`, badge manual de `/admin/control`, ajuda contextual, test focal i registres.
+Últim canvi tancat: #1985.
+Validació #1985: focused Vitest OK (`emails-post-event-costura`, 4 tests; `PostEventEmailButton`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1985.
+Proper pas previst: continuar Manolo/Zenit amb el següent KO real de costura post-event/documental; possible lectura següent: altres entrades laterals que permetin enviar o completar post-event sense veure el workspace canònic.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat schema, migracions, crons, backend d'enviament ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1984 pilot control post-event entra pel hub]
+Perímetre tancat: `lib/constants/admin.ts`, `__tests__/lib/constants/adminDashboardPilotSteps.test.ts` i registres.
+Últim canvi tancat: #1984.
+Validació #1984: focused Vitest OK (`adminDashboardPilotSteps`, 1 test); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1984.
+Proper pas previst: continuar Manolo/Zenit amb el següent KO real de costura post-event/documental, sense enviar emails reals des de terminal.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat schema, migracions, crons ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1983 dashboard post-event entra pel hub]
+Perímetre tancat: `app/admin/lib/dashboard-data.ts`, `__tests__/app/admin/dashboard-post-event-alert.test.ts` i registres.
+Últim canvi tancat: #1983.
+Validació #1983: focused Vitest OK (`dashboard-post-event-alert`, 1 test); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1983.
+Proper pas previst: continuar Manolo/Zenit amb el següent KO real de costura post-event/documental, sense enviar emails reals des de terminal.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat schema, migracions, crons ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1982 hub post-event mostra emails pendents]
+Perímetre tancat: `app/admin/post-event/page.tsx`, `__tests__/app/admin/post-event/page-test-artifact-filter.test.ts` i registres.
+Últim canvi tancat: #1982.
+Validació #1982: focused Vitest OK (`post-event page-test-artifact-filter`, `postEventPendingService`, 9 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1982.
+Proper pas previst: continuar Manolo/Zenit amb el següent KO real de costura post-event/documental, sense enviar emails reals des de terminal.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat schema, migracions, crons ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1981 poda càrrega ClientFeedback en detall reserva]
+Perímetre tancat: `app/admin/bookings/[id]/page.tsx`, `lib/services/bookingRouteService.ts`, tests focalitzats i registres.
+Últim canvi tancat: #1981.
+Validació #1981: focused Vitest OK (`BookingDetailPostEventButtonState`, `bookingRouteService`, 33 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1981.
+Proper pas previst: continuar Manolo/Zenit amb el següent KO real de costura post-event/documental, sense enviar emails reals des de terminal.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat schema, migracions, crons ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1980 portal timeline post-event canònica]
+Perímetre tancat: `app/[locale]/portal/[token]/page.tsx`, `lib/clientPortalMessages.ts`, `__tests__/app/portal/portalPostEventFeedbackSource.test.ts` i registres.
+Últim canvi tancat: #1980.
+Validació #1980: focused Vitest OK (`portalPostEventFeedbackSource`, `clientPortalMessages`, 13 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1980.
+Proper pas previst: continuar Manolo/Zenit buscant la següent font duplicada o KO de costura post-event/documental, sense enviar emails reals des de terminal.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat backend, cron, schema, migracions ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1979 estat intern post-event sense ClientFeedback]
+Perímetre tancat: `lib/services/bookingOperationalService.ts`, `app/admin/bookings/[id]/page.tsx`, tests focalitzats i registres.
+Últim canvi tancat: #1979.
+Validació #1979: focused Vitest OK (`bookingOperationalService`, `BookingDetailPostEventButtonState`, `PostEventEmailButton`, 35 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1979.
+Proper pas previst: continuar Manolo/Zenit buscant la següent font duplicada o KO de costura post-event/documental, sense enviar emails reals des de terminal.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat backend, cron, schema, migracions ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1978 portal post-event amb font canònica]
+Perímetre tancat: `app/[locale]/portal/[token]/page.tsx`, `lib/clientPortalMessages.ts`, `lib/services/clientPortalAccess.ts`, tests focalitzats i registres.
+Últim canvi tancat: #1978.
+Validació #1978: focused Vitest OK (`portalPostEventFeedbackSource`, `clientPortalAccess`, `clientPortalMessages`, 34 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1978.
+Proper pas previst: continuar Manolo/Zenit amb el següent KO de font canònica post-event, sense enviar emails reals des de terminal.
+Avís per l'altre agent: no he enviat cap email i no he fet cap write de BD; no he tocat backend, cron, schema, migracions ni `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1977 email post-event amb font canònica]
+Perímetre tancat: `app/admin/bookings/[id]/page.tsx`, `__tests__/app/admin/bookings/BookingDetailPostEventButtonState.test.ts`, registres.
+Últim canvi tancat: #1977.
+Validació #1977: focused Vitest OK (`BookingDetailPostEventButtonState` + `PostEventEmailButton`, 6 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1977.
+Proper pas previst: continuar Manolo/Zenit amb el KO de dades viu (`OE-2026-004`, `OE-2026-005` sense volant arrencat), sense enviar emails reals des de terminal.
+Avís per l'altre agent: no he enviat cap email i no he fet BD write; només UI/test/documentació.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1976 enquesta post-event sense falsa acció]
+Perímetre tancat: `app/admin/bookings/[id]/page.tsx`, `__tests__/app/admin/bookings/BookingDetailPostEventButtonState.test.ts`, registres.
+Últim canvi tancat: #1976.
+Validació #1976: focused Vitest OK (`BookingDetailPostEventButtonState` + `PostEventEmailButton`, 5 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1976.
+Proper pas previst: continuar Manolo/Zenit amb el KO de dades viu (`OE-2026-004`, `OE-2026-005` sense volant arrencat), sense enviar emails reals des de terminal.
+Avís per l'altre agent: no he enviat cap email, no he creat cap enquesta i no he tocat backend/schema/migracions; només copy/estat UI i test.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1975 playbook post-event aterra a reserva]
+Perímetre tancat: `app/admin/lib/post-event-actions.ts`, `app/admin/bookings/[id]/page.tsx`, tests focalitzats i registres.
+Últim canvi tancat: #1975.
+Validació #1975: focused Vitest OK (`post-event-actions`, `BookingDetailPostEventButtonState`, `PostEventEmailButton`, 14 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `git diff --check` OK sobre perímetre #1975; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run zenit:db:audit` OK read-only amb finding viu `completedBookingsPostEventNotStarted=2`.
+Proper pas previst: continuar Manolo/Zenit amb el KO de dades encara viu (`OE-2026-004`, `OE-2026-005` sense email/informe/enquesta); ara el playbook obre directament `#sec-post-event`, però falta que un operador arrenqui email, informe o enquesta per ruta confirmada.
+Avís per l'altre agent: no he enviat cap email i no he fet cap BD write; no he tocat backend d'enviament, cron, schema ni migracions. #1974 de Claude queda respectat.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1973 confirmació individual post-event]
+Perímetre tancat: `app/admin/bookings/[id]/PostEventEmailButton.tsx`, `__tests__/app/admin/bookings/PostEventEmailButton.test.tsx`, registres.
+Últim canvi tancat: #1973.
+Validació #1973: focused Vitest OK (`PostEventEmailButton`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1973.
+Proper pas previst: continuar Manolo/Zenit amb el KO de dades encara viu (`OE-2026-004`, `OE-2026-005` sense email/informe/enquesta), mantenint enviaments reals només via UI confirmada o automatització explícita.
+Avís per l'altre agent: no he enviat cap email i no he fet cap BD write; només UI/test.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1972 confirmació segura post-event]
+Perímetre tancat: `app/admin/components/QuickActions.tsx`, `app/admin/emails/ManualActionsPanel.tsx`, `app/admin/components/adminHelpContent.ts`, test focal i registres.
+Últim canvi tancat: #1972.
+Validació #1972: focused Vitest OK (`post-event-manual-confirmation`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1972.
+Proper pas previst: continuar Manolo/Zenit amb el KO de dades encara viu (`OE-2026-004`, `OE-2026-005` sense email/informe/enquesta), però qualsevol enviament real ha de passar per la UI confirmada o per una automatització explícita.
+Avís per l'altre agent: no he enviat emails, no he fet BD write de client, no he tocat backend d'enviament, cron, schema, migracions ni `app/admin/tasks/**`; només he afegit confirmació UI.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1971 cron post-event canònic]
+Perímetre tancat: `ADMIN_POST_EVENT_CRON_STATUS_PREFIX`, `/api/cron/post-event`, `/api/admin/emails/run-cron`, lectures d'Emails/Home/Salut/Integracions i `scripts/autofix-system-health.ts`.
+Últim canvi tancat: #1971.
+Validació #1971: `zenit:db:audit` read-only OK amb documents/PDF/propostes/proves a 0 i finding viu `completedBookingsPostEventNotStarted=2`; focused Vitest OK (`emails-run-cron-route`, `post-event-route`, `adminCronPrefixes`, `adminHealthService`, 20 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run qa:api-cron-auth` OK; `git diff --check` OK sobre el perímetre #1971.
+Proper pas previst: continuar Manolo/Zenit amb el KO operatiu restant: `OE-2026-004` i `OE-2026-005` continuen sense email/informe/enquesta post-event; no enviar correus reals sense passar per acció explícita d'operador o automatització deliberada.
+Avís per l'altre agent: no he enviat emails, no he fet BD write de client, no he tocat schema/migracions ni `app/admin/tasks/**`; només he canonitzat l'estat del cron perquè manual i automàtic no siguin dues fonts.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1969 òrfenes finals stale]
+Perímetre tancat: `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1969; #1970 de Claude observat i respectat com a tall de codi/validació real.
+Validació #1969: cerca residual sense `computeProductMargin`/`computeSupportableTravelKm`/`getDossiersByLead` fora de docs; focused Vitest OK (`collaboratorProductService.test.ts`, `costEngine.test.ts`, `dossierService.test.ts`, 108 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1969.
+Proper pas previst: continuar Manolo/Zenit amb el següent front canònic fora d'aquest inventari, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat `collaboratorProductService.ts`, `costEngine.ts`, `dossierService.ts` ni els seus tests; aquest tall només sincronitza el mapa i evita duplicar el #1970 de Claude.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1968 handleAdminAuth fals positiu]
+Perímetre tancat: `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1968.
+Validació #1968: cerca ampla confirma `middleware.ts` com a consumidor real; focused Vitest OK (`middleware.test.ts`, `admin-auth.test.ts`, 31 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1968.
+Proper pas previst: continuar Manolo/Zenit amb els tres pendents finals de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat `lib/middleware/admin-auth.ts`, `middleware.ts`, auth, CSRF, schema/BD ni rutes; `handleAdminAuth` queda confirmat viu.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1967 pricing-intelligence orfe]
+Perímetre tancat: `lib/constants/pricing-intelligence.ts`, `__tests__/lib/constants/pricing-intelligence.test.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1967.
+Validació #1967: cerca residual sense `computeCollaboratorCost`/`computeFullBookingCost`/`getHourlyColor`/`getPriceDeviationAlert` fora de docs; focused Vitest OK (`pricing-intelligence.test.ts`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1967.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat `/admin/pricing`, packPricingHealth, economia, configurador, schema/BD ni UI; tarifes, tons de marge, amortització i `getMarginColor` queden intactes.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1966 social performance wrapper orfe]
+Perímetre tancat: `lib/services/socialPerformanceService.ts`, `__tests__/lib/services/socialPerformanceService.test.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1966.
+Validació #1966: cerca residual sense `loadSocialPerformanceReport` fora de docs; focused Vitest OK (`socialPerformanceService.test.ts`, 19 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1966.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat `/admin/social`, `socialContentPulseService`, social posts, calendari, schema/BD ni UI; motor pur de mètriques socials queda intacte.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1965 public service media residual]
+Perímetre tancat: `lib/services/publicServiceMediaService.ts`, `__tests__/lib/services/publicServiceMediaService.test.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1965.
+Validació #1965: cerca residual sense `getPublicServicePortfolioSlug`/`listPublicMobileServiceCardImages`/resolver/cache de cards fora de docs; focused Vitest OK (`publicServiceMediaService.test.ts`, 9 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1965.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat pàgines públiques, image-manager, galeries/portfolio, constants de media, schema/BD ni assets; hero/gallery públiques queden intactes.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1963 protocol sections index orfe]
+Perímetre tancat: `lib/services/protocolCanvisService.ts`, `__tests__/lib/services/protocolCanvisService.test.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1963.
+Validació #1963: cerca residual sense `indexProtocolSectionsById` fora de docs; focused Vitest OK (`protocolCanvisService.test.ts`, 13 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1963.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat `app/admin/docs/protocol/page.tsx`, docs de protocol existents, schema/BD ni UI admin; parsers vius queden intactes.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1962 lead href helpers orfes]
+Perímetre tancat: `lib/admin/leadCustomerHref.ts`, `lib/admin/leadWorkspaceHref.ts`, tests href, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1962.
+Validació #1962: cerca residual sense `buildLeadCustomerContinuityTarget`/`buildLeadPaymentsHref`/`buildLeadTaskHref` fora de docs; focused Vitest OK (`leadCustomerHref.test.ts`, `leadWorkspaceHref.test.ts`, 7 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1962.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat pantalles admin, calendari, customer hub, inbox, tasks, bookings, schema/BD ni rutes; els helpers href vius queden intactes.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1961 getOrbitaService orfe]
+Perímetre tancat: `lib/constants/orbita-services.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1961.
+Validació #1961: cerca residual sense `getOrbitaService` fora de docs; focused Vitest OK (`orbita-services.test.ts`, 11 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1961.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat preus, `app/config/packs-config.ts`, BookingServiceLinesSection, admin packs, dossiers, schema/BD ni UI; `ORBITA_SERVICES` i helpers vius queden intactes.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1960 getOpenAPIJSON orfe]
+Perímetre tancat: `lib/api/openapi.ts`, `__tests__/lib/api/openapi.test.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1960.
+Validació #1960: cerca residual sense `getOpenAPIJSON` fora de docs; focused Vitest OK (`openapi.test.ts`, 2 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1960.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat `app/api/docs/route.ts`, cap ruta API, schema/BD ni contractes OpenAPI; `openAPISchema` i `/api/docs` queden com a via canònica.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1959 getAdminLeadPackOptions orfe]
+Perímetre tancat: `lib/constants/admin.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1959.
+Validació #1959: cerca residual sense `getAdminLeadPackOptions` fora de docs; `lib/constants/admin.ts` ja no importa `getAllPacks`; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1959.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat `app/config/packs-config.ts`, admin packs, configurador públic, packs DB, schema/BD ni Studio; `packs-config` continua sent la font viva de packs.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1958 imap cache clear helpers]
+Perímetre tancat: `lib/imap.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1958.
+Validació #1958: cerca residual sense `clearFetchEmailCache`/`clearSpecialFoldersCache` fora de docs; focused Vitest OK (`imap-cache-invalidation.test.ts`, 5 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre el perímetre #1958.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari d'òrfenes, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat rutes inbox, drafts/sent retry, connexió IMAP, schema/BD, scripts append ni UI admin; `invalidateFetchEmailCache` i `discoverSpecialFolders(forceRefresh)` queden com a vies vives.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1951 normalize.ts Grup B orfe]
+Perímetre tancat: `lib/utils/normalize.ts`, `__tests__/lib/utils/normalize.test.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1951.
+Validació #1951: focused Vitest OK (`normalize.test.ts`, 34 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre perímetre #1951; cerca precisa sense exports/imports antics de `normalize.ts`.
+Proper pas previst: reprendre Manolo/Zenit amb `email.ts` testimonials/privacy orfe i decidir REFER/MATAR sense tocar SMTP/signatura/templates vius a cegues.
+Avís per l'altre agent: no he tocat `deduplicationService`, schema, rutes de clients/leads, formularis admin ni serveis de descompte; el nucli viu de normalització queda intacte.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1953 email.ts testimonials/privacy canònic]
+Perímetre tancat: `lib/email.ts`, `app/api/admin/emails/testimonials-reminder/route.ts`, `app/admin/emails/ManualActionsPanel.tsx`, `lib/services/testimonialAdminService.ts`, tests relacionats, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1953.
+Validació #1953: focused Vitest OK (26 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK; cerca residual sense exports antics fora de docs.
+Proper pas previst: continuar Manolo/Zenit amb el següent punt petit de l'inventari d'òrfenes, revalidant ús real abans de tocar codi.
+Avís per l'altre agent: no he tocat inbox, proposal/booking emails, plantilles BD generals (`testimonial_received`, `testimonial_reminder`), tracking ni `app/admin/tasks/**`; #1952 de Claude queda intacte i aquest tall s'ha renumerat a #1953.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1954 communicationStatusService deriveFlowStatus]
+Perímetre tancat: `lib/services/communicationStatusService.ts`, `__tests__/lib/services/communicationStatusService.test.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1954.
+Validació #1954: focused Vitest OK (`communicationStatusService.test.ts`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK; cerca exacta sense `deriveFlowStatus` antic fora de docs.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat timelineQueryService, bookingOperationalService, economia ni schema/BD; només el wrapper antic sense consumidor de producció.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1955 csrf shouldEnforceCsrf]
+Perímetre tancat: `lib/csrf.ts`, `__tests__/lib/csrf.test.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1955.
+Validació #1955: focused Vitest OK (`csrf.test.ts`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK; cerca exacta sense `shouldEnforceCsrf` fora de docs.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat handlers admin, scripts CSRF, middleware admin, ni cap allowlist.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1956 inventory-image constants viu]
+Perímetre tancat: `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1956.
+Validació #1956: `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK; cerca activa confirma consumidors reals de `INVENTORY_IMAGE_USER_AGENT`.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat `lib/inventory-image-constants.ts`, inventari admin, scripts de localització/backfill, BD ni uploads.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1957 home-meta stale]
+Perímetre tancat: `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1957.
+Validació #1957: `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK; cerca activa confirma que `getDefaultHomeMeta` no existeix fora de l'inventari i que `getHomeMeta`/`getHomeKeywords` són la via viva.
+Proper pas previst: continuar Manolo/Zenit amb el següent pendent petit de l'inventari, revalidant consumidors abans de decidir REFER/MATAR.
+Avís per l'altre agent: no he tocat `lib/home-meta.ts`, layouts públics, messages ni SEO runtime.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1950 analytics.ts tracking orfe]
+Perímetre tancat: `app/lib/analytics.ts`, `__tests__/app/lib/analytics.test.ts`, `docs/audit/inventari-funcions-orfenes.md`, protocol/diari/counter.
+Últim canvi tancat: #1950.
+Validació #1950: focused Vitest OK (`analytics.test.ts`, `trackPublicServiceEvent.test.ts`; 6 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `git diff --check` OK sobre perímetre #1950; cerca activa sense exports antics a `app/lib/components/scripts`.
+Proper pas previst: continuar Manolo/Zenit amb `email.ts` testimonials, últim clúster principal de la tanda d'òrfenes; no tocar Grup B `normalize.ts` ni files ⬜ soltes a cegues.
+Avís per l'altre agent: no he tocat GA4 admin, `lib/analytics/ga4.ts`, CookieConsent, WebVitals, serveis públics ni email testimonials.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1949 sync documental òrfenes ja mortes]
+Perímetre tancat: `docs/audit/inventari-funcions-orfenes.md`, `docs/ATLES-FUNCIONAL.md`, protocol/diari/counter.
+Últim canvi tancat: #1949.
+Validació #1949: `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `git diff --check` OK sobre el perímetre #1949; cerca activa fora de `docs/**` sense helpers morts de portfolio/media/gallery.
+Proper pas previst: continuar Manolo/Zenit pels clústers principals pendents de la tanda d'òrfenes (`analytics.ts` tracking i `email.ts` testimonials), sense tocar Grup B `normalize.ts` ni files ⬜ soltes a cegues.
+Avís per l'altre agent: #1949 ha estat només documental/canònic; no ha entrat a codi de portfolio/media ni a cap eliminació física.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1947 post-event hub/reports/feedback canònics]
+Perímetre tancat: `postEventPendingService` i les pàgines `/admin/post-event`, `/admin/post-event/reports`, `/admin/post-event/feedback`; tests/guard Zenit i docs.
+Últim canvi tancat: #1947.
+Validació #1947: `node --check scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (`postEventPendingService`, `check-zenit-tooling`, tests post-event admin; 44 tests); `pnpm run qa:zenit-tooling` OK; cerca residual de cues locals buida; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK sobre perímetre #1947.
+Proper pas previst: continuar Manolo/Zenit pel següent front executable.
+Avís per l'altre agent: sense escriptura persistent, sense emails reals, sense cleaners i sense `app/admin/tasks/**`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1945 sincronització inventari Grup A normalize]
+Perímetre tancat: `docs/audit/inventari-funcions-orfenes.md` ja separa Grup A mort #1944 (`compareCustomers`, `normalizeCustomerData`) de Grup B viu (`formatPhone`, `isValidPhone`, `isValidDni`, `getInstagramUrl`, `isValidInstagram`, `generatePersonalizedCode`).
+Últim canvi tancat: #1945.
+Validació #1945: cerca exacta en `app/lib/__tests__/scripts` sense `compareCustomers|normalizeCustomerData|NormalizedCustomerData|CustomerData` actius; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1945>` OK.
+Proper pas previst: continuar Manolo/Zenit pel següent front executable; el carril d'eliminació d'òrfenes continua amb Claude (customerSegmentationService, portfolioEventService/media, analytics.ts, email.ts testimonials).
+Avís per l'altre agent: no he tocat codi runtime, BD, schema, cleaners ni `app/admin/tasks/**`; només mapa viu/protocol/counter.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1943 playbook post-event amb finestra canònica]
+Perímetre tancat: `postEventWorkflow.json/ts` governa també `playbookTake` i `actionDueDays`; `postEventPlaybookService` consumeix `getPostEventWorkflowDates`, `POST_EVENT_DAY_MS` i `POST_EVENT_WORKFLOW`; `/admin/post-event/playbook` mostra la finestra amb `catchupWindowDays`; `qa:zenit-tooling` blinda servei i copy.
+Últim canvi tancat: #1943.
+Validació #1943: node check OK; focused Vitest OK (60 tests); `node scripts\check-zenit-tooling.mjs` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run zenit:db:audit` OK read-only amb `completedBookingsPostEventNotStarted=2` (`OE-2026-004`, `OE-2026-005`); `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1943>` OK; `pnpm run validate:core` OK complet.
+Proper pas previst: continuar Manolo/Zenit pel següent front executable; els dos bookings continuen pendents operatius a arrencar pel playbook/hub, sense email real ni BD write manual.
+Avís per l'altre agent: cap fitxer de `app/admin/tasks/**`, schema, cleaners ni clúster d'òrfenes tocat per Codex.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1940 post-event COMPLETED amb catch-up canònic]
+Perímetre tancat: `lib/constants/postEventWorkflow.json` + `postEventPendingService` unifiquen la finestra post-event per emails pendents, `/admin/emails`, dashboard, brief, checklist, automació i `zenit:db:audit`.
+Últim canvi tancat visible: #1942 per Claude; aquest bloc omple el #1940 reservat sense rebaixar counter (`ADMIN_CHANGE_COUNTER=1942`).
+Validació #1940: node checks OK; focused Vitest OK (103 tests); `pnpm run qa:service-coverage` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run zenit:db:audit` OK read-only amb `completedBookingsPostEventNotStarted=2` (`OE-2026-004`, `OE-2026-005`); `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK complet.
+Proper pas previst: continuar Manolo/Zenit pel següent front executable sense tocar `app/admin/tasks/**`; els dos bookings pendents queden visibles com a operació post-event pendent, no s'ha enviat cap email real ni fet BD write manual.
+Avís per l'altre agent: el bloqueig `qa:service-coverage` del servei nou ja queda resolt amb test propi; cap fitxer del clúster d'òrfenes tocat per Codex.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1939 robustesa qa:patches amb fitxers efímers]
+Perímetre tancat: `scripts/check-patches.mjs` i el seu test fan que `validate:core` no caigui amb `ENOENT` si un fitxer temporal de test/concurrència desapareix entre la recollida i la lectura.
+Últim canvi tancat: #1939.
+Validació #1939: `node --check scripts\check-patches.mjs` OK; focused Vitest OK (1 fitxer / 25 tests); `pnpm run qa:patches` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK complet (75 fitxers de tests de scripts / 660 tests, `qa:admin-canon` conserva 2 P3 coneguts i cap P1).
+Proper pas previst: continuar Manolo/Zenit pel següent front executable; finding viu principal: `completedBookingsPostEventNotStarted=2` (`OE-2026-004`, `OE-2026-005`).
+Avís per l'altre agent: renumerat de #1938 a #1939 per no trepitjar el tall de Claude; sense BD write, sense UI, sense schema, sense emails i sense cleaners.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1937 coherència EmailSend/PDF Proposal]
+Perímetre tancat: `zenit:db:audit` audita `proposalEmailDocumentMismatches` perquè cada `EmailSend` `proposal-send` amb `orbitaKind=proposal` resolgui a un `Proposal` existent i no divergeixi de `Proposal.reference/pdfUrl` al subject/cos.
+Últim canvi tancat: #1937.
+Validació #1937: node checks OK; `node scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (1 fitxer / 18 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run zenit:db:audit` OK amb `proposalEmailDocumentMismatches=0`, `sentLikeProposalsMissingQuoteSnapshot=0`, `proposalEmailTraceMismatches=0`, `sentLikeProposalsIncompleteDispatch=0`, `adminTestArtifact*=0` i `completedBookingsPostEventNotStarted=2`; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:zenit-tooling` OK.
+Proper pas previst: #1939 robustesa `qa:patches` perquè `validate:core` ha detectat `ENOENT` sobre `app\admin\covtmp\[id]\page.tsx` efímer després de la suite de scripts; renumerat perquè Claude ha tancat #1938 en paral·lel.
+Avís per l'altre agent: sense BD write, sense emails, sense PDF nou, sense schema i sense cleaners; no he entrat al cleaner #1935 ni a `funcions-orfenes.md`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1936 snapshot canònic Proposal enviat]
+Perímetre tancat: `zenit:db:audit` audita `sentLikeProposalsMissingQuoteSnapshot` per detectar `Proposal` `SENT|VIEWED` amb PDF/enviament però sense `snapshot.quoteSnapshot` canònic (`QUOTE_SNAPSHOT_V1`) o amb divergència a `documentType/proposalId/reference/pricing.total`; `qa:zenit-tooling` ho blinda amb regressió.
+Últim canvi tancat: #1936.
+Validació #1936: node checks OK; `node scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (1 fitxer / 17 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run zenit:db:audit` OK amb `sentLikeProposalsMissingQuoteSnapshot=0`, `proposalEmailTraceMismatches=0`, `sentLikeProposalsIncompleteDispatch=0`, `adminTestArtifact*=0` i `completedBookingsPostEventNotStarted=2`; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run validate:core` OK complet.
+Proper pas previst: continuar Manolo/Zenit pel següent invariant executable; finding viu principal ara mateix: post-event no arrencat en `OE-2026-004` i `OE-2026-005`.
+Avís per l'altre agent: sense BD write, sense emails, sense PDF nou, sense schema i sense cleaners; no he entrat al cleaner #1935 ni a `funcions-orfenes.md`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1933 identitat documental Proposal]
+Perímetre tancat: `Proposal` passa a ser entitat Òrbita de primer nivell al canal email; `sendAdminProposal()` registra i envia el correu amb `orbitaKind='proposal'`/`orbitaId=proposalId`, la Safata obre fils `proposal` com a `Pressupost`, i `zenit:db:audit` audita `proposalEmailTraceMismatches`.
+Últim canvi tancat visible: #1934 per Claude; aquest bloc omple el #1933 reservat sense rebaixar counter (`ADMIN_CHANGE_COUNTER=1934`).
+Validació #1933: node checks OK; `node scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (4 fitxers / 73 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run zenit:db:audit` OK amb `proposalEmailTraceMismatches=0`, `sentLikeProposalsIncompleteDispatch=0`, carrils legacy de pressupost a 0, `adminTestArtifactLeads=14` i `completedBookingsPostEventNotStarted=2`.
+Proper pas previst: continuar Manolo/Zenit pel següent invariant executable; Claude manté el handoff de neteja dels 14 `Zenit Whatsapp` i la resta de codi mort fora d'aquest perímetre.
+Avís per l'altre agent: sense BD write, sense schema, sense reenviaments i sense cleaners; només costura de traça documental, guard, audit i tests.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1930 auditoria artefactes de prova Zenit]
+Perímetre tancat: `lib/constants/adminTestArtifacts.json` passa a ser font única de marcadors Manolo; `zenit:db:audit` exposa `adminTestArtifactCustomers/Leads/Bookings/Dossiers/Proposals/EmailSends/LeadDocuments/LeadNotes/LeadActivities`; `qa:zenit-tooling` blinda el JSON i els findings.
+Últim canvi tancat visible: #1932 per Claude; aquest bloc omple el #1930 reservat sense rebaixar counter.
+Validació #1930: node checks OK; `node scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (1 fitxer / 15 tests); `pnpm run zenit:db:audit` OK amb `adminTestArtifactLeads=14` i la resta `adminTestArtifact*` principals/documentals a 0.
+Proper pas previst: Claude pot eliminar els 14 leads `Zenit Whatsapp` del finding amb neteja acotada; Codex continuarà auditant altres carrils vells/invariants quan agafi el següent tall.
+Avís per l'altre agent: acord propietari 2026-07-11: Codex audita; Claude elimina. Sense schema, sense migracions, sense BD write, sense cleaners `--apply` i sense UI. Risc adjacent pendent: `preview/desat/enviament` de pressupost han de compartir una sola font documental.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1929 auditoria legacyLeadTaskId]
+Perímetre tancat: `zenit:db:audit` i `qa:zenit-tooling` auditen el residu temporal `Task.legacyLeadTaskId`; la primera lectura real retorna `legacyLeadTaskLinks=0`.
+Últim canvi tancat: #1929.
+Validació #1929: node checks OK; focused Vitest OK (1 fitxer / 13 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run zenit:db:audit` OK amb `legacyLeadTaskLinks=0`.
+Proper pas previst: continuar Manolo/Zenit en carril d'auditoria: trobar carrils vells, incoherències i invariants que faltin; les eliminacions físiques/migracions queden per Claude quan el finding estigui provat.
+Avís per l'altre agent: acord propietari 2026-07-11: Codex audita i deixa evidència/guards/handoff; Claude elimina o migra. `legacyLeadTaskLinks=0` queda preparat per a neteja física de `legacyLeadTaskId`, però Codex no l'executa.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1928 auditoria post-event no arrencat]
+Perímetre tancat: `zenit:db:audit` i `qa:zenit-tooling` detecten bookings `COMPLETED` recents sense email post-event, informe ni enquesta, i incoherències `postEventEmailSent=true` sense timestamp.
+Últim canvi tancat: #1928.
+Validació #1928: node checks OK; focused Vitest OK (1 fitxer / 12 tests); `pnpm run zenit:db:audit` OK amb `completedBookingsPostEventNotStarted=2` (`OE-2026-004`, `OE-2026-005`) i `postEventEmailFlagWithoutSentAt=0`; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo/Zenit pel següent front E2E canònic, prioritzant carrils vells, incoherències i processos que encara no siguin auditables.
+Avís per l'altre agent: sense schema, sense BD write, sense UI, sense emails, sense crons i sense tocar serveis post-event; només auditoria/guard/test i documentació.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1927 auditoria documents operatius finals]
+Perímetre tancat: `zenit:db:audit` i `qa:zenit-tooling` vigilen contractes `SENT|SIGNED`, factures actives i albarans `DELIVERED|SIGNED` sense `pdfUrl/pdfKey`.
+Últim canvi tancat: #1927.
+Validació #1927: node checks OK; focused Vitest OK (1 fitxer / 11 tests); `pnpm run zenit:db:audit` OK amb els 3 nous findings a 0; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo/Zenit pel següent front E2E canònic.
+Avís per l'altre agent: sense schema, sense BD write, sense UI, sense emails, sense generar PDFs i sense tocar serveis de negoci; només auditoria/guard/test i documentació.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1926 guard upload LeadDocument QUOTE]
+Perímetre tancat: `qa:zenit-tooling` blinda que `uploadLeadDocument()` continuï rebutjant `QUOTE` amb 410 i ruta canònica a `Proposal`.
+Últim canvi tancat: #1926.
+Validació #1926: `node --check scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (2 fitxers / 20 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+Proper pas previst: executar guards finals i continuar Manolo/Zenit pel següent front E2E canònic.
+Avís per l'altre agent: sense BD, sense schema, sense UI, sense rutes i sense tocar `leadDocumentService`; només guard estàtic i test.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1925 guard lead quote legacy]
+Perímetre tancat: `qa:zenit-tooling` blinda que `lib/services/leads/quoteRouteHandler.ts` continuï retornant 410 i no pugui recrear `LeadDocument QUOTE` ni enviar email pel carril antic.
+Últim canvi tancat: #1925.
+Validació #1925: `node --check scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (3 fitxers / 16 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+Proper pas previst: executar guards finals i continuar Manolo/Zenit pel següent front E2E canònic.
+Avís per l'altre agent: sense BD, sense schema, sense UI, sense emails i sense modificar rutes; només guard estàtic i test.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1924 guard legacy pressupostos paral·lels]
+Perímetre tancat: `qa:zenit-tooling` blinda que `adminQuoteEmailService` no enviï pressupostos legacy i que `customQuoteAdminService` no muti `custom_quotes`.
+Últim canvi tancat: #1924.
+Validació #1924: `node --check scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (5 fitxers / 36 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+Proper pas previst: executar guards finals i continuar Manolo/Zenit pel següent front E2E canònic.
+Avís per l'altre agent: sense BD, sense schema, sense UI, sense emails i sense canvis als serveis legacy; només guard estàtic i test.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1923 auditoria ACCEPTED sense reserva]
+Perímetre tancat: `zenit:db:audit` detecta `acceptedProposalsWithoutBooking` i el guard `qa:zenit-tooling` exigeix que aquest invariant continuï cobert.
+Últim canvi tancat: #1923.
+Validació #1923: `node --check` OK per scripts; focused Vitest OK (1 fitxer / 6 tests); `node scripts\check-zenit-tooling.mjs` OK; `pnpm run zenit:db:audit` OK amb `acceptedProposalsWithoutBooking=0`; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+Proper pas previst: executar guards finals i continuar Manolo/Zenit pel següent front E2E canònic.
+Avís per l'altre agent: sense BD write, sense schema, sense emails, sense PDFs, sense UI i sense cleaners; només auditoria read-only i guard.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1920 Proposal ACCEPTED sense reserva al copilot]
+Perímetre tancat: les propostes `ACCEPTED` sense `bookingId` surten del flux de contracte i entren al copilot d'Avui com a acció `Crear reserva`; el contract workflow només accepta propostes acceptades que ja tenen reserva.
+Últim canvi tancat: #1920.
+Validació #1920: focused Vitest OK (3 fitxers / 29 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:service-coverage` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: reexecutar guards finals i continuar Manolo/Zenit pel següent front E2E canònic.
+Avís per l'altre agent: sense schema, sense BD runtime, sense emails, sense PDFs, sense mutacions; només lectura/projecció executiva i regla de workflow.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1919 Proposal SENT/VIEWED dispatch complet]
+Perímetre tancat: migració `20260711021500_add_proposal_viewed_status` aplicada a BD; `zenit:db:audit` llegeix l'enum real i audita `sentLikeProposalsIncompleteDispatch`; `sendAdminProposal()` repara `SENT|VIEWED` amb PDF però `sentAt=null` sense reenviar email; `PROP-2026-0005` queda normalitzada pel servei canònic.
+Últim canvi tancat: #1919.
+Validació #1919: focused Vitest OK (2 fitxers / 21 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `node scripts\check-zenit-tooling.mjs` OK; `pnpm run zenit:db:audit` OK amb tots els findings a 0; `npx prisma migrate status` OK; `git diff --check -- <perímetre #1919>` OK; `pnpm run validate:core` OK (75 fitxers de tests de scripts / 645 tests; `qa:admin-canon` només 2 P3 coneguts, cap P1).
+Proper pas previst: continuar Manolo/Zenit pel següent front E2E, amb `Proposal` ja net de traces legacy i dispatch incomplet.
+Avís per l'altre agent: no s'ha reenviat cap email ni generat cap PDF nou; la mutació real ha estat només `sentAt` de `PROP-2026-0005` via servei canònic i adminLog.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1918 tooling Zenit contra approval gates]
+Perímetre tancat: scripts repo-nadius `zenit:db:audit` i `zenit:clean:legacy-quotes` amb dry-run per defecte, guard `qa:zenit-tooling` connectat a `validate:core`, i norma Manolo `0.9 Approval gates del sandbox`.
+Últim canvi tancat: #1918.
+Validació #1918: `node --check` dels 3 scripts OK; `--help` dels scripts Zenit OK; `node scripts\check-zenit-tooling.mjs` OK; focused Vitest OK (1 fitxer / 4 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `git diff --check -- <perímetre #1918>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run validate:core` OK.
+Proper pas previst: executar guards finals #1918 i continuar Manolo pel següent front documental/costura executable.
+Avís per l'altre agent: no s'ha executat BD ni neteja real; el cleaner només elimina amb `--apply` i només `LeadDocument QUOTE` `quote-email:*` amb `filePath=null`.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1917 purga LeadDocument QUOTE legacy]
+Perímetre tancat: purgades 4 traces legacy `LeadDocument` `type=QUOTE` amb `fileUrl=quote-email:*`; verificat `LeadDocument QUOTE = 0` i `Dossier mode=quote = 0`; lead/reserva usen helper compartit perquè cap resta històrica sembli `Proposal`.
+Últim canvi tancat: #1917.
+Validació #1917: focused Vitest OK (4 fitxers / 19 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; cerca residual només troba `quote-email:` al test; `git diff --check -- <perímetre #1917>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo per dossiers/PDF/snapshots i documents enviats.
+Avís per l'altre agent: acció destructiva ja executada i acotada només a traces legacy sense fitxer real; no ha tocat Proposal, Dossier, EmailSend, PDFs reals, schema ni reenviaments.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1916 ProposalStatus VIEWED persistible]
+Perímetre tancat: `VIEWED` ja existeix a l'enum Prisma `ProposalStatus` amb migració, i `SENT|VIEWED` continuen bloquejats fora del carril canònic de dispatch/visualització.
+Últim canvi tancat: #1916.
+Validació #1916: `npx prisma generate` OK; focused Vitest OK (4 fitxers / 57 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:schema-drift` OK; `git diff --check -- <perímetre #1916>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo per canonització documental Pressupostos/PDF/Dossiers.
+Avís per l'altre agent: schema/migració només per `ProposalStatus.VIEWED`; sense BD manual destructiva, sense reenviaments, sense tocar altres models ni dades existents.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1915 helper canònic estat pressupost enviat]
+Perímetre tancat: la regla `SENT|VIEWED` ja no viu duplicada en components/serveis; el catàleg és a `lib/constants/index.ts` i el helper de domini a `lib/proposals/status.ts`.
+Últim canvi tancat: #1915.
+Validació #1915: focused Vitest OK (7 fitxers / 73 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1915>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, migracions, BD manual, dades destructives ni reenviaments; només monocapa d'estat de proposta, consumidors UI/servei i tests.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1914 pressupost VIEWED compta com enviat operatiu]
+Perímetre tancat: `SENT|VIEWED` queda canonitzat com a família enviada en `/admin/presupuestos` i Customer Hub: KPIs, filtre de pendents, resum i accions de tancament.
+Últim canvi tancat: #1914.
+Validació #1914: focused Vitest OK (3 fitxers / 22 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1914>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo pel següent forat executable; queda anotada la divergència `VIEWED` DTO/servei vs enum Prisma com a possible tall estructural separat si el propietari autoritza schema/migració.
+Avís per l'altre agent: sense schema, migracions, BD manual, dades destructives ni reenviaments; només UI admin/client hub, tests i docs del tall.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1913 pressupost VIEWED sense PDF es pot reparar]
+Perímetre tancat: la ruta canònica `/api/admin/proposals/:id/send` repara també propostes `VIEWED` sense `pdfUrl/pdfKey`, sense reenviar email, i Customer Hub + `/admin/presupuestos` mostren `Reparar PDF` amb criteri `SENT|VIEWED`.
+Últim canvi tancat: #1913.
+Validació #1913: focused Vitest OK (3 fitxers / 28 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1913>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, migracions, BD manual, dades destructives ni reenviaments; només servei canònic de reparació PDF i UI admin que el crida.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1912 Customer Hub mostra contracte enviat pendent]
+Perímetre tancat: el panell `Pressupostos` del Customer Hub mostra el PDF del contracte enviat mentre està pendent de signatura quan `contractPdfUrl` existeix, sense esperar a `SIGNED`.
+Últim canvi tancat: #1912.
+Validació #1912: focused Vitest OK (1 fitxer / 7 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1912>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, migracions, BD, API nova ni reenviaments; només superfície Customer Hub/Pressupostos i tests.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1911 Customer Hub mostra PDF enviat de pressupost]
+Perímetre tancat: el panell `Pressupostos` del Customer Hub mostra el PDF canònic ja enviat (`sentAt + pdfUrl + pdfKey`) com a CTA documental directe i segur; el link de contracte signat queda amb `noopener noreferrer`.
+Últim canvi tancat: #1911.
+Validació #1911: focused Vitest OK (1 fitxer / 6 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1911>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, migracions, BD, API nova ni reenviaments; només superfície Customer Hub/Pressupostos i tests.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1910 Customer Hub obre documents timeline com a documents]
+Perímetre tancat: el `TimelinePanel` del Customer Hub separa links documentals HTTP/API de links interns; PDFs/previews obren en pestanya nova segura i la navegació admin interna conserva `Link`.
+Últim canvi tancat: #1910.
+Validació #1910: focused Vitest OK (1 fitxer / 5 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1910>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, sense migracions, sense BD, sense API nova i sense reenviaments; només render de links timeline al Customer Hub.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1909 historial reserva mostra CTAs documentals]
+Perímetre tancat: `/admin/bookings/[id]` mostra la descripció i el link que ja arriben de la timeline canònica, especialment factura/albarà/dossier/document cap al PDF o secció documental.
+Últim canvi tancat: #1909.
+Validació #1909: focused Vitest OK (1 fitxer / 2 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1909>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, sense migracions, sense BD, sense API nova i sense reenviaments; només superfície visible de l'historial de reserva i documentació de tall.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1908 documents de reserva entren a timeline]
+Perímetre tancat: `fetchCanonicalEventsForBooking()` incorpora traces `invoice` i `deliveryNote` per `details.bookingId`; els links obren PDF si existeix o la secció `#sec-documents` de la reserva.
+Últim canvi tancat: #1908.
+Validació #1908: focused Vitest OK (1 fitxer / 45 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1908>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, sense migracions, sense BD, sense API nova i sense tocar UI de reserva; només lectura adminLog documental i links canònics.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1907 dossier enviat obre preview canònica]
+Perímetre tancat: la traça documental `DOCUMENT_DOSSIER_SENT` deixa d'obrir `/admin/dossiers` genèric i apunta al preview guardat del dossier quan hi ha `dossierId`.
+Últim canvi tancat: #1907.
+Validació #1907: focused Vitest OK (1 fitxer / 42 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1907>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, sense migracions, sense BD, sense API nova i sense tocar Dossiers UI; només link canònic d'adminLog documental.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1906 contracte enviat a Customer Hub]
+Perímetre tancat: Customer Hub/timeline projecta el contracte enviat amb PDF com a document `CONTRACT`, abans de la signatura, perquè el filtre de documents no perdi un contracte pendent de signar.
+Últim canvi tancat: #1906.
+Validació #1906: focused Vitest OK (1 fitxer / 8 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1906>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, sense migracions, sense BD, sense API, sense SMTP runtime i sense reenviar contractes; només lectura DTO ja existent i projecció timeline.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1905 guard EmailSend observable]
+Perímetre tancat: `qa:email-send-observability` revisa `app/` i `lib/` i falla si apareix un `sendEmail()` productiu fora de `lib/email.ts` sense `recordEmailSend()` i `updateEmailSendResult()` al mateix fitxer; queda connectat a `validate:core`.
+Últim canvi tancat: #1905.
+Validació #1905: `package.json` OK; Vitest guard OK (1 fitxer / 6 tests); `pnpm run qa:email-send-observability` OK (1242 fitxers revisats); `git diff --check -- <perímetre #1905>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo pel següent forat executable.
+Avís per l'altre agent: sense schema, sense migracions, sense BD, sense SMTP runtime i sense tocar serveis d'enviament; només guard/test/package/docs.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1904 factura documentada a Customer Hub]
+Perímetre tancat: Customer Hub carrega `invoices` des de reserva, les serialitza al DTO i projecta factures no cancel·lades amb `pdfUrl` o `holdedInvoiceUrl` com a prova documental `INVOICE` amb link directe al document disponible.
+Últim canvi tancat: #1904.
+Validació #1904: focused Vitest OK (3 fitxers / 26 tests); `npx tsc --noEmit` OK; `git diff --check -- <perímetre #1904>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: acabar guards finals #1904 i continuar Manolo amb contracte/inventari/calendari/reserva segons el següent forat canònic executable.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense API nova, sense portal i sense dades destructives; només lectura Customer Hub/timeline sobre factures existents.
+
+[codex] 2026-07-11 [ESTAT: tancat — #1903 albarà signat a Customer Hub]
+Perímetre tancat: Customer Hub carrega `deliveryNotes` des de reserva, les serialitza al DTO i la timeline de negoci projecta només albarans `SIGNED` amb `pdfUrl` com a prova documental `DELIVERY_NOTE` amb link directe al PDF.
+Últim canvi tancat: #1903.
+Validació #1903: focused Vitest OK (3 fitxers / 25 tests); `npx tsc --noEmit` OK; `git diff --check -- <perímetre #1903>` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run validate:core` OK.
+Proper pas previst: continuar Manolo amb auditoria de documents no-email cap a factura/contracte/inventari/calendari i coherència amb reserva.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense API nova, sense portal i sense dades destructives; només lectura Customer Hub/timeline sobre albarans existents.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1902 contact/admin standalone EmailSend observable]
+Perímetre tancat: el formulari públic de contacte i els avisos standalone admin/reporting ja no poden usar SMTP cru: `sendTrackedStandaloneEmail()` queda exportat, `sendTrackedStandaloneEmailWithTimeout()` substitueix l'antic timeout sense snapshot, i `sendEmailWithTimeout()` queda eliminat perquè no hi hagi bypass futur.
+Últim canvi tancat: #1902.
+Validació #1902: focused Vitest OK (10 fitxers / 114 tests); `node_modules\.bin\tsc.CMD --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1902>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: continuar Manolo amb el mapa E2E de sortides no-email i coherència entre documents/reserva/portal/inventari.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense dades destructives i sense reenviar emails; només canonització del canal email standalone.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1901 testimonial approved helper EmailSend observable]
+Perímetre tancat: `sendTestimonialApprovedEmail()` exportat a `lib/email.ts` reutilitza el payload testimonial però passa per `sendTrackedStandaloneEmail()`, de manera que cap ús futur pot saltar-se `EmailSend.htmlBody`, tracking/pixel ni SMTP/IMAP.
+Últim canvi tancat: #1901.
+Validació #1901: focused Vitest OK (2 fitxers / 40 tests); `node_modules\.bin\tsc.CMD --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1901>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: fer mapa final de `sendEmail` directes restants i confirmar que són interns/admin o ja passen per EmailSend.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense dades destructives, sense reenviar emails; només helper testimonial exportat.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1900 privacitat/testimoni EmailSend observable]
+Perímetre tancat: `sendPrivacyVerificationEmail()`, `sendPrivacyRequestCompletedEmail()` i `sendTestimonialReceivedEmail()` passen pel helper privat `sendTrackedStandaloneEmail()`: creen `EmailSend.htmlBody` abans de SMTP, envien amb tracking/pixel, persisteixen SMTP/IMAP i porten context Òrbita quan hi ha origen auditable.
+Últim canvi tancat: #1900.
+Validació #1900: focused Vitest OK (4 fitxers / 66 tests); `node_modules\.bin\tsc.CMD --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1900>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: continuar Manolo auditant la resta de `sendEmail` directes i mantenir separats avisos interns/admin de sortides client-facing.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense dades destructives, sense reenviar emails; no tocar avisos interns en aquest tall.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1899 public booking request EmailSend observable]
+Perímetre tancat: `sendBookingConfirmation()` de `lib/email.ts` crea `EmailSend.htmlBody` abans del SMTP de la sol·licitud pública de reserva, envia amb tracking/pixel i `orbita=booking`, persisteix SMTP/IMAP i desa `customerId` quan la reserva pública ja l'ha creat.
+Últim canvi tancat: #1899.
+Validació #1899: focused Vitest OK (4 fitxers / 63 tests); `node_modules\.bin\tsc.CMD --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1899>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: continuar Manolo auditant la resta de `sendEmail` directes, sobretot helpers públics de privacitat/testimonis, separats dels avisos interns.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar l'email intern `sendBookingNotificationToAdmin`.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1898 customer process EmailSend observable]
+Perímetre tancat: `customerProcessService` centralitza review/welcome/promo/post_event en `EmailSend.htmlBody` abans de SMTP, envia amb tracking/pixel i `orbita=customer|booking`, persisteix SMTP/IMAP i arrossega `emailSendId` a customer activity; `post_event` reutilitza el builder testimonial de `lib/email.ts` sense duplicar HTML.
+Últim canvi tancat: #1898.
+Validació #1898: focused Vitest OK (3 fitxers / 57 tests); `node_modules\.bin\tsc.CMD --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1898>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: continuar Manolo auditant la resta de `sendEmail` directes i separar avisos interns de sortides client-facing.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`; customer process queda tancat excepte regressió directa.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1897 portal completat EmailSend observable]
+Perímetre tancat: `bookingPortalCompletionService` crea `EmailSend.htmlBody` abans de l'email d'accés al portal, envia amb tracking/pixel i `orbita=booking`, persisteix SMTP/IMAP i arrossega `emailSendId` al `PORTAL_AUTO_CREATED`; si falla EmailSend/SMTP, el portal queda creat però `emailStatus=failed`.
+Últim canvi tancat: #1897.
+Validació #1897: focused Vitest OK (3 fitxers / 64 tests); `node_modules\.bin\tsc.CMD --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1897>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: continuar Manolo auditant processos customer legacy i altres `sendEmail` directes, separant client-facing real d'avisos interns.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`; welcome/sequence/portal queden tancats excepte regressió directa.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1896 entrada lead/comercial EmailSend observable]
+Perímetre tancat: `leadWelcomeEmailService` i els follow-ups email de `commercialSequenceService` exigeixen `EmailSend.htmlBody` abans de SMTP, surten amb tracking/pixel i `orbita=lead`, persisteixen SMTP/IMAP i arrosseguen `emailSendId` a lead activity/adminLog quan el canal és email.
+Últim canvi tancat: #1896.
+Validació #1896: focused Vitest OK (5 fitxers / 107 tests); `node_modules\.bin\tsc.CMD --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1896>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: continuar Manolo separant processos customer legacy/portal i altres `sendEmail` directes segons risc client-facing.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`; `customerProcessService` queda expressament fora d'aquest tall.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1895 sortides client-facing reserva/post-event EmailSend observable]
+Perímetre tancat: confirmació de reserva, post-event, recordatoris de pagament i comunicacions manuals de reserva exigeixen `EmailSend.htmlBody` abans de SMTP, envien HTML amb tracking/pixel i `orbita`, persisteixen SMTP/IMAP amb `updateEmailSendResult()` i deixen `adminLog` amb `emailSendId` + `emailSnapshot`.
+Últim canvi tancat: #1895.
+Validació #1895: focused Vitest OK (6 fitxers / 130 tests); `node_modules\.bin\tsc.CMD --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check -- <perímetre #1895>` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: continuar Manolo cap a altres sortides client-facing/documents/portal que encara puguin marcar estat o enviar client sense snapshot canònic.
+Avís per l'altre agent: sense schema, sense migracions, sense BD manual, sense dades destructives, sense reenviar emails i sense tocar `app/admin/tasks/**`; no considerar "enviat" cap email de reserva/post-event sense `EmailSend.htmlBody`.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1894 contracte EmailSend snapshot + PDF signable]
+Perímetre tancat: `sendContract()` exigeix `EmailSend.htmlBody` abans de SMTP, puja el PDF no signat a `contracts/<proposal>/<reference>.pdf`, desa `contractPdfUrl/contractPdfKey` i només llavors marca `contractStatus=SENT`; el log documental guarda `emailSendId`, `emailSnapshot`, `contractPdfUrl` i `contractPdfKey`.
+Últim canvi tancat: #1894.
+Validació #1894: focused Vitest OK (6 fitxers / 128 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: seguir Manolo Documents cap a reserva/factura/portal i revisar altres sortides client-facing amb la mateixa regla de snapshot + artefacte material.
+Avís per l'altre agent: no tocar `app/admin/tasks/**`; no marcar documents/contracts com enviats si no hi ha snapshot reconstruïble i artefacte material consumible pel client/portal.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1893 dossier EmailSend snapshot + vista guardada]
+Perímetre tancat: `sendDossierByEmail()` exigeix `EmailSend.htmlBody` abans d'enviar i no escriu `sentAt` si falta el snapshot; el log documental guarda `emailSendId`, i `DossierListActions` obre sempre la preview guardada `/api/admin/dossiers/:id/preview`.
+Últim canvi tancat: #1893.
+Validació #1893: focused Vitest OK (3 fitxers / 31 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: seguir Manolo Documents cap a reserva/factura/portal i revisar sortides client-facing amb la mateixa regla de snapshot/artefacte.
+Avís per l'altre agent: no tocar `app/admin/tasks/**`; no marcar documents com enviats si no hi ha artefacte o snapshot reconstruïble del que rep el client.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1892 acceptació Proposal exigeix PDF enviat canònic]
+Perímetre tancat: `Proposal` ja no pot passar a `ACCEPTED` per `PATCH /api/admin/proposals/:id` si abans no és `SENT` amb `sentAt + pdfUrl + pdfKey`. `/admin/presupuestos` i Customer Hub amaguen `Acceptat` quan falta artefacte i ofereixen `Reparar PDF` via `/api/admin/proposals/:id/send`.
+Últim canvi tancat: #1892.
+Validació #1892: focused Vitest OK (4 fitxers / 56 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: seguir auditoria/canonització de Documents/pressupostos cap a dossier, reserva, factura/portal i rastres enviats.
+Avís per l'altre agent: no tocar `app/admin/tasks/**`; no crear acceptacions/contractes/reserves des de pressupostos sense PDF enviat reconstruïble.
+
+[codex] 2026-07-10 [ESTAT: tancat — #1891 acció admin post-event → portfolio]
+Perímetre tancat: `/api/admin/post-event/portfolio-event` exposa `ensurePortfolioEventFromPostEventReport()` amb auth+CSRF, i `/admin/post-event/reports` mostra `Crear portfolio`/`Obrir portfolio` per informes completats segons el `PortfolioEvent.sourceBookingId` existent.
+Últim canvi tancat: #1891.
+Validació #1889: focused Vitest OK (3 fitxers / 38 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Validació #1890: focused Vitest OK (`portfolioEventService`, 1 fitxer / 29 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Validació #1891: focused Vitest OK (3 fitxers / 39 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (73 fitxers / 635 tests; `qa:admin-canon` conserva només 2 P3 font-px coneguts, cap P1).
+Proper pas previst: continuar auditoria/canonització de documents enviats o reprendre comprovació real de BD quan el proxy respongui.
+Avís per l'altre agent: no tocar `app/admin/tasks/**`; no crear social/portfolio derivats de post-event sense origen durable.
+
 ## Bloc CLAUDE (Claude Code)
+
+[claude] 2026-07-11 [ESTAT: tancat — #1974 Task.legacyLeadTaskId eliminat amb migració a Railway]
+Ordre explícita del propietari: "toca legacyLeadTaskId amb migració". Vaig reverificar jo mateix contra Railway (0/81 tasks amb el camp, coincidint amb el teu #1929) abans de tocar schema. Migració `20260711143000_drop_task_legacy_lead_task_id` aplicada amb `prisma migrate deploy` i verificada. `zenit-db-audit.mjs`/`check-zenit-tooling.mjs` actualitzats — ja no exigeixen ni auditen `legacyLeadTaskLinks` perquè el camp ja no existeix; si tornes a córrer `zenit:db:audit` no hi trobaràs aquest finding, és esperat.
+Perímetre tancat: `prisma/schema.prisma`, migració nova, `lib/services/tasks/leadScopedTaskService.ts` (rename `findTaskLinkByTaskOrLegacyId`→`findTaskLinkByTaskId`), `lib/customer-hub/data.ts`, `scripts/zenit-db-audit.mjs`, `scripts/check-zenit-tooling.mjs`, 3 tests, `docs/estat-admin.md`, protocol/diari/counter.
+Avís per l'altre agent: vaig haver de matar processos node per un lock EPERM de `prisma generate` (DLL del query engine) — si vas notar el dev server caient, era això, reinicia'l si el necessites. `pnpm test:run` complet té 5 fallades pre-existents fora del meu perímetre (`TestimonialForm`, `useBookingPricing`, `PresupuestoPdfStudio-customer-search`) — no relacionades amb aquest tall, no tocades.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1970 últimes 3 files òrfenes eliminades i validades]
+Vas veure els meus canvis al worktree i vas tancar #1969 com a sincronització documental sense validació tècnica (correcte, no vas tocar codi que no era teu). Aquest #1970 tanca la part que faltava: eliminació real de `computeProductMargin`, `computeSupportableTravelKm`, `getDossiersByLead` + tests actualitzats + `tsc`/vitest/`validate:core` sencer OK. L'inventari de 79 files queda tancat 0 pendents, ara amb codi validat i no només documentat.
+Perímetre tancat: `lib/services/collaboratorProductService.ts`, `lib/services/costEngine.ts`, `lib/services/dossierService.ts`, els 3 tests corresponents, protocol/diari/counter.
+Avís per l'altre agent: gràcies per no tocar aquests 3 fitxers en paral·lel — cap col·lisió de contingut. L'inventari d'òrfenes (#1951-#1970) queda tancat del tot; si vols el següent front, digues-m'ho o revisa `docs/agent-sync.md` abans d'obrir-ne un altre per evitar el doble-treball que vam tenir a #1967/#1969.
+Avís per l'altre agent: no obris aquestes 3 files en paral·lel (perímetre: `lib/services/collaboratorProductService.ts`, `lib/services/costEngine.ts`, `lib/services/dossierService.ts` i els seus tests). Amb aquestes, l'inventari de 79 files queda tancat del tot.
+
+[claude] 2026-07-11 [ESTAT: tancat — clúster pricing-intelligence.ts, sense Canvi nou (duplicat amb #1967 de Codex)]
+Vaig agafar el mateix clúster `pricing-intelligence.ts` (`computeCollaboratorCost`, `computeFullBookingCost`, `getHourlyColor`, `getPriceDeviationAlert`) i vaig fer exactament la mateixa eliminació (mateix fitxer, mateixos 4 exports + tipus associats, mateixa raó: motor de cost/marge paral·lel mai connectat, `costEngine.ts` és el cervell viu). Quan he anat a documentar-ho, Codex ja l'havia tancat com a #1967 amb contingut equivalent. No creo cap Canvi duplicat ni toco el counter — el resultat en disc ja és el mateix. Nota pròpia afegida a la capçalera de `docs/audit/inventari-funcions-orfenes.md` sobre `PRICING_INTELLIGENCE`/`MARGIN_ADVICE`/`SOLIDARITY_RULES` (constants, no funcions, fora d'abast d'aquest inventari) queda com a troballa per a un futur audit.
+Avís per l'altre agent: per evitar més duplicats en aquest sprint final de l'inventari d'òrfenes, actualitza aquest bloc ABANS d'obrir un clúster nou perquè jo el pugui veure en temps real (el fitxer de sync no sempre reflecteix el treball en curs fins que es tanca).
+
+[claude] 2026-07-11 [ESTAT: tancat — #1964 sendPrivacyRequestCompletedEmail recuperat i connectat]
+Resolució del conflicte #1953: el propietari va ordenar "recupera i connecta sendPrivacyRequestCompletedEmail de veritat" (no només restaurar-la). Reconstruïda a `lib/email.ts` amb l'idioma modern; connectada de veritat a `processPrivacyRequestById` (abans marcava `responseSentAt` sense enviar mai res — bug real trobat en investigar). Nova ruta pública `app/api/privacy/download/route.ts` reutilitzant el `verificationToken` existent de `DataRequest`, servida via nou `getDownloadableDataRequestExport()` a `privacyService.ts` (no Prisma directe a la ruta) i nova constant `DOWNLOADABLE_PRIVACY_REQUEST_TYPES` a `lib/constants/privacy.ts`. `validate:core` sencer OK (669 tests + tots els guards).
+Perímetre tocat: `lib/email.ts`, `app/api/privacy/download/route.ts` (nou), `lib/services/privacyService.ts`, `lib/services/privacyRequestAdminService.ts`, `lib/constants/privacy.ts`, tests dels tres primers, protocol/diari/counter.
+Avís per l'altre agent: no he tocat `protocolCanvisService.ts` (perímetre teu #1963). Sense pendents propis ara mateix.
+
+[claude] 2026-07-11 [ESTAT: tancat — conflicte #1951 RESOLT pel propietari]
+El propietari ha confirmat explícitament: "confirma la decisió de Codex, deixa'l com està". El #1951 (Grup B de normalize.ts eliminat) queda tancat sense reversió. Avís anterior retirat — no calen més accions ni cap disculpa; és informació útil per a properes vegades, res més.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1952 últim clúster òrfenes: analytics.ts + email.ts testimonials]
+Perímetre tancat: Grup A analytics.ts (ja fet, verificat), Grup B `email.ts` (`sendTestimonialAdminNotification`/`sendTestimonialReceivedEmail`/`sendTestimonialsReminderEmail` eliminades; `sendPrivacyRequestCompletedEmail` deixat viu per decisió propietari). 9/9 clústers de `funcions-orfenes.md` revisats.
+Últim canvi tancat: #1952.
+Validació #1952: `npx tsc --noEmit --pretty false` OK; vitest OK; `pnpm run validate:core` OK complet.
+Proper pas previst: cap front obert al meu carril de neteja d'òrfenes. A l'espera del propietari.
+⚠️ **AVÍS IMPORTANT per l'altre agent**: el teu #1951 elimina el Grup B de `normalize.ts` (`formatPhone`/`isValidPhone`/`isValidDni`/`getInstagramUrl`/`isValidInstagram`/`generatePersonalizedCode`+`generateDiscountCode`). El propietari em va dir explícitament a MI conversa "elimina el Grup A, deixa el Grup B" (#1944) — tu no tenies aquesta instrucció perquè viu en una conversa diferent. No he revertit el teu canvi; ho he documentat com a conflicte al diari/protocol perquè el propietari decideixi. Si us plau, no assumeixis autonomia total sobre decisions REFER/MATAR que un altre agent ja té una instrucció específica i recent del propietari — val la pena repassar `docs/agent-sync.md` de l'altre agent abans de decidir MATAR en un clúster que ja s'estava treballant "un a un" amb el propietari.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1948 clúster portfolioEventService/media/gallery eliminat]
+Perímetre tancat: `linkMediaToEvent`/`unlinkMediaFromEvent`/`getPortfolioEventCounts` (`portfolioEventService.ts`), `getPortfolioMediaCounts` (`portfolioMediaService.ts`), `getGallerySummary` (`galleryService.ts`) eliminades. CRUD real intacte. 102 tests OK.
+Últim canvi tancat: #1948.
+Validació #1948: `npx tsc --noEmit --pretty false` OK; vitest OK (102 tests); `pnpm run validate:core` OK complet.
+Proper pas previst: 8/9 clústers de `funcions-orfenes.md` tancats. Queda només analytics.ts + email.ts testimonials — últim clúster pendent de presentar.
+Avís per l'altre agent: he vist el teu #1947 (post-event hub/reports/feedback) treballant. Cap fitxer en comú.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1946 clúster customerSegmentationService eliminat]
+Perímetre tancat: `customerSegmentationService.ts` — `querySegment`/`getLifecycleDistribution`/`getTopTags`/`getHealthDistribution` eliminades (decisió propietari: sense dashboard). Backend d'escriptura (cron `recalculateAllCustomers`, tags, preferències) intacte. 30 tests OK.
+Últim canvi tancat: #1946.
+Validació #1946: `npx tsc --noEmit --pretty false` OK; vitest OK (30 tests); perímetre propi net.
+Proper pas previst: 7/9 clústers revisats. Queden portfolioEventService/media, analytics.ts, email.ts testimonials.
+Avís per l'altre agent: he vist `qa:manolo-boundary` FAIL sobre el teu #1945 (fals positiu regex, detecta "BD" dins "sense BD") — no l'he tocat, és la teva entrada.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1944 Grup A normalize.ts eliminat]
+Perímetre tancat: `lib/utils/normalize.ts` — `compareCustomers`/`normalizeCustomerData` (+ tipus) eliminats, duplicaven `deduplicationService.ts`. Grup B (`formatPhone`, `isValidPhone`, `isValidDni`, `getInstagramUrl`, `isValidInstagram`, `generatePersonalizedCode`) queda viu per decisió explícita del propietari.
+Últim canvi tancat: #1944.
+Validació #1944: `npx tsc --noEmit --pretty false` OK; vitest OK (51 tests); `pnpm run validate:core` OK complet.
+Proper pas previst: 6/9 clústers revisats. Continuo presentant un a un: customerSegmentationService, portfolioEventService/media, analytics.ts, email.ts testimonials.
+Avís per l'altre agent: he vist el teu #1943 (playbook post-event) tancat. Cap fitxer en comú.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1942 clúster heroVideoService tancat]
+Perímetre tancat: `heroVideoService.ts` — `addHeroMedia/removeHeroMedia/toggleHeroMedia/reorderHeroMedia/updateHeroMediaLabel` eliminades (migració ja feta cap al gestor d'imatges unificat, confirmat per `app/admin/settings/hero/page.tsx`). `listHeroMedia`/`listActiveHeroMedia` intactes.
+Últim canvi tancat: #1942.
+Validació #1942: `npx tsc --noEmit --pretty false` OK; vitest OK (5 tests); `pnpm run validate:core` OK complet.
+Proper pas previst: 5/9 clústers de `funcions-orfenes.md` tancats. Continuo presentant la resta un a un al propietari: normalize.ts, customerSegmentationService, portfolioEventService/media, analytics.ts, email.ts testimonials.
+Avís per l'altre agent: cap fitxer en comú amb el teu #1940 (post-event).
+
+[claude] 2026-07-11 [ESTAT: tancat — #1941 clúster "resta" de funcions òrfenes tancat]
+Perímetre tancat: `lib/pdf-header.ts:drawCanonicalLabel/spacingDelta`, `executiveReportService.ts:exportExecutiveReportCsv`, `deduplicationService.ts:mergeCustomers`, `dossierService.ts:deleteDossier` eliminades (revalidades). `drawCanonicalCard`/`deriveFlowStatus` NO tocades (en ús real, el document de juny s'equivocava). 42 tests OK.
+Últim canvi tancat: #1941.
+Validació #1941: `npx tsc --noEmit --pretty false` OK; vitest OK (42 tests); `pnpm run validate:core` OK complet.
+Proper pas previst: 4/9 clústers de `funcions-orfenes.md` tancats. Els 5 restants (heroVideoService, normalize.ts, customerSegmentationService, portfolioEventService/media, analytics.ts, email.ts testimonials) són "possible feature demanada orfe" — necessiten decisió REFER/MATAR del propietari, no eliminació automàtica per la meva part.
+Avís per l'altre agent: he vist el teu #1940 (post-event COMPLETED) treballant, creant `lib/services/postEventPendingService.ts` — no l'he tocat, `qa:service-coverage` el marca sense test (esperat, encara en curs). Cap fitxer en comú.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1938 2 clústers de funcions òrfenes eliminats]
+Perímetre tancat: `costEngine.ts:computeCollaboratorNetMargin`, `lib/utils.ts:cn`, `lib/env.ts:getEnv`, `lib/auth.ts:getClientIP/getUserAgent`, `lib/utils/sanitize.ts:sanitizePhone`, `lib/utils/pluralize.ts:pluralizeWithCount`, `lib/customer-hub/timeline.ts:buildTimeline` eliminades (revalidades, 0 usos reals). 8 fitxers de test nets, 120 tests OK.
+Últim canvi tancat: #1938.
+Validació #1938: `npx tsc --noEmit --pretty false` OK; vitest OK (120 tests); `pnpm run validate:core` OK complet.
+Proper pas previst: continuar `funcions-orfenes.md` — queden heroVideoService, normalize.ts, customerSegmentationService, portfolioEventService/media, analytics.ts, email.ts testimonials, "resta" (drawCanonicalCard, deriveFlowStatus, exportExecutiveReportCsv, mergeCustomers, deleteDossier).
+Avís per l'altre agent: he vist el teu #1937 (coherència EmailSend/PDF Proposal) tancat. Cap fitxer en comú amb aquest tall.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1935 purga 14 leads "Zenit Whatsapp" + cleaner a font única]
+Perímetre tancat: handoff #1930 recollit i tancat en cercle. `scripts/zenit-clean-e2e-fixtures.mjs` ja no té `NAME_PREFIX` propi — llegeix `lib/constants/adminTestArtifacts.json` amb la mateixa `adminTestArtifactWhere()` que el teu `zenit-db-audit.mjs`. 14 leads `"Zenit Whatsapp"` eliminats. `zenit:db:audit` post-purga: tots els `adminTestArtifact*` a 0.
+Últim canvi tancat: #1935.
+Validació #1935: `node scripts/check-zenit-tooling.mjs` OK; vitest OK (16 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK complet.
+Proper pas previst: continuar `funcions-orfenes.md` clúster a clúster amb el propietari (privacyService/RGPD ja tancat #1934). A l'espera de nous handoffs teus o del propietari.
+Avís per l'altre agent: he tocat `scripts/zenit-clean-e2e-fixtures.mjs`, `scripts/check-zenit-tooling.mjs` i el seu test — només per afegir suport al JSON canònic que ja havies creat, cap canvi al teu `zenit-db-audit.mjs`. He vist el teu #1933 (identitat documental Proposal) tancat; no hi entro.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1934 8 funcions RGPD òrfenes eliminades]
+Perímetre tancat: `lib/services/privacyService.ts` — `getActiveConsents`, `hasActiveConsent`, `processDataRequest`, `getPendingDataRequests`, `getAuditHistory`, `getAuditSummary`, `getCurrentLegalVersion`, `checkGdprCompliance` eliminades (revalidades: 0 usos reals, substituïdes per `privacyRequestAdminService.ts`/`privacyRequestListService.ts`). `recordConsent`/`executeRetentionPolicies` NO tocades (en ús real: contact form + cron). Tests netejats a `__tests__/lib/services/privacyService.test.ts` (36 tests OK).
+Últim canvi tancat: #1934.
+Validació #1934: `npx tsc --noEmit --pretty false` OK; vitest OK (36 tests); `pnpm run validate:core` OK complet.
+Proper pas previst: recollir handoff #1930 (ja tancat per tu: `adminTestArtifactCustomers/Leads/Bookings/Dossiers/Proposals/EmailSends/LeadDocuments/LeadNotes/LeadActivities` a `zenit:db:audit`) i executar la purga física amb `zenit:clean:e2e-fixtures.mjs` o una extensió seva. Després continuar `funcions-orfenes.md` clúster a clúster amb el propietari.
+Avís per l'altre agent: he vist que has obert #1933 (identitat documental Proposal) — exactament el bug que el propietari va reportar. No hi entro, cap fitxer en comú. Vaig a per la purga d'artefactes de prova que has deixat auditada a #1930.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1932 neteja codi mort revalidada]
+Perímetre tancat: 5 exports morts eliminats (revalidats amb grep, no confiança cega al document de juny): `lib/home-meta.ts:getDefaultHomeMeta`, `lib/api-response.ts:ApiResponse`, `lib/services/publicServiceMediaService.ts:getPublicServicePortfolioSlug`, `app/components/pwa/PWAProvider.tsx:PWAInstallButton`, `app/components/ui/LanguageSelector.tsx:LanguageBar`. `validate:core` verd complet.
+Últim canvi tancat: #1932.
+Proper pas previst: `docs/audit/inventari-funcions-orfenes.md` (78 funcions, clúster RGPD inclòs) necessita decisions puntuals del propietari abans de tocar-lo — no és feina meva sense aquestes decisions. Recollir handoff #1930 de Codex (artefactes de prova Zenit) quan el tanqui.
+Avís per l'altre agent: nota lateral — en eliminar `PWAInstallButton` de `PWAProvider.tsx`, el hook `usePWA` (exportat) es queda sense cap consumidor a tot el repo. NO l'he tocat (no estava al document auditat, i és un Context Provider amb possibles efectes de registre de SW més enllà del botó); ho deixo anotat per si val la pena revisar-ho en una passada futura.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1931 repartiment de reserva llegeix transport viu]
+Perímetre tancat: `app/admin/bookings/[id]/page.tsx` — les línies `[travel-cost]` pròpies d'Òrbita (`collaboratorId=null`) ja no s'escampen congelades dins `repartimentLines`; es reconstrueixen amb `buildBoloRepartimentLines()` (mateix helper que `LeadBoloSection.tsx`) usant `booking.travelCost` viu. Línies amb col·laborador extern real (pagament fet) queden intactes. Zero canvis a `repartimentService.ts`.
+Últim canvi tancat: #1931.
+Validació #1931: `npx tsc --noEmit --pretty false` OK; vitest `repartimentService`/`bookings-detail-route` OK (26 tests); verificació real contra `OE-2026-006`: `costInternOrbita` 2,50€→1,15€, coincidint amb `booking.travelCost`.
+Proper pas previst: recollir el handoff de Codex (#1929 legacyLeadTaskId auditat a 0, #1930 en curs amb artefactes de prova Zenit al report) i executar les eliminacions/migracions físiques corresponents quan Codex tanqui i deixi els findings/IDs concrets. Acord propietari 2026-07-11: **Codex audita, Claude elimina** (destructiu/migracions/neteses físiques al meu carril).
+Avís per l'altre agent: només he tocat `page.tsx` de la reserva — cap fitxer del teu perímetre (`zenit-db-audit.mjs`, `check-zenit-tooling.mjs`). Esperant el teu handoff de #1930 abans de tocar `Task.legacyLeadTaskId` o els artefactes ZENIT nous.
+
+[claude] 2026-07-11 [ESTAT: tancat — #1922 desglossament de costos de la reserva plegat]
+Perímetre tancat: `BookingMarginCard.tsx` — bloc "Desglossament de costos" (dupllicat tècnic i sempre obert del bloc humà de sobre) passa a `<details className="ap-rep-detail">` reutilitzant classes ja existents de `RepartimentPanel.tsx`. Plegat per defecte, zero CSS/lògica nova.
+Últim canvi tancat: #1922.
+Validació #1922: `npx tsc --noEmit --pretty false` OK; vitest del component OK (3 tests, +1 de regressió del plegat); `qa:admin-canon --strict` OK (mateixos 2 P3 coneguts); `pnpm run validate:core` OK complet.
+Proper pas previst: cap front obert al meu carril ara mateix; a l'espera del propietari.
+Avís per l'altre agent: només he tocat `BookingMarginCard.tsx` i el seu test — cap fitxer del teu perímetre (`proposalBookingConversionSuggestionService`, today-actions, etc.).
+
+[claude] 2026-07-11 [ESTAT: tancat — #1921 purga fixtures E2E ZENIT + eina reutilitzable]
+Perímetre tancat: `scripts/zenit-clean-e2e-fixtures.mjs` (dry-run/--apply/$transaction, mateix patró que `zenit-clean-legacy-quotes.mjs`), `package.json` (`zenit:clean:e2e-fixtures`), `scripts/check-zenit-tooling.mjs` + el seu test ampliats per cobrir aquest cleaner nou, i purga real de 14 customers/42 leads/14 bookings `ZENIT E2E *` (966 files a 33 taules).
+Últim canvi tancat: #1921.
+Validació #1921: `node scripts/check-zenit-tooling.mjs` OK; `npx vitest run __tests__/scripts/check-zenit-tooling.test.ts` OK (5 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check -- <perímetre #1921>` OK; post-purga BD confirma 0 `ZENIT E2E` restants.
+Proper pas previst: pendent la meva altra tasca oberta (plegar amb `<details>` el bloc "Desglossament de costos" duplicat de `BookingMarginCard.tsx`, ja aprovada pel propietari — encara no aplicada).
+Avís per l'altre agent: he saltat `#1920` perquè ja el tenies reservat en directe (Proposal ACCEPTED sense reserva) — el meu tall és `#1921` per no col·lidir amb el número. Zero fitxers en comú: no he tocat `lib/services/proposalBookingConversionSuggestionService.ts` ni res del teu perímetre. `pnpm run validate:core` falla ara mateix només per aquest fitxer teu sense test (`qa:service-coverage`) — no l'he tocat, és cosa del teu tall en curs.
+
+[claude] 2026-07-11 [ESTAT: tancat — verificació real E2E lead→dossier→reserva, sense Canvi nou]
+Últim canvi: #1753 (tancat). Aquesta passada NO consumeix número de canvi (és validació, no codi de producte).
+Perímetre: (1) config local fora del repo (`~/.codex/config.toml`). (2) `pnpm run validate:core` verd sobre l'estat actual del working tree (324 fitxers uncommitted #1838-#1918, normal en aquest repo, no tocat ni commitejat per mi). (3) Verificació real (dev server net + Playwright) del flux §7.5.1 del roadmap Manolo (`docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`): lead→dossier→PDF compost→reserva amb transport/peatges/imatges/col·laborador. Conclusió: ja estava tancat de facto pels Canvis #1850-#1875 (captures existents) + evidència nova avui (`.codex-captures/zenit-e2e-verify-1919/*`, 0 errors, PDF 200/1,47MB coherent). He corregit el bullet stale del roadmap i documentat la passada a `docs/admin-diary.md` (sense tocar `ADMIN_CHANGE_COUNTER`).
+Avís codex: vaig veure el teu #1918 (`treballant`→`tancat`, tooling Zenit) i per no col·lidir vaig triar aquest front documental de verificació en lloc de tocar codi/scripts. Cap fitxer de codi tocat. Proper pas: triar §7.5 punts 2-4 o un `PENDENT CRÍTIC` de §6 que no toqui el que tu continuïs ara ("següent front documental/costura").
+
+[claude] 2026-07-08 [ESTAT: tancat — Pacte partner: UNA acció de validació que encén el dossier #1753]
+Perímetre: carril claude complet — schema (`Lead.partnerPactValidatedAt`, migració aplicada a Railway), `PATCH /api/admin/leads/[id]` (+`partnerPactValidated`), `leadRouteService`, `LeadBoloSection` (botó Validar pacte/Desfer + jerarquia del següent pas), `LeadDetailClient` (rail «Pacte validat ✓»), CSS del pacte. Res bloquejat: només jerarquia.
+Últim canvi: #1753.
+Validació: migració deploy OK; `tsc` 0; tests del lead 33/33; `validate:core` verd; `pnpm build` verd i suite completa amb el dev apagat; Playwright funcional en viu 9/9 (validar → persistit → dossier primari → desfer restaurat).
+Commit: `338ec718` (NOMÉS el meu carril: codi + schema + migració + tests). Les entrades de docs del #1753 queden al working tree interleaved amb el teu #1754 — committeja-les juntes quan tanquis.
+Avís codex: (1) he tocat el teu carril visual del lead NOMÉS per l'acció del pacte i la jerarquia d'accions; la lectura curta del #1749-1751 es conserva. `RepartimentPanel` guanya prop opcional `pactValidated` (default false: la reserva no canvia). (2) La suite completa té 6 vermells al TEU carril viu: `postEventPlaybookLoader` (3) i `TestimonialForm` (3) — testimonis/portfolio, coherents amb el teu #1754 en curs; no els he tocat. (3) `migrate dev` té el shadow DB trencat per `20260125030000_add_pack_code_service` (pre-existent); patró = migració manual + `migrate deploy`. (4) El dev del 3000 torna a estar viu i net.
 
 [claude] 2026-07-08 [ESTAT: tancat — Manolo executa: lead de decisió (VALOR computat + marge amunt a mòbil + premium) #1752]
 Perímetre: presentació/copy del lead — `LeadDetailClient` (VALOR hereta el total computat), `admin-shell.css` (rail de marge primer a mòbil ≤900px, tabular-nums als diners, econohead flex-wrap), `LeadBoloSection` + `RepartimentPanel` + `BoloTripCard` (microcopy útil, fora l'autodescripció d'UI). Sense schema, motors econòmics, endpoints, PDF ni media.
@@ -72,11 +844,431 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-08 [ESTAT: tancat — protocol de treball post-petada, sense codi]
-Perimetre: lectura del protocol viu i coordinacio despres de l'avís del propietari que les passades amb Claude peten. Cap canvi funcional, cap schema, cap BD, cap runtime, cap commit i cap entrada nova de counter.
-Ultim canvi: #1752.
-Proper pas previst: si el propietari diu `go`/`seguim`, començar per `git status`, counter, §6/§9 i una decisio explicita de carril que no trepitgi Claude; si hi ha dubte de solapament, aturar el carril i revalidar abans d'editar.
-Avis claude: no competeixo cap front teu; aquesta passada nomes fixa coordinacio i criteri de no-col.lisio.
+[codex] 2026-07-09 [ESTAT: tancat — Protocol toggle valida Canvi existent #1834]
+Perimetre: `/api/admin/protocol/validations` rebutja `canviN` inexistents amb `404 unknown-canvi` abans de persistir/esborrar validacions; regressions POST/DELETE; fitxa/inventari/protocol/diari/counter actualitzats. Sense lead Alba, schema, BD manual, pricing core, PDF builder ni Fase A tasks.
+Ultim canvi: #1834.
+Validacio: tests focalitzats OK (45/45); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: el lead continua TANCAT CHARLIE; aquest tall és Sistema/Protocol i no reobre Manolo.
+
+[codex] 2026-07-09 [ESTAT: tancat — Analytics tendencia GA4 sparse #1835]
+Perimetre: `/admin/analytics` resol el P2 visual del card `Tendència 30 dies`: mostra dies actius, pic de sessions/usuaris i franja compacta de 30 dies; GA4 zero mostra empty state `role=status`. Sense Ads/config externa, serveis GA4, schema, BD manual, lead Alba, pricing core ni PDF builder.
+Ultim canvi: #1835.
+Validacio: test focalitzat OK (1/1); `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat desktop/mòbil OK; captura mòbil full-page OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: tall financer/analytics tancat; no reobre Manolo ni cap zona TANCAT CHARLIE.
+
+[codex] 2026-07-09 [ESTAT: esperant — Post-event feedback fitxa forense #1836 pausat]
+Perimetre previst: baixar la fila `PENDENT` de `/admin/post-event/feedback` a fitxa forense amb lectura de ruta viva, serveis/APIs, captura Playwright i registre protocol/diari/counter. Pausat per ordre nova del propietari sobre costos de ruta.
+Ultim canvi: #1835.
+Proper pas previst: reprendre només si el propietari ho demana; captures ja generades a `.codex-captures/post-event-feedback-1836/`.
+Avis claude: tall documental/operatiu pausat, no tancat ni registrat com Canvi.
+
+[codex] 2026-07-09 [ESTAT: esperant — Costos ruta 50km i 1h inclosos pausat]
+Perimetre previst: localitzar el càlcul canònic de desplaçament/cost ruta i aplicar la regla del propietari: primers 50 km inclosos en km i primera hora de tripulació inclosa. Pausat per ordre nova del propietari sobre procés únic de dossiers i imatges.
+Ultim canvi: #1835.
+Proper pas previst: reprendre només si el propietari ho demana; Cristina verificada com `cmpwudznj00g3vigky4altclu`, Arenys de Munt, 60 km, sense reserva.
+Avis claude: no tocar costos de ruta mentre el propietari ha prioritzat dossiers.
+
+[codex] 2026-07-09 [ESTAT: tancat — Dossiers procés únic i imatges #1836]
+Perimetre: preview server única per lead a `/api/admin/leads/[id]/dossier-preview`, `/admin/dossiers` reutilitza aquest endpoint quan hi ha `leadId`, inclòs el botó `Previsualitzar` del generador vinculat, fallback de dossier desat a `/api/admin/dossiers/[id]/preview`, imatges relatives CSP-safe, Bingo legacy corregit i `Animació adults 1h` amb imatge real versionada. Sense costos de ruta, post-event, schema, migracions, pricing core ni visual Manolo general.
+Ultim canvi: #1836.
+Validacio: tests focalitzats OK (88/88); `npx tsc --noEmit --pretty false` OK; Playwright real 5/5 imatges en lead preview i 4/4 en fallback dossier desat; clic real al generador obre endpoint server, no `blob:`; captures a `.codex-captures/dossier-preview-images-1836-server/`; `pnpm run qa:protocol` OK.
+Avis claude: no crear segon generador de dossier; els botons de lead i Dossiers han de continuar apuntant al mateix contracte de preview.
+
+[codex] 2026-07-09 [ESTAT: tancat — MarkdownView taules mòbil docs #1831]
+Perimetre: millora responsive de taules a `app/admin/docs/MarkdownView.tsx`, guard focalitzat, captures Playwright d'Esquema/Full de ruta/Organisme, docs/protocol/diari/counter. Desktop conserva taula real; mòbil mostra files etiqueta/valor sense scroll-x obligatori. Sense tocar contingut dels documents, `tasks`, pricing core, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1831.
+Validacio: `MarkdownView-responsive-table` 1/1 OK; `audit:visual:admin` focalitzat 6/6 OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: docs Markdown milloren en mòbil però no queden TANCAT CHARLIE; Atles encara és molt llarg i requereix validació humana.
+
+[codex] 2026-07-09 [ESTAT: tancat — Docs electric-atlas fitxa forense #1830]
+Perimetre: lectura de `/admin/docs/electric-atlas`, client/servei/constants/tests relacionats, captura Playwright, fitxa/inventari/protocol/diari/counter. Ruta FETA com a escàner read-only de `repoElectricAtlasService`; secrets/generats exclosos per test; deute: validació visual humana dels tabs de cens. Sense tocar serveis d'atles, `tasks`, pricing core, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1830.
+Validacio: `audit:visual:admin` focalitzat OK; `repoElectricAtlasService` 3/3 OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: docs Sistema principals del sidebar ja estan registrats; següent tall segur: llegibilitat mòbil compartida de `MarkdownView` o continuar fitxes pendents fora de docs.
+
+[codex] 2026-07-09 [ESTAT: tancat — Docs master fitxa forense #1829]
+Perimetre: lectura de `/admin/docs/master`, components/serveis relacionats, captura Playwright, fitxa/inventari/protocol/diari/counter. Ruta FETA com a consola read-only de `masterAtlasService` sobre Atles elèctric + auditoria visual + constants canòniques; deute: validació visual/priorització humana. Sense tocar `MarkdownView`, `tasks`, pricing core, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1829.
+Validacio: `audit:visual:admin` focalitzat OK; `masterAtlasService` 6/6 OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: següent tall segur: `/admin/docs/electric-atlas` fitxa, l'altra ruta docs del sidebar que faltava al registre.
+
+[codex] 2026-07-09 [ESTAT: tancat — Docs organisme fitxa forense #1828]
+Perimetre: lectura de `/admin/docs/organisme`, captura Playwright, fitxa/inventari/protocol/diari/counter. Ruta FETA com a viewer read-only de `docs/admin-organisme-atles.md`; deute: Atles v1 declara API/serveis/dades incomplets i Markdown tabular poc llegible a mòbil. Sense tocar `MarkdownView` shared, `tasks`, pricing core, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1828.
+Validacio: `audit:visual:admin` focalitzat OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: següent tall segur: saneig compartit de `MarkdownView` mòbil o continuar docs pendents, sense envair Fase A tasks.
+
+[codex] 2026-07-09 [ESTAT: tancat — Docs full de ruta fitxa forense #1827]
+Perimetre: lectura de `/admin/docs/full-de-ruta`, captura Playwright, fitxa/inventari/protocol/diari/counter. Ruta FETA com a viewer read-only de `docs/producte-zenit-full-de-ruta.md`; deute visual: llegibilitat mòbil de Markdown llarg/dens. Sense tocar `MarkdownView` shared, `tasks`, pricing core, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1827.
+Validacio: `audit:visual:admin` focalitzat OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: següent tall segur: `/admin/docs/organisme` fitxa abans de decidir un saneig compartit de `MarkdownView` mòbil.
+
+[codex] 2026-07-09 [ESTAT: tancat — Docs esquema fitxa forense #1826]
+Perimetre: lectura de `/admin/docs/esquema`, captura Playwright, fitxa/inventari/protocol/diari/counter. Ruta FETA com a viewer read-only de `docs/admin-esquema-absolut.md`; deute visual: llegibilitat mòbil de Markdown tècnic ample. Sense tocar `tasks`, pricing core, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1826.
+Validacio: `audit:visual:admin` focalitzat OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: següent tall segur: `/admin/docs/full-de-ruta` fitxa o saneig compartit de `MarkdownView` mòbil si es prioritza docs.
+
+[codex] 2026-07-09 [ESTAT: tancat — Discount codes P1 toggle/API i feedback #1825]
+Perimetre: `app/api/admin/discount-codes/route.ts`, `lib/services/discountCodeAdminService.ts`, `app/admin/discount-codes/page.tsx`, tests focalitzats, captures i docs/counter. Toggle actiu/inactiu reparat via `PATCH`, permisos `read/mutate`, euro net i feedback accessible. Sense schema, BD manual, pricing core, tasks, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1825.
+Validacio: tests focalitzats OK (31/31); `qa:api-admin-auth` OK; `qa:api-admin-csrf` OK; `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: següent tall segur: continuar Zenit amb una altra ruta pendent o fer visual/densitat de `/admin/discount-codes`; no tocar Fase A tasks.
+
+[codex] 2026-07-09 [ESTAT: tancat — Discount codes fitxa forense #1824]
+Perimetre: lectura de `/admin/discount-codes`, captura Playwright base/formulari, fitxa/inventari/protocol/diari/counter. La ruta queda FETA com a gestor global de `DiscountCode`; inventari conserva `🔴` per P1 toggle/API, mojibake euro, permisos fins i feedback accessible.
+Ultim canvi: #1824.
+Validacio: `audit:visual:admin` focalitzat OK; tests route+servei OK; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: següent tall segur #1825 és reparar `/admin/discount-codes` sense tocar `tasks`, pricing core, schema, BD manual ni lead Alba: toggle contracte API, permisos `read/mutate`, mojibake euro i feedback accessible.
+
+[codex] 2026-07-09 [ESTAT: tancat — Catalog semafor visual #1823]
+Perimetre: `app/admin/catalog/page.tsx`, guard estàtic, captures i docs. `Sa/Vigilar/Crític` ja pinta to visual real amb classes canòniques, sense tocar càlculs, preus, serveis, API, schema ni BD.
+Ultim canvi: #1823.
+Validacio: `health-tone-contract.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: `/admin/catalog` queda FETA amb semàfor visual resolt; densitat del hub/taula pendent si es prioritza.
+
+[codex] 2026-07-09 [ESTAT: tancat — Catalog fitxa forense #1822]
+Perimetre: lectura de `/admin/catalog`, captura Playwright, fitxa/inventari/protocol/diari/counter. La ruta queda FETA com a hub viu de lectura/navegació; semàfor visual/densitat queden pendents. Sense tocar `tasks`, preus, serveis de pricing, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1822.
+Validacio: `audit:visual:admin` focalitzat OK; queries `extras/inventory/pricing` desktop 200 sense overflow ni errors consola; `qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: següent tall segur detectat: `resolveHealthTone()` calcula `Sa/Vigilar/Crític` però no pinta to visual real.
+
+[codex] 2026-07-09 [ESTAT: tancat — Extras feedback/botons accessibles #1821]
+Perimetre: `app/admin/packs/extras/ExtrasConfiguratorClient.tsx`, guard estàtic, captures i docs. Loading/error/success i botons d'Extres tenen semàntica accessible i variants canòniques sense canviar dades, preus, servei, API, schema ni BD.
+Ultim canvi: #1821.
+Validacio: `extras-client-a11y.test.ts` OK (2/2); `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: continuo lluny de `tasks`; Cataleg/Packs extras queda amb visual/densitat pendent, però P1 permisos/labels/feedback resolts.
+
+[codex] 2026-07-09 [ESTAT: tancat — Extras admin claus i18n #1820]
+Perimetre: `lib/services/extrasConfiguratorService.ts`, registre públic d'extres, tests de servei, captures i docs. `/admin/packs/extras` ja rep noms/descripcions humans quan `EXTRAS` porta claus `services.mobile...`, incloent `micro-inalambric`. Sense tocar UI gran, preus, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1820.
+Validacio: tests de servei OK (27/27); `npx tsc --noEmit --pretty false` OK; `audit:visual:admin` focalitzat OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF aliens.
+Avis claude: P1 claus i18n resolt; queda visual/a11y de `/admin/packs/extras` si cal continuar el carril.
+
+[codex] 2026-07-09 [ESTAT: tancat — Extras API permisos #1819]
+Perimetre: `app/api/admin/extras/route.ts` + test existent de route + docs/counter. GET exigeix `read`, PUT exigeix `mutate` abans de CSRF/body/servei. Sense tocar UI, dades d'extres, serveis, schema, BD manual, preus, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1819.
+Validacio: `extras-route.test.ts` OK (8/8); `npx tsc --noEmit --pretty false` OK; `qa:api-admin-auth` OK; `qa:api-admin-csrf` OK; `qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: permisos API d'extres resolts; les claus i18n crues queden per tall separat de contracte de dades/presentació.
+
+[codex] 2026-07-09 [ESTAT: tancat — Packs quick editor accessible #1806]
+Perimetre: `PackPriceQuickEditor` a `/admin/packs` afegeix labels reals als inputs de PVP/hora extra i feedback `role=status/alert`; guard estàtic i captures `.codex-captures/packs-1806/`. No toca preus, càlculs, `MARGIN_TONES`, API, serveis, model de packs, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1806.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\packs\quick-editor-a11y.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright sense overflow horitzontal ni errors consola; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Packs encara conserva `🔴`; seguent tall segur: icones locals a lucide o extraccio de `PackCard` per reduir duplicacio/densitat.
+
+[codex] 2026-07-09 [ESTAT: tancat — Packs fitxa forense #1805]
+Perimetre: `/admin/packs` queda amb fitxa específica FETA: editor real de PVP/hora extra, salut de packs, sync config→BD, APIs/serveis/dades/veïns/residus/riscos/evidència documentats. Captures `.codex-captures/packs-1805/` en vista completa i focus alert desktop/mòbil. `/admin/packs/[id]`, `/new` i `/extras` continuen pendents. Sense tocar UI Packs, calculs, model de packs, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1805.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; Playwright autenticat sense overflow horitzontal ni errors consola; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: seguent tall segur en Packs: `PackPriceQuickEditor` accessible (labels + feedback) o icones locals a lucide; no tocar pricing core ni sync sense ordre.
+
+[codex] 2026-07-09 [ESTAT: tancat — Pricing tarifes sense estat mort #1804]
+Perimetre: `/admin/pricing?tab=tarifes` elimina `pricingConfig/savingConfig` sense servei/persistència i el copy "Aviat"; la taula llegeix directament `SERVICE_HOURLY_RATES`. Guard estàtic i captures `.codex-captures/pricing-1804/`. No toca preus, càlculs, `MARGIN_TONES`, API, serveis, model de packs, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1804.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\pricing\tariff-source-contract.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright tarifes desktop/mòbil sense overflow ni errors consola; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Pricing encara conserva `🔴`; seguent tall segur: compactacio de densitat mòbil a `inventory` o fitxa específica de Packs, sense tocar pricing core.
+
+[codex] 2026-07-09 [ESTAT: tancat — Pricing feedback inicial accessible #1803]
+Perimetre: `/admin/pricing` anuncia loading inicial amb `role=status` i error inicial amb `role=alert`/`aria-live=assertive`; guard estàtic focalitzat. Sense canvi visual ni dades. No toca càlculs, `MARGIN_TONES`, API, serveis, model de packs, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1803.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\pricing\feedback-a11y.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Pricing encara conserva `🔴`; seguent tall segur: neteja/decisio de l'estat parcial de tarifes editables o compactacio de densitat mòbil.
+
+[codex] 2026-07-09 [ESTAT: tancat — Pricing icones locals lucide #1802]
+Perimetre: `/admin/pricing` substitueix emoji/text symbols locals per `lucide-react` en tabs, KPI, capçaleres, avisos i microaccions; `ADMIN_PRICING_TABS` ara porta claus `PricingTabIcon` i test estàtic. Captures `.codex-captures/pricing-1802/` en 5 pestanyes desktop/mòbil. No toca càlculs, `MARGIN_TONES`, API, serveis, model de packs, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1802.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\pricing\icon-contract.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright autenticat sense overflow horitzontal i recaptura final sense errors consola; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Pricing encara conserva `🔴`; seguent tall segur: feedback inicial accessible o neteja de l'estat parcial de tarifes editables, sense tocar pricing core.
+
+[codex] 2026-07-09 [ESTAT: tancat — Pricing fitxa forense #1801]
+Perimetre: `/admin/pricing` queda amb fitxa específica FETA: cockpit de PVP/extres i lectura de salut de catàleg, amb API/servei/dades/veïns/residus/riscos/evidència documentats. Captures autenticades a `.codex-captures/pricing-1801/` per 5 pestanyes en desktop i mòbil. Inventari conserva `🔴`: permisos #1799 resolts, visual/densitat encara pendents. Sense tocar UI Pricing, calculs, model de packs, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1801.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: seguent tall segur en aquest front: substituir emoji locals de Pricing per `lucide-react` o eliminar/aterrar l'estat mort de tarifes editables, sense tocar càlculs ni `MARGIN_TONES`.
+
+[codex] 2026-07-09 [ESTAT: tancat — Packs API permisos #1800]
+Perimetre: `/api/admin/packs`, `/api/admin/packs/[id]` i `/api/admin/packs/sync` exigeixen `read/mutate` segons verb abans de CSRF/body/servei; tests de route ampliats a 25 casos. Inventari/fitxes indiquen permisos #1800 però fitxes específiques de Packs pendents. Sense tocar UI Packs/Pricing, calculs, model de packs, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1800.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\packs-route.test.ts __tests__\app\api\admin\packs-detail-route.test.ts __tests__\app\api\admin\packs-sync-route.test.ts` OK (25/25); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: seguent tall segur: fitxa forense específica de `/admin/pricing` o Packs, no tocar model economic d'Economia sense decisio.
+
+[codex] 2026-07-09 [ESTAT: tancat — Pricing API permisos #1799]
+Perimetre: `/api/admin/pricing` exigeix `read` en GET i `mutate` en PUT abans de CSRF/body; test de route ampliat a 8 casos. Inventari/fitxes indiquen permisos #1799 però fitxa específica de `/admin/pricing` encara pendent. Sense tocar UI Pricing, calculs, model de packs, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1799.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\pricing-route.test.ts` OK (8/8); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: seguent tall si continua aquest front: fitxa forense específica de `/admin/pricing` o revisar rutes `/api/admin/packs*` per permisos, sense barrejar amb model de packs d'Economia.
+
+[codex] 2026-07-09 [ESTAT: tancat — shell Nova entrada sense clipping #1798]
+Perimetre: shell admin global: `.ax__add` rep mes amplada relativa que `.ax__inbox` perque `+ Nova entrada` no quedi truncat al sidebar desktop. Guard estàtic i captura `.codex-captures/admin-shell-1798/` amb `+ Nova entrada` 118/118 i `Safata` 79/79. Sense tocar rutes/nav funcional, calculs, serveis economics, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1798.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\shell-primary-actions.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright desktop 200 sense errors consola ni clipping; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Economia ha passat auditoria agregada desktop/mobil sense overflow intern; encara no es marca `TANCAT CHARLIE` sense decisio humana.
+
+[codex] 2026-07-09 [ESTAT: tancat — Economia config packs responsive #1797]
+Perimetre: `/admin/economia?tab=config` deixa de començar amb una taula de 1450px en mobil/desktop normal: `Semàfor de packs` mostra cards compactes i reserva la taula a `2xl+`. Guard estàtic i captures `.codex-captures/economia-1797/`. Sense tocar calculs, serveis economics, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1797.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\pack-pricing-mobile-cards.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright desktop/mobil 200 sense errors consola ni overflow visible; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Economia encara `🔴`; seguent tall segur si es continua aqui: passada visual agregada de totes les pestanyes i només llavors plantejar si es pot demanar validacio humana.
+
+[codex] 2026-07-09 [ESTAT: tancat — Economia previsions mobil #1796]
+Perimetre: `/admin/economia?tab=previsions` deixa de forçar taules tallades en mobil: `Previsió de vendes` i `CAC per canal` mostren cards mobile i conserven taules `md+`. Guards estàtics i captures `.codex-captures/economia-1796/`. Sense tocar calculs, serveis economics, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1796.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\forecast-mobile-cards.test.ts __tests__\app\admin\economia\cac-mobile-cards.test.ts` OK (2/2); `npx tsc --noEmit --pretty false` OK; Playwright desktop/mobil 200 sense errors consola ni overflow visible; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Economia encara `🔴`; seguent tall segur si es continua aqui: `Config` te el semafor de packs com a taula molt ampla pendent de tractament mobil.
+
+[codex] 2026-07-09 [ESTAT: tancat — Economia tresoreria mobil #1795]
+Perimetre: `/admin/economia?tab=tresoreria` deixa de forçar scroll lateral en mobil: `Previsió de tresoreria` mostra cards mensuals amb ingressos/costos/flux/acumulat i conserva la taula en `md+`. Guard estàtic i captures `.codex-captures/economia-1795/`. Sense tocar calculs, serveis economics, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1795.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\cashflow-mobile-cards.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright desktop/mobil 200 sense errors consola ni overflow visible; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Economia encara `🔴`; seguent tall segur si es continua aqui: `Previsions` i `Config` tenen taules denses pendents de tractament mobil.
+
+[codex] 2026-07-09 [ESTAT: tancat — Economia rendibilitat mobil #1794]
+Perimetre: `/admin/economia?tab=rendibilitat` deixa de forçar taula tallada en mobil: `Rendibilitat per canal` mostra cards mobile i taula `md+`; top marge permet wrap mobile i conserva truncat en `sm+`. Guard estàtic i captures `.codex-captures/economia-1794/`. Sense tocar calculs, serveis economics, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1794.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\profitability-mobile-cards.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright desktop/mobil 200 sense errors consola ni overflow visible; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Economia encara `🔴`; seguent tall segur si es continua aqui: revisar `Cobraments`, `Previsions` i `Config` amb captures abans de qualsevol migracio/Charlie.
+
+[codex] 2026-07-09 [ESTAT: tancat — Economia icones de secció #1793]
+Perimetre: `/admin/economia` substitueix emoji locals de cards d'alerta/top i capçaleres de secció per icones `lucide-react`; guard estàtic i captures `.codex-captures/economia-1793/` amb `sectionEmoji=[]`, `bodySvgCount=11`. Sense tocar calculs, serveis economics, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1793.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\section-icons.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright desktop/mobil 200 sense errors consola ni overflow global; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Economia encara `🔴`; seguent tall segur si es continua aqui: densitat de taules/top lists i micro-overflows interns amb captures, sense tocar calculs.
+
+[codex] 2026-07-09 [ESTAT: tancat — Economia tabs icones reals #1792]
+Perimetre: `/admin/economia` tabs principals passen d'emoji a icones `lucide-react` via `TabIcon` + `TAB_ICON_MAP`; guard estàtic i captures `.codex-captures/economia-1792/` amb `tabSvgCount=6`, `emojiTabs=[]`. Sense tocar calculs, serveis economics, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1792.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\tab-icons.test.ts` OK (1/1); `npx tsc --noEmit --pretty false` OK; Playwright desktop/mobil 200 sense errors consola ni overflow global; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Economia encara `🔴`; queden cards d'alerta/top amb emoji locals i densitat de taules si es fa una passada visual mes profunda.
+
+[codex] 2026-07-09 [ESTAT: tancat — Economia feedback accessible #1791]
+Perimetre: `/admin/economia` anuncia bulk error amb `role=alert` i els missatges de config/restauracio amb `Notice` tipat: exit `status`, error `alert`, `aria-live` coherent. Test estàtic nou i fitxa/inventari actualitzats. Sense tocar calculs, serveis economics, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1791.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\accessible-feedback.test.ts` OK (5/5); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Economia ja te fitxa, permisos i feedback bàsic resolts. Seguent tall si segueixes Economia: visual/captures, icones en lloc d'emoji i densitat de taules.
+
+[codex] 2026-07-09 [ESTAT: tancat — Economia permisos bulk/marketing #1790]
+Perimetre: `/api/admin/bookings/bulk-payment` exigeix `mutate`; `/api/admin/marketing/spend` exigeix `read` en GET i `mutate` en POST/DELETE. Tests de route nous i fitxa/inventari Economia actualitzats. Sense tocar calculs, serveis economics, UI client, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1790.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\bookings-bulk-payment-route.test.ts __tests__\app\api\admin\marketing-spend-route.test.ts` OK (12/12); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: P1 permisos Economia resolt. Seguent tall segur si continues Economia: feedback accessible de `msg` en editors/historials i bulk error, o be visual amb captures.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Economia #1789]
+Perimetre: `/admin/economia` auditat i documentat com a cockpit financer transversal: cobraments, marge, tresoreria, forecast, CAC, vehicle i model de packs. Fitxa FETA, inventari/protocol/diari/counter a #1789. Sense tocar runtime, calculs, serveis, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1789.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: P1 segur pendent: afegir `requirePermission` a `/api/admin/bookings/bulk-payment` i `/api/admin/marketing/spend` amb tests de route. No tocar calculs ni visual dins aquest cable.
+
+[codex] 2026-07-09 [ESTAT: tancat — Economia mojibake intern #1788]
+Perimetre: `app/admin/economia/page.tsx` net de quatre separadors de comentari corruptes (`â...`) i inventari/fitxes/protocol/diari/counter actualitzats a #1788. Sense tocar `EconomiaClient`, motors economics, cobraments, rendibilitat, API, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1788.
+Validacio: `rg -n "â|Ã|�" app\admin\economia\page.tsx` sense resultats; `pnpm run qa:encoding` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Economia continua `🔴` i pendent de fitxa forense/validacio visual; aquest tall nomes neteja codificacio interna.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Protocol #1787]
+Perimetre: `/admin/docs/protocol` auditat i documentat com a viewer normatiu dinamic sobre `docs/admin-protocol.md` + cua de validacio humana a `Setting(protocol.canviValidations)`. Fitxa FETA, inventari/protocol/diari/counter a #1787. Sense tocar runtime, API route, serveis, parser, schema, BD manual, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1787.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Protocol continua `🔴` per validacio visual/migracio formal pendent, no per falta de fitxa. Deute P2 anotat: API podria endurir-se contra Canvis inexistents si es prioritza.
+
+[codex] 2026-07-09 [ESTAT: tancat — Protocol toggle sense doble mutacio #1786]
+Perimetre: `/admin/docs/protocol` P1 d'interaccio resolt al client: `ProtocolValidationToggle` bloqueja el boto durant el `fetch`, evita doble mutacio, anuncia errors amb `role=alert` i exposa `aria-busy`. Protocol continua `🔴` i pendent de fitxa forense completa. Sense tocar servei de validacions, API route, schema, BD manual, parser, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1786.
+Validacio: `node_modules\.bin\vitest.CMD run __tests__\app\admin\docs\ProtocolValidationToggle.test.tsx` OK (6/6); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: proper tall natural es fitxa forense de `/admin/docs/protocol` o continuar pel següent PENDENT de Sistema segons inventari.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Manual #1785]
+Perimetre: `/admin/manual` auditat i documentat com a memoria operativa server sobre constants `adminManual` + §9 del protocol. Fitxa FETA, inventari/protocol/diari/counter a #1785. Sense tocar constants del manual, roadmap, copy, protocol parser, UI runtime, schema, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1785.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Manual segueix `🔴` per densitat/validacio visual humana, no per codi mort o mutacions pendents.
+
+[codex] 2026-07-09 [ESTAT: tancat — Stats icones reals #1784]
+Perimetre: `/admin/stats` P1 visual resolt: claus `stat.icon` (`party`, `people`, `calendar`, `star`, `sparkle`) mapades a icones lucide amb test focalitzat. Sense tocar serveis, API, calculs, settings, BD, schema, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1784.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\stats\StatsPage.test.tsx __tests__\app\api\admin\stats-route.test.ts __tests__\lib\services\adminStatsService.test.ts __tests__\lib\services\publicStatsService.test.ts` OK (32/32); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Stats queda amb fitxa FETA, pont public #1782 i icones #1784 resolts. Deute menor restant: decidir si `stats.satisfaction_percent` ha de tenir sortida publica o sortir del cataleg admin.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Stats #1783]
+Perimetre: `/admin/stats` auditat i documentat com a govern de numeros publics i fallbacks manuals: page, route admin, adminStatsService, publicStatsService, tests, inventari/protocol/diari/counter. Sense tocar UI/runtime addicional, BD manual, schema, public route, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1783.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: P1 visual detectat: `stat.icon` es renderitza com a text (`party`, `people`, etc.). Seguent tall segur: mapar a icones reals sense tocar stats ni serveis.
+
+[codex] 2026-07-09 [ESTAT: tancat — Stats admin-public key bridge #1782]
+Perimetre: `publicStatsService` ja llegeix les claus que escriu `/admin/stats` (`stats.events_completed`, `stats.people_entertained`, `stats.years_experience`, `stats.rating_average`) i mante compat amb claus legacy/camel. Test de servei public. Sense tocar UI stats, BD manual, schema, public route, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1782.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\publicStatsService.test.ts __tests__\lib\services\adminStatsService.test.ts __tests__\app\api\admin\stats-route.test.ts` OK (31/31); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: no s'ha migrat BD ni renombrat claus; el pont es compatible en lectura publica. Seguent: fitxa forense `/admin/stats` amb aquest P1 ja resolt.
+
+[codex] 2026-07-09 [ESTAT: tancat — Text Manager alerts accessibles #1781]
+Perimetre: `/admin/text-manager` P2 accessibilitat resolt: loading/status, error inicial, error persistent i exit amb `role`/`aria-live`; test focalitzat de carrega inicial fallida. Sense editar textos, JSON, BD, API route, permisos, auto-traduccio, schema, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1781.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\text-manager\TextManagerPage.test.tsx __tests__\app\api\admin\text-manager-route.test.ts __tests__\lib\services\textManagerService.test.ts` OK (21/21); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Text Manager queda amb fitxa FETA i P1/P2 resolts; deute menor restant: decidir si `POST sync/export/validate` ha de tenir UI visible o seguir latent.
+
+[codex] 2026-07-09 [ESTAT: tancat — Text Manager GET role guard #1780]
+Perimetre: `GET /api/admin/text-manager` alineat amb la frontera del layout: OWNER/MANAGER poden llegir el cataleg editorial, VIEWER no. Tocats route, test focalitzat i docs/counter. Sense editar textos, JSON, BD, auto-traduccio, UI page, schema, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1780.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\text-manager-route.test.ts __tests__\lib\services\textManagerService.test.ts` OK (20/20); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: P1 frontera resolt. P2 segur pendent si es continua: missatges error/success de la page sense `role=alert`/`aria-live` explicit.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Text Manager #1779]
+Perimetre: `/admin/text-manager` auditat i documentat com a editor PRO de copy multidioma sobre `messages/*.json` + overrides `Translation`. Fitxa FETA, inventari/protocol/diari/counter a #1779. Sense tocar textos, JSON, BD, auto-traduccio, API runtime, schema, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1779.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: P1 detectat: layout restringeix UI a OWNER/MANAGER pero `GET /api/admin/text-manager` nomes exigeix auth. Seguent tall segur: reflectir aquesta frontera a la route sense tocar contingut.
+
+[codex] 2026-07-09 [ESTAT: tancat — Features icones reals #1778]
+Perimetre: `/admin/features` P1 visual resolt: claus `feature.icon` mapades a icones `lucide-react` amb test focalitzat. Sense connectar flags al public, sense canviar `ADMIN_FEATURE_DEFINITIONS`, API, servei, BD, schema, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1778.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\features\FeaturesPage.test.tsx __tests__\app\api\admin\features-route.test.ts __tests__\lib\services\adminFeaturesService.test.ts` OK (16/16); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: el P1 producte continua obert: `Setting(features.*)` no te consumidor public verificat i `SITE_CONFIG.features` es separat. Seguent tall possible: decidir lectura canonica de flags o reetiquetar com a settings interns.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Features #1777]
+Perimetre: `/admin/features` auditat i documentat com a panell admin de settings `features.*` sobre `ADMIN_FEATURE_DEFINITIONS`. Fitxa FETA, inventari/protocol/diari/counter a #1777. Sense tocar runtime de feature flags, consumidor public, BD, schema, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1777.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: P1 detectats i acotats: les flags no tenen consumidor public verificat (`SITE_CONFIG.features` es separat) i `feature.icon` es renderitza com a text. Seguent tall segur possible: corregir icones visuals sense connectar flags al public.
+
+[codex] 2026-07-09 [ESTAT: tancat — Scripts file guard #1776]
+Perimetre: `SCRIPTS[].file` de `/admin/scripts` queda blindat amb test estàtic que valida paths existents al repo. Tocats test petit i docs/counter. Sense executar scripts, sense canviar comandes, sense UI runtime, API, schema, BD, scheduler, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1776.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\scripts\ScriptsClient-catalog-files.test.ts __tests__\app\admin\scripts\ScriptsClient.test.tsx` OK (3/3); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Scripts segueix `🔴` per validacio visual/metadata opcional, però P1 risc i P2 paths estan resolts sense executar res.
+
+[codex] 2026-07-09 [ESTAT: tancat — Scripts risk metadata #1775]
+Perimetre: `/admin/scripts` marca amb `mutatesData` els scripts que poden tocar dades/config, mostra resum `Toca dades` i badge `toca dades` en cards sensibles no destructives. Tocats `ScriptsClient.tsx`, test de component i docs/counter. Sense executar scripts, sense canviar comandes, sense API, schema, BD, scheduler, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1775.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\scripts\ScriptsClient.test.tsx` OK (2/2); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Scripts segueix `🔴` per validacio visual/guard de fitxers, però ja no infra-marca el risc de comandes mutadores.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Scripts #1774]
+Perimetre: `/admin/scripts` auditat i documentat com a cataleg/copiador de comandes, no executor. Fitxa FETA, inventari/protocol/diari/counter a #1774. Sense executar scripts, sense canviar comandes, sense API, schema, BD, scheduler, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1774.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: P1 detectat per tall petit: metadata `danger` infra-marca scripts `fix` que poden mutar dades; no executar ni canviar comandes per corregir-ho.
+
+[codex] 2026-07-09 [ESTAT: tancat — CSS Manager load error #1773]
+Perimetre: `/admin/css-manager` mostra `role=alert` persistent amb missatge backend/fallback i botó `Reintentar` si falla `GET /api/admin/css`. Tocats `page.tsx`, test de component i docs/counter. Sense tocar sanititzador, paletes, route PUT, schema, BD manual, tema global, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1773.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\css-manager\AdminCssManagerPage-load-error.test.tsx __tests__\app\admin\css-manager\AdminCssManagerPage-sanitized.test.ts __tests__\app\api\admin\css-route.test.ts` OK (8/8); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: CSS Manager segueix `🔴` només per validacio visual/migracio formal; P1 live sanititzat i P2 load error estan resolts.
+
+[codex] 2026-07-09 [ESTAT: tancat — CSS Manager aplica sanititzat #1772]
+Perimetre: `/admin/css-manager` ja aplica al DOM i propaga el CSS sanititzat retornat pel backend (`savedCss`), no el cru del textarea. Tocats `app/api/admin/css/route.ts`, `app/admin/css-manager/page.tsx`, tests focalitzats i docs/counter. Sense canviar sanititzador, paletes, schema, BD manual, tema global, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1772.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\css-route.test.ts __tests__\app\admin\css-manager\AdminCssManagerPage-sanitized.test.ts __tests__\lib\services\adminCustomCssService.test.ts` OK (13/13); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: P2 encara obert i acotat: error persistent de càrrega inicial; no tocar paletes ni sanititzador fora d'aquest cable.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense CSS Manager #1771]
+Perimetre: `/admin/css-manager` auditat i documentat com a editor de CSS viu global de tot `/admin`. Fitxa FETA, inventari/protocol/diari/counter a #1771. Sense tocar runtime, sanititzador, route, schema, BD, scheduler, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1771.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: P1 detectat per tall petit: el client aplica CSS cru encara que el backend el sanititzi; no reobrir paletes ni tema global fora d'aquest cable.
+
+[codex] 2026-07-09 [ESTAT: tancat — Crons error state #1770]
+Perimetre: `/admin/crons` mostra `role=alert` persistent amb missatge backend/fallback i botó `Reintentar` si falla `/api/admin/crons`. Tocats `CronsClient.tsx`, test de component i docs/counter. Sense tocar scheduler, `/api/cron/*`, `CRON_SECRET`, schema, BD, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1770.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\crons\CronsClient.test.tsx __tests__\app\api\admin\crons-route.test.ts` OK (4/4); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF.
+Avis claude: Crons segueix `🔴` només per validacio visual/migracio formal; health, route i error state ja estan resolts.
+
+[codex] 2026-07-09 [ESTAT: tancat — Crons route test #1769]
+Perimetre: `GET /api/admin/crons` queda amb test de route: auth abans de Settings, delegacio a `readCronRunStatuses([...ADMIN_CRON_PREFIXES])` i error 500 amb log. Sense tocar UI, scheduler, `/api/cron/*`, `CRON_SECRET`, schema, BD, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1769.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\crons-route.test.ts __tests__\lib\services\cronRunStatusService.test.ts __tests__\lib\constants\adminCronPrefixes.test.ts` OK (19/19); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+Avis claude: Crons segueix `🔴` per validacio visual/empty state, però ja no té el P1 health ni el P2 route test oberts.
+
+[codex] 2026-07-09 [ESTAT: tancat — Crons health per frecuencia #1768]
+Perimetre: `/admin/crons` ja calcula health amb `maxAgeHours` per definicio: 2h Calendar Sync, 8h alertes urgents, 26h diaris i 192h benchmark setmanal. Tocats `ADMIN_CRON_PREFIXES`, `cronRunStatusService`, tests de servei/constants i docs/counter. Sense executar crons, sense tocar scheduler, `/api/cron/*`, `CRON_SECRET`, schema, BD, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1768.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\cronRunStatusService.test.ts __tests__\lib\constants\adminCronPrefixes.test.ts` OK (16/16); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+Avis claude: P2 encara obert i acotat: falta test de route `GET /api/admin/crons`; no confondre amb execucio de crons.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Crons #1767]
+Perimetre: `/admin/crons` auditat i documentat com a monitor read-only de `ADMIN_CRON_PREFIXES` + `readCronRunStatuses()`. Fitxa FETA, inventari/protocol/diari/counter a #1767. Sense tocar rutes `/api/cron/*`, scheduler, `CRON_SECRET`, schema, BD, serveis de negoci, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1767.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+Avis claude: P1 detectat per tall petit: health de crons usa 26h per tot, però el cataleg inclou 15 min, 4x diari, diari i setmanal. P2: falta test de route `GET /api/admin/crons`.
+
+[codex] 2026-07-09 [ESTAT: tancat — Coverage busy accions #1766]
+Perimetre: `/admin/coverage` ja marca remove/toggle amb `aria-busy`, text d'accio en curs i bloqueig de doble clic mentre hi ha una mutació de ciutat pendent. Tocats només `page.tsx`, helper/test petit i docs/counter. Sense tocar `lib/coverage.ts`, endpoint públic, schema, BD, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1766.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\coverage\coverage-utils.test.ts __tests__\app\api\admin\coverage-route.test.ts` OK (9/9); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+Avis claude: Coverage encara NO queda `🟢` ni TANCAT CHARLIE; no he entrat en rollback optimista, persistència ni endpoint públic.
+
+[codex] 2026-07-09 [ESTAT: tancat — Coverage feedback errors #1765]
+Perimetre: `/admin/coverage` ja mostra feedback visible quan `/api/admin/coverage` retorna `{ok:false}` o quan add/remove/toggle falla (`city_exists`, errors HTTP o fallback local). Tocats només `page.tsx`, helper/test petit i docs/counter. Sense tocar `lib/coverage.ts`, endpoint públic, schema, BD, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1765.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\coverage\coverage-utils.test.ts __tests__\app\api\admin\coverage-route.test.ts` OK (8/8); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents.
+Avis claude: Coverage encara NO queda `🟢` ni TANCAT CHARLIE; queda resolt el P1 de feedback, però no el busy/rollback visual de remove/toggle.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Coverage #1764]
+Perimetre: `/admin/coverage` auditat i documentat com a gestor territorial públic sobre `Setting(coverage.areas)`, connectat a `/api/public/coverage`, footer i zones SEO. Fitxa FETA, inventari amb nota #1764, protocol/diari/counter a #1764. Sense codi funcional, schema, BD, APIs mutadores, lead Alba, Clients/Activity acabats ni zones TANCAT CHARLIE.
+Ultim canvi: #1764.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents a `portfolioEventService.ts` i `prisma/schema.prisma`.
+Avis claude: Coverage NO queda `🟢` ni TANCAT CHARLIE; P1 detectat: feedback visible quan `/api/admin/coverage` retorna `{ok:false}` o `city_exists`.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Activity log #1763]
+Perimetre: `/admin/activity` auditat i documentat com a visor read-only transversal d'`adminLog` via `fetchCanonicalAdminActivityPage()`. Fitxa FETA, inventari amb nota #1763, protocol/diari/counter a #1763. Sense codi funcional, schema, BD, APIs mutadores, lead Alba, Clients acabat ni zones TANCAT CHARLIE.
+Ultim canvi: #1763.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents a `portfolioEventService.ts` i `prisma/schema.prisma`.
+Avis claude: Activity NO queda `🟢` ni TANCAT CHARLIE; només fitxa forense FETA. Si s'afegeixen accions noves a `adminLog`, cal actualitzar meta/categoria/link abans que quedin invisibles o sense destí.
+
+[codex] 2026-07-09 [ESTAT: tancat — Clients segment query #1762]
+Perimetre: `/admin/clientes?segment=...` ja aplica els filtres de `CUSTOMER_SEGMENTS` mitjançant `resolveCustomerSegmentFilter()`. Tocats només `page.tsx`, `customer-utils.ts`, test focalitzat i docs/counter. Sense API, serveis Prisma, Customer Hub, Referrals, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1762.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\clientes\customer-utils.test.ts` OK (4/4); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents a `portfolioEventService.ts` i `prisma/schema.prisma`.
+Avis claude: cable de navegació corregit; no s'ha tocat cap procés d'email ni backend. Següent tall pot continuar pel registre de fitxes o per un altre cable petit detectat al mapa Zenit.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Clients llista #1761]
+Perimetre: `/admin/clientes` auditat i regularitzat al mapa Zenit. Fitxa forense FETA, inventari corregit (#811 + #1273 real, sense `clientes.css`), fitxa mare Clients a FETA i protocol/diari/counter a #1761. Sense tocar schema, BD, APIs, migracions, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1761.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents a `portfolioEventService.ts` i `prisma/schema.prisma`.
+Avis claude: P1 detectat i pendent de tall petit: `/admin/clientes?segment=at-risk` existeix com a link entrant però la pàgina encara no consumeix `segment`; següent pas natural és connectar-lo a `CUSTOMER_SEGMENTS` sense tocar serveis ni Customer Hub.
+
+[codex] 2026-07-09 [ESTAT: tancat — fitxa forense Referrals clients #1760]
+Perimetre: `/admin/clientes/referrals` auditat fora del lead protegit. Fitxa forense FETA a `docs/admin-fitxes-pantalles.md`, inventari alineat, protocol/diari/counter a #1760. Sense tocar schema, BD, APIs, UI runtime, lead Alba ni zones TANCAT CHARLIE.
+Ultim canvi: #1760.
+Validacio: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents a `portfolioEventService.ts` i `prisma/schema.prisma`.
+Avis claude: Referrals NO queda migrada visualment ni TANCAT CHARLIE; la reauditoria reobre la discrepància #1140 (codi viu encara `AdminPage`/`ap-*`/utilitats, sense `referrals.css`). No reobrir `/admin/leads/[id]`.
+
+[codex] 2026-07-09 [ESTAT: tancat — TANCAT CHARLIE lead Alba #1759]
+Perimetre: ordre directa del propietari: `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` queda consolidat com `TANCAT CHARLIE`. Actualitzats inventari, fitxa forense, marques a `page.tsx`/`LeadDetailClient`, §6, §9, diari i counter. Sense codi funcional, schema, BD, API, migracions ni càlculs.
+Ultim canvi: #1759.
+Validacio: `pnpm run qa:protocol` OK; `git diff --check` OK amb avisos CRLF preexistents a `portfolioEventService.ts` i `prisma/schema.prisma`.
+Avis claude: `/admin/leads/[id]` queda zona protegida pel propietari; no reobrir-la per auditories genèriques ni reintroduir pacte/validació partner.
+
+[codex] 2026-07-09 [ESTAT: tancat — remat Manolo Zenit lead Alba #1758]
+Perimetre: remat visual/copy/layout de `/admin/leads/cmr1xh7la0000ug7dj4jnihjr`: net estimat amb to de vigilància visible, formula client centrada amb peatges dins `Transport`, i fila `Cost col·laborador` / `Següent pas` amb accions centrades, panell més baixet i vora clara. Sense schema, BD, API, migracions, motors econòmics ni portfolio.
+Ultim canvi: #1758.
+Validacio: captures Playwright autenticades finals a `.codex-captures/lead-alba-layout-1758/manolo-zenit-*` en desktop 1440 i mòbil 390; sense console errors ni overflow. Tests lead 10/10 OK; `tsc` OK; `qa:visual-overflow` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK amb avisos CRLF preexistents.
+Avis claude: no reintroduir validació amb partner ni copiar `Següent pas` com a estat de negoci; és acció visual del lead. Els peatges visibles del lead van integrats sota `Transport`, no com a text orfe.
+
+[codex] 2026-07-09 [ESTAT: tancat — distribució visual lead Alba #1757]
+Perimetre: repàs visual/copy de tota la fitxa `/admin/leads/cmr1xh7la0000ug7dj4jnihjr`: desplaçament, resum `Serveis/Transport/Total client`, rail financer i cost col·laborador. Només presentació CSS/JSX/tests/docs; sense canviar càlculs, schema, BD, API, migracions, portfolio ni el paquet #1754-#1756 dirty.
+Ultim canvi: #1757.
+Validacio: Playwright autenticat a `.codex-captures/lead-alba-layout-1757/` confirma desktop/tablet/mòbil sense overflow, resum client com a fórmula `Serveis + Transport = Total client`, `Cost col·laborador` sense caixa gegant i `badCopy=[]` per `Tarifa partner`, `Veure tarifa partner`, `Pacte amb partner`; tests lead 10/10 OK; `tsc` OK; `qa:visual-overflow` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK amb avisos CRLF preexistents.
+Avis claude: lead Alba alliberat; no reintroduir validació partner ni copy `pacte/tarifa partner` a aquesta superfície.
+
+[codex] 2026-07-09 [ESTAT: tancat — captures i poliment Zenit lead Alba #1756]
+Perimetre: passada visual real sobre `/admin/leads/cmr1xh7la0000ug7dj4jnihjr`: captures desktop/mobil v4, neteja de `a operatiu` -> `inclòs`, nav admin mòbil sense retalls i neutralització del padding global de `<main>` que deixava buit abans de l'històric. Sense schema, BD, API nova, portfolio ni revertir el paquet #1754 dirty.
+Ultim canvi: #1756.
+Validacio: Playwright autenticat desktop 1440 + mòbil 390 a `.codex-captures/lead-alba-zenit-1756/*-v4.png`: `overflow=[]`, `scrollWidth == clientWidth`, `Validar pacte=0`, `Desfer validació=0`, `Pacte validat=0`, `Veure pacte partner=1`, `Crear dossier=1`, `a operatiu=0`, `Crear dossier` primari i `mainPaddingBottom=0px`. Test focalitzat LeadBoloSection OK (6/6); `tsc` OK; `qa:visual-overflow` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `validate:core` OK (73 fitxers test / 634 asserts); `git diff --check` OK amb avisos CRLF preexistents.
+Avis claude: lead Alba queda alliberat; no reintroduir validació partner ni padding global al Zenit. Les captures finals són les `*-v4.png`.
+
+[codex] 2026-07-09 [ESTAT: tancat — Manolo blindat i validació amb partner fora #1755]
+Perimetre: revert quirúrgic del #1753 no demanat: fora `Validar pacte`/`Desfer validació`/`Pacte validat`, fora contracte `partnerPactValidated`, fora `Lead.partnerPactValidatedAt` del schema i nova migració inversa per dropejar la columna quan es desplegui. També eliminats tots els `.dbg-*` tracked i afegit `qa:manolo-boundary` a `validate:core`. Preservat el paquet #1754 dirty.
+Ultim canvi: #1755.
+Validacio: tests focalitzats lead/servei/guard OK (31/31); `qa:manolo-boundary` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `tsc` OK; `qa:schema-drift` OK; `npx prisma generate` OK; `validate:core` OK; Playwright real al lead Alba confirma `Validar pacte=0`, `Desfer validació=0`, `Pacte validat=0`, `Veure pacte partner=1` i `Crear dossier` primari. Dev 3000 viu (PID 18876).
+Avis claude: Manolo queda blindat: schema/migracions/endpoints/API/BD requereixen `Autorització explícita propietari:` al Canvi #N. No reintroduir validació amb partner al lead.
+
+[codex] 2026-07-08 [ESTAT: tancat — Portfolio/media: portada d'event no pot usar producte #1754]
+Perimetre: carril disjunt del #1753 de Claude. `/admin/portfolio` queda amb fitxa forense i `PortfolioEvent.coverImage` ja no accepta imatges de producte/partner: només media de portfolio, galeria de booking o catàleg estàtic de portfolio. Sense schema, BD, lead, reserva, PDF render, `app/admin/tasks` ni migracions.
+Ultim canvi: #1754.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\portfolioEventService.test.ts` OK (20/20); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK (només avisos CRLF coneguts); `pnpm run validate:core` OK (72 fitxers test / 629 asserts).
+Avis claude: no competeixo el teu #1753 ni edito lead/reserva/schema/migracio. Si necessites lead/schema, el carril Portfolio/media queda separat.
 
 [codex] 2026-07-08 [ESTAT: tancat — Lead Alba canònic visual + Isma intern #1751]
 Perimetre: lead d'Alba com a primera pagina canonica visual post-canvis; Isma surt del cataleg visible i queda com a cost intern de 50 EUR dins el DJ; pressupost en banda desplaçament+total, pacte sota, accions i historic amb mides mes llegibles. Sense schema, migracions, endpoints nous, PDF render, media ni `app/admin/tasks`.

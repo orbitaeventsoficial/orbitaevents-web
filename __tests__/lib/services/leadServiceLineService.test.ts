@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { listLeadServiceLines, replaceLeadServiceLines } from '@/lib/services/leadServiceLineService';
 import { SOUND_RENTAL } from '@/lib/constants/inventory';
+import { BINGO_ASSISTANT_LINE_LABEL } from '@/lib/constants/orbita-services';
+import { TRAVEL_HEADCOUNT_NOTE_PREFIX } from '@/lib/services/travelLaborCost';
 
 const { mockPrisma, mockUpdateBookingDetail } = vi.hoisted(() => ({
   mockPrisma: {
@@ -184,5 +186,40 @@ describe('replaceLeadServiceLines', () => {
     });
     expect(mockPrisma.$transaction).not.toHaveBeenCalled();
     expect(mockPrisma.leadServiceLine.createMany).not.toHaveBeenCalled();
+  });
+
+  it('afegeix l’assistent Bingo +70 quan desa un lead amb Bingo adult', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'lead1', guestCount: 96 });
+
+    const r = await replaceLeadServiceLines('lead1', [
+      { label: 'Bingo Musical · Masquerade Events', kind: 'PROVIDER_SERVICE', collaboratorId: 'masquerade', revenueAmount: 240, costAmount: 200 },
+    ]);
+
+    expect((r.body as { count: number }).count).toBe(2);
+    const createArg = mockPrisma.leadServiceLine.createMany.mock.calls[0][0];
+    expect(createArg.data).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        label: BINGO_ASSISTANT_LINE_LABEL,
+        kind: 'OTHER',
+        quantity: 1,
+        revenueAmount: 0,
+      }),
+    ]));
+  });
+
+  it('persisteix el crew de ruta sense tocar quantity/preu', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'lead1', guestCount: 50 });
+
+    await replaceLeadServiceLines('lead1', [
+      { label: 'Animació amb personatge', kind: 'PROVIDER_SERVICE', collaboratorId: 'masquerade', revenueAmount: 300, costAmount: 250, quantity: 1, travelHeadcount: 2 },
+    ]);
+
+    const createArg = mockPrisma.leadServiceLine.createMany.mock.calls[0][0];
+    expect(createArg.data[0]).toMatchObject({
+      label: 'Animació amb personatge',
+      quantity: 1,
+      revenueAmount: 300,
+    });
+    expect(createArg.data[0].notes).toContain(`${TRAVEL_HEADCOUNT_NOTE_PREFIX}2]`);
   });
 });

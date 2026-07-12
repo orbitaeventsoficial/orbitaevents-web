@@ -1,14 +1,18 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockVerifyCsrf, mockGetById, mockUpdate } = vi.hoisted(() => ({
+const { mockRequireAuth, mockRequirePermission, mockVerifyCsrf, mockGetById, mockUpdate } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockRequirePermission: vi.fn(),
   mockVerifyCsrf: vi.fn(),
   mockGetById: vi.fn(),
   mockUpdate: vi.fn(),
 }));
 
-vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
+vi.mock('@/lib/auth', () => ({
+  requireAuth: mockRequireAuth,
+  requirePermission: mockRequirePermission,
+}));
 vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 vi.mock('@/lib/services/packAdminService', () => ({
   getAdminPackById: mockGetById,
@@ -24,6 +28,7 @@ describe('GET /api/admin/packs/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
+    mockRequirePermission.mockReturnValue(null);
     mockVerifyCsrf.mockReturnValue(null);
     mockGetById.mockResolvedValue({ status: 200, body: { id: 'p1' } });
   });
@@ -31,10 +36,23 @@ describe('GET /api/admin/packs/[id]', () => {
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response('{}', { status: 401 }));
     expect((await GET(new NextRequest('http://localhost/x'), ctx)).status).toBe(401);
+    expect(mockRequirePermission).not.toHaveBeenCalled();
+  });
+
+  it('rebutja permisos de lectura abans de resoldre params', async () => {
+    mockRequirePermission.mockReturnValueOnce(new Response('{}', { status: 403 }));
+
+    const res = await GET(new NextRequest('http://localhost/x'), ctx);
+
+    expect(res.status).toBe(403);
+    expect(mockRequirePermission).toHaveBeenCalledWith(expect.any(NextRequest), 'read');
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
+    expect(mockGetById).not.toHaveBeenCalled();
   });
 
   it('retorna pack', async () => {
     expect((await GET(new NextRequest('http://localhost/x'), ctx)).status).toBe(200);
+    expect(mockRequirePermission).toHaveBeenCalledWith(expect.any(NextRequest), 'read');
     expect(mockVerifyCsrf).not.toHaveBeenCalled();
     expect(mockGetById).toHaveBeenCalledWith('p1');
   });
@@ -54,6 +72,7 @@ describe('PATCH /api/admin/packs/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
+    mockRequirePermission.mockReturnValue(null);
     mockVerifyCsrf.mockReturnValue(null);
     mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } });
   });
@@ -65,6 +84,19 @@ describe('PATCH /api/admin/packs/[id]', () => {
     const res = await PATCH(req, ctx);
 
     expect(res.status).toBe(401);
+    expect(mockRequirePermission).not.toHaveBeenCalled();
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it('rebutja permisos de mutacio abans de CSRF/params/body', async () => {
+    mockRequirePermission.mockReturnValueOnce(new Response('{}', { status: 403 }));
+    const req = new NextRequest('http://localhost/x', { method: 'PATCH', body: JSON.stringify({ name: 'Nou' }), headers: { 'Content-Type': 'application/json' } });
+
+    const res = await PATCH(req, ctx);
+
+    expect(res.status).toBe(403);
+    expect(mockRequirePermission).toHaveBeenCalledWith(req, 'mutate');
     expect(mockVerifyCsrf).not.toHaveBeenCalled();
     expect(mockUpdate).not.toHaveBeenCalled();
   });
@@ -76,6 +108,7 @@ describe('PATCH /api/admin/packs/[id]', () => {
     const res = await PATCH(req, ctx);
 
     expect(res.status).toBe(403);
+    expect(mockRequirePermission).toHaveBeenCalledWith(req, 'mutate');
     expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockUpdate).not.toHaveBeenCalled();
   });
@@ -83,6 +116,7 @@ describe('PATCH /api/admin/packs/[id]', () => {
   it('actualitza pack', async () => {
     const req = new NextRequest('http://localhost/x', { method: 'PATCH', body: JSON.stringify({ name: 'Nou' }), headers: { 'Content-Type': 'application/json' } });
     expect((await PATCH(req, ctx)).status).toBe(200);
+    expect(mockRequirePermission).toHaveBeenCalledWith(req, 'mutate');
     expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockUpdate).toHaveBeenCalledWith('p1', { name: 'Nou' });
   });

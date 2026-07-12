@@ -1,7 +1,6 @@
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { NextResponse, type NextRequest } from 'next/server';
-import { createDossier } from '@/lib/services/dossierService';
 import type { CreateDossierInput } from '@/lib/services/dossierService';
 import { createDossierDraftFromLead } from '@/lib/services/dossierAutoDraftService';
 
@@ -24,13 +23,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!body.nom?.trim()) {
-    return NextResponse.json({ error: 'Nom requerit' }, { status: 400 });
-  }
-  if (!body.productIds?.length) {
-    return NextResponse.json({ error: 'Cal seleccionar almenys un producte' }, { status: 400 });
-  }
-
-  const dossier = await createDossier(body);
-  return NextResponse.json(dossier, { status: 201 });
+  return NextResponse.json({
+    error: 'El dossier canònic requereix leadId. Crea o vincula un lead abans de desar-lo.',
+    canonicalRoute: '/admin/dossiers?leadId=...',
+  }, { status: 410 });
 }

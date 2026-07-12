@@ -39,4 +39,12 @@ describe('ScriptsClient', () => {
     expect(mockClipboardWriteText).toHaveBeenCalledWith('npx tsx prisma/seed-email-templates.ts');
     expect(consoleErrorSpy).toHaveBeenCalled();
   });
+
+  it('marca scripts mutadors encara que no siguin destructius', () => {
+    render(<ScriptsClient />);
+
+    expect(screen.getByText(/scripts poden tocar dades\/config/i)).toBeInTheDocument();
+    expect(screen.getAllByText('toca dades').length).toBeGreaterThan(5);
+    expect(screen.getByText('destructiu')).toBeInTheDocument();
+  });
 });

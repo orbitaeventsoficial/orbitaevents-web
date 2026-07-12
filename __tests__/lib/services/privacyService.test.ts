@@ -43,24 +43,17 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 import {
   recordConsent,
   revokeConsent,
-  getActiveConsents,
-  hasActiveConsent,
   listConsents,
   createDataRequest,
   verifyDataRequest,
-  processDataRequest,
-  getPendingDataRequests,
+  getDownloadableDataRequestExport,
   getUrgentDataRequests,
   logPrivacyAction,
-  getAuditHistory,
-  getAuditSummary,
   getActiveLegalDocument,
-  getCurrentLegalVersion,
   exportCustomerData,
   anonymizeCustomerData,
   executeRetentionPolicies,
   getPrivacyStats,
-  checkGdprCompliance,
   fetchCustomerPrivacyData,
   listPrivacyAuditLogs,
   findConsentById,
@@ -143,49 +136,6 @@ describe('revokeConsent', () => {
   });
 });
 
-describe('getActiveConsents', () => {
-  it('retorna consentiments actius', async () => {
-    const consents = [{ id: 'c1', consentType: 'GDPR_BASIC' }];
-    mockPrisma.consentRecord.findMany.mockResolvedValue(consents);
-
-    const result = await getActiveConsents('cust1');
-
-    expect(result).toEqual(consents);
-    expect(mockPrisma.consentRecord.findMany).toHaveBeenCalledWith({
-      where: { customerId: 'cust1', granted: true, revokedAt: null },
-      orderBy: { createdAt: 'desc' },
-    });
-  });
-});
-
-describe('hasActiveConsent', () => {
-  it('retorna true si existeix consentiment', async () => {
-    mockPrisma.consentRecord.findFirst.mockResolvedValue({ id: 'c1' });
-
-    expect(await hasActiveConsent('cust1', 'GDPR_BASIC' as any)).toBe(true);
-  });
-
-  it('retorna false si no existeix', async () => {
-    mockPrisma.consentRecord.findFirst.mockResolvedValue(null);
-
-    expect(await hasActiveConsent('cust1', 'GDPR_BASIC' as any)).toBe(false);
-  });
-
-  it('cerca per email o customerId', async () => {
-    mockPrisma.consentRecord.findFirst.mockResolvedValue(null);
-
-    await hasActiveConsent('test@test.com', 'GDPR_BASIC' as any);
-
-    expect(mockPrisma.consentRecord.findFirst).toHaveBeenCalledWith({
-      where: {
-        OR: [{ customerId: 'test@test.com' }, { email: 'test@test.com' }],
-        consentType: 'GDPR_BASIC',
-        granted: true,
-        revokedAt: null,
-      },
-    });
-  });
-});
 
 describe('listConsents', () => {
   const mockItems = [
@@ -365,89 +315,53 @@ describe('verifyDataRequest', () => {
   });
 });
 
-describe('processDataRequest', () => {
-  it('processa sol·licitud ACCESS amb exportació', async () => {
-    mockPrisma.dataRequest.findUnique.mockResolvedValue({
-      id: 'req1',
-      requestType: 'ACCESS',
-      customerId: 'cust1',
-    });
-    mockPrisma.customer.findUnique.mockResolvedValue({
-      id: 'cust1',
-      name: 'Test',
-      email: 'test@test.com',
-      phone: null,
-      instagram: null,
-      preferredLocale: 'ca',
-      source: 'web',
-      gdprConsent: true,
-      gdprConsentDate: new Date(),
-      marketingConsent: false,
-      marketingConsentDate: null,
-      totalEvents: 1,
-      totalSpent: 1000,
-      lastEventDate: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      leads: [],
-      testimonials: [],
-      discountCodes: [],
-      consentRecords: [],
-      activityLog: [],
-    });
-    mockPrisma.dataRequest.update.mockResolvedValue({ id: 'req1', status: 'COMPLETED' });
-
-    const result = await processDataRequest('req1', 'admin', 'DATA_PROVIDED' as any);
-
-    expect(result.status).toBe('COMPLETED');
-    expect(mockPrisma.dataRequest.update).toHaveBeenCalledWith({
-      where: { id: 'req1' },
-      data: expect.objectContaining({ status: 'COMPLETED', processedBy: 'admin' }),
-    });
-  });
-
-  it('llança error si sol·licitud no existeix', async () => {
+describe('getDownloadableDataRequestExport', () => {
+  it('retorna null si el token no correspon a cap sol·licitud', async () => {
     mockPrisma.dataRequest.findUnique.mockResolvedValue(null);
 
-    await expect(processDataRequest('nonexist', 'admin', 'DATA_PROVIDED' as any))
-      .rejects.toThrow('Sol·licitud no trobada');
+    const result = await getDownloadableDataRequestExport('tok-x');
+
+    expect(result).toBeNull();
   });
 
-  it('processa sol·licitud ERASURE amb anonimització', async () => {
+  it('retorna null si la sol·licitud no esta completada', async () => {
     mockPrisma.dataRequest.findUnique.mockResolvedValue({
-      id: 'req1',
-      requestType: 'ERASURE',
-      customerId: 'cust1',
+      id: 'req1', status: 'VERIFIED', requestType: 'ACCESS', responseData: { foo: 'bar' },
     });
-    mockPrisma.customer.findUnique.mockResolvedValue({
-      id: 'cust1',
-      name: 'Test',
-      email: 'test@test.com',
-      phone: '123',
-      instagram: '@test',
-    });
-    mockPrisma.$transaction.mockResolvedValue([]);
-    mockPrisma.dataRequest.update.mockResolvedValue({ id: 'req1', status: 'COMPLETED' });
 
-    await processDataRequest('req1', 'admin', 'COMPLETED' as any);
+    const result = await getDownloadableDataRequestExport('tok-x');
 
-    expect(mockPrisma.$transaction).toHaveBeenCalled();
+    expect(result).toBeNull();
   });
-});
 
-describe('getPendingDataRequests', () => {
-  it('retorna sol·licituds pendents ordenades per deadline', async () => {
-    const requests = [{ id: 'req1' }, { id: 'req2' }];
-    mockPrisma.dataRequest.findMany.mockResolvedValue(requests);
-
-    const result = await getPendingDataRequests();
-
-    expect(result).toEqual(requests);
-    expect(mockPrisma.dataRequest.findMany).toHaveBeenCalledWith({
-      where: { status: { in: ['PENDING', 'VERIFIED', 'IN_PROGRESS'] } },
-      orderBy: { legalDeadline: 'asc' },
-      include: { customer: { select: { id: true, name: true, email: true } } },
+  it('retorna null si el tipus no es descarregable (ERASURE)', async () => {
+    mockPrisma.dataRequest.findUnique.mockResolvedValue({
+      id: 'req1', status: 'COMPLETED', requestType: 'ERASURE', responseData: null,
     });
+
+    const result = await getDownloadableDataRequestExport('tok-x');
+
+    expect(result).toBeNull();
+  });
+
+  it('retorna les dades exportades per una sol·licitud ACCESS completada', async () => {
+    mockPrisma.dataRequest.findUnique.mockResolvedValue({
+      id: 'req1', status: 'COMPLETED', requestType: 'ACCESS', responseData: { name: 'Ana' },
+    });
+
+    const result = await getDownloadableDataRequestExport('tok-x');
+
+    expect(result).toEqual({ id: 'req1', data: { name: 'Ana' } });
+  });
+
+  it('retorna les dades exportades per una sol·licitud PORTABILITY completada', async () => {
+    mockPrisma.dataRequest.findUnique.mockResolvedValue({
+      id: 'req2', status: 'COMPLETED', requestType: 'PORTABILITY', responseData: { name: 'Ana' },
+    });
+
+    const result = await getDownloadableDataRequestExport('tok-y');
+
+    expect(result).toEqual({ id: 'req2', data: { name: 'Ana' } });
   });
 });
 
@@ -580,39 +494,6 @@ describe('logPrivacyAction', () => {
   });
 });
 
-describe('getAuditHistory', () => {
-  it('retorna historial per entitat', async () => {
-    const logs = [{ id: 'log1', action: 'DATA_ACCESSED' }];
-    mockPrisma.privacyAuditLog.findMany.mockResolvedValue(logs);
-
-    const result = await getAuditHistory('Customer', 'cust1');
-
-    expect(result).toEqual(logs);
-    expect(mockPrisma.privacyAuditLog.findMany).toHaveBeenCalledWith({
-      where: { entityType: 'Customer', entityId: 'cust1' },
-      orderBy: { createdAt: 'desc' },
-    });
-  });
-});
-
-describe('getAuditSummary', () => {
-  it('retorna resum agrupat per acció', async () => {
-    mockPrisma.privacyAuditLog.groupBy.mockResolvedValue([
-      { action: 'DATA_ACCESSED', _count: 5 },
-      { action: 'CONSENT_GRANTED', _count: 10 },
-    ]);
-
-    const start = new Date('2026-01-01');
-    const end = new Date('2026-03-31');
-    const result = await getAuditSummary(start, end);
-
-    expect(result).toEqual([
-      { action: 'DATA_ACCESSED', count: 5 },
-      { action: 'CONSENT_GRANTED', count: 10 },
-    ]);
-  });
-});
-
 // ═══════════════════════════════════════════════════════════════════════════
 // DOCUMENTS LEGALS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -625,24 +506,6 @@ describe('getActiveLegalDocument', () => {
     const result = await getActiveLegalDocument('PRIVACY_POLICY' as any, 'ca');
 
     expect(result).toEqual(doc);
-  });
-});
-
-describe('getCurrentLegalVersion', () => {
-  it('retorna versió del document actiu', async () => {
-    mockPrisma.legalDocument.findFirst.mockResolvedValue({ version: '2.1' });
-
-    const result = await getCurrentLegalVersion('PRIVACY_POLICY' as any, 'ca');
-
-    expect(result).toBe('2.1');
-  });
-
-  it('retorna null si no hi ha document', async () => {
-    mockPrisma.legalDocument.findFirst.mockResolvedValue(null);
-
-    const result = await getCurrentLegalVersion('PRIVACY_POLICY' as any, 'ca');
-
-    expect(result).toBeNull();
   });
 });
 
@@ -723,39 +586,6 @@ describe('getPrivacyStats', () => {
       consents: { total: 100, active: 80 },
       requests: { pending: 5, completed: 20, urgent: 2 },
     });
-  });
-});
-
-describe('checkGdprCompliance', () => {
-  it('retorna compliant si té GDPR_BASIC', async () => {
-    mockPrisma.customer.findUnique.mockResolvedValue({
-      id: 'cust1',
-      consentRecords: [{ consentType: 'GDPR_BASIC' }, { consentType: 'MARKETING_EMAIL' }],
-    });
-
-    const result = await checkGdprCompliance('cust1');
-
-    expect(result.isCompliant).toBe(true);
-    expect(result.hasGdprConsent).toBe(true);
-    expect(result.hasMarketingConsent).toBe(true);
-  });
-
-  it('retorna no compliant sense GDPR_BASIC', async () => {
-    mockPrisma.customer.findUnique.mockResolvedValue({
-      id: 'cust1',
-      consentRecords: [{ consentType: 'MARKETING_EMAIL' }],
-    });
-
-    const result = await checkGdprCompliance('cust1');
-
-    expect(result.isCompliant).toBe(false);
-    expect(result.hasGdprConsent).toBe(false);
-  });
-
-  it('llança error si client no trobat', async () => {
-    mockPrisma.customer.findUnique.mockResolvedValue(null);
-
-    await expect(checkGdprCompliance('nonexist')).rejects.toThrow('Client no trobat');
   });
 });
 
