@@ -15,12 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-12 [ESTAT: tancat — #2007 Repo Atlas post-event sense feedback a definició]
-Perímetre tancat: `lib/constants/repo-atlas.ts`, `__tests__/lib/services/repoElectricAtlasService.test.ts`, roadmap, counter i registres.
-Últim canvi tancat: #2007.
-Validació #2007: focused Vitest OK (`repoElectricAtlasService`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
-Proper pas previst: continuar cap al #2008 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments i publicacions reals.
-Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
+[codex] 2026-07-12 [ESTAT: treballant — #2012 cua post-event legacy cap a FollowUp]
+Perímetre previst: `lib/services/postEventPendingService.ts`, `app/admin/post-event/feedback/page.tsx`, `scripts/check-zenit-tooling.mjs`, tests focalitzats de post-event/tooling/atlas, roadmap, counter i registres.
+Últim canvi tancat: #2011.
+Proper pas previst: canviar la cua tècnica de `/admin/post-event/feedback` perquè consumeixi el builder canònic de seguiment (`FollowUp`) i deixar `Feedback` només com alias legacy, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+Avís per l'altre agent: servidor local verificat a `http://127.0.0.1:3000` (PID 20612); no tocaré `app/[locale]/**`, `ContactFormComplete`, footer, `ClientFeedback`, descomptes públics ni `app/admin/tasks/**`.
 
 [codex] 2026-07-12 [ESTAT: tancat — #2006 CRM post-event hint sense feedback]
 Perímetre tancat: `lib/constants/customer-crm.ts`, `__tests__/lib/constants/customer-crm.test.ts`, roadmap, counter i registres.
@@ -725,6 +724,11 @@ Proper pas previst: continuar auditoria/canonització de documents enviats o rep
 Avís per l'altre agent: no tocar `app/admin/tasks/**`; no crear social/portfolio derivats de post-event sense origen durable.
 
 ## Bloc CLAUDE (Claude Code)
+
+[claude] 2026-07-12 [ESTAT: tancat — #2012 web pública: copy castellà + packs coherents amb fitxa canònica]
+Perímetre tancat: `messages/{ca,es,en}.json` (secció servicios + packs + portfolio), `app/[locale]/servicios/{client,page}.tsx`, `app/[locale]/packs/PacksClient.tsx`, `app/components/ui/footer.tsx`, `app/components/forms/ContactFormComplete.tsx`, protocol/diari/counter. Sync canònic de packs executat (`updated:8, errors:0`) perquè la BD tornés a mirar la font (config diu 2h/5h; el copy deia 3h/6h).
+Validació #2012: JSON parse OK; `tsc --noEmit` OK; `validate:core` OK; captures abans/després + curl de `/es/packs` confirmant el copy nou. `pnpm build` NO passat per no tombar el teu `next dev` — compte si necessites build.
+Avís per l'altre agent: he commitejat i pujat els teus talls #1838-#1997 (`76f2cc18`) i #1998-#2007 (`97034310`) a `origin/fix/admin-phantom-tokens-classes` per ordre del propietari — el worktree portava 526 fitxers sense commit. Continuaré commitejant per talls tancats. No he tocat `app/admin/**` ni `lib/services/**`; només `lib/constants/admin.ts` (counter).
 
 [claude] 2026-07-11 [ESTAT: tancat — #1974 Task.legacyLeadTaskId eliminat amb migració a Railway]
 Ordre explícita del propietari: "toca legacyLeadTaskId amb migració". Vaig reverificar jo mateix contra Railway (0/81 tasks amb el camp, coincidint amb el teu #1929) abans de tocar schema. Migració `20260711143000_drop_task_legacy_lead_task_id` aplicada amb `prisma migrate deploy` i verificada. `zenit-db-audit.mjs`/`check-zenit-tooling.mjs` actualitzats — ja no exigeixen ni auditen `legacyLeadTaskLinks` perquè el camp ja no existeix; si tornes a córrer `zenit:db:audit` no hi trobaràs aquest finding, és esperat.

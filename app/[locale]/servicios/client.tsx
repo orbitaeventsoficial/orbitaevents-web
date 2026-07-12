@@ -40,6 +40,7 @@ interface ServiciosClientProps {
     backup: string;
     guarantee: string;
     mostPopular: string;
+    newBadge: string;
     viewService: string;
     ctaTitle: string;
     ctaSubtitle: string;
@@ -192,7 +193,7 @@ export default function ServiciosClient({ servicios, texts, heroImage }: Servici
                   {servicio.novelty && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                       <span className="bg-gradient-to-r from-orange-500 to-rose-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-orange-500/30 animate-pulse">
-                        ✨ NOU
+                        {texts.newBadge}
                       </span>
                     </div>
                   )}

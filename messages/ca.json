@@ -1554,7 +1554,7 @@
           "name": "Premium",
           "tagline": "El vostre ball, amb un espectacle de llums que els convidats recordaran",
           "features": {
-            "f1": "DJ professional 3 hores per gaudir sense pressa",
+            "f1": "DJ professional 5 hores per gaudir sense pressa",
             "f2": "So PRO 4000W EV + controladora Pioneer",
             "f3": "4 caps mòbils que segueixen el ritme de la música",
             "f4": "Cabina DJ ampliada — el centre de la festa",
@@ -1580,7 +1580,7 @@
           "name": "Corporate Cocktail",
           "tagline": "El detall sonor que fa que el teu còctel sigui diferent",
           "features": {
-            "f1": "Fil musical o DJ ambient 4 hores — posem el to just",
+            "f1": "Fil musical o DJ ambient 2 hores — posem el to just",
             "f2": "So nítid EV ETX que acompanya sense molestar",
             "f3": "Il·luminació decorativa que reforça l'ambient",
             "f4": "1 micròfon sense fils per si cal fer un discurs",
@@ -1603,7 +1603,7 @@
           "name": "Corporate Gala",
           "tagline": "Producció a un altre nivell — que la teva marca brilli",
           "features": {
-            "f1": "Servei integral 6 hores amb DJ + tècnic de so dedicat",
+            "f1": "Servei integral 5 hores amb DJ + tècnic de so dedicat",
             "f2": "So reforçat + microfonia avançada (4 micros)",
             "f3": "Disseny d'il·luminació corporativa a mida",
             "f4": "Coordinació directa amb agència o venue",
@@ -1890,6 +1890,7 @@
     "guests": "Convidats",
     "idealFor": "Ideal per a",
     "configurePack": "Configura aquest pack",
+    "configureCustom": "Configura el teu esdeveniment",
     "customNeeds": "Necessites algo diferent?",
     "customNeedsSub": "Fem esdeveniments a mida. Explica'ns què tens al cap i et proposem.",
     "contactUs": "Parla amb nosaltres",
@@ -2045,7 +2046,7 @@
       "title": "Alguns dels nostres events",
       "subtitle": "Cada festa és diferent. Mira el que hem fet i fes-te una idea del que podem muntar per a tu.",
       "noCategories": "Encara no hi ha categories de portfolio configurades.",
-      "viewGallery": "Veure galeria →",
+      "viewGallery": "Veure galeria",
       "breadcrumb": "Portfolio",
       "categories": {
         "bodas": "Casaments",
@@ -2195,6 +2196,7 @@
       },
       "viewService": "Veure servei",
       "mostPopular": "⭐ MÉS POPULAR",
+      "newBadge": "✨ NOU",
       "ctaWhatsappButton": "WhatsApp Directe",
       "cta": {
         "title": "No Saps Quin Servei Necessites?",
@@ -2479,7 +2481,7 @@
           "tagline": "La teva festa, el teu so — nosaltres posem la resta",
           "ideal": "Aniversaris, celebracions i festes privades",
           "features": [
-            "DJ professional 3 hores — triem junts la música",
+            "DJ professional 2 hores — triem junts la música",
             "So PRO 4000W EV que s'escolta clar i net",
             "4 caps mòbils + multiefectes que transformen l'espai",
             "Màquina de fum per als moments clau",
@@ -2527,7 +2529,7 @@
           "tagline": "La festa on ningú vol marxar",
           "ideal": "Festes grans on vols que sigui inoblidable",
           "features": [
-            "DJ professional 6 hores — tota la nit al teu servei",
+            "DJ professional 5 hores — tota la nit al teu servei",
             "So de club (4000W + subwoofer de reforç) — ho sentireu a tot el cos",
             "Espectacle de llums complet amb caps mòbils sincronitzats",
             "Efectes VIP: fum, bombolles, espurnes fredes, confeti",
@@ -3814,7 +3816,7 @@
       "greeting": "Hola {name}",
       "body": "Han passat uns quants dies des del vostre {eventType} i ens agradaria saber de vosaltres.",
       "time": "Només et portarà 2 minuts.",
-      "cta": "Els vostres comentaris ens ajuden a millorar i continuar creant experiències increïbles.",
+      "cta": "La vostra opinió ens ajuda a millorar i continuar creant experiències increïbles.",
       "ctaButton": "Completar enquesta",
       "signature": "Gràcies pel teu temps,\nÒrbita Events"
     }
@@ -4706,7 +4708,7 @@
       "emojiMessages": {
         "1": "Oh no! Què va passar?",
         "2": "Entenem, podem millorar",
-        "3": "Gràcies pels comentaris!",
+        "3": "Gràcies per la teva opinió!",
         "4": "Genial! Ens alegrem!",
         "5": "INCREÏBLE! Això ens fa molt feliços! 🎉"
       },

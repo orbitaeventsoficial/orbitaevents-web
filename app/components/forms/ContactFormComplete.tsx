@@ -297,7 +297,7 @@ export default function ContactFormComplete({
       {/* Seccio: Dades personals */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span>👤</span> {t('sections.personalData')}
+          {t('sections.personalData')}
         </h3>
 
         {/* Nom complet */}
@@ -385,7 +385,7 @@ export default function ContactFormComplete({
       {/* Seccio: Dades event */}
       <div className="space-y-4 pt-4 border-t border-white/10">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span>🎉</span> {t('sections.eventData')}
+          {t('sections.eventData')}
         </h3>
 
         {/* Tipus event */}
@@ -499,7 +499,7 @@ export default function ContactFormComplete({
       {/* Seccio: Missatge */}
       <div className="space-y-4 pt-4 border-t border-white/10">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span>💬</span> {t('sections.tellUsMore')}
+          {t('sections.tellUsMore')}
         </h3>
 
         {/* Missatge */}

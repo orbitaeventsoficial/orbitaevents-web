@@ -1892,7 +1892,7 @@
           "name": "Premium",
           "tagline": "Vuestro baile, con un espectáculo de luces que los invitados recordarán",
           "features": {
-            "f1": "DJ profesional 3 horas para disfrutar sin prisas",
+            "f1": "DJ profesional 5 horas para disfrutar sin prisas",
             "f2": "Sonido PRO 4000W EV + controladora Pioneer",
             "f3": "4 cabezas móviles que siguen el ritmo de la música",
             "f4": "Cabina DJ ampliada — el centro de la fiesta",
@@ -1918,7 +1918,7 @@
           "name": "Corporate Cocktail",
           "tagline": "El detalle sonoro que hace que tu cóctel sea diferente",
           "features": {
-            "f1": "Hilo musical o DJ ambiente 4 horas — ponemos el tono justo",
+            "f1": "Hilo musical o DJ ambiente 2 horas — ponemos el tono justo",
             "f2": "Sonido nítido EV ETX que acompaña sin molestar",
             "f3": "Iluminación decorativa que refuerza el ambiente",
             "f4": "1 micrófono inalámbrico por si hace falta un discurso",
@@ -1941,7 +1941,7 @@
           "name": "Corporate Gala",
           "tagline": "Producción a otro nivel — que tu marca brille",
           "features": {
-            "f1": "Servicio integral 6 horas con DJ + técnico de sonido dedicado",
+            "f1": "Servicio integral 5 horas con DJ + técnico de sonido dedicado",
             "f2": "Sonido reforzado + microfonía avanzada (4 micros)",
             "f3": "Diseño de iluminación corporativa a medida",
             "f4": "Coordinación directa con agencia o venue",
@@ -2228,6 +2228,7 @@
     "guests": "Invitados",
     "idealFor": "Ideal para",
     "configurePack": "Configura este pack",
+    "configureCustom": "Configura tu evento",
     "customNeeds": "¿Necesitas algo diferente?",
     "customNeedsSub": "Hacemos eventos a medida. Cuéntanos qué tienes en mente y te proponemos.",
     "contactUs": "Habla con nosotros",
@@ -2451,7 +2452,7 @@
       "title": "Algunos de nuestros eventos",
       "subtitle": "Cada fiesta es diferente. Mira lo que hemos hecho y hazte una idea de lo que podemos montar para ti.",
       "noCategories": "Aún no hay categorías de portfolio configuradas.",
-      "viewGallery": "Ver galería →",
+      "viewGallery": "Ver galería",
       "breadcrumb": "Portfolio",
       "categories": {
         "bodas": "Bodas",
@@ -2496,7 +2497,7 @@
         "imageAlt": "Servicios Orbita Events Barcelona"
       },
       "hero": {
-        "badge": "+2 anos · Barcelona y Girona",
+        "badge": "+3 años · Barcelona y Girona",
         "title": "Nuestros Servicios",
         "titleHighlight": "Para Tu Evento Inolvidable",
         "subtitle": "DJ profesional, luces sincronizadas y efectos especiales para que tu evento se recuerde.",
@@ -2512,49 +2513,49 @@
       "items": {
         "bodas": {
           "name": "Bodas",
-          "tagline": "El dia mas importante merece el mejor ambiente",
-          "desc": "Ceremonia emotiva, coctel elegante y fiesta memorable. Lo coordinamos todo para que tus invitados bailen hasta el final.",
+          "tagline": "El día más importante merece el mejor ambiente",
+          "desc": "Ceremonia emotiva, cóctel elegante y fiesta memorable. Lo coordinamos todo para que tus invitados bailen hasta el final.",
           "features": [
             "DJ que lee la sala",
             "Luces sincronizadas",
             "Efectos especiales",
-            "Coordinacion total"
+            "Coordinación total"
           ]
         },
         "discomovil": {
-          "name": "Discomovil",
+          "name": "Discomóvil",
           "tagline": "DJ profesional donde lo necesites",
-          "desc": "Llevamos la fiesta donde tu quieras: jardines, masias, playas o locales. Equipo completo y autónomo.",
+          "desc": "Llevamos la fiesta donde tú quieras: jardines, masías, playas o locales. Equipo completo y autónomo.",
           "features": [
-            "Equipo portatil completo",
-            "Autonomia total",
-            "Cualquier ubicacion"
+            "Equipo portátil completo",
+            "Autonomía total",
+            "Cualquier ubicación"
           ]
         },
         "fiestas": {
           "name": "Fiestas Privadas",
           "tagline": "La fiesta que tu gente va a recordar.",
-          "desc": "Cumpleanos, aniversarios, comuniones y graduaciones. Adaptamos la fiesta a cada celebracion.",
+          "desc": "Cumpleaños, aniversarios, comuniones y graduaciones. Adaptamos la fiesta a cada celebración.",
           "features": [
-            "Musica personalizada",
-            "Juegos y animacion",
+            "Música personalizada",
+            "Juegos y animación",
             "Efectos especiales"
           ]
         },
         "empresas": {
           "name": "Empresas",
           "tagline": "Eventos corporativos a la altura de tu marca",
-          "desc": "Team building, cenas de empresa, inauguraciones y presentaciones. Profesionalidad y coordinacion garantizadas.",
+          "desc": "Team building, cenas de empresa, inauguraciones y presentaciones. Profesionalidad y coordinación garantizadas.",
           "features": [
             "Imagen corporativa",
-            "Coordinacion total",
+            "Coordinación total",
             "Sonido profesional"
           ]
         },
         "animacionInfantil": {
-          "name": "Animacion Infantil",
-          "tagline": "Juegos, talleres, magia y diversion para los mas pequenos",
-          "desc": "Animadores profesionales para cumpleanos, comuniones y eventos familiares. Pintacaras, globoflexia, talleres y juegos adaptados por edades.",
+          "name": "Animación Infantil",
+          "tagline": "Juegos, talleres, magia y diversión para los más pequeños",
+          "desc": "Animadores profesionales para cumpleaños, comuniones y eventos familiares. Pintacaras, globoflexia, talleres y juegos adaptados por edades.",
           "features": [
             "Animadores profesionales",
             "Juegos y actividades",
@@ -2563,23 +2564,23 @@
           ]
         },
         "produccion": {
-          "name": "Produccion Tecnica",
-          "tagline": "Montaje, operacion y gestion sin sorpresas",
-          "desc": "Diseno tecnico, montaje profesional y operacion en directo para productoras y organizadores que necesitan cero problemas.",
+          "name": "Producción Técnica",
+          "tagline": "Montaje, operación y gestión sin sorpresas",
+          "desc": "Diseño técnico, montaje profesional y operación en directo para productoras y organizadores que necesitan cero problemas.",
           "features": [
-            "Equipo tecnico completo",
-            "Operacion in situ",
+            "Equipo técnico completo",
+            "Operación in situ",
             "Plan B garantizado",
             "Desde 700€"
           ]
         },
         "alquiler": {
           "name": "Alquiler",
-          "tagline": "Equipamiento profesional con o sin tecnico",
+          "tagline": "Equipamiento profesional con o sin técnico",
           "desc": "EV ETX-15P, B-150 LED y Pioneer DJ. Alquila el equipo que usamos en nuestros eventos, con entrega incluida.",
           "features": [
             "EV + Pioneer + B-150",
-            "Con/sin tecnico",
+            "Con/sin técnico",
             "Consultar"
           ]
         },
@@ -2597,14 +2598,15 @@
         }
       },
       "viewService": "Ver servicio",
-      "mostPopular": "⭐ MAS POPULAR",
+      "mostPopular": "⭐ MÁS POPULAR",
+      "newBadge": "✨ NUEVO",
       "ctaWhatsappButton": "WhatsApp Directo",
       "cta": {
         "title": "¿No sabes qué servicio necesitas?",
         "subtitle": "Cuéntanos tu evento y te recomendamos la opción que mejor encaja.",
         "responseTime": "Respondemos en menos de 2 horas.",
         "button": "Pedir asesoramiento gratis",
-        "whatsappMessage": "Hola! Quiero informacion sobre vuestros servicios.",
+        "whatsappMessage": "¡Hola! Quiero información sobre vuestros servicios.",
         "whatsappButton": "WhatsApp"
       }
     },
@@ -2882,7 +2884,7 @@
           "tagline": "Tu fiesta, tu sonido — nosotros ponemos el resto",
           "ideal": "Cumpleaños, celebraciones y fiestas privadas",
           "features": [
-            "DJ profesional 3 horas — elegimos juntos la música",
+            "DJ profesional 2 horas — elegimos juntos la música",
             "Sonido PRO 4000W EV que se escucha claro y limpio",
             "4 cabezas móviles + multiefectos que transforman el espacio",
             "Máquina de humo para los momentos clave",
@@ -2930,7 +2932,7 @@
           "tagline": "La fiesta de la que nadie quiere irse",
           "ideal": "Fiestas grandes donde quieres que sea inolvidable",
           "features": [
-            "DJ profesional 6 horas — toda la noche a tu servicio",
+            "DJ profesional 5 horas — toda la noche a tu servicio",
             "Sonido de club (4000W + subwoofer de refuerzo) — lo sentiréis en todo el cuerpo",
             "Show de luces completo con cabezas móviles sincronizadas",
             "Efectos VIP: humo, burbujas, chispas frías, confeti",
@@ -4275,7 +4277,7 @@
       "greeting": "Hola {name}",
       "body": "Han pasado unos días desde vuestro {eventoType} y nos gustaría saber de vosotros.",
       "time": "Solo te llevará 2 minutos.",
-      "cta": "Vuestros comentarios nos ayudan a mejorar y continuar creando experiencias increíbles.",
+      "cta": "Vuestra opinión nos ayuda a mejorar y a seguir creando experiencias increíbles.",
       "ctaButton": "Completar encuesta",
       "signature": "Gracias por tu tiempo,\nÒrbita Events"
     }
@@ -4805,7 +4807,7 @@
       "emojiMessages": {
         "1": "¡Oh no! ¿Qué pasó?",
         "2": "Entendemos, podemos mejorar",
-        "3": "¡Gracias por el feedback!",
+        "3": "¡Gracias por tu opinión!",
         "4": "¡Genial! ¡Nos alegramos!",
         "5": "¡INCREÍBLE! ¡Esto nos hace muy felices! 🎉"
       },

@@ -23429,7 +23429,7 @@ Excepcions: `canvas/` i `email-templates/`. Color-mix() i ternaris no detectats 
 ### Canvi #42 — 2026-04-10 — claude (FET)
 **Campanyes CRM — servei + UI (§6.5/Growth)**
 - **Creat `lib/services/campaignService.ts`** — servei pur `generateCampaigns(input)` + wrapper `loadCampaigns()`.
-- **7 tipus de campanya**: REACTIVATION (dormants + at-risk), UPSELL (first-time), LOYALTY (VIP), REFERRAL (returning), FEEDBACK_REQUEST (recent), SEASONAL (per temporada).
+- **7 tipus de campanya**: REACTIVATION (dormants + at-risk), UPSELL (first-time), LOYALTY (VIP), REFERRAL (returning), REVIEW_REQUEST (recent; actualitzat al #2008), SEASONAL (per temporada).
 - Cada campanya inclou: segment, audienceSize, canal suggerit (WhatsApp/email), subject, body template amb `{nom}` i `{link_ressenya}`, urgència, estimatedImpact.
 - Campanyes SEASONAL dinàmiques segons el mes: primavera-estiu (comunions/bodes), tardor (corporatives), Nadal, hivern (Carnaval/Sant Valentí).
 - **Creat `app/admin/campaigns/page.tsx`** — server component amb:
@@ -33049,6 +33049,95 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació funcional: el Repo Atlas continua trobant els fitxers post-event i conserva els patrons detector legacy, però la definició humana ja no presenta feedback com a peça del volant.
 - Validació humana/UX: un agent que entra pel diccionari llegeix post-event com ressenya/testimoni/referral/recurrencia.
 - `ADMIN_CHANGE_COUNTER` passa a `2007`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2008 — 2026-07-12 — codex (FET)
+**Manolo: campanya CRM recent sense tipus feedback.**
+- Context: el generador de campanyes CRM ja mostrava una campanya de `Recol·lecció de ressenyes`, però el contracte intern que arriba a `/admin/campaigns` encara sortia com `FEEDBACK_REQUEST` amb id `campaign:feedback-recent`. Això reobria la confusió de producte: el volant post-event ha de parlar de review/ressenya/testimoni, no d'un calaix genèric de feedback.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat al generador de campanyes, pantalla admin de campanyes, test, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `lib/services/campaignService.ts`: la campanya recent passa de `FEEDBACK_REQUEST`/`campaign:feedback-recent` a `REVIEW_REQUEST`/`campaign:review-recent`.
+- `app/admin/campaigns/page.tsx`: el mapa d'icones admin reconeix `REVIEW_REQUEST` i conserva la lectura visual de campanya de reputació.
+- `__tests__/lib/services/campaignService.test.ts`: blinda que la campanya recent generada tingui tipus/id de review i no recuperi el tipus/id de feedback.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2008 i explicita el canvi a la campanya CRM recent.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`campaignService`, 14 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: `/admin/campaigns` continua generant la campanya de ressenyes amb el mateix missatge i canal, però el tipus/id ja no la presenten com feedback.
+- Validació humana/UX: l'operador veu una peça de reputació coherent amb ressenyes i prova social, sense que el contracte de campanya reintrodueixi el vocabulari vell.
+- `ADMIN_CHANGE_COUNTER` passa a `2008`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2009 — 2026-07-12 — codex (FET)
+**Manolo: copy pública post-event sense feedback.**
+- Context: la copy pública de post-event ja estava orientada a opinió/ressenya en bona part del flux, però quedaven tres punts de client que reintroduïen el vocabulari vell: el CTA EN de `emails.survey_request` deia `Your feedback helps us improve...` i el formulari gamificat ES/EN agraïa `feedback`. La variant CA també parlava de `comentaris`; no era incorrecte, però quedava menys precisa que opinió.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a missatges públics i18n, test, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `messages/ca.json`: el CTA de `emails.survey_request` i el missatge gamificat de valoració 3 passen a `opinió`.
+- `messages/es.json`: el CTA de `emails.survey_request` i el missatge gamificat de valoració 3 passen a `opinión`, eliminant `feedback` visible.
+- `messages/en.json`: el CTA de `emails.survey_request` i el missatge gamificat de valoració 3 passen a `opinion`, eliminant `feedback` visible.
+- `__tests__/messages/postEventPublicCopy.test.ts`: blinda les claus públiques post-event perquè no recuperin `feedback` en EN/ES ni el redactat vell.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2009 i explicita el canvi a la copy pública.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`postEventPublicCopy`, 2 tests); cerca focalitzada OK dels literals vells; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: els emails/enquestes i el formulari públic de testimoni mantenen el flux i les recompenses, però demanen i agraeixen opinió/review en lloc de feedback.
+- Validació humana/UX: el client rep un missatge més concret i coherent amb reputació, ressenya i prova social.
+- `ADMIN_CHANGE_COUNTER` passa a `2009`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2010 — 2026-07-12 — codex (FET)
+**Manolo: inventaris post-event sense etiqueta feedback.**
+- Context: la pantalla viva `/admin/post-event/feedback` ja funciona com `Agraïment al Client` i seguiment post-event, però els mapes permanents de l'admin encara descrivien l'òrgan amb `Feedback clients`, `Post-event feedback` o llistes de rutes amb `feedback` com a etiqueta de producte. Això mantenia una lectura antiga en la documentació operativa.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a inventaris/estat documentals, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `docs/estat-admin.md`: el resum de Post-event passa a informes, enquestes, seguiment i ressenyes; `/admin/post-event/feedback` queda com `Seguiment i agraïment clients`.
+- `docs/admin-inventari-pagines.md`: `/admin/post-event/surveys` queda com `Valoracions clients` i `/admin/post-event/feedback` com `Seguiment post-event`.
+- `docs/admin-fitxes-pantalles.md`: l'òrgan post-event i la taula final descriuen la ruta legacy com `seguiment`, no com `feedback`.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2010 i explicita el canvi als inventaris.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: cerca focalitzada OK de les etiquetes documentals velles; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: els mapes permanents de l'admin continuen apuntant a les mateixes rutes, però expliquen el mòdul com seguiment, agraïment, valoracions i ressenyes.
+- Validació humana/UX: el següent agent o operador que llegeixi les fitxes ja no rep la idea que el producte post-event sigui un calaix de feedback.
+- `ADMIN_CHANGE_COUNTER` passa a `2010`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2012 — 2026-07-12 — claude (FET)
+**Web pública: copy castellà sanejat i packs coherents amb la fitxa canònica.**
+- Context: revisió visual conjunta amb el propietari de la web pública (home, serveis, packs, portfolio, contacte) amb captures als 3 breakpoints. Trobat: castellà sense accents a tota la secció de serveis (`+2 anos` sense ñ al hero, `MAS POPULAR`, `Coordinacion`, `Cumpleanos`…), badge `✨ NOU` hardcodejat en català a totes les locales, hores de DJ al copy dels packs contradient la fitxa canònica (`packs-config.ts`: Bàsic 2h · Complet 5h, reforma registrada al protocol §Canvi #1146+), CTA `Configura este pack` a la secció d'esdeveniments a mida, correu del footer trencat per qualsevol caràcter (`break-all`), emojis duplicats als headers del formulari de contacte i fletxa doble a `Ver galería → →` del portfolio.
+- Autorització explícita propietari: el propietari obre la sessió amb "ens dediquem a revisar les visuals i coses de la web"; sessió en mode autònom sense preguntes. El write de BD és l'operació canònica existent de sync de packs (botó `Sync` de `/admin/packs`), executada perquè la norma 2 exigeix el canvi visible a la web real; cap schema, migració ni endpoint nou.
+- `messages/es.json`: secció `servicios` amb ortografia castellana correcta (badge `+3 años` coherent amb footer, `⭐ MÁS POPULAR`, accents a totes les targetes); nova clau `newBadge: ✨ NUEVO`; `whatsappMessage` amb obertura `¡`; packs `bodas-premium`/`disco-basico`/`disco-premium`/`empresas-cocktail`/`empresas-gala` amb hores = fitxa canònica (2h/5h); nova clau `configureCustom: Configura tu evento`; `viewGallery` sense fletxa textual.
+- `messages/ca.json` + `messages/en.json`: mateixes claus noves (`newBadge`, `configureCustom`) i mateixes correccions d'hores i `viewGallery`; els packs morts (`bodas-luxury`, `disco-completo`, `empresas-evento`) no es toquen.
+- `app/[locale]/servicios/client.tsx` + `page.tsx`: el badge de novetat consumeix `texts.newBadge` via i18n en lloc del literal `✨ NOU`.
+- `app/[locale]/packs/PacksClient.tsx`: el CTA d'esdeveniments a mida consumeix `configureCustom`; el CTA per-pack conserva `configurePack`.
+- `app/components/ui/footer.tsx`: el correu es parteix només després de la `@` amb `<wbr />` (sense caràcters afegits al copiar), fora el `break-all`.
+- `app/components/forms/ContactFormComplete.tsx`: eliminats els `<span>` d'emoji davant els headers de secció (l'emoji ja viu al valor i18n; monocapa).
+- BD Railway: `POST /api/admin/packs/sync` executat amb auth+CSRF → `{ok:true, updated:8, errors:0}`; la BD torna a mirar la font canònica.
+- Validació tècnica: JSON parse OK als 3 fitxers; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK (exit 0). `pnpm build` NO executat per no tombar el `next dev` viu de codex (`.next` compartit); pendent al pròxim build de CI.
+- Validació funcional: captures Playwright abans/després a `/es/servicios`, `/es/packs`, `/es/contacto`, `/es/portfolio`; `curl /es/packs` confirma `DJ profesional 2 horas`/`5 horas` renderitzats; footer mostra `info@`+`orbitaevents.com` en dues línies netes.
+- Validació humana/UX: el propietari participa a la sessió i té les captures; pendent la seva ullada final al navegador.
+- `ADMIN_CHANGE_COUNTER` passa a `2012`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #2011 — 2026-07-12 — codex (FET)
+**Manolo: manual màrqueting sense feedback genèric.**
+- Context: el gate de màrqueting del Manual intern, visible a `/admin/manual`, encara explicava la xarxa personal com el canal amb `feedback immediat`, demanava `recollir feedback` i bloquejava SEO per `Sense feedback real del missatge`. El criteri era bo, però la paraula tornava a ser massa genèrica: el que el negoci necessita aquí són respostes, objeccions i senyals comercials registrables.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat al Manual de màrqueting, tests, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `lib/constants/adminManual.ts`: `ADMIN_MARKETING_PHASE_GATE.nextPhaseReason` parla de `resposta immediata`.
+- `lib/constants/adminManual.ts`: el pla bootstrap passa a `recollir respostes` abans de SEO/social.
+- `lib/constants/adminManual.ts`: el bloqueig de SEO passa a `Sense resposta real del missatge`.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts` i `__tests__/app/admin/manual/AdminManualPage.test.tsx`: actualitzen els asserts del Manual i del gate.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front Manolo incorpora #2011 com a neteja de copy visible del Manual.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`adminManualRoadmap` + `AdminManualPage`, 11 tests); cerca focalitzada OK dels textos vells; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: `/admin/manual` continua bloquejant canals cars fins validar la xarxa personal, però ara demana respostes i senyals comercials concrets.
+- Validació humana/UX: l'operador llegeix una instrucció més accionable que no confon validació comercial amb feedback genèric.
+- `ADMIN_CHANGE_COUNTER` passa a `2011`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

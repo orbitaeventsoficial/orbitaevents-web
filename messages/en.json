@@ -1892,7 +1892,7 @@
           "name": "Premium",
           "tagline": "Don't just dance — live the experience",
           "features": {
-            "f1": "Professional DJ — 3 hours to enjoy without rushing",
+            "f1": "Professional DJ — 5 hours to enjoy without rushing",
             "f2": "PRO sound 4000W EV + Pioneer controller",
             "f3": "4 moving heads that follow the rhythm of the music",
             "f4": "Extended DJ booth — the centre of the party",
@@ -1918,7 +1918,7 @@
           "name": "Corporate Cocktail",
           "tagline": "The sound detail that makes your cocktail stand out",
           "features": {
-            "f1": "Background music or ambient DJ for 4 hours — we set the right tone",
+            "f1": "Background music or ambient DJ for 2 hours — we set the right tone",
             "f2": "Crystal-clear EV ETX sound that accompanies without intruding",
             "f3": "Decorative lighting that enhances the atmosphere",
             "f4": "1 wireless microphone in case a speech is needed",
@@ -1941,7 +1941,7 @@
           "name": "Corporate Gala",
           "tagline": "Production on another level — let your brand shine",
           "features": {
-            "f1": "Full 6-hour service with DJ + dedicated sound technician",
+            "f1": "Full 5-hour service with DJ + dedicated sound technician",
             "f2": "Reinforced sound + advanced miking (4 mics)",
             "f3": "Custom corporate lighting design",
             "f4": "Direct coordination with agency or venue",
@@ -2228,6 +2228,7 @@
     "guests": "Guests",
     "idealFor": "Ideal for",
     "configurePack": "Configure this pack",
+    "configureCustom": "Configure your event",
     "customNeeds": "Need something different?",
     "customNeedsSub": "We do custom events. Tell us what you have in mind and we'll propose.",
     "contactUs": "Talk to us",
@@ -2451,7 +2452,7 @@
       "title": "Experiences that are remembered for a lifetime",
       "subtitle": "Each event is unique. See what we've created for others... and imagine what we can create for you.",
       "noCategories": "There are no portfolio categories configured yet.",
-      "viewGallery": "See gallery →",
+      "viewGallery": "See gallery",
       "breadcrumb": "Portfolio",
       "categories": {
         "bodas": "Wedding",
@@ -2598,6 +2599,7 @@
       },
       "viewService": "View service",
       "mostPopular": "⭐ MOST POPULAR",
+      "newBadge": "✨ NEW",
       "ctaWhatsappButton": "WhatsApp Direct",
       "cta": {
         "title": "Not sure which service you need?",
@@ -2882,7 +2884,7 @@
           "tagline": "Your party, your sound — we bring the rest",
           "ideal": "Birthdays, celebrations and private parties",
           "features": [
-            "Professional DJ for 3 hours — we choose the music together",
+            "Professional DJ for 2 hours — we choose the music together",
             "PRO 4000W EV sound, clear and crisp",
             "4 moving heads + multieffects that transform the space",
             "Smoke machine for the key moments",
@@ -2930,7 +2932,7 @@
           "tagline": "The party nobody wants to leave",
           "ideal": "Big parties where you want it to be unforgettable",
           "features": [
-            "Professional DJ for 6 hours — the whole night at your service",
+            "Professional DJ for 5 hours — the whole night at your service",
             "Club sound (4000W + reinforcement subwoofer) — you'll feel it in your bones",
             "Full light show with synchronised moving heads",
             "VIP effects: smoke, bubbles, cold sparks, confetti",
@@ -4275,7 +4277,7 @@
       "greeting": "Hello {name}",
       "body": "A few days have passed since your {eventoType} and we would like to hear from you.",
       "time": "It will only take you 2 minutes.",
-      "cta": "Your feedback helps us improve and continue creating incredible experiences.",
+      "cta": "Your opinion helps us improve and keep creating incredible experiences.",
       "ctaButton": "Complete survey",
       "signature": "Thanks for your time,\nOrbita Events"
     }
@@ -4805,7 +4807,7 @@
       "emojiMessages": {
         "1": "Oh no! What happened?",
         "2": "We understand, we can improve",
-        "3": "Thanks for the feedback!",
+        "3": "Thanks for your opinion!",
         "4": "Brilliant! We are glad!",
         "5": "INCREDIBLE! This makes us very happy! 🎉"
       },
