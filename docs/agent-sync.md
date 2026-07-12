@@ -15,11 +15,46 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-12 [ESTAT: treballant — #2012 cua post-event legacy cap a FollowUp]
-Perímetre previst: `lib/services/postEventPendingService.ts`, `app/admin/post-event/feedback/page.tsx`, `scripts/check-zenit-tooling.mjs`, tests focalitzats de post-event/tooling/atlas, roadmap, counter i registres.
-Últim canvi tancat: #2011.
-Proper pas previst: canviar la cua tècnica de `/admin/post-event/feedback` perquè consumeixi el builder canònic de seguiment (`FollowUp`) i deixar `Feedback` només com alias legacy, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
-Avís per l'altre agent: servidor local verificat a `http://127.0.0.1:3000` (PID 20612); no tocaré `app/[locale]/**`, `ContactFormComplete`, footer, `ClientFeedback`, descomptes públics ni `app/admin/tasks/**`.
+[codex] 2026-07-12 [ESTAT: treballant — #2019 pressupost hereta bolo real]
+Perímetre previst: `app/admin/presupuestos/**`, serveis de proposta/pressupost, tests focalitzats, diari, protocol i sync. No tocar schema, migracions, crons, enviaments reals ni BD write sense necessitat explícita.
+Últim canvi tancat: #2018 (preu únic Tall A per Claude) + #2017 omplert per Codex.
+Proper pas previst: Tall B de la reforma de pressupostos — si hi ha `leadId` o reserva vinculada, l'editor/previsualització ha de documentar les línies reals del bolo i no reconstruir-lo des de `Pack base`.
+Avís per l'altre agent: prenc el relleu del perímetre que Claude havia deixat obert perquè el propietari ha ordenat "acaba la feina"; servidor local continua a `http://127.0.0.1:3000`. Evitaré codi públic/mobile, schema, API nova, BD write, migracions, crons, enviaments i publicacions reals.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2017 font-px quadrant repartiment]
+Perímetre tancat: `app/admin/cuadrant/repartiment/page.tsx`, diari, protocol i sync.
+Últim canvi tancat: #2017 (counter viu #2018 perquè Claude havia tancat Tall A en paral·lel).
+Validació #2017: `node scripts/check-admin-canon.mjs --strict --list` OK (0 troballes, cap P1); `pnpm run qa:protocol` OK; `git diff --check` OK.
+Proper pas previst: reprendre la reforma de pressupostos dictada pel propietari.
+Avís per l'altre agent: no s'ha tocat cap càlcul, servei, API, schema, BD, email, cron ni publicació real.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2016 roadmap post-event sincronitzat]
+Perímetre tancat: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, `__tests__/docs/manolo-post-event-roadmap.test.ts`, `lib/constants/admin.ts`, diari, protocol i sync.
+Últim canvi tancat: #2016.
+Validació #2016: focused Vitest OK (`manolo-post-event-roadmap`, 1 test); `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #2016; servidor local OK (`Status=200`).
+Proper pas previst: continuar cap al #2017 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments, publicacions reals i el perímetre públic/mobile que Claude està movent.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post, no he fet cap write de BD i no he tocat `app/[locale]/**`, `ContactFormComplete`, footer, `ClientFeedback`, descomptes públics, `app/admin/tasks/**`, `lib/intro.ts`, `LayoutWrapper` ni `MobileHomePage`.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2015 retirada helper feedback post-event]
+Perímetre tancat: `lib/services/postEventPendingService.ts`, tests post-event/tooling/atlas, roadmap, counter i registres.
+Últim canvi tancat: #2015.
+Validació #2015: cerca focalitzada OK (`buildPendingPostEventFeedbackBookingWhere` absent); focused Vitest OK (`postEventPendingService`, `check-zenit-tooling`, `repoElectricAtlasService`, `post-event-booking-anchors`, 40 tests); `pnpm run qa:zenit-tooling` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #2015; servidor local OK (`Status=200`).
+Proper pas previst: continuar cap al #2016 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments, publicacions reals i el perímetre públic/mobile que Claude està movent.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post, no he fet cap write de BD i no he tocat `app/[locale]/**`, `ContactFormComplete`, footer, `ClientFeedback`, descomptes públics, `app/admin/tasks/**`, `lib/intro.ts`, `LayoutWrapper` ni `MobileHomePage`.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2014 ruta canònica seguiment post-event]
+Perímetre tancat: `app/admin/post-event/{seguiment,feedback,page}.tsx`, `scripts/check-zenit-tooling.mjs`, tests post-event/tooling/Master Atlas, mapes admin, roadmap, counter i registres.
+Últim canvi tancat: #2014.
+Validació #2014: focused Vitest OK (`page-test-artifact-filter`, `post-event-booking-anchors`, `check-zenit-tooling`, `masterAtlasService`, 44 tests); `pnpm run qa:zenit-tooling` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #2014; servidor local OK (`Status=200`).
+Proper pas previst: continuar cap al #2015 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments, publicacions reals i el perímetre públic/mobile que Claude està movent.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post, no he fet cap write de BD i no he tocat `app/[locale]/**`, `ContactFormComplete`, footer, `ClientFeedback`, descomptes públics, `app/admin/tasks/**`, `lib/intro.ts`, `LayoutWrapper` ni `MobileHomePage`.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2013 cua post-event legacy cap a FollowUp]
+Perímetre tancat: `lib/services/postEventPendingService.ts`, `app/admin/post-event/feedback/page.tsx`, `scripts/check-zenit-tooling.mjs`, tests focalitzats de post-event/tooling/atlas, roadmap, counter i registres.
+Últim canvi tancat: #2013.
+Validació #2013: focused Vitest OK (`postEventPendingService`, `check-zenit-tooling`, `repoElectricAtlasService`, `post-event-booking-anchors`, 40 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #2013; servidor local OK (`Status=200`).
+Proper pas previst: continuar cap al #2014 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments, publicacions reals i el perímetre públic/mobile que Claude està movent.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post, no he fet cap write de BD i no he tocat `app/[locale]/**`, `ContactFormComplete`, footer, `ClientFeedback`, descomptes públics, `app/admin/tasks/**`, `lib/intro.ts`, `LayoutWrapper` ni `MobileHomePage`.
 
 [codex] 2026-07-12 [ESTAT: tancat — #2006 CRM post-event hint sense feedback]
 Perímetre tancat: `lib/constants/customer-crm.ts`, `__tests__/lib/constants/customer-crm.test.ts`, roadmap, counter i registres.
@@ -724,6 +759,10 @@ Proper pas previst: continuar auditoria/canonització de documents enviats o rep
 Avís per l'altre agent: no tocar `app/admin/tasks/**`; no crear social/portfolio derivats de post-event sense origen durable.
 
 ## Bloc CLAUDE (Claude Code)
+
+[claude] 2026-07-12 [ESTAT: treballant — reforma pressupostos per ordre del propietari (4 talls: preu únic cervell econòmic, pressupost arrossega bolo del lead, lead solidari amb reserva + auditoria, neteja menús editor)]
+Perímetre previst: `app/admin/presupuestos/**`, `app/config/packs-config.ts`, `lib/services/proposalAdminService.ts`/`bookingRouteService.ts` (solidaritat), `lib/constants`, messages si cal, tests. Doctrina nova del propietari (2026-07-12): (1) preu de client de producte partner = cervell econòmic (cost × markup), tots els preus canònics, cap «aparador»; (2) CollaboratorProduct és intern, només el cervell hi toca; (3) lead SOLIDARI amb reserva amb foto prèvia + registre + alerta (capgira el criteri «lead congelat» del #1872 en escriptura; el filtre de lectura pot quedar obsolet — coordinem si toques crewScheduleService).
+Avís per l'altre agent: no toquis `app/admin/presupuestos/**` ni packs-config mentre duri això.
 
 [claude] 2026-07-12 [ESTAT: tancat — #2012 web pública: copy castellà + packs coherents amb fitxa canònica]
 Perímetre tancat: `messages/{ca,es,en}.json` (secció servicios + packs + portfolio), `app/[locale]/servicios/{client,page}.tsx`, `app/[locale]/packs/PacksClient.tsx`, `app/components/ui/footer.tsx`, `app/components/forms/ContactFormComplete.tsx`, protocol/diari/counter. Sync canònic de packs executat (`updated:8, errors:0`) perquè la BD tornés a mirar la font (config diu 2h/5h; el copy deia 3h/6h).

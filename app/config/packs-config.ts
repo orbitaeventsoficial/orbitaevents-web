@@ -264,8 +264,9 @@ const RAW_PACKS: PackDefinition[] = [
     name: "services.mobile.discoPacks.bingo-musical.name",
     tagline: "services.mobile.discoPacks.bingo-musical.tagline",
     emotion: "services.mobile.discoPacks.bingo-musical.tagline",
-    price: "250€",
-    priceValue: 250,
+    // Preu de client = cervell econòmic (cost partner 200 × markup 20% — SUBCONTRACTED_MARKUP_TARGET_PCT)
+    price: "240€",
+    priceValue: 240,
     features: [
       "services.mobile.discoPacks.bingo-musical.features.f1",
       "services.mobile.discoPacks.bingo-musical.features.f2",
@@ -290,8 +291,9 @@ const RAW_PACKS: PackDefinition[] = [
     name: "services.mobile.discoPacks.batalla-musical.name",
     tagline: "services.mobile.discoPacks.batalla-musical.tagline",
     emotion: "services.mobile.discoPacks.batalla-musical.tagline",
-    price: "250€",
-    priceValue: 250,
+    // Preu de client = cervell econòmic (cost partner 200 × markup 20% — SUBCONTRACTED_MARKUP_TARGET_PCT)
+    price: "240€",
+    priceValue: 240,
     features: [
       "services.mobile.discoPacks.batalla-musical.features.f1",
       "services.mobile.discoPacks.batalla-musical.features.f2",

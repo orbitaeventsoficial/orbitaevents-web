@@ -1,3 +1,150 @@
+## 2026-07-12 — Pressupostos Tall A: preu únic dels formats de partner via cervell econòmic (Canvi #2018, claude)
+
+### Context
+Sessió de reforma de pressupostos ordenada pel propietari després de revisar `/admin/presupuestos?customerId=...&proposalId=...`: el desplegable «Pack base» venia `Bingo Musical (250€)` mentre el bolo real del lead (LeadServiceLine) el té a 240€ (cost partner 200 × markup 20% del cervell econòmic). Doctrina dictada pel propietari: tots els preus són canònics, no existeix «aparador», `CollaboratorProduct` és intern i només el cervell hi toca; el preu que mana és l'«economic».
+
+### Canvi
+- `app/config/packs-config.ts`: bingo-musical i batalla-musical 250€ → 240€ (= cervell econòmic).
+- `messages/{ca,es,en}.json`: feature «des de 250€» de la targeta Animació → 240€.
+- `__tests__/app/config/packs-config-partner-price.test.ts` (nou): preu públic = cost × SUBCONTRACTED_MARKUP_TARGET_PCT, blindat.
+- Sync canònic de packs a BD Railway (`updated:8, errors:0`), verificat 240 als dos codes.
+
+### Validació
+- Validació tècnica: test nou verd (2), 8 suites de packs-config verdes (81 tests). `validate:core` complet es passa al tancament del bloc B-D d'aquesta mateixa sessió.
+- Validació funcional: el config, els missatges publics i la BD sincronitzada deixen Bingo Musical i Batalla Musical a 240€, sense conviure amb el preu anterior de 250€ en la targeta Animació.
+- Validació humana/UX: el propietari ha dictat el criteri en sessió: tots els preus són canònics, cap aparador, i el preu de client d'aquests formats surt del cervell econòmic.
+- Pendent en curs (mateixa sessió): Tall B (pressupost arrossega LeadServiceLines), Tall C (lead solidari amb reserva + auditoria + alerta), Tall D (neteja de menús de l'editor).
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2018.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-12 — Manolo: Quadrant/Repartiment sense font-px (Canvi #2017, codex)
+
+### Context
+El `validate:core` del #2016 deixava dos P3 `font-px` a `app/admin/cuadrant/repartiment/page.tsx`. Era un tall petit, ja obert a `agent-sync`, per retirar tipografia a píxel en una pantalla admin i deixar el guard visual a zero abans de reprendre pressupostos.
+
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; després el propietari ha reprès la feina amb "acaba la feina". Aquest tall queda acotat a canon visual admin, registres i validació, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+
+### Canvi
+- `app/admin/cuadrant/repartiment/page.tsx`: les dues classes `text-[11px]` passen a `text-[length:var(--o-text-2xs)]`.
+- No s'ha tocat cap càlcul de repartiment, import, servei, ruta, API ni dada.
+- El `ADMIN_CHANGE_COUNTER` viu es manté a 2018 perquè Claude ja havia tancat el Tall A de pressupostos com a #2018; aquest tall omple el número #2017 que Codex tenia obert.
+
+### Validació
+- Validació tècnica: `node scripts/check-admin-canon.mjs --strict --list` OK (0 troballes, cap P1); `pnpm run qa:protocol` OK després de reparar les etiquetes del #2018; `git diff --check` OK.
+- Validació funcional: la pàgina de repartiment manté els mateixos totals i textos, però ja no introdueix mida tipogràfica en píxel.
+- Validació humana/UX: el canon visual de l'admin deixa d'arrossegar una excepció menor just abans de tornar al front crític de pressupostos.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2018 (counter viu ja avançat pel #2018).
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: roadmap post-event sincronitzat (Canvi #2016, codex)
+
+### Context
+Després de tancar la canonització de la cua de seguiment (#2013), la ruta canònica `/admin/post-event/seguiment` (#2014) i la retirada del helper `Feedback` (#2015), el detall del full Manolo ja ho recollia però la taula executiva del front post-event no ho deixava llegible com a resum operatiu.
+
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a roadmap, test estàtic, counter i registres, sense runtime, schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+
+### Canvi
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: afegeix una fila executiva curta per al sync de ruta de seguiment amb #2013-#2016 i una línia de detall #2016.
+- `__tests__/docs/manolo-post-event-roadmap.test.ts`: prova estàtica perquè la fila curta conservi `buildPendingPostEventFollowUpBookingWhere`, `/admin/post-event/seguiment`, l'alias legacy i els canvis #2013-#2016.
+- No s'ha canviat cap pantalla runtime, cap API, cap schema, cap cron, cap email real, cap publicació social i cap dada de BD.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`manolo-post-event-roadmap`, 1 test); `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #2016; servidor local OK (`Status=200`).
+- Validació funcional: el comandament Manolo ja pot llegir en una sola fila la decisió operativa actual: seguiment és ruta canònica, feedback és alias legacy i el builder viu és `FollowUp`.
+- Validació humana/UX: redueix fricció per al següent agent o operador que busqui l'estat real del front post-event.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2016.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: helper feedback post-event retirat (Canvi #2015, codex)
+
+### Context
+Després de fer canònica la ruta `/admin/post-event/seguiment`, el helper `buildPendingPostEventFeedbackBookingWhere` ja no tenia consumidors vius. Mantenir-lo exportat allargava el contracte tècnic vell i obligava els tests a recordar una paraula que el producte ja havia substituït per seguiment.
+
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat al servei de cues post-event, tests, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+
+### Canvi
+- `lib/services/postEventPendingService.ts`: elimina `buildPendingPostEventFeedbackBookingWhere`; la cua viva queda només com `buildPendingPostEventFollowUpBookingWhere`.
+- `__tests__/lib/services/postEventPendingService.test.ts`: retira l'assert de l'alias legacy i conserva el contracte de seguiment pendent.
+- `__tests__/scripts/check-zenit-tooling.test.ts` i `__tests__/lib/services/repoElectricAtlasService.test.ts`: fixtures actualitzades perquè el guard i l'atles no mantinguin el helper vell.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2015 com a retirada final del helper `Feedback`.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+
+### Validació
+- Validació tècnica: cerca focalitzada OK (`buildPendingPostEventFeedbackBookingWhere` absent); focused Vitest OK (`postEventPendingService`, `check-zenit-tooling`, `repoElectricAtlasService`, `post-event-booking-anchors`, 40 tests); `pnpm run qa:zenit-tooling` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #2015; servidor local OK (`Status=200`).
+- Validació funcional: la cua de seguiment post-event continua filtrant exactament com l'email post-event pendent, sense exportar un nom antic.
+- Validació humana/UX: el model mental intern queda alineat amb el producte visible: seguiment/agraïment, no feedback.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2015.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: ruta canònica seguiment post-event (Canvi #2014, codex)
+
+### Context
+El hub post-event i la subpantalla ja parlaven de seguiment i agraïment, però la navegació principal encara aterrava a `/admin/post-event/feedback`. Això deixava el nom antic com a ruta viva, malgrat que el producte i el builder ja havien passat a seguiment.
+
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a rutes admin post-event, guard, tests, mapes, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+
+### Canvi
+- `app/admin/post-event/seguiment/page.tsx` i `loading.tsx`: nova ruta canònica de seguiment post-event amb la mateixa UI, cua i botó d'email post-event.
+- `app/admin/post-event/feedback/page.tsx`: queda reduïda a reexport de la ruta canònica per compatibilitat legacy.
+- `app/admin/post-event/page.tsx`: el hub obre `/admin/post-event/seguiment`.
+- `scripts/check-zenit-tooling.mjs` i tests: el guard exigeix el builder `FollowUp` a la ruta canònica `seguiment`.
+- `lib/constants/master-atlas.ts` i mapes admin: l'atles i els inventaris reconeixen `/admin/post-event/seguiment` com a ruta principal i `/feedback` com a alias legacy.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2014 com a canvi de ruta canònica.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`page-test-artifact-filter`, `post-event-booking-anchors`, `check-zenit-tooling`, `masterAtlasService`, 44 tests); `pnpm run qa:zenit-tooling` OK; `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #2014; servidor local OK (`Status=200`).
+- Validació funcional: el hub `/admin/post-event` porta a `/admin/post-event/seguiment`; `/admin/post-event/feedback` continua resolent la mateixa pàgina com a compatibilitat.
+- Validació humana/UX: l'operador veu i navega per una ruta coherent amb seguiment/agraïment, sense que el nom legacy sigui el camí principal.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2014.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-12 — Manolo: cua post-event legacy cap a FollowUp (Canvi #2013, codex)
+
+### Context
+La ruta viva `/admin/post-event/feedback` ja es presenta com a seguiment i agraïment, però encara importava `buildPendingPostEventFeedbackBookingWhere` com a builder principal. Això deixava el nom tècnic antic com a contracte viu del guard Zenit, tot i que el producte ja no parla de feedback com a peça de domini.
+
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a cua post-event, guard, tests, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+
+### Canvi
+- `lib/services/postEventPendingService.ts`: afegeix `buildPendingPostEventFollowUpBookingWhere` com a builder canònic de seguiment pendent i manté `buildPendingPostEventFeedbackBookingWhere` com a alias legacy.
+- `app/admin/post-event/feedback/page.tsx`: la subpantalla legacy consumeix el builder `FollowUp` i el component passa a `PostEventFollowUpPage`.
+- `scripts/check-zenit-tooling.mjs`: el guard exigeix el builder `FollowUp` a la ruta legacy i deixa de tractar `Feedback` com a nom viu de cua.
+- Tests focalitzats: servei post-event, tooling Zenit i fixture d'atles actualitzats; l'alias legacy queda blindat perquè delegui al nou nom.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2013 com a neteja de contracte tècnic.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`postEventPendingService`, `check-zenit-tooling`, `repoElectricAtlasService`, `post-event-booking-anchors`, 40 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-tooling` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre el perímetre #2013; servidor local OK (`Status=200`).
+- Validació funcional: `/admin/post-event/feedback` conserva ruta, llista de pendents i botó canònic d'email post-event, però ara entra per una cua anomenada seguiment.
+- Validació humana/UX: el producte visible continua dient seguiment/agraïment i el contracte tècnic deixa de reintroduir feedback com a nom principal.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2013.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-12 — Web pública: copy castellà sanejat i packs coherents amb la fitxa canònica (Canvi #2012, claude)
 
 ### Context
