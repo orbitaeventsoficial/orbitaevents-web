@@ -89,6 +89,8 @@ describe('generateAutoTasks', () => {
     expect(result).toHaveLength(1);
     expect(result[0].rule).toBe('POST_EVENT');
     expect(result[0].priority).toBe('MEDIUM');
+    expect(result[0].description).toBe('Enviar seguiment post-event, demanar review o testimoni i tancar el cicle.');
+    expect(result[0].description).not.toMatch(/feedback/i);
   });
 
   it('genera tasca MEDIUM per client en risc', () => {

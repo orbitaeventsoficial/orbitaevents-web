@@ -239,7 +239,7 @@ export function generateDailyBrief(input: DailyBriefInput): DailyBrief {
       level: 'INFO',
       icon: '📧',
       title: `${input.postEventPending} ${plural(input.postEventPending, 'post-event pendent', 'post-events pendents')}`,
-      detail: 'Envia correus de seguiment i demana feedback.',
+      detail: 'Envia correus de seguiment i demana review o testimoni.',
       href: '/admin/post-event',
     });
   }

@@ -83,4 +83,18 @@ describe('generatePostEventEmail', () => {
     expect(html).toContain('https://test.com/review');
     expect(html).toContain('https://google.com/review');
   });
+
+  it('usa review en anglès en comptes de feedback legacy', () => {
+    const html = generatePostEventEmail({
+      name: 'Maria García',
+      packName: 'Premium',
+      eventDate: new Date('2026-06-15'),
+      reviewUrl: 'https://test.com/review',
+      googleReviewUrl: 'https://google.com/review',
+      locale: 'en',
+    });
+
+    expect(html).toContain('Your review helps us improve');
+    expect(html).not.toContain('Your feedback helps us improve');
+  });
 });

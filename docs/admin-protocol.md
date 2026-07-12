@@ -32889,6 +32889,170 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #1998 — 2026-07-12 — codex (FET)
+**Manolo: post-event visible sense feedback legacy.**
+- Context: la font operativa post-event ja no depèn de `ClientFeedback`, però el hub i la subpantalla `/admin/post-event/feedback` encara mostraven `Feedback al Client` i `Veure feedback` com a etiqueta visible. Això podia fer pensar que "feedback" continuava sent un producte/estat del sistema en lloc del seguiment canònic d'agraïment, email i review.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a copy visible d'admin, tests, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `app/admin/post-event/page.tsx`: el pas 3 passa de `Feedback al Client`/`Veure feedback` a `Agraïment al Client`/`Veure seguiment`, i el subtítol del hub parla de seguiment.
+- `app/admin/post-event/feedback/page.tsx`: la pantalla conserva la ruta tècnica però mostra `Agraïment al Client`, `Seguiment post-esdeveniment` i `Què incloure al seguiment?`.
+- `__tests__/app/admin/post-event/page-test-artifact-filter.test.ts`: blinda que el hub no recuperi les etiquetes visibles legacy de feedback.
+- `__tests__/app/admin/post-event/post-event-booking-anchors.test.ts`: blinda que la subpantalla de seguiment mantingui el botó compartit, l'anchor de reserva i el vocabulari visible nou.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #1998 i explicita el canvi de llenguatge visible.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`page-test-artifact-filter` + `post-event-booking-anchors`, 10 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #1998 fora del protocol llarg.
+- Validació funcional: el hub post-event i la subpantalla de seguiment mantenen el flux i els enllaços canònics, però ja no venen el pas com a `Feedback al Client`.
+- Validació humana/UX: l'operador veu "agraïment/seguiment" com a acció posterior al bolo, coherent amb email post-event, review i referral, sense reintroduir el vocabulari de `ClientFeedback`.
+- `ADMIN_CHANGE_COUNTER` passa a `1998`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1999 — 2026-07-12 — codex (FET)
+**Manolo: surveys post-event sense feedback visible.**
+- Context: després de treure `Feedback al Client` del hub i del seguiment, la subpantalla `/admin/post-event/surveys` encara presentava el subtítol visible `Feedback i valoracions dels clients`. El model i la ruta tècnica continuen sent correctes, però la superfície havia de parlar de valoracions, NPS i testimonis, que és el que realment governa `ClientSurvey`.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a copy visible d'admin, test, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `app/admin/post-event/surveys/page.tsx`: el subtítol visible passa de `Feedback i valoracions dels clients` a `Valoracions, NPS i testimonis dels clients`.
+- `__tests__/app/admin/post-event/surveys-page-test-artifact-filter.test.ts`: blinda que la pantalla no recuperi el subtítol legacy de feedback.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #1999 i explicita el canvi de llenguatge visible a surveys.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`surveys-page-test-artifact-filter` + `post-event-booking-anchors`, 9 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #1999 fora del protocol llarg.
+- Validació funcional: `/admin/post-event/surveys` manté KPIs, enllaços i filtre de proves, però el subtítol ja descriu l'enquesta com a valoracions/NPS/testimonis.
+- Validació humana/UX: l'operador veu la pantalla com a lectura de retorn estructurat del client, no com una altra peça amb "feedback" genèric.
+- `ADMIN_CHANGE_COUNTER` passa a `1999`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2000 — 2026-07-12 — codex (FET)
+**Manolo: brief diari post-event sense demana feedback.**
+- Context: el brief diari, visible a `/admin` i `/admin/control`, encara descrivia els post-events pendents amb `Envia correus de seguiment i demana feedback.`. Després dels talls #1998-#1999, aquesta frase reintroduïa el vocabulari genèric de feedback en una superfície executiva.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a copy visible del servei canònic del brief, test, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `lib/services/dailyBriefService.ts`: l'alerta de post-event pendent passa a `Envia correus de seguiment i demana review o testimoni.` mantenint `href: /admin/post-event`.
+- `__tests__/lib/services/dailyBriefService.test.ts`: blinda que l'alerta post-event del brief apunti al hub i no recuperi `feedback`.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2000 i explicita el canvi al brief diari.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`dailyBriefService`, 43 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #2000 fora del protocol llarg (només avís CRLF/LF als fitxers tocats).
+- Validació funcional: el brief continua portant l'operador al hub post-event quan hi ha pendents, però el detall visible parla de review/testimoni.
+- Validació humana/UX: el resum executiu ja no reforça "feedback" com a nom del loop; demana accions concretes de reputació.
+- `ADMIN_CHANGE_COUNTER` passa a `2000`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2001 — 2026-07-12 — codex (FET)
+**Manolo: Sales Ops post-event sense feedback visible.**
+- Context: Sales Ops encara tenia dues frases visibles amb `feedback` dins el bloc de post-esdeveniment i reputació: `Bucle de feedback per millorar oferta comercial` i `Post-event: feedback incorporat per millorar proposta comercial`. Després de netejar el hub, surveys i brief, aquesta pantalla executiva havia de parlar d'aprenentatge de valoracions i testimonis.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a copy visible de Sales Ops, test estàtic, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `app/admin/sales-ops/page.tsx`: l'auditoria de `Post-esdeveniment i reputació` passa a `Aprenentatge de valoracions i testimonis per millorar oferta comercial`.
+- `app/admin/sales-ops/page.tsx`: el pla d'escalat a 90 dies passa a `Post-event: aprenentatge de valoracions i testimonis per millorar proposta comercial`.
+- `__tests__/app/admin/sales-ops/page-post-event-copy.test.ts`: blinda que Sales Ops no recuperi `Bucle de feedback` ni `feedback incorporat`.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2001 i explicita el canvi a Sales Ops.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`sales-ops/page-post-event-copy`, 1 test); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #2001 fora del protocol llarg.
+- Validació funcional: `/admin/sales-ops` manté CTA i auditoria cap a `/admin/post-event`, però descriu el valor com aprenentatge de reputació.
+- Validació humana/UX: el propietari llegeix un pla comercial concret basat en valoracions/testimonis, no una etiqueta genèrica de feedback.
+- `ADMIN_CHANGE_COUNTER` passa a `2001`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2002 — 2026-07-12 — codex (FET)
+**Manolo: tasca automàtica post-event sense demanar feedback.**
+- Context: l'automatització de tasques `POST_EVENT` encara generava la descripció `Enviar seguiment post-event, demanar feedback i tancar el cicle.`. Després de netejar hub, surveys, brief i Sales Ops, aquesta proposta podia reintroduir el vocabulari genèric de feedback en una tasca operativa.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a servei d'automatització de tasques, test, roadmap, counter i registres, sense tocar `app/admin/tasks/**`, schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `lib/services/tasks/taskAutomationService.ts`: la descripció automàtica `POST_EVENT` passa a `Enviar seguiment post-event, demanar review o testimoni i tancar el cicle.`.
+- `__tests__/lib/services/tasks/taskAutomationService.test.ts`: blinda que la tasca post-event mantingui prioritat `MEDIUM`, la descripció nova i no recuperi `feedback`.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2002 i explicita el canvi a l'automatització.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat `app/admin/tasks/**`, schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`taskAutomationService`, 16 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: les propostes automàtiques post-event continuen deduplicades per reserva i amb prioritat `MEDIUM`, però demanen review/testimoni.
+- Validació humana/UX: l'operador rep una tasca concreta de reputació i testimoni, no una ordre genèrica de feedback.
+- `ADMIN_CHANGE_COUNTER` passa a `2002`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2003 — 2026-07-12 — codex (FET)
+**Manolo: email post-event EN sense feedback legacy.**
+- Context: el servei canònic `postEventEmailService` ja enfocava CTA i recompensa cap a la ressenya, però en anglès encara explicava `Your feedback helps us improve`. Això mantenia `feedback` com a llenguatge visible dins l'email post-event.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat al servei canònic d'email post-event, tests, roadmap, counter i registres, sense enviar emails reals, sense tocar templates globals, schema, API, BD write, migracions, crons ni publicacions reals.
+- `lib/services/postEventEmailService.ts`: la copy anglesa passa de `Your feedback helps us improve` a `Your review helps us improve`.
+- `__tests__/lib/services/postEventEmailService.test.ts`: afegeix cobertura del locale `en` perquè l'HTML contingui review i no recuperi el feedback legacy.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2003 i explicita el canvi a l'email canònic.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron, migracions ni templates globals.
+- Validació tècnica: focused Vitest OK (`postEventEmailService` + `postEventEmailQuestionnaire`, 14 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: l'email post-event continua incloent valoració, Google Review i enquesta opcional, però l'explicació EN ja parla de review.
+- Validació humana/UX: el client anglès rep una petició concreta de review, coherent amb reputació i testimoni, sense reforçar "feedback" com a producte.
+- `ADMIN_CHANGE_COUNTER` passa a `2003`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2004 — 2026-07-12 — codex (FET)
+**Manolo: plantilles email EN sense feedback legacy.**
+- Context: després de netejar el servei canònic d'email post-event, les plantilles fallback EN de `emailTemplateService` encara conservaven `Your feedback is very important`, `Leave your feedback`, `we'd love your feedback` i `your feedback would really help us improve`. Si la BD no tenia plantilla activa, el fallback tornava a exposar aquest vocabulari.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a plantilles fallback, test, roadmap, counter i registres, sense enviar emails reals, sense BD write, schema, API, migracions, crons ni publicacions reals.
+- `lib/services/emailTemplateService.ts`: la plantilla EN `post_event` passa a `Your review is very important...` i preheader `Leave your review`.
+- `lib/services/emailTemplateService.ts`: la plantilla EN `testimonial_reminder` passa a `we'd love your review` i `your review would really help us improve`.
+- `__tests__/lib/services/emailTemplateService.test.ts`: blinda els fallbacks EN perquè no recuperin `feedback` en subject, body ni preheader.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2004 i explicita el canvi als fallbacks.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`emailTemplateService`, 26 tests; stderr esperat del cas mock `DB down`); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: si no hi ha plantilla activa a BD, els fallbacks EN de post-event i recordatori ja demanen review.
+- Validació humana/UX: el client anglès rep una petició de ressenya clara també en mode fallback, no una etiqueta genèrica de feedback.
+- `ADMIN_CHANGE_COUNTER` passa a `2004`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2005 — 2026-07-12 — codex (FET)
+**Manolo: testimonial approved EN sense feedback.**
+- Context: la copy i18n de l'email de testimoni aprovat en anglès encara deia `We love reading your feedback`, tot i que el subject i el flux ja parlaven de review. Això reintroduïa el vocabulari genèric dins un email públic de recompensa.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a copy i18n d'email, test, roadmap, counter i registres, sense enviar emails reals, sense BD write, schema, API, migracions, crons ni publicacions reals.
+- `lib/email-i18n.ts`: `TESTIMONIAL_COPY.en.approved` passa de `We love reading your feedback` a `We love reading your review`.
+- `__tests__/lib/email-i18n.test.ts`: blinda que la copy EN aprovada contingui review i no recuperi `feedback`.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2005 i explicita el canvi a l'email de testimoni aprovat.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`email-i18n` + `email-send-booking-confirmation`, 7 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: l'email de testimoni aprovat manté subject, codi de descompte i tracking, però la frase EN aprovada ja parla de review.
+- Validació humana/UX: el client anglès rep un agraïment coherent amb una ressenya/testimoni aprovat, no amb un feedback genèric.
+- `ADMIN_CHANGE_COUNTER` passa a `2005`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2006 — 2026-07-12 — codex (FET)
+**Manolo: CRM post-event hint sense feedback.**
+- Context: el següent pas CRM de client per post-event encara mostrava el hint `Tanca feedback, testimoni i seguiment de recurrencia.`. La ruta i el flux eren correctes, però el text visible reintroduïa `feedback` com a acció de producte.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat a constant CRM, test, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `lib/constants/customer-crm.ts`: `CUSTOMER_NEXT_STEPS.POST_EVENT.hint` passa a `Tanca review, testimoni i seguiment de recurrencia.`.
+- `__tests__/lib/constants/customer-crm.test.ts`: blinda el hint post-event perquè no recuperi `feedback`.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2006 i explicita el canvi al següent pas CRM.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`customer-crm`, 1 test); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: el CTA CRM continua portant a `/admin/post-event`, però el hint ja demana review/testimoni.
+- Validació humana/UX: l'operador veu una acció comercial concreta de reputació i seguiment, no una etiqueta genèrica de feedback.
+- `ADMIN_CHANGE_COUNTER` passa a `2006`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2007 — 2026-07-12 — codex (FET)
+**Manolo: Repo Atlas post-event sense feedback a definició.**
+- Context: el Repo Atlas mantenia la definició humana del domini `post-event` com `Volant de ressenya, testimoni, feedback i referral despres del bolo.`. El patró `feedback` continua sent útil com a detector legacy, però la definició visible havia de parlar de ressenya, testimoni, referral i recurrencia.
+- Autorització explícita propietari: `go` + "fins a 3000 no paris" sota protocol viu activa continuar Manolo/Zenit; aquest tall queda acotat al catàleg Repo Atlas, test, roadmap, counter i registres, sense schema, API, BD write, migracions, crons, enviaments ni publicacions reals.
+- `lib/constants/repo-atlas.ts`: la definició `post-event` passa a `Volant de ressenya, testimoni, referral i recurrencia despres del bolo.`.
+- `__tests__/lib/services/repoElectricAtlasService.test.ts`: blinda que la definició del diccionari contingui la nova frase i no exposi `feedback`.
+- `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`: el front `Post-event i recurrencia` incorpora #2007 i explicita el canvi al Repo Atlas.
+- No s'ha enviat cap email real, no s'ha publicat cap social post, no s'ha fet cap write de BD i no s'ha tocat schema, API, cron ni migracions.
+- Validació tècnica: focused Vitest OK (`repoElectricAtlasService`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+- Validació funcional: el Repo Atlas continua trobant els fitxers post-event i conserva els patrons detector legacy, però la definició humana ja no presenta feedback com a peça del volant.
+- Validació humana/UX: un agent que entra pel diccionari llegeix post-event com ressenya/testimoni/referral/recurrencia.
+- `ADMIN_CHANGE_COUNTER` passa a `2007`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 # 10. Veredicte
 
 OrbitaEvents està en fase de **refinament seriós**.

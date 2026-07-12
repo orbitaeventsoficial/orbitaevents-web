@@ -23,6 +23,11 @@ describe('/admin/post-event/surveys test artifact visibility', () => {
     expect(source).toContain('{totalVisible}');
   });
 
+  it('uses survey wording instead of visible feedback legacy copy', () => {
+    expect(source).toContain('Valoracions, NPS i testimonis dels clients');
+    expect(source).not.toContain('Feedback i valoracions dels clients');
+  });
+
   it('keeps an explicit review mode for hidden E2E evidence', () => {
     expect(source).toContain('showTestSurveys');
     expect(source).toContain('Mostrar proves');

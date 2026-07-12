@@ -119,7 +119,7 @@ export const CUSTOMER_NEXT_STEPS = {
   POST_EVENT: {
     label: 'Obrir post-esdeveniment',
     href: '/admin/post-event',
-    hint: 'Tanca feedback, testimoni i seguiment de recurrencia.',
+    hint: 'Tanca review, testimoni i seguiment de recurrencia.',
   },
   CREATE_QUOTE: {
     label: 'Crear pressupost',

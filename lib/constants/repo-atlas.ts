@@ -241,7 +241,7 @@ export const REPO_ATLAS_DOMAIN_DICTIONARY = [
   {
     id: 'post-event',
     term: 'Post-event',
-    definition: 'Volant de ressenya, testimoni, feedback i referral despres del bolo.',
+    definition: 'Volant de ressenya, testimoni, referral i recurrencia despres del bolo.',
     useWhen: 'Tancar el cercle comercial i aprofitar clients contents.',
     sourceOfTruth: ['postEventPlaybookService', 'postEventPendingService', 'postEventDispatchService', 'Booking.postEventEmailSent', 'PostEventReport', 'ClientSurvey', 'CustomerTestimonial'],
     validations: ['post-event tests', 'captura seccio Tanca el cercle'],

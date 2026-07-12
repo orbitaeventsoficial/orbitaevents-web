@@ -15,11 +15,75 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-12 [ESTAT: treballant — #1998 Post-event visible sense feedback legacy]
-Perímetre previst: `app/admin/post-event/page.tsx`, `app/admin/post-event/feedback/page.tsx`, tests post-event focalitzats, roadmap, counter i registres.
-Últim canvi tancat visible: #1997.
-Proper pas previst: substituir la copy visible `Feedback al Client`/`Veure feedback` per llenguatge d'agraïment i seguiment post-event, mantenint ruta i serveis canònics sense canvis de dades.
-Avís per l'altre agent: no toco `app/admin/tasks/**`, schema, migracions, crons, enviaments, publicacions socials ni BD; és copy d'admin i test de regressió.
+[codex] 2026-07-12 [ESTAT: tancat — #2007 Repo Atlas post-event sense feedback a definició]
+Perímetre tancat: `lib/constants/repo-atlas.ts`, `__tests__/lib/services/repoElectricAtlasService.test.ts`, roadmap, counter i registres.
+Últim canvi tancat: #2007.
+Validació #2007: focused Vitest OK (`repoElectricAtlasService`, 3 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+Proper pas previst: continuar cap al #2008 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2006 CRM post-event hint sense feedback]
+Perímetre tancat: `lib/constants/customer-crm.ts`, `__tests__/lib/constants/customer-crm.test.ts`, roadmap, counter i registres.
+Últim canvi tancat: #2006.
+Validació #2006: focused Vitest OK (`customer-crm`, 1 test); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+Proper pas previst: continuar cap al #2007 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2005 Testimonial approved EN sense feedback]
+Perímetre tancat: `lib/email-i18n.ts`, `__tests__/lib/email-i18n.test.ts`, roadmap, counter i registres.
+Últim canvi tancat: #2005.
+Validació #2005: focused Vitest OK (`email-i18n` + `email-send-booking-confirmation`, 7 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+Proper pas previst: continuar cap al #2006 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2004 Plantilles email EN sense feedback legacy]
+Perímetre tancat: `lib/services/emailTemplateService.ts`, `__tests__/lib/services/emailTemplateService.test.ts`, roadmap, counter i registres.
+Últim canvi tancat: #2004.
+Validació #2004: focused Vitest OK (`emailTemplateService`, 26 tests; stderr esperat del cas mock `DB down`); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+Proper pas previst: continuar cap al #2005 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2003 Email post-event EN sense feedback legacy]
+Perímetre tancat: `lib/services/postEventEmailService.ts`, `__tests__/lib/services/postEventEmailService.test.ts`, roadmap, counter i registres.
+Últim canvi tancat: #2003.
+Validació #2003: focused Vitest OK (`postEventEmailService` + `postEventEmailQuestionnaire`, 14 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+Proper pas previst: continuar cap al #2004 amb el següent KO real Manolo/Zenit, evitant schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2002 Tasca automàtica post-event sense demanar feedback]
+Perímetre tancat: `lib/services/tasks/taskAutomationService.ts`, test focalitzat de `taskAutomationService`, roadmap, counter i registres.
+Últim canvi tancat: #2002.
+Validació #2002: focused Vitest OK (`taskAutomationService`, 16 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1).
+Proper pas previst: continuar cap al #2003 amb el següent KO real Manolo/Zenit, evitant `app/admin/tasks/**`, schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post, no he fet cap write de BD i no he tocat `app/admin/tasks/**`.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2001 Sales Ops post-event sense feedback visible]
+Perímetre tancat: `app/admin/sales-ops/page.tsx`, test estàtic Sales Ops, roadmap, counter i registres.
+Últim canvi tancat: #2001.
+Validació #2001: focused Vitest OK (`sales-ops/page-post-event-copy`, 1 test); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #2001 fora del protocol llarg i bloc `Canvi #2001` del protocol verificat sense trailing whitespace.
+Proper pas previst: continuar cap al #2002 amb el següent KO real Manolo/Zenit, evitant `app/admin/tasks/**`, schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2000 Brief diari post-event sense demana feedback]
+Perímetre tancat: `lib/services/dailyBriefService.ts`, `__tests__/lib/services/dailyBriefService.test.ts`, roadmap, counter i registres.
+Últim canvi tancat: #2000.
+Validació #2000: focused Vitest OK (`dailyBriefService`, 43 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #2000 fora del protocol llarg (només avís CRLF/LF als fitxers tocats) i bloc `Canvi #2000` del protocol verificat sense trailing whitespace.
+Proper pas previst: continuar cap al #2001 amb el següent KO real Manolo/Zenit, evitant `app/admin/tasks/**`, schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1999 Surveys post-event sense feedback visible]
+Perímetre tancat: `app/admin/post-event/surveys/page.tsx`, test focalitzat de surveys, roadmap, counter i registres.
+Últim canvi tancat: #1999.
+Validació #1999: focused Vitest OK (`surveys-page-test-artifact-filter` + `post-event-booking-anchors`, 9 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #1999 fora del protocol llarg i bloc `Canvi #1999` del protocol verificat sense trailing whitespace.
+Proper pas previst: continuar cap al #2000 amb el següent KO real Manolo/Zenit, evitant `app/admin/tasks/**`, schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local continua a `http://127.0.0.1:3000`; no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
+
+[codex] 2026-07-12 [ESTAT: tancat — #1998 Post-event visible sense feedback legacy]
+Perímetre tancat: `app/admin/post-event/page.tsx`, `app/admin/post-event/feedback/page.tsx`, tests post-event focalitzats, roadmap, counter i registres.
+Últim canvi tancat: #1998.
+Validació #1998: focused Vitest OK (`page-test-artifact-filter` + `post-event-booking-anchors`, 10 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `pnpm run qa:manolo-boundary` OK; `pnpm run validate:core` OK (admin-canon manté 2 P3 `font-px`, cap P1); `git diff --check` OK sobre fitxers #1998 fora del protocol llarg i bloc `Canvi #1998` del protocol verificat sense trailing whitespace.
+Proper pas previst: continuar cap al #1999 amb el següent KO real Manolo/Zenit, evitant `app/admin/tasks/**`, schema, migracions, crons, enviaments i publicacions reals.
+Avís per l'altre agent: servidor local arrencat a `http://127.0.0.1:3000` (PID node 20612 en arrencada); no he enviat cap email, no he publicat cap social post i no he fet cap write de BD.
 
 [codex] 2026-07-12 [ESTAT: tancat — #1997 Master Atlas reconeix portfolio post-event]
 Perímetre tancat: `lib/constants/master-atlas.ts`, `__tests__/lib/services/masterAtlasService.test.ts`, `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, counter i registres.

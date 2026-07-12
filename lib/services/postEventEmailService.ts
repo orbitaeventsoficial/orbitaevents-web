@@ -101,7 +101,7 @@ export function generatePostEventEmail(params: {
       greeting: `Hi ${firstName},`,
       intro: `We hope your event on <strong>${formattedDate}</strong> with the <strong>${packName}</strong> was amazing and that you and your guests had a great time.`,
       question: 'Would you leave us a review?',
-      explanation: 'Your feedback helps us improve and <strong>we have a gift for you</strong>.',
+      explanation: 'Your review helps us improve and <strong>we have a gift for you</strong>.',
       reward: "When you leave your review, you'll receive an <strong>exclusive discount code</strong> for your next event or to share with friends and family.",
       cta: 'Leave my review',
       bonus: 'The more you share, the bigger the discount',

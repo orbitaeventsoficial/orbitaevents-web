@@ -135,7 +135,7 @@ export function generateAutoTasks(input: AutoTaskInput): AutoTaskProposal[] {
     proposals.push({
       rule: 'POST_EVENT',
       title: `Post-event: ${e.name}`,
-      description: `Enviar seguiment post-event, demanar feedback i tancar el cicle.`,
+      description: `Enviar seguiment post-event, demanar review o testimoni i tancar el cicle.`,
       priority: 'MEDIUM',
       dueDate: tomorrow,
       leadId: null,

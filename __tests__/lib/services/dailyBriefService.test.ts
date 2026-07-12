@@ -95,6 +95,16 @@ describe('generateDailyBrief', () => {
     expect(alert!.href).toContain('reactivation');
   });
 
+  it('genera alerta post-event amb copy de review/testimoni, no feedback generic', () => {
+    const brief = generateDailyBrief(makeInput({ postEventPending: 2 }));
+    const alert = brief.alerts.find((a) => a.href === '/admin/post-event');
+
+    expect(alert).toBeDefined();
+    expect(alert!.title).toContain('2 post-events pendents');
+    expect(alert!.detail).toBe('Envia correus de seguiment i demana review o testimoni.');
+    expect(alert!.detail).not.toContain('feedback');
+  });
+
   it('genera alerta WARNING per clients en risc', () => {
     const brief = generateDailyBrief(makeInput({ atRiskCustomers: 4 }));
     const alert = brief.alerts.find((a) => a.icon === '⚠️');

@@ -70,7 +70,7 @@ export default async function SurveysPage({ searchParams }: SurveysPageProps) {
   return (
     <AdminPage
       title="Enquestes Post-Event"
-      subtitle="Feedback i valoracions dels clients"
+      subtitle="Valoracions, NPS i testimonis dels clients"
       back={{ href: '/admin/post-event', label: 'Post-Event' }}
       actions={hiddenTestSurveys > 0 ? (
         <div className="flex flex-wrap items-center justify-end gap-2">
@@ -172,7 +172,6 @@ export default async function SurveysPage({ searchParams }: SurveysPageProps) {
     </AdminPage>
   );
 }
-
 
 
 

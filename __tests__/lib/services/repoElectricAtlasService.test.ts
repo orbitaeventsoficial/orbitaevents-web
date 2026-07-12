@@ -182,6 +182,8 @@ describe('repoElectricAtlasService', () => {
     expect(dossierEntry?.files.some((file) => file.path === 'lib/services/dossierService.ts')).toBe(true);
     expect(postEventEntry?.sourceOfTruth).toEqual(expect.arrayContaining(['postEventPlaybookService', 'postEventPendingService', 'postEventDispatchService', 'Booking.postEventEmailSent']));
     expect(postEventEntry?.sourceOfTruth).not.toContain('ClientFeedback');
+    expect(postEventEntry?.definition).toContain('Volant de ressenya, testimoni, referral i recurrencia');
+    expect(postEventEntry?.definition).not.toContain('feedback');
     expect(postEventEntry?.files.map((file) => file.path)).toEqual(expect.arrayContaining([
       'lib/services/postEventDispatchService.ts',
       'lib/services/postEventPendingService.ts',
