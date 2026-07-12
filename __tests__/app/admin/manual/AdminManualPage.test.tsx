@@ -66,7 +66,7 @@ describe('AdminManualPage', () => {
     expect(screen.getByText(/Sense ICP i proposta clara/)).toBeInTheDocument();
     expect(screen.getByText('Després de la fundació')).toBeInTheDocument();
     expect(screen.getAllByText('Activar xarxa personal').length).toBeGreaterThan(0);
-    expect(screen.getByText(/feedback immediat/)).toBeInTheDocument();
+    expect(screen.getByText(/resposta immediata/)).toBeInTheDocument();
     expect(screen.getAllByText('50 contactes avisats').length).toBeGreaterThan(0);
     expect(screen.getByText('Pla de 14 dies')).toBeInTheDocument();
     expect(screen.getByText('Triar un sol canal gratuït')).toBeInTheDocument();

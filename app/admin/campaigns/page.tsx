@@ -24,7 +24,7 @@ const TYPE_ICON: Record<string, string> = {
   REACTIVATION: '🔄',
   UPSELL: '📈',
   SEASONAL: '🌸',
-  FEEDBACK_REQUEST: '⭐',
+  REVIEW_REQUEST: '⭐',
   REFERRAL: '🤝',
   LOYALTY: '💜',
 };

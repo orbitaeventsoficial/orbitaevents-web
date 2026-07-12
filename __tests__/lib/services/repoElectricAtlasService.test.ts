@@ -135,7 +135,7 @@ describe('repoElectricAtlasService', () => {
       '}',
     ].join('\n'));
     await writeFixture('lib/services/postEventPendingService.ts', [
-      'export function buildPendingPostEventFeedbackBookingWhere() {',
+      'export function buildPendingPostEventFollowUpBookingWhere() {',
       '  return { postEventEmailSent: true };',
       '}',
     ].join('\n'));

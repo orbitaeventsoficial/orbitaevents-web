@@ -101,6 +101,7 @@ export type StudioProps = {
   initialLeadId?: string;
   initialLeadServiceLines?: StudioLeadServiceLine[];
   initialProposalId?: string;
+  initialProposalStatus?: string;
   initialPreferLeadPrefill?: boolean;
   initialPreferredLocale?: string;
   initialBrandName?: string;

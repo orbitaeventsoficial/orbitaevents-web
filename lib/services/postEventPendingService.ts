@@ -25,7 +25,7 @@ export function buildPendingPostEventEmailBookingWhere(now: Date = new Date()): 
   };
 }
 
-export function buildPendingPostEventFeedbackBookingWhere(now: Date = new Date()): Prisma.BookingWhereInput {
+export function buildPendingPostEventFollowUpBookingWhere(now: Date = new Date()): Prisma.BookingWhereInput {
   return buildPendingPostEventEmailBookingWhere(now);
 }
 

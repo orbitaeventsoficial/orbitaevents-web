@@ -1,3 +1,27 @@
+## 2026-07-12 — Pressupostos Tall B: el DRAFT hereta el bolo real del lead (Canvi #2019, codex)
+
+### Context
+El propietari detecta el defecte de fons a `/admin/presupuestos`: un pressupost obert des d'un lead tornava a passar pel selector `Pack base` i podia reconstruir el bolo des del catàleg, mentre el lead ja tenia les seves `LeadServiceLine` comercials i el seu transport. En el cas Alba Orna, la pantalla podia barrejar Bingo 250/240 i ensenyar totals diferents entre rail i proposta desada. Doctrina activa: pressupost amb `leadId` documenta el bolo real; no el recompra.
+
+### Canvi
+- `app/admin/presupuestos/page.tsx`: l'entrada a l'editor llegeix l'estat de la proposta i només prefereix el bolo viu del lead quan no hi ha proposta explícita o quan la proposta existent és `DRAFT`.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: si hi ha `LeadServiceLine`, el DRAFT entra en mode `Bolo configurat al lead`, `packId=__custom_pack__`, `basePrice=0` i les línies comercials del lead passen a extres de pressupost; el selector `Pack base` queda fora del flux.
+- Les propostes no-DRAFT queden congelades com a foto enviada: no s'autodesen, conserven el transport i el total del snapshot, i poden avisar si el bolo viu del lead ja suma un altre import.
+- `buildProposalSnapshot()` desa `source.kind` (`lead-service-lines`, `proposal-snapshot` o `manual`) amb `leadId`, `proposalId` i ids de línies per deixar traça de procedència.
+- UI: el mode lead mostra el banner `Bolo del lead com a font`, una capsa `Bolo detectat al lead`, línies comercials readonly i missatge clar que el `Pack base` del catàleg queda fora; extres de catàleg i extres manuals no es poden afegir quan el bolo ja ve del lead.
+- `__tests__/app/admin/presupuestos/PresupuestoPdfStudio-customer-search.test.ts`: afegeix cobertura del mode lead, del bloqueig de catàleg i del mode congelat.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`studio-utils`, `PresupuestoPdfStudio-customer-search`, `PresupuestoPdfStudio-send-canonical`, `proposalAdminService`: 44 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `node scripts/check-admin-canon.mjs --strict --list` OK; Playwright real a `/admin/presupuestos?leadId=cmr1xh7la0000ug7dj4jnihjr` OK amb `domcontentloaded` (el `networkidle` queda obert per fetch/polling de la pantalla); lectura Prisma read-only de la proposta DRAFT OK; `git diff --check` OK.
+- Validació funcional: el DRAFT `PROP-2026-0012` del lead Alba Orna queda desat pel flux normal d'autosave UI amb `subtotal=805,35`, `IVA=169,12`, `total=974,47`, `snapshot.source.kind=lead-service-lines`, `packId=__custom_pack__`, `basePrice=0`, Bingo 240 + DJ 250 + transport 315,35. El total del rail i el total desat ja quadren.
+- Validació humana/UX: quan l'operador obre un lead amb bolo, veu `Bolo del lead com a font` i no un selector actiu de Pack base; una proposta enviada/vista conserva la foto enviada i no muta en silenci si el lead canvia després.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2019.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-12 — Pressupostos Tall A: preu únic dels formats de partner via cervell econòmic (Canvi #2018, claude)
 
 ### Context

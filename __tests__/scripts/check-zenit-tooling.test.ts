@@ -177,7 +177,7 @@ export function buildPendingPostEventEmailBookingWhere(now = new Date()) {
   const { catchupFrom, emailDueBefore } = getPostEventWorkflowDates(now);
   return { status: 'COMPLETED', eventDate: { gte: catchupFrom, lte: emailDueBefore }, postEventEmailSent: false, clientEmail: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } } };
 }
-export function buildPendingPostEventFeedbackBookingWhere(now = new Date()) {
+export function buildPendingPostEventFollowUpBookingWhere(now = new Date()) {
   return buildPendingPostEventEmailBookingWhere(now);
 }
 export function buildPendingPostEventReportBookingWhere(now = new Date()) {
@@ -211,11 +211,11 @@ export async function getAvailableBookings() {
 }
 `;
 
-const validPostEventFeedbackPage = `
+const validPostEventFollowUpPage = `
 import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
-import { buildPendingPostEventFeedbackBookingWhere } from '@/lib/services/postEventPendingService';
+import { buildPendingPostEventFollowUpBookingWhere } from '@/lib/services/postEventPendingService';
 export async function getCompletedBookings() {
-  return prisma.booking.findMany({ where: buildPendingPostEventFeedbackBookingWhere(), take: POST_EVENT_WORKFLOW.pendingTake });
+  return prisma.booking.findMany({ where: buildPendingPostEventFollowUpBookingWhere(), take: POST_EVENT_WORKFLOW.pendingTake });
 }
 `;
 
@@ -326,7 +326,7 @@ function validFiles(overrides: Record<string, string> = {}) {
     'lib/services/postEventPendingService.ts': validPostEventPendingService,
     'app/admin/post-event/page.tsx': validPostEventHubPage,
     'app/admin/post-event/reports/page.tsx': validPostEventReportsPage,
-    'app/admin/post-event/feedback/page.tsx': validPostEventFeedbackPage,
+    'app/admin/post-event/seguiment/page.tsx': validPostEventFollowUpPage,
     'lib/services/postEventPlaybookService.ts': validPostEventPlaybookService,
     'app/admin/post-event/playbook/page.tsx': validPostEventPlaybookPage,
     'lib/services/adminQuoteEmailService.ts': validAdminQuoteEmailService,
@@ -551,20 +551,20 @@ export async function getAvailableBookings() {
     expect(result.stderr).toContain('pendingTake');
   });
 
-  it('falla si feedback post-event torna a filtrar amb eventDate local', () => {
+  it('falla si el seguiment post-event torna a filtrar amb eventDate local', () => {
     const result = runGuard(validFiles({
-      'app/admin/post-event/feedback/page.tsx': `
+      'app/admin/post-event/seguiment/page.tsx': `
 import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
-import { buildPendingPostEventFeedbackBookingWhere } from '@/lib/services/postEventPendingService';
+import { buildPendingPostEventFollowUpBookingWhere } from '@/lib/services/postEventPendingService';
 export async function getCompletedBookings() {
   await prisma.booking.findMany({ where: { status: 'COMPLETED', eventDate: { lt: new Date() } }, take: POST_EVENT_WORKFLOW.pendingTake });
-  return buildPendingPostEventFeedbackBookingWhere();
+  return buildPendingPostEventFollowUpBookingWhere();
 }
 `,
     }));
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('feedback/page.tsx');
+    expect(result.stderr).toContain('seguiment/page.tsx');
     expect(result.stderr).toContain('eventDate lt new Date');
   });
 

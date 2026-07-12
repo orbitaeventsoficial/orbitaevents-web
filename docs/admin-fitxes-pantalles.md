@@ -59,7 +59,7 @@ Les rutes admin no es tracten com 90 pantalles independents. Primer s'agrupen pe
 | Clients | `/admin/clientes`, `/admin/clientes/[id]`, `/admin/clientes/reactivation`, `/admin/clientes/referrals` | FETA (#1761; satèl·lits #1114/#1210/#1760) |
 | Catàleg | `/admin/packs`, `/admin/packs/[id]`, `/admin/packs/extras`, `/admin/inventory`, `/admin/pricing`, `/admin/catalog` | FETA (#1132) |
 | Partners | `/admin/collaborators`, `/admin/collaborators/[id]` | FETA (#1145) |
-| Post-event | `/admin/post-event`, reports, surveys, feedback, playbook | FETA (#1162) |
+| Post-event | `/admin/post-event`, reports, surveys, seguiment, playbook | FETA (#1162) |
 | Sistema | settings, crons, scripts, features, coverage, docs, canvas, text/css/image managers | FETA (#1162) |
 
 Una ruta detall (`[id]`), editor o modal gran només rep fitxa pròpia si governa dades/accions diferents de la fitxa mare.
@@ -468,7 +468,7 @@ CSS viu:
 - Residus coneguts: overrides amb `!important` sobre components encaixats (`admin-booking-margin*`, inputs dins `bd__root`). El P1 cromàtic de `StripePaymentPanel.tsx` queda resolt al Canvi #1113.
 
 APIs/serveis vius:
-- Lectura inicial: `prisma.booking.findUnique()` al `page.tsx` amb `pack`, `extras`, `serviceLines`, `inventory`, `lead`, `proposals`, `invoices`, post-event, enquesta i feedback.
+- Lectura inicial: `prisma.booking.findUnique()` al `page.tsx` amb `pack`, `extras`, `serviceLines`, `inventory`, `lead`, `proposals`, `invoices`, post-event, enquesta i seguiment.
 - Snapshot operacional: `getBookingOperationalSnapshot()` → checklist, timeline canònica, client, portal actiu, configuració de rendibilitat, cost inventari, comunicacions i post-event.
 - Meteo/logística: `getWeatherForEvent()` i `buildEventLogistics()`.
 - Customer/lead/proposal links: `buildCustomerHubHref`, `buildCustomerComposeHref`, `buildLeadWorkspaceHref`, `buildLeadComposeHref`, `buildProposalHref`, `buildPackHref`.
@@ -1851,14 +1851,14 @@ Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render /admi
 
 Decisio de treball: organ SA, cap canvi de codi nou. Pendent validacio visual del propietari.
 
-### Òrgan Post-event (`/admin/post-event`, reports, surveys, feedback, playbook)
+### Òrgan Post-event (`/admin/post-event`, reports, surveys, seguiment, playbook)
 
-Pantalla: Post-event — tancament de bolo i aprenentatge (informes, enquestes, feedback, playbook).
+Pantalla: Post-event — tancament de bolo i aprenentatge (informes, enquestes, seguiment, playbook).
 Estat inventari: 🟢
 TANCAT CHARLIE: no — pendent validacio visual del propietari.
 Estat fitxa: FETA (auditoria forense #1162, claude, 2026-06-25)
 
-Reachability: les 5 rutes (post-event, reports, reports/new, surveys, feedback, playbook) són pages amb AdminPage + loading. Passa qa:no-dead-admin-views.
+Reachability: les 5 rutes (post-event, reports, reports/new, surveys, seguiment, playbook) són pages amb AdminPage + loading. Passa qa:no-dead-admin-views.
 CSS viu: classes canòniques `.ap-*`. Títols ja canon.
 APIs/serveis vius: postEventReportAdmin i serveis post-event consumits per les pages.
 Codi mort / Duplicacions / Hardcoded: cap (escaneig #1162: 0 BEM doble, 0 dialog natiu, 0 títol cru).
@@ -4027,7 +4027,8 @@ Decisio de treball:
 | `/admin/packs/new` | `app/admin/packs/new/page.tsx` | FETA | codex | Nou pack — fitxa #1816; saneig formulari #1817; permisos API #1800; validació visual pendent |
 | `/admin/portfolio` | `app/admin/portfolio/page.tsx` | FETA | codex | Portfolio/media pipeline — fitxa forense #1754 |
 | `/admin/post-event` | `app/admin/post-event/page.tsx` | PENDENT | codex/claude | Post-event |
-| `/admin/post-event/feedback` | `app/admin/post-event/feedback/page.tsx` | PENDENT | codex/claude | Feedback |
+| `/admin/post-event/seguiment` | `app/admin/post-event/seguiment/page.tsx` | PENDENT | codex/claude | Seguiment |
+| `/admin/post-event/feedback` | `app/admin/post-event/feedback/page.tsx` | PENDENT | codex/claude | Alias legacy de seguiment |
 | `/admin/post-event/playbook` | `app/admin/post-event/playbook/page.tsx` | PENDENT | codex/claude | Playbook |
 | `/admin/post-event/reports` | `app/admin/post-event/reports/page.tsx` | PENDENT | codex/claude | Reports |
 | `/admin/post-event/reports/new` | `app/admin/post-event/reports/new/page.tsx` | PENDENT | codex/claude | Nou report |

@@ -51,7 +51,7 @@ export default async function PresupuestosPage({
   const proposalForEditor = proposalId
     ? await prisma.proposal.findUnique({
         where: { id: proposalId },
-        select: { customerId: true, leadId: true },
+        select: { customerId: true, leadId: true, status: true },
       })
     : null;
   const resolvedCustomerId = customerId || proposalForEditor?.customerId || '';
@@ -116,7 +116,8 @@ export default async function PresupuestosPage({
       })
     : null;
   const editorProposalId = explicitProposalId || implicitLeadDraft?.id || '';
-  const preferLeadPrefill = Boolean(!explicitProposalId && resolvedLeadId);
+  const editorProposalStatus = proposalForEditor?.status || (implicitLeadDraft ? 'DRAFT' : '');
+  const preferLeadPrefill = Boolean(resolvedLeadId && (!explicitProposalId || proposalForEditor?.status === 'DRAFT'));
 
   const brandSettingsRows = await prisma.setting.findMany({
     where: {
@@ -319,6 +320,7 @@ export default async function PresupuestosPage({
         initialLeadId={resolvedLeadId}
         initialLeadServiceLines={leadForEditor?.serviceLines || []}
         initialProposalId={editorProposalId}
+        initialProposalStatus={editorProposalStatus}
         initialPreferLeadPrefill={preferLeadPrefill}
         initialPreferredLocale={editorCustomer?.preferredLocale || leadForEditor?.preferredLocale || 'ca'}
         initialBrandName={String(brandSettings['quotes.brandName'] || ADMIN_PDF_STUDIO_DEFAULTS.brandName)}

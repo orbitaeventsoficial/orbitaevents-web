@@ -15,7 +15,7 @@ const FILES = {
   postEventPendingService: path.join(ROOT, 'lib', 'services', 'postEventPendingService.ts'),
   postEventHubPage: path.join(ROOT, 'app', 'admin', 'post-event', 'page.tsx'),
   postEventReportsPage: path.join(ROOT, 'app', 'admin', 'post-event', 'reports', 'page.tsx'),
-  postEventFeedbackPage: path.join(ROOT, 'app', 'admin', 'post-event', 'feedback', 'page.tsx'),
+  postEventFollowUpPage: path.join(ROOT, 'app', 'admin', 'post-event', 'seguiment', 'page.tsx'),
   postEventPlaybookService: path.join(ROOT, 'lib', 'services', 'postEventPlaybookService.ts'),
   postEventPlaybookPage: path.join(ROOT, 'app', 'admin', 'post-event', 'playbook', 'page.tsx'),
   adminQuoteEmailService: path.join(ROOT, 'lib', 'services', 'adminQuoteEmailService.ts'),
@@ -259,7 +259,7 @@ function checkPostEventPendingService(source) {
 
   for (const required of [
     'export function buildPendingPostEventEmailBookingWhere',
-    'export function buildPendingPostEventFeedbackBookingWhere',
+    'export function buildPendingPostEventFollowUpBookingWhere',
     'export function buildPendingPostEventReportBookingWhere',
     'export function buildPendingPostEventSurveyBookingWhere',
     'export function buildNotStartedPostEventBookingWhere',
@@ -467,9 +467,9 @@ try {
     ['buildPendingPostEventReportBookingWhere'],
   ));
   errors.push(...checkPostEventAdminQueuePage(
-    readText(FILES.postEventFeedbackPage),
-    'app/admin/post-event/feedback/page.tsx',
-    ['buildPendingPostEventFeedbackBookingWhere'],
+    readText(FILES.postEventFollowUpPage),
+    'app/admin/post-event/seguiment/page.tsx',
+    ['buildPendingPostEventFollowUpBookingWhere'],
   ));
   errors.push(...checkPostEventPlaybookService(readText(FILES.postEventPlaybookService)));
   errors.push(...checkPostEventPlaybookPage(readText(FILES.postEventPlaybookPage)));

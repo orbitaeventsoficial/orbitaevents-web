@@ -584,7 +584,7 @@ export const MASTER_ATLAS_MODULES: MasterAtlasModuleDefinition[] = [
     subtitle: 'Ressenyes, testimonis, referrals, informes i aprenentatge.',
     mission: 'Convertir cada bolo fet en prova social, aprenentatge i el següent lead més barat.',
     ownerQuestion: 'Què falta demanar després del bolo perquè no es perdi valor?',
-    routes: ['/admin/post-event', '/admin/post-event/playbook', '/admin/post-event/reports', '/admin/post-event/surveys', '/admin/post-event/feedback', '/admin/ressenyes', '/admin/portfolio'],
+    routes: ['/admin/post-event', '/admin/post-event/playbook', '/admin/post-event/reports', '/admin/post-event/surveys', '/admin/post-event/seguiment', '/admin/post-event/feedback', '/admin/ressenyes', '/admin/portfolio'],
     visualGroups: ['Post-event', 'Web'],
     electricPatterns: ['postEventPlaybookService', 'postEventPendingService', 'postEventDispatchService', 'postEventRecurrenceDecisionService', 'socialPostReviewGuard', 'postEventReportAdminService', 'portfolioEventService', 'testimonialAdminService', 'questionnaireService', 'reviewsSyncService', 'referralsService', 'reactivationService'],
     sourceOfTruth: ['postEventPlaybookService', 'postEventPendingService', 'postEventDispatchService', 'postEventRecurrenceDecisionService', 'socialPostReviewGuard', 'portfolioEventService', 'Booking.postEventEmailSent', 'PostEventReport', 'PortfolioEvent', 'ClientSurvey', 'CustomerTestimonial', 'SocialPost', 'reviewsSyncService', 'referralsService'],

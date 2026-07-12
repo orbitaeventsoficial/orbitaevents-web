@@ -31,7 +31,7 @@
 | Packs | ✅ Complet | Motor preus, health, extras |
 | Inventari | ✅ Complet | Items, fotos, cost/hora, bundles |
 | Sales Ops | ✅ Complet | SLA, seqüències, auditoria, plans |
-| Post-event | ✅ Complet | 3 passos, informes, surveys, feedback |
+| Post-event | ✅ Complet | 3 passos, informes, enquestes, seguiment i ressenyes |
 | Col·laboradors | ✅ Complet | **NOU** — CRUD, KPIs, comissions (model net/descompte), integració costEngine |
 | Cost Calculator | ✅ Complet | **NOU** — D&D components, cost inventari real, marge suggerit, guardar pressupost |
 | Analítica | ✅ Complet | GA4, Ads, KPIs operatius |
@@ -205,7 +205,8 @@ Es tracta de conservar el que ja té valor, cosir el que avui està dispers, exp
 - `/admin/post-event` — Hub post-event
 - `/admin/post-event/reports` — Informes interns
 - `/admin/post-event/reports/new` — Nou informe
-- `/admin/post-event/feedback` — Feedback clients
+- `/admin/post-event/seguiment` — Seguiment i agraïment clients
+- `/admin/post-event/feedback` — Alias legacy del seguiment
 - `/admin/post-event/surveys` — Enquestes
 - `/admin/post-event/playbook` — Playbook post-event
 - `/admin/questionnaires` — Qüestionaris (llistat)
@@ -396,8 +397,6 @@ Sèrie de talls per drenar tots els `MÉS ENDAVANT` factuals del Master Checklis
 | A1 | **Insights narratius** — fins a 5 insights prioritzats en català al dashboard | `dashboardInsightsService.ts` | ✅ |
 | A5 | **Timeline unificat** — email+WhatsApp+trucades+notes en un fil, icones per canal | `TimelinePanel.tsx` | ✅ |
 | A6 | **Auto-triggers** — proposal→contracte, lead→welcome, booking→checklist | `automationTriggers.ts` | ✅ |
-
-
 
 
 

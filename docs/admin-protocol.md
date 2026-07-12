@@ -1604,6 +1604,7 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 **FET** *(2026-06-30 per `codex` — Canvi #1245)*: l'enviament manual del Studio de pressupostos ja no reinterpreta el total com a preu base. `PresupuestoPdfStudio` envia `quoteTotals` explícits i `adminQuoteEmailService` els respecta sense recalcular extres/IVA pel camí legacy del lead.
 
 **FET** *(2026-06-30 per `codex` — Canvi #1247)*: PDF, preview, proposta, contracte i email de pressupost comparteixen el mateix càlcul final amb IVA. `computeQuoteStudioTotals()` centralitza subtotal/descompte/IVA/total, `quotePdfService` mostra fila d'IVA i canvia el disclaimer a IVA inclòs quan rep `vatAmount`. #1246 pertany a Claude.
+**FET** *(2026-07-12 per `codex` — Canvi #2019)*: `/admin/presupuestos` ja no reconstrueix un DRAFT vinculat a lead des del selector `Pack base`. Si hi ha `LeadServiceLine`, el pressupost entra com a `Bolo configurat al lead`, `packId=__custom_pack__`, `basePrice=0`, línies comercials readonly i `snapshot.source.kind=lead-service-lines`. Les propostes enviades/vistes queden congelades com a foto documental i poden avisar divergència amb el bolo viu sense autodesar canvis silenciosos.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #586)*: el portal guanya subruta de procés/timeline a `/[locale]/portal/[token]/timeline`. `getClientPortalTimeline()` deriva sis fites (reserva creada, pressupost enviat, contracte signat, paga i senyal, dia de l'event, pagament final) amb estat `done/upcoming/future` sense schema nou; la pàgina mostra la línia de temps vertical amb colors semàfor (emerald/cyan/blanc); la portada principal enllaça a la nova ruta des de la secció "Estat del procés". Missatges trilingüals afegits a `CLIENT_PORTAL_MESSAGES`.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #587)*: el portal guanya subruta de factura/pressupost a `/[locale]/portal/[token]/invoice`. `getClientPortalInvoiceSummary()` exposa total, desglossament bestreta/resta amb dates de pagament i referència+PDF del primer pressupost amb PDF; `buildClientPortalInvoicePath()` construeix la ruta canònica. La portada substitueix l'enllaç directe al PDF per dos botons: "Veure pressupost" (invoice) + PDF si existeix. 8 claus noves trilingüals a `CLIENT_PORTAL_MESSAGES`.
 **FET** *(2026-05-17 per `claude` — Canvi #592)*: subruta `/portal/[token]/gallery` tanca G.25. `buildClientPortalGalleryPath()` canònic. Pàgina dedicada de galeria amb `listPortalPhotos()` i `next/image`. Portada del portal: preview 6 fotos + CTA "Veure totes les fotos". Clau `galleryViewLink` als tres locales. 3 tests del builder. Portal complet: `overview` + `contract` + `payments` + `timeline` + `invoice` + `questionnaire` (G.26) + `gallery` (ara).
@@ -33101,6 +33102,24 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació funcional: els mapes permanents de l'admin continuen apuntant a les mateixes rutes, però expliquen el mòdul com seguiment, agraïment, valoracions i ressenyes.
 - Validació humana/UX: el següent agent o operador que llegeixi les fitxes ja no rep la idea que el producte post-event sigui un calaix de feedback.
 - `ADMIN_CHANGE_COUNTER` passa a `2010`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #2019 — 2026-07-12 — codex (FET)
+**Pressupostos Tall B: el DRAFT hereta el bolo real del lead.**
+- Context: el propietari detecta que l'editor de pressupostos reobria un bolo existent com si fos una venda nova per `Pack base`, barrejant preus i totals. El pressupost amb `leadId` ha de documentar les `LeadServiceLine`, no reconstruir-les des del catàleg.
+- Autorització explícita propietari: "acaba la feina" després de reprendre el relleu de Claude en la reforma de pressupostos. Aquest tall toca editor de pressupostos, tests, diari, protocol i una verificació real de UI/BD; no toca schema, migracions, crons, emails reals ni publicacions.
+- `app/admin/presupuestos/page.tsx`: l'editor rep l'estat de la proposta i només prefereix el bolo viu quan no hi ha proposta explícita o quan la proposta és `DRAFT`.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: mode lead amb `packId=__custom_pack__`, `packName=Bolo configurat al lead`, `basePrice=0`, línies comercials del lead com a extres i selector `Pack base` fora del flux.
+- Propostes no-DRAFT: foto congelada del snapshot, sense autosave, amb transport i total llegits del snapshot i avís de divergència si el lead viu ha canviat.
+- `buildProposalSnapshot()` desa `source.kind` (`lead-service-lines`, `proposal-snapshot`, `manual`) amb ids de procedència perquè el document tingui traça del bolo.
+- UI: banner `Bolo del lead com a font`, caixa `Bolo detectat al lead`, línies comercials readonly i bloqueig dels extres de catàleg/manuals quan el bolo ja ve del lead.
+- `__tests__/app/admin/presupuestos/PresupuestoPdfStudio-customer-search.test.ts`: blinda mode lead, absència de selector actiu de catàleg i mode congelat.
+- Validació tècnica: focused Vitest OK (`studio-utils`, `PresupuestoPdfStudio-customer-search`, `PresupuestoPdfStudio-send-canonical`, `proposalAdminService`: 44 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `node scripts/check-admin-canon.mjs --strict --list` OK; Playwright real OK a `/admin/presupuestos?leadId=cmr1xh7la0000ug7dj4jnihjr` amb `domcontentloaded` (no `networkidle`, per polling/fetch viu); lectura Prisma read-only OK; `git diff --check` OK.
+- Validació funcional: el DRAFT `PROP-2026-0012` del lead Alba Orna queda en 974,47 € totals (805,35 subtotal + 169,12 IVA), amb Bingo 240 + DJ 250 + transport 315,35, `snapshot.source.kind=lead-service-lines`, `packId=__custom_pack__` i `basePrice=0`; rail i proposta desada quadren.
+- Validació humana/UX: l'operador deixa de veure un Pack base que li fa recomprar el bolo; una proposta enviada/vista queda com a document enviat i no canvia d'esquena.
+- `ADMIN_CHANGE_COUNTER` passa a `2019`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

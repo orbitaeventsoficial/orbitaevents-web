@@ -1290,7 +1290,7 @@ export const ADMIN_MARKETING_PHASE_GATE: AdminMarketingPhaseGate = {
   },
   primaryActionId: 'icp-definition',
   nextPhaseActionId: 'personal-network',
-  nextPhaseReason: 'És el canal amb menys cost i més feedback immediat: valida el missatge amb gent propera abans de dedicar hores a SEO, social o partners.',
+  nextPhaseReason: 'És el canal amb menys cost i més resposta immediata: valida el missatge amb gent propera abans de dedicar hores a SEO, social o partners.',
   nextPhaseOutputs: [
     '50 contactes avisats',
     '3 converses comercials obertes',
@@ -1314,7 +1314,7 @@ export const ADMIN_MARKETING_BOOTSTRAP_PLAN: AdminMarketingBootstrapStep[] = [
   {
     window: 'Dies 3-7',
     title: 'Validar amb xarxa personal',
-    objective: 'Enviar el missatge a contactes reals i recollir feedback abans de fer SEO o social.',
+    objective: 'Enviar el missatge a contactes reals i recollir respostes abans de fer SEO o social.',
     outputs: ['50 contactes avisats', '3 converses obertes', 'Objeccions anotades'],
   },
   {
@@ -1385,7 +1385,7 @@ export const ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK: AdminMarketingActiveChannelLoc
   blockedSwitches: [
     {
       actionId: 'seo-local-pages',
-      reason: 'Sense feedback real del missatge, una pàgina SEO només escala un posicionament encara no validat.',
+      reason: 'Sense resposta real del missatge, una pàgina SEO només escala un posicionament encara no validat.',
     },
     {
       actionId: 'instagram-organic',

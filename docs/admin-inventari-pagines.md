@@ -63,8 +63,8 @@
 | Post-event playbook | `/admin/post-event/playbook` | Checklist post-event | 🔴 | |
 | Post-event reports | `/admin/post-event/reports` | Informes | 🔴 | |
 | Nou report | `/admin/post-event/reports/new` | Formulari report | 🔴 | |
-| Enquestes | `/admin/post-event/surveys` | Feedback clients | 🔴 | |
-| Post-event feedback | `/admin/post-event/feedback` | Respostes | 🔴 | |
+| Enquestes | `/admin/post-event/surveys` | Valoracions clients | 🔴 | |
+| Seguiment post-event | `/admin/post-event/seguiment` | Agraïments, reviews i incentius | 🔴 | Legacy `/admin/post-event/feedback` reexporta aquesta ruta (#2014). |
 | Collaboradors | `/admin/collaborators` | Recursos externs | 🔴 | |
 
 ## Growth

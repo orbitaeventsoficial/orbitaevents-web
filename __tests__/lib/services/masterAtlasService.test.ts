@@ -119,6 +119,7 @@ function buildAtlas(): MasterAtlas {
       'lib/services/referralsService.ts',
       'app/admin/post-event/reports/EnsurePortfolioEventButton.tsx',
       'app/api/admin/post-event/portfolio-event/route.ts',
+      'app/admin/post-event/seguiment/page.tsx',
       'app/admin/post-event/feedback/page.tsx',
       'app/admin/docs/electric-atlas/page.tsx',
       'docs/TESI-MAQUINA-full-de-ruta-2026-07.md',
@@ -175,6 +176,7 @@ describe('masterAtlasService', () => {
     const atlas = buildAtlas();
     const postEvent = atlas.modules.find((m) => m.id === 'post-event');
 
+    expect(postEvent?.routes).toContain('/admin/post-event/seguiment');
     expect(postEvent?.routes).toContain('/admin/post-event/feedback');
     expect(postEvent?.routes).toContain('/admin/portfolio');
     expect(postEvent?.sourceOfTruth).toEqual(expect.arrayContaining([
@@ -207,6 +209,7 @@ describe('masterAtlasService', () => {
       'lib/services/portfolioEventService.ts',
       'app/admin/post-event/reports/EnsurePortfolioEventButton.tsx',
       'app/api/admin/post-event/portfolio-event/route.ts',
+      'app/admin/post-event/seguiment/page.tsx',
       'app/admin/post-event/feedback/page.tsx',
     ]));
   });

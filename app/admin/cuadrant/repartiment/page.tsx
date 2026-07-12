@@ -54,7 +54,7 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
         <div className="rounded-xl border admin-tone-border-warning admin-tone-bg-warning p-3 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Saldo tercers</p>
           <p className="text-xl font-bold admin-tone-text-warning">{formatCurrency(payout.totals.collaboratorCost)}</p>
-          <p className="text-[11px] opacity-50">
+          <p className="text-[length:var(--o-text-2xs)] opacity-50">
             {formatCurrency(payout.totals.collaboratorPayments)} pagaments
             {payout.totals.collaboratorSettlements > 0 ? ` · ${formatCurrency(payout.totals.collaboratorSettlements)} a Òrbita` : ''}
           </p>
@@ -62,7 +62,7 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
         <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Brut Òrbita</p>
           <p className="text-xl font-bold admin-tone-text-success">{formatCurrency(payout.totals.ownerGross)}</p>
-          <p className="text-[11px] opacity-50">{formatCurrency(payout.totals.internalCost)} cost intern</p>
+          <p className="text-[length:var(--o-text-2xs)] opacity-50">{formatCurrency(payout.totals.internalCost)} cost intern</p>
         </div>
         <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Benefici net</p>

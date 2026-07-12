@@ -32,10 +32,10 @@ describe('PresupuestoPdfStudio customer search guard', () => {
     const sendBlock = source.slice(start, end);
 
     expect(source).toContain('function readStudioMutationError');
-    expect(sendBlock).toContain('const markSentResponse = await fetchWithCsrf(`/api/admin/proposals/${targetProposalId}/send`, { method: \'POST\' });');
-    expect(sendBlock).toContain('const markSentData = await markSentResponse.json().catch(() => ({})) as StudioMutationPayload;');
-    expect(sendBlock).toContain('if (!markSentResponse.ok || markSentData.ok === false) {');
-    expect(sendBlock).toContain('throw new Error(readStudioMutationError(markSentData, "No s\'ha pogut marcar la proposta com enviada"));');
+    expect(sendBlock).toContain('const sendResponse = await fetchWithCsrf(`/api/admin/proposals/${targetProposalId}/send`, { method: \'POST\' });');
+    expect(sendBlock).toContain('const sendData = await sendResponse.json().catch(() => ({})) as StudioMutationPayload;');
+    expect(sendBlock).toContain('if (!sendResponse.ok || sendData.ok === false) {');
+    expect(sendBlock).toContain('throw new Error(readStudioMutationError(sendData, \'No s\\\'ha pogut enviar el pressupost canònic\'));');
     expect(sendBlock).not.toMatch(/^\s*await fetchWithCsrf\(`\/api\/admin\/proposals\/\$\{targetProposalId\}\/send`, \{ method: 'POST' \}\);/m);
   });
 
@@ -137,16 +137,29 @@ describe('PresupuestoPdfStudio customer search guard', () => {
 
   it('quan edita un proposalId resol el lead vinculat i rehidrata snapshots antics buits', () => {
     expect(pageSource).toContain('const proposalForEditor = proposalId');
-    expect(pageSource).toContain('select: { customerId: true, leadId: true }');
+    expect(pageSource).toContain('select: { customerId: true, leadId: true, status: true }');
     expect(pageSource).toContain("const resolvedLeadId = leadId || proposalForEditor?.leadId || '';");
+    expect(pageSource).toContain("const editorProposalStatus = proposalForEditor?.status || (implicitLeadDraft ? 'DRAFT' : '');");
+    expect(pageSource).toContain("const preferLeadPrefill = Boolean(resolvedLeadId && (!explicitProposalId || proposalForEditor?.status === 'DRAFT'));");
     expect(pageSource).toContain('initialLeadId={resolvedLeadId}');
+    expect(pageSource).toContain('initialProposalStatus={editorProposalStatus}');
 
     expect(source).toContain('type StudioSnapshotLike = {');
     expect(source).toContain('type StudioProposalLeadPayload = {');
     expect(source).toContain('function hasSnapshotExtras');
     expect(source).toContain('const proposalLead = data?.proposal?.lead as StudioProposalLeadPayload | null | undefined;');
     expect(source).toContain('const linkedLeadId = initialLeadId || nonEmptyString(data?.proposal?.leadId) || nonEmptyString(proposalLead?.id) || \'\';');
-    expect(source).toContain('const shouldHydrateLeadLines = Boolean(linkedLeadId && resolvedLeadCustomExtras.length > 0 && !hasSnapshotExtras(snap));');
+    expect(source).toContain("const isDraftProposal = proposalStatus === 'DRAFT';");
+    expect(source).toContain('linkedLeadId && resolvedLeadCustomExtras.length > 0 && (isDraftProposal || !hasSnapshotExtras(snap))');
+    expect(source).toContain('const isExistingProposalFrozen = Boolean(initialProposalStatus && initialProposalStatus !== \'DRAFT\');');
+    expect(source).toContain('const shouldUseLeadBoloAsSource = Boolean(');
+    expect(source).toContain('shouldUseLeadBoloAsSource ? CUSTOM_PACK_ID : getPacksByService(initialEventType)[0]?.id || \'\'');
+    expect(source).toContain('if (packId === CUSTOM_PACK_ID) return customPackDefinition;');
+    expect(source).toContain('setFrozenTravelCharge(isExistingProposalFrozen && snapTravelCharge !== null ? snapTravelCharge : null);');
+    expect(source).toContain('if (isExistingProposalFrozen) return proposalId || null;');
+    expect(source).toContain("'lead-service-lines'");
+    expect(source).toContain("'proposal-snapshot'");
+    expect(source).toContain("El pressupost surt de {leadCustomExtras.length} línies comercials del lead. El Pack base del catàleg queda fora d'aquest flux.");
     expect(source).toContain('else if (leadDistanceKm > 0) setTravelKm(Math.max(0, Number(leadDistanceKm) || 0));');
     expect(source).toContain('else if (leadEventLocation) setEventLocation(leadEventLocation);');
     expect(source).toContain('if (shouldHydrateLeadLines && leadGuests > 0) setGuests(leadGuests);');

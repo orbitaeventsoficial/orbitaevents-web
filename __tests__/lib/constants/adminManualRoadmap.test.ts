@@ -91,7 +91,7 @@ describe('ADMIN_MANUAL_ROADMAP', () => {
     ].sort());
     expect(ADMIN_MARKETING_PHASE_GATE.primaryActionId).toBe('icp-definition');
     expect(ADMIN_MARKETING_PHASE_GATE.nextPhaseActionId).toBe('personal-network');
-    expect(ADMIN_MARKETING_PHASE_GATE.nextPhaseReason).toContain('feedback immediat');
+    expect(ADMIN_MARKETING_PHASE_GATE.nextPhaseReason).toContain('resposta immediata');
     expect(ADMIN_MARKETING_PHASE_GATE.focusRule).toContain('un sol canal actiu');
     expect(ADMIN_MARKETING_PHASE_GATE.nextPhaseOutputs).toEqual([
       '50 contactes avisats',

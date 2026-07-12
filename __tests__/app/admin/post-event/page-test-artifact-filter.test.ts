@@ -35,9 +35,11 @@ describe('/admin/post-event test artifact visibility', () => {
   it('uses follow-up wording instead of visible feedback legacy labels', () => {
     expect(source).toContain('Agraïment al Client');
     expect(source).toContain('Veure seguiment');
+    expect(source).toContain("href: '/admin/post-event/seguiment'");
     expect(source).toContain('Gestiona informes, enquestes i seguiment dels esdeveniments');
     expect(source).not.toContain('Feedback al Client');
     expect(source).not.toContain('Veure feedback');
+    expect(source).not.toContain("href: '/admin/post-event/feedback'");
   });
 
   it('keeps an explicit review mode for post-event test evidence', () => {

@@ -259,7 +259,7 @@ export default async function PostEventPage({ searchParams }: PostEventPageProps
       number: 3,
       title: 'Agraïment al Client',
       subtitle: 'Seguiment post-event',
-      href: '/admin/post-event/feedback',
+      href: '/admin/post-event/seguiment',
       cta: 'Veure seguiment',
       numberTone: 'admin-tone-soft-success admin-tone-border-success admin-tone-text-success',
       items: ['💌 Missatge personalitzat', '📸 Foto icònica', '🎁 Codi descompte 10%', '👥 Per referits'],

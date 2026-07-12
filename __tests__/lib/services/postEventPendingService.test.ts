@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import {
-  buildPendingPostEventFeedbackBookingWhere,
+  buildPendingPostEventFollowUpBookingWhere,
   buildNotStartedPostEventBookingWhere,
   buildPendingPostEventEmailBookingWhere,
   buildPendingPostEventReportBookingWhere,
@@ -38,8 +38,8 @@ describe('postEventPendingService', () => {
     });
   });
 
-  it('construeix la cua canònica de feedback pendent amb la mateixa regla que email post-event', () => {
-    expect(buildPendingPostEventFeedbackBookingWhere(now)).toEqual(buildPendingPostEventEmailBookingWhere(now));
+  it('construeix la cua canònica de seguiment pendent amb la mateixa regla que email post-event', () => {
+    expect(buildPendingPostEventFollowUpBookingWhere(now)).toEqual(buildPendingPostEventEmailBookingWhere(now));
   });
 
   it('construeix la cua canònica d informes interns pendents', () => {

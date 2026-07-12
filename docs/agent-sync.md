@@ -15,11 +15,19 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-12 [ESTAT: treballant — #2019 pressupost hereta bolo real]
-Perímetre previst: `app/admin/presupuestos/**`, serveis de proposta/pressupost, tests focalitzats, diari, protocol i sync. No tocar schema, migracions, crons, enviaments reals ni BD write sense necessitat explícita.
-Últim canvi tancat: #2018 (preu únic Tall A per Claude) + #2017 omplert per Codex.
-Proper pas previst: Tall B de la reforma de pressupostos — si hi ha `leadId` o reserva vinculada, l'editor/previsualització ha de documentar les línies reals del bolo i no reconstruir-lo des de `Pack base`.
-Avís per l'altre agent: prenc el relleu del perímetre que Claude havia deixat obert perquè el propietari ha ordenat "acaba la feina"; servidor local continua a `http://127.0.0.1:3000`. Evitaré codi públic/mobile, schema, API nova, BD write, migracions, crons, enviaments i publicacions reals.
+[codex] 2026-07-12 [ESTAT: tancat — neteja worktree #2011-#2019]
+Perímetre tancat: deixar el working tree coherent després de detectar que els talls #2011 i #2013-#2017 estaven documentats però amb codi encara sense commit, i que #2019 tenia codi verificat però encara faltava protocol/counter. S'ha commitejat feina útil amb validació i sense esborrar res a cegues.
+Últim canvi tancat: #2019 (pressupost DRAFT amb lead hereta el bolo real del lead i congela snapshots enviats).
+Validació neteja: focused Vitest OK (14 fitxers, 110 tests); `tsc --noEmit` OK; `qa:protocol` OK; admin-canon OK; `git diff --check` OK; `validate:core` OK (75 fitxers, 668 tests, deute canon 0).
+Proper pas previst: reprendre Tall C (lead solidari amb reserva + auditoria + alerta) només després de confirmar `git status` net.
+Avís per l'altre agent: el problema detectat era higiene/traçabilitat: docs de talls ja registrats sense codi commitejat i #2019 sense protocol/counter. Queda explícitament corregit en aquest bloc.
+
+[codex] 2026-07-12 [ESTAT: tancat — #2019 pressupost hereta bolo real]
+Perímetre tancat: `app/admin/presupuestos/page.tsx`, `app/admin/presupuestos/PresupuestoPdfStudio.tsx`, `app/admin/presupuestos/studio-utils.ts`, test focalitzat del Studio, diari, protocol, counter i sync.
+Últim canvi tancat: #2019.
+Validació #2019: focused Vitest OK (44 tests); `tsc --noEmit` OK; admin-canon OK; Playwright real OK a `/admin/presupuestos?leadId=cmr1xh7la0000ug7dj4jnihjr` amb `domcontentloaded`; lectura Prisma read-only OK del DRAFT `PROP-2026-0012` (total 974,47 €, `source.kind=lead-service-lines`, `packId=__custom_pack__`); `git diff --check` OK. El `networkidle` de Playwright queda obert per fetch/polling.
+Proper pas previst: netejar el working tree abans de reprendre Tall C.
+Avís per l'altre agent: la verificació UI ha fet l'autosave normal del DRAFT existent; no hi ha script manual de mutació BD ni schema/migració.
 
 [codex] 2026-07-12 [ESTAT: tancat — #2017 font-px quadrant repartiment]
 Perímetre tancat: `app/admin/cuadrant/repartiment/page.tsx`, diari, protocol i sync.
