@@ -1,3 +1,25 @@
+## 2026-07-12 — Pressupostos: un lead formalitzat no reobre editor nou (Canvi #2021, codex)
+
+### Context
+El propietari concreta la regla operativa: "jo opero en lead, sempre en lead, pressupostos, dossiers, tot ho opero en lead, i passa a reserva quan es ferm". Després del #2020, la fitxa lead ja deixava d'editar el bolo si tenia reserva, però `/admin/presupuestos?leadId=...` encara podia obrir un editor nou sense `proposalId` des d'un lead ja formalitzat.
+
+### Canvi
+- `app/admin/presupuestos/page.tsx`: l'entrada de pressupostos llegeix `lead.booking` i, si el lead ja té reserva i no hi ha `proposalId` explícit, no munta `PresupuestoPdfStudio`.
+- La ruta mostra `Lead formalitzat com a reserva`, conserva el llistat/històric de `Proposal` del lead i ofereix CTA canònic `Obrir reserva {referència}` amb `buildBookingHref`.
+- El carregament de configuració de marca i cost/km queda després d'aquest guard, de manera que el cas formalitzat no inicialitza peces d'editor que no s'han de fer servir.
+- `__tests__/app/admin/presupuestos/PresupuestoPdfStudio-customer-search.test.ts`: nou contracte estàtic per blindar que un lead formalitzat no reobre editor nou sense `proposalId`.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`PresupuestoPdfStudio-customer-search`: 9 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: pressupostos continua sent part del workspace de lead abans de fermar; després de formalitzar, el mateix URL amb `leadId` conserva l'històric comercial i envia a la reserva per canvis operatius, sense crear un nou DRAFT accidental.
+- Validació humana/UX: l'operador no es troba una segona capa editable disfressada de pressupost nou quan el bolo ja és ferm; veu reserva i traça, no un altre lloc on tocar el mateix.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2021.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-12 — Lead formalitzat: el lead deixa de ser editor operatiu de la reserva (Canvi #2020, codex)
 
 ### Context

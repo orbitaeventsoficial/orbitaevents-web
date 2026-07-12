@@ -33106,6 +33106,22 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #2021 — 2026-07-12 — codex (FET)
+**Pressupostos: un lead formalitzat no reobre editor nou.**
+- Context: el #2020 tanca la fitxa de lead com a editor operatiu quan ja existeix reserva, però quedava una porta lateral: `/admin/presupuestos?leadId=...` podia muntar un editor nou sense `proposalId` sobre un lead formalitzat.
+- Autorització explícita propietari: "jo opero en lead, sempre en lead, pressupostos, dossiers, tot ho opero en lead, i passa a reserva quan es ferm". Tall acotat a la porta de pressupostos, test estàtic, diari, protocol i counter; no toca schema, migracions, BD write, crons, emails reals ni publicacions.
+- `app/admin/presupuestos/page.tsx`: la query del lead inclou `booking { id, reference }`; si hi ha reserva i no hi ha `proposalId` explícit, la pàgina no renderitza `PresupuestoPdfStudio`.
+- En aquest cas formalitzat, la pàgina mostra `Lead formalitzat com a reserva`, manté el llistat de `Proposal` com a històric comercial i dona CTA canònic `Obrir reserva {reference}` amb `buildBookingHref`.
+- El carregament de `quotes.*` i del cost/km queda darrere del guard perquè un lead formalitzat no inicialitzi peces d'editor que ja no corresponen.
+- `__tests__/app/admin/presupuestos/PresupuestoPdfStudio-customer-search.test.ts`: afegeix cobertura perquè la ruta no torni a obrir editor nou per leads formalitzats sense proposta explícita.
+- Validació tècnica: focused Vitest OK (`PresupuestoPdfStudio-customer-search`: 9 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: abans de fermar, pressupostos segueix operant des del lead; després de fermar, `leadId` mostra traça comercial i envia a reserva, evitant DRAFTs accidentals i doble capa editable.
+- Validació humana/UX: l'operador veu una frontera clara: lead = feina comercial viva fins a formalitzar; reserva = lloc operatiu després de formalitzar.
+- `ADMIN_CHANGE_COUNTER` passa a `2021`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #2020 — 2026-07-12 — codex (FET)
 **Lead formalitzat: el lead deixa de ser editor operatiu de la reserva.**
 - Context: el propietari rectifica el Tall C de la reforma de pressupostos. El criteri no és crear solidaritat permanent lead-reserva, sinó aprimar el programa: el lead és el workspace comercial viu fins que el bolo és ferm; quan es formalitza, la reserva és el workspace operatiu i el lead queda com a traça comercial.

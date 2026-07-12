@@ -6,6 +6,7 @@ import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
 import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import ProposalsList from './ProposalsList';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
 import { inferStudioServiceFromLead } from './studio-utils';
 
@@ -91,6 +92,12 @@ export default async function PresupuestosPage({
               preferredLocale: true,
             },
           },
+          booking: {
+            select: {
+              id: true,
+              reference: true,
+            },
+          },
           serviceLines: {
             orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
             select: {
@@ -118,32 +125,6 @@ export default async function PresupuestosPage({
   const editorProposalId = explicitProposalId || implicitLeadDraft?.id || '';
   const editorProposalStatus = proposalForEditor?.status || (implicitLeadDraft ? 'DRAFT' : '');
   const preferLeadPrefill = Boolean(resolvedLeadId && (!explicitProposalId || proposalForEditor?.status === 'DRAFT'));
-
-  const brandSettingsRows = await prisma.setting.findMany({
-    where: {
-      key: {
-        in: [
-          'quotes.brandName',
-          'quotes.brandWebsite',
-          'quotes.brandEmail',
-          'quotes.brandPhone',
-          'quotes.brandTagline',
-          'quotes.logoDataUrl',
-        ],
-      },
-    },
-    select: { key: true, value: true },
-  });
-  const brandSettings = Object.fromEntries(brandSettingsRows.map((row) => [row.key, row.value]));
-  const editorCustomer = customer || leadForEditor?.customer || null;
-  const initialEventType = inferStudioServiceFromLead({
-    eventType: leadForEditor?.eventType,
-    serviceLines: leadForEditor?.serviceLines || [],
-  });
-  const vehicleCostReference = await getEffectiveVehicleCostPerKm().catch(() => null);
-  const initialVehicleCostPerKm = vehicleCostReference && vehicleCostReference.costPerKm > 0
-    ? vehicleCostReference.costPerKm
-    : undefined;
 
   // Always load canonical proposals for the list. Legacy LeadDocument quotes are
   // historical audit traces and must not appear as live budgets here.
@@ -175,6 +156,56 @@ export default async function PresupuestosPage({
     createdAt: p.createdAt.toISOString(),
     sentAt: p.sentAt?.toISOString() || null,
   }));
+
+  if (leadForEditor?.booking && !explicitProposalId) {
+    return (
+      <AdminPage
+        back={{ href: '/admin/presupuestos', label: 'Pressupostos' }}
+        eyebrow="Comercial · Pressupostos"
+        title="Lead formalitzat com a reserva"
+        subtitle={`Aquest lead ja és la reserva ${leadForEditor.booking.reference}. Els pressupostos del lead són històric comercial; els canvis operatius es fan a la reserva.`}
+        actions={
+          <Link
+            href={buildBookingHref(leadForEditor.booking.id)}
+            className="ap-btn ap-btn--primary"
+          >
+            Obrir reserva {leadForEditor.booking.reference}
+          </Link>
+        }
+      >
+        <ProposalsList
+          proposals={serializedProposals}
+          initialStatusFilter={statusFilter}
+        />
+      </AdminPage>
+    );
+  }
+
+  const brandSettingsRows = await prisma.setting.findMany({
+    where: {
+      key: {
+        in: [
+          'quotes.brandName',
+          'quotes.brandWebsite',
+          'quotes.brandEmail',
+          'quotes.brandPhone',
+          'quotes.brandTagline',
+          'quotes.logoDataUrl',
+        ],
+      },
+    },
+    select: { key: true, value: true },
+  });
+  const brandSettings = Object.fromEntries(brandSettingsRows.map((row) => [row.key, row.value]));
+  const editorCustomer = customer || leadForEditor?.customer || null;
+  const initialEventType = inferStudioServiceFromLead({
+    eventType: leadForEditor?.eventType,
+    serviceLines: leadForEditor?.serviceLines || [],
+  });
+  const vehicleCostReference = await getEffectiveVehicleCostPerKm().catch(() => null);
+  const initialVehicleCostPerKm = vehicleCostReference && vehicleCostReference.costPerKm > 0
+    ? vehicleCostReference.costPerKm
+    : undefined;
 
   if (!showEditor) {
     // LIST VIEW — show all proposals with filters and actions

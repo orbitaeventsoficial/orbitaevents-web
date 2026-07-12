@@ -15,6 +15,13 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-12 [ESTAT: tancat — #2021 pressupostos no reobren leads formalitzats]
+Perímetre tancat: `/admin/presupuestos?leadId=` detecta `lead.booking` i, sense `proposalId` explícit, no munta editor nou; mostra històric comercial de propostes i CTA canònic cap a la reserva. Sense schema, migracions, BD write, crons, emails reals ni publicacions.
+Últim canvi tancat: #2021.
+Validació #2021: focused Vitest OK (`PresupuestoPdfStudio-customer-search`: 9 tests); `tsc --noEmit` OK; `qa:protocol` OK; `git diff --check` OK; `validate:core` OK (75 fitxers, 668 tests, deute canon 0).
+Proper pas previst: continuar l'aprimament de pressupostos amb el Tall D (neteja de menús de l'editor) o revisar primer dossiers des de lead si el propietari ho prioritza.
+Avís per l'altre agent: el perímetre de `app/admin/presupuestos/page.tsx` queda lliure; no reintrodueixis editor nou per leads formalitzats sense `proposalId`.
+
 [codex] 2026-07-12 [ESTAT: tancat — #2020 lead workspace comercial -> reserva ferma]
 Perímetre tancat: pivot del Tall C segons criteri del propietari: no crear solidaritat permanent lead-reserva. El lead continua sent el workspace comercial viu fins que el bolo és ferm; quan existeix reserva, la fitxa de lead passa a lectura/traça i obre la reserva com a workspace operatiu.
 Últim canvi tancat: #2020.

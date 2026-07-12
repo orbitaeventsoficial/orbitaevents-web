@@ -135,6 +135,20 @@ describe('PresupuestoPdfStudio customer search guard', () => {
     expect(source).not.toContain("setTravelKm(0);\n      setDistanceMessage('No s\\'ha pogut calcular la ruta. Cost de desplaçament: 0 €.')");
   });
 
+  it('no reobre editor nou quan el lead ja esta formalitzat com a reserva', () => {
+    expect(pageSource).toContain("import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';");
+    expect(pageSource).toContain('booking: {');
+    expect(pageSource).toContain('id: true,');
+    expect(pageSource).toContain('reference: true,');
+    expect(pageSource).toContain('if (leadForEditor?.booking && !explicitProposalId) {');
+    expect(pageSource).toContain('title="Lead formalitzat com a reserva"');
+    expect(pageSource).toContain('Els pressupostos del lead són històric comercial');
+    expect(pageSource).toContain('href={buildBookingHref(leadForEditor.booking.id)}');
+    expect(pageSource).toContain('Obrir reserva {leadForEditor.booking.reference}');
+    expect(pageSource).toContain('<ProposalsList');
+    expect(pageSource).toContain('initialStatusFilter={statusFilter}');
+  });
+
   it('quan edita un proposalId resol el lead vinculat i rehidrata snapshots antics buits', () => {
     expect(pageSource).toContain('const proposalForEditor = proposalId');
     expect(pageSource).toContain('select: { customerId: true, leadId: true, status: true }');
