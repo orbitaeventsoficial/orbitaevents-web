@@ -1,3 +1,24 @@
+## 2026-07-13 — Dossier: el copy del desplaçament diu el veredicte del cervell, no una frase fixa (Canvi #2024, claude)
+
+### Context
+El propietari detecta al dossier real (cas Vilassar) un text liós: la nota deia «Inclòs fins a 25 km des de Granollers» (anada, dividint localment `INCLUDED_TRAVEL_KM/2`) i la línia de ruta deia «44 km (anada i tornada)… El desplaçament s'aplica sobre aquesta ruta» — dues unitats barrejades i, pitjor, la frase «s'aplica» sortia SEMPRE, encara que el cervell (`computeBoloTransport`, franquícia 50 km a/t + 1a hora inclosa) digués càrrec 0 (44 < 50 → inclòs). Ordre explícita: cap pegat, buscar el canònic.
+
+### Canvi
+- `messages/{ca,es,en}.json` (`dossier.budget`): `travelNote` passa a parlar en la MATEIXA unitat que la ruta («fins a {includedKm} km d'anada i tornada», amb el canònic 50); clau nova `travelRouteIncluded` per al cas dins franquícia («…: el desplaçament us queda inclòs»); `travelRoute` queda per al cas amb càrrec.
+- `lib/utils/dossier-html-builder.ts`: eliminat el càlcul local `includedOneWay = INCLUDED_TRAVEL_KM/2` (era la font de la mentida); la nota interpola `INCLUDED_TRAVEL_KM` directe i la línia de ruta tria plantilla segons el veredicte del cervell (`travelCharge > 0` → `travelRoute`; si no → `travelRouteIncluded`). Cap número nou es calcula a la vista: només es llegeix `clientCharge` del cervell que ja governava el preu.
+- Tests: fixture mirall actualitzada (+`travelRouteIncluded`) a `dossier-html-builder.test.ts` i `dossierService.test.ts`; 2 tests nous — cas Vilassar (44 km a/t: copy d'inclòs, sense bloc de preu, franquícia en a/t) i cas ruta llarga (copy de càrrec + bloc de preu).
+
+### Validació
+- Validació tècnica: focused Vitest OK (`dossier-html-builder` + `dossierService`: 57 tests, inclosos els 2 nous); `npx tsc --noEmit` OK; `validate:core` OK. `pnpm build` NO executat: `next dev` viu al port 3000 (PID 20612, workspace de codex) i el build escriu `.next` (precedent #2020).
+- Validació funcional: el cas real del propietari (Vilassar, 44 km a/t) queda blindat per test: la nota diu 50 km anada i tornada i la ruta diu «queda inclòs» sense bloc de cost; una ruta de 180 km manté «s'aplica sobre aquesta ruta» amb el desglossament.
+- Validació humana/UX: el client ja no llegeix «25 km» i «44 km» en unitats diferents ni un «s'aplica» que sona a cobrament quan el desplaçament surt gratis; el text del dossier ara diu exactament el que el cervell econòmic cobra.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2024.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-13 — Catàleg Masquerade: fitxa Cantant reescrita i Bingo Musical Old Stars nou (Canvi #2023, claude)
 
 ### Context
@@ -12,6 +33,7 @@ Ordre directa del propietari (2026-07-13): dos productes de col·laborador per a
 ### Validació
 - Validació tècnica: escriptura via script Prisma puntual (update + create) amb sortida confirmada; re-consulta read-only posterior mostra els dos productes amb tots els camps esperats (nom, descripció, categoria, crew, durada, cost/PVP, imatge, includes, actius i visibles a dossier/booking). Scripts temporals eliminats.
 - Validació funcional: `/admin/colaboradores` llegeix del mateix `listCollaboratorProducts`, per tant la fitxa surt directament del que s'ha verificat a BD. La foto de la cantant queda comitejada a `public/img/collaborators/masquerade/cantant-directe.jpg` perquè la URL funcioni també desplegada.
+- Validació humana/UX: la foto s'ha revisat visualment (cantant amb micro, vàlida com a imatge de producte); els textos són client-facing en català, sense preus dins la descripció i sense marca del proveïdor, coherents amb la resta del catàleg Masquerade.
 - Fora d'abast: cap canvi de codi, schema, preus d'altres productes ni textos client-facing existents.
 
 ### Tancament

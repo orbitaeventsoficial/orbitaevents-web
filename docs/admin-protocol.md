@@ -33106,12 +33106,28 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #2024 — 2026-07-13 — claude (FET)
+**Dossier: el copy del desplaçament diu el veredicte del cervell, no una frase fixa.**
+- Context: cas real Vilassar — la nota deia «Inclòs fins a 25 km» (anada, `INCLUDED_TRAVEL_KM/2` calculat localment a la vista) i la ruta «44 km (anada i tornada)… El desplaçament s'aplica», sempre, encara que `computeBoloTransport` digués càrrec 0. Ordre del propietari: cap pegat, el canònic.
+- `messages/{ca,es,en}.json`: `travelNote` en anada i tornada amb el canònic 50; NOVA `travelRouteIncluded` (dins franquícia); `travelRoute` reservada al cas amb càrrec.
+- `lib/utils/dossier-html-builder.ts`: fora el `includedOneWay` local; interpola `INCLUDED_TRAVEL_KM` directe i tria la plantilla de ruta segons `travelCharge` del cervell (cap càlcul de domini a la vista).
+- Tests: fixtures mirall +`travelRouteIncluded`; 2 tests nous (Vilassar 44 km a/t inclòs · ruta 180 km amb càrrec).
+- Validació tècnica: focused Vitest OK (57 tests); `npx tsc --noEmit` OK; `validate:core` OK; `pnpm build` no executat (dev viu a :3000, precedent #2020).
+- Validació funcional: cas Vilassar blindat per test (nota 50 km a/t + «queda inclòs» sense bloc de preu); ruta llarga manté «s'aplica» + desglossament.
+- Validació humana/UX: unitats coherents i cap «s'aplica» que soni a cobrament quan el desplaçament surt inclòs.
+- `ADMIN_CHANGE_COUNTER` passa a `2024`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #2023 — 2026-07-13 — claude (FET)
 **Catàleg Masquerade: fitxa Cantant reescrita i Bingo Musical Old Stars nou.**
 - Context: ordre directa del propietari; la cantant existia sense descripció ni foto i el bingo per a gent gran no existia. Instrucció: preus a la seva casella (no a la descripció) i PVP amb 20% de recàrrec sobre el cost.
 - Operació de dades a BD, sense codi: `Cantant en directe` (abans «Cantant Boleros i infantil») amb descripció nova en català, categoria `Animació adulta`, durada `70-80 min`, 150 € → 180 €, foto nova `cantant-directe.jpg`; `Bingo Musical Old Stars` nou amb descripció en català (Marisol, Antonio Machín, Raphael, +8 línies, minijocs), `70 min`, 200 € → 240 €, imatge reutilitzada del bingo d'adults, `sortOrder` 12.
 - Únic artefacte de repo: `public/img/collaborators/masquerade/cantant-directe.jpg` (comitejat sol perquè la URL funcioni desplegada).
-- Validació: escriptura Prisma confirmada + re-consulta read-only amb tots els camps esperats; `/admin/colaboradores` llegeix del mateix servei verificat.
+- Validació tècnica: escriptura Prisma confirmada (update + create amb IDs retornats) + re-consulta read-only amb tots els camps esperats; scripts temporals eliminats.
+- Validació funcional: `/admin/colaboradores` llegeix del mateix `listCollaboratorProducts` verificat a BD; la foto comitejada fa que la `imageUrl` funcioni també desplegada.
+- Validació humana/UX: foto revisada visualment; textos client-facing en català coherents amb el catàleg, sense preus a la descripció ni marca de proveïdor.
 - `ADMIN_CHANGE_COUNTER` passa a `2023`.
 - Començat per: `claude`
 - Treballant per: `claude`

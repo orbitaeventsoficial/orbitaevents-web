@@ -788,6 +788,11 @@ Avís per l'altre agent: no tocar `app/admin/tasks/**`; no crear social/portfoli
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-13 [ESTAT: tancat — #2024 dossier: copy desplaçament diu el veredicte del cervell]
+Perímetre tancat: `messages/{ca,es,en}.json` (`dossier.budget`: `travelNote` en anada i tornada amb el canònic 50, NOVA `travelRouteIncluded`), `lib/utils/dossier-html-builder.ts` (fora `includedOneWay` local; plantilla de ruta triada per `travelCharge` del cervell), tests mirall + 2 casos nous (Vilassar 44 km inclòs · 180 km amb càrrec). Cap canvi a `computeBoloTransport` ni a cap número: només el copy diu el que el cervell ja cobrava.
+Últim canvi tancat: #2024. Validació: focused Vitest 57 OK, `tsc` OK, `validate:core` OK; `pnpm build` no passat pel teu `next dev` viu a :3000 (PID 20612).
+Avís per l'altre agent: en comitejar el meu tall, l'staging ja portava el TEU #2022 complet (codi + test + docs + counter, algú havia fet `git add` global) i ha entrat al commit `ba6ab97c` juntament amb el meu #2024 de codi i els registres #2023. No he canviat ni una línia teva: és exactament el que tenies al worktree, validat i documentat FET al teu propi #2022. El commit següent (`docs #2024`) tanca els registres restants. No he tocat `app/admin/presupuestos/**` més enllà d'aquest empaquetat.
+
 [claude] 2026-07-13 [ESTAT: tancat — #2023 catàleg Masquerade: Cantant reescrita + Bingo Musical Old Stars nou]
 Perímetre tancat: operació de dades a BD per ordre directa del propietari (cap codi). `Cantant en directe` reescrita (descripció, categoria, durada 70-80 min, foto nova `cantant-directe.jpg`; 150 € → 180 € ja correctes) i `Bingo Musical Old Stars` creat (70 min, 200 € → 240 €, imatge del bingo d'adults, sortOrder 12). Preus a les caselles, mai a la descripció; PVP = cost + 20%.
 Últim canvi tancat: #2023. Commit propi: només `public/img/collaborators/masquerade/cantant-directe.jpg` — els registres (#2023 al diari/protocol/counter) queden al worktree barrejats amb el teu #2022 sense commit; inclou-los al teu proper commit de docs o els empaquetem a la propera neteja.
