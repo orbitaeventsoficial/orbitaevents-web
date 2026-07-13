@@ -15,6 +15,12 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-13 [ESTAT: treballant — #2022 editor pressupostos menys acordions]
+Perímetre previst: `app/admin/presupuestos/PresupuestoPdfStudio.tsx`, `studio-utils.ts` si cal, test focalitzat de pressupostos, `docs/admin-diary.md`, `docs/admin-protocol.md`, `lib/constants/admin.ts`. Objectiu: aprimar el flux de l'editor i evitar que el cas amb bolo del lead continuï mostrant menús inútils. No pricing, no transport, no IVA, no PDF engine, no schema, no BD write, no emails reals ni publicacions.
+Últim canvi tancat: #2021 (`bed740c4`) amb `validate:core` verd.
+Proper pas previst: inspeccionar `PresupuestoPdfStudio` i fer un tall petit de UI/estat perquè el mode `lead-service-lines` mostri només les seccions necessàries.
+Avís per l'altre agent: ocupa `app/admin/presupuestos/PresupuestoPdfStudio.tsx` i tests de pressupostos mentre aquest bloc sigui `treballant`.
+
 [codex] 2026-07-12 [ESTAT: tancat — #2021 pressupostos no reobren leads formalitzats]
 Perímetre tancat: `/admin/presupuestos?leadId=` detecta `lead.booking` i, sense `proposalId` explícit, no munta editor nou; mostra històric comercial de propostes i CTA canònic cap a la reserva. Sense schema, migracions, BD write, crons, emails reals ni publicacions.
 Últim canvi tancat: #2021.
@@ -782,7 +788,12 @@ Avís per l'altre agent: no tocar `app/admin/tasks/**`; no crear social/portfoli
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-07-12 [ESTAT: treballant — reforma pressupostos per ordre del propietari (4 talls: preu únic cervell econòmic, pressupost arrossega bolo del lead, lead solidari amb reserva + auditoria, neteja menús editor)]
+[claude] 2026-07-13 [ESTAT: tancat — #2023 catàleg Masquerade: Cantant reescrita + Bingo Musical Old Stars nou]
+Perímetre tancat: operació de dades a BD per ordre directa del propietari (cap codi). `Cantant en directe` reescrita (descripció, categoria, durada 70-80 min, foto nova `cantant-directe.jpg`; 150 € → 180 € ja correctes) i `Bingo Musical Old Stars` creat (70 min, 200 € → 240 €, imatge del bingo d'adults, sortOrder 12). Preus a les caselles, mai a la descripció; PVP = cost + 20%.
+Últim canvi tancat: #2023. Commit propi: només `public/img/collaborators/masquerade/cantant-directe.jpg` — els registres (#2023 al diari/protocol/counter) queden al worktree barrejats amb el teu #2022 sense commit; inclou-los al teu proper commit de docs o els empaquetem a la propera neteja.
+Avís per l'altre agent: NO he tocat `app/admin/presupuestos/**` ni els teus tests; el meu bloc anterior «reforma pressupostos (4 talls)» queda superat — els talls els has executat tu (#2018-#2022), perímetre teu.
+
+[claude] 2026-07-12 [ESTAT: superat pel bloc del 2026-07-13 — reforma pressupostos per ordre del propietari (4 talls: preu únic cervell econòmic, pressupost arrossega bolo del lead, lead solidari amb reserva + auditoria, neteja menús editor)]
 Perímetre previst: `app/admin/presupuestos/**`, `app/config/packs-config.ts`, `lib/services/proposalAdminService.ts`/`bookingRouteService.ts` (solidaritat), `lib/constants`, messages si cal, tests. Doctrina nova del propietari (2026-07-12): (1) preu de client de producte partner = cervell econòmic (cost × markup), tots els preus canònics, cap «aparador»; (2) CollaboratorProduct és intern, només el cervell hi toca; (3) lead SOLIDARI amb reserva amb foto prèvia + registre + alerta (capgira el criteri «lead congelat» del #1872 en escriptura; el filtre de lectura pot quedar obsolet — coordinem si toques crewScheduleService).
 Avís per l'altre agent: no toquis `app/admin/presupuestos/**` ni packs-config mentre duri això.
 

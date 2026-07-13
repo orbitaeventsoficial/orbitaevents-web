@@ -7496,8 +7496,9 @@
     "budget": {
       "servicesLabel": "Les propostes",
       "travelTitle": "Desplaçament",
-      "travelNote": "Inclòs fins a {includedKm} km des de Granollers. En rutes més llargues, el desplaçament es calcula de manera transparent segons la distància i l'equip que cal moure.",
+      "travelNote": "Inclòs fins a {includedKm} km d'anada i tornada des de Granollers. En rutes més llargues, el desplaçament es calcula de manera transparent segons la distància i l'equip que cal moure.",
       "travelRoute": "El vostre esdeveniment és a {location}, a uns {km} km (anada i tornada) des de Granollers. El desplaçament s'aplica sobre aquesta ruta.",
+      "travelRouteIncluded": "El vostre esdeveniment és a {location}, a uns {km} km (anada i tornada) des de Granollers: el desplaçament us queda inclòs.",
       "travelPriceLabel": "Cost del desplaçament",
       "travelBreakdownLabel": "Desglossament",
       "travelBreakdownVehicle": "Vehicle i combustible",

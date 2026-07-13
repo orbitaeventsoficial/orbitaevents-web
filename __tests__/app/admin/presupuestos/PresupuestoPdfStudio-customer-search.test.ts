@@ -60,7 +60,9 @@ describe('PresupuestoPdfStudio customer search guard', () => {
     expect(utilsSource).toContain("export type SectionId = 'config' | 'client' | 'brand' | 'transport'");
     expect(adminConstantsSource).toContain("transport: 'Transport'");
     expect(adminConstantsSource).toContain("'config', 'client', 'transport', 'brand'");
+    expect(adminConstantsSource).toContain('ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_ORDER');
     expect(adminConstantsSource).toContain('ADMIN_PDF_STUDIO_DEFAULT_COLLAPSED_SECTIONS');
+    expect(utilsSource).toContain('LEAD_BOLO_SECTION_ORDER');
     expect(utilsSource).toContain('DEFAULT_COLLAPSED_SECTIONS');
     expect(source).toContain('DEFAULT_COLLAPSED_SECTIONS.filter((id) => id !== \'pack\' && id !== \'extras-custom\')');
     expect(source).toContain("case 'transport':");
@@ -100,6 +102,22 @@ describe('PresupuestoPdfStudio customer search guard', () => {
     expect(previewBlock).toContain('onClick={sendQuoteEmail}');
     expect(previewBlock).toContain('Obrir en pestanya');
     expect(previewBlock).toContain('documentMessageIsPositive');
+  });
+
+  it('redueix els acordions visibles quan el pressupost documenta el bolo del lead', () => {
+    expect(adminConstantsSource).toContain("export const ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_ORDER = [");
+    expect(adminConstantsSource).toContain("'config', 'client', 'transport', 'pack'");
+    expect(adminConstantsSource).toContain("pack: 'Bolo i condicions'");
+    expect(utilsSource).toContain('export const LEAD_BOLO_SECTION_ORDER: SectionId[] = [...ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_ORDER];');
+    expect(utilsSource).toContain('export const LEAD_BOLO_SECTION_LABELS: Partial<Record<SectionId, string>> = ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_LABELS;');
+    expect(source).toContain('const [leadBoloSectionOrder, setLeadBoloSectionOrder] = useState<SectionId[]>(LEAD_BOLO_SECTION_ORDER);');
+    expect(source).toContain('const visibleSectionOrder = useMemo<SectionId[]>(() => {');
+    expect(source).toContain('if (!shouldUseLeadBoloAsSource) return sectionOrder;');
+    expect(source).toContain("return docMode === 'contract' ? [...base, 'contract'] : base;");
+    expect(source).toContain('const handleSectionReorder = useCallback((newOrder: SectionId[]) => {');
+    expect(source).toContain('items={visibleSectionOrder}');
+    expect(source).toContain('onReorder={handleSectionReorder}');
+    expect(source).toContain('{getVisibleSectionLabel(sectionId)}');
   });
 
   it('hereta km i peatges del lead quan el pressupost s’obre des de leads', () => {

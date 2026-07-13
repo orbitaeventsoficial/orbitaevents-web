@@ -7202,8 +7202,9 @@
     "budget": {
       "servicesLabel": "Las propuestas",
       "travelTitle": "Desplazamiento",
-      "travelNote": "Incluido hasta {includedKm} km desde Granollers. En rutas más largas, el desplazamiento se calcula de forma transparente según la distancia y el equipo que hay que mover.",
+      "travelNote": "Incluido hasta {includedKm} km de ida y vuelta desde Granollers. En rutas más largas, el desplazamiento se calcula de forma transparente según la distancia y el equipo que hay que mover.",
       "travelRoute": "Vuestro evento es en {location}, a unos {km} km (ida y vuelta) desde Granollers. El desplazamiento se aplica sobre esta ruta.",
+      "travelRouteIncluded": "Vuestro evento es en {location}, a unos {km} km (ida y vuelta) desde Granollers: el desplazamiento os queda incluido.",
       "travelPriceLabel": "Coste del desplazamiento",
       "travelBreakdownLabel": "Desglose",
       "travelBreakdownVehicle": "Vehículo y combustible",

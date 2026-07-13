@@ -7202,8 +7202,9 @@
     "budget": {
       "servicesLabel": "The proposals",
       "travelTitle": "Travel",
-      "travelNote": "Included up to {includedKm} km from Granollers. On longer routes, travel is calculated transparently according to distance and the crew that needs to move.",
+      "travelNote": "Included up to {includedKm} km round trip from Granollers. On longer routes, travel is calculated transparently according to distance and the crew that needs to move.",
       "travelRoute": "Your event is in {location}, about {km} km (round trip) from Granollers. Travel applies to this route.",
+      "travelRouteIncluded": "Your event is in {location}, about {km} km (round trip) from Granollers: travel is included.",
       "travelPriceLabel": "Travel cost",
       "travelBreakdownLabel": "Breakdown",
       "travelBreakdownVehicle": "Vehicle and fuel",

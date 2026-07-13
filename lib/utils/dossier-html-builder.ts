@@ -54,6 +54,7 @@ export type DossierCopy = {
     travelTitle: string;
     travelNote: string;
     travelRoute: string;
+    travelRouteIncluded: string;
     travelPriceLabel: string;
     travelBreakdownLabel: string;
     travelBreakdownVehicle: string;
@@ -192,7 +193,6 @@ function buildProposalBlock(
   const money = (n: number) => escHtml(formatCurrency(n, locale));
   const decimal = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const fromPrefix = escHtml(copy.chapter.priceFromPrefix);
-  const includedOneWay = Math.round(INCLUDED_TRAVEL_KM / 2);
   const fillRaw = (tpl: string, vars: Record<string, string>) =>
     Object.entries(vars).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), tpl);
   const fill = (tpl: string, vars: Record<string, string>) => escHtml(fillRaw(tpl, vars));
@@ -260,8 +260,8 @@ function buildProposalBlock(
       </div>
       <div class="bud-travel-main">
         <div class="bud-travel-title">${escHtml(copy.budget.travelTitle)}</div>
-        <p class="bud-note">${fill(copy.budget.travelNote, { includedKm: String(includedOneWay) })}</p>
-        ${location ? `<p class="bud-note bud-note--route">${fill(copy.budget.travelRoute, { location, km: String(Math.round(travelKm)) })}</p>` : ''}
+        <p class="bud-note">${fill(copy.budget.travelNote, { includedKm: String(INCLUDED_TRAVEL_KM) })}</p>
+        ${location ? `<p class="bud-note bud-note--route">${fill(travelCharge > 0 ? copy.budget.travelRoute : copy.budget.travelRouteIncluded, { location, km: String(Math.round(travelKm)) })}</p>` : ''}
         ${travelCharge > 0 ? `<div class="bud-travel-price">
           <span class="bud-travel-price-label">${escHtml(copy.budget.travelPriceLabel)}</span>
           <span class="bud-travel-price-val">${money(travelCharge)}</span>

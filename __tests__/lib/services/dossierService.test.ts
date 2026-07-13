@@ -86,6 +86,7 @@ vi.mock('@/lib/constants/dossier-copy', () => ({
       travelTitle: '',
       travelNote: '',
       travelRoute: '',
+      travelRouteIncluded: '',
       travelPriceLabel: '',
       travelBreakdownLabel: '',
       travelBreakdownVehicle: '',

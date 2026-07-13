@@ -33106,6 +33106,34 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #2023 — 2026-07-13 — claude (FET)
+**Catàleg Masquerade: fitxa Cantant reescrita i Bingo Musical Old Stars nou.**
+- Context: ordre directa del propietari; la cantant existia sense descripció ni foto i el bingo per a gent gran no existia. Instrucció: preus a la seva casella (no a la descripció) i PVP amb 20% de recàrrec sobre el cost.
+- Operació de dades a BD, sense codi: `Cantant en directe` (abans «Cantant Boleros i infantil») amb descripció nova en català, categoria `Animació adulta`, durada `70-80 min`, 150 € → 180 €, foto nova `cantant-directe.jpg`; `Bingo Musical Old Stars` nou amb descripció en català (Marisol, Antonio Machín, Raphael, +8 línies, minijocs), `70 min`, 200 € → 240 €, imatge reutilitzada del bingo d'adults, `sortOrder` 12.
+- Únic artefacte de repo: `public/img/collaborators/masquerade/cantant-directe.jpg` (comitejat sol perquè la URL funcioni desplegada).
+- Validació: escriptura Prisma confirmada + re-consulta read-only amb tots els camps esperats; `/admin/colaboradores` llegeix del mateix servei verificat.
+- `ADMIN_CHANGE_COUNTER` passa a `2023`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #2022 — 2026-07-13 — codex (FET)
+**Pressupostos: el bolo del lead redueix l'editor a les seccions útils.**
+- Context: #2019 fa que el DRAFT documenti les `LeadServiceLine` reals, #2020/#2021 tanquen la frontera lead formalitzat → reserva, però el Studio encara mostrava els 8 acordions complets quan el pressupost venia del lead.
+- Autorització explícita propietari: `go` reprèn el protocol viu després de la regla "jo opero en lead, sempre en lead, pressupostos, dossiers, tot ho opero en lead, i passa a reserva quan es ferm" i de la queixa sobre "una quantitat de menus desmesurada". Tall acotat a UI/estat de l'editor, constants, test i registres; no toca pricing, transport, IVA, motor PDF, schema, BD write, crons, emails reals ni publicacions.
+- `lib/constants/admin.ts`: afegeix `ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_ORDER` (`config`, `client`, `transport`, `pack`) i label `Bolo i condicions`.
+- `app/admin/presupuestos/studio-utils.ts`: exporta `LEAD_BOLO_SECTION_ORDER` i `LEAD_BOLO_SECTION_LABELS` des de la capa de constants, sense array local al component.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: calcula `visibleSectionOrder`; en mode `lead-service-lines` renderitza només les seccions útils i afegeix `contract` només si `docMode === 'contract'`. El mode manual conserva els 8 blocs i el `sectionOrder` de localStorage.
+- `SortableList` ara rep `visibleSectionOrder` i un `handleSectionReorder` que separa l'ordre del mode manual de l'ordre reduït del bolo del lead.
+- `__tests__/app/admin/presupuestos/PresupuestoPdfStudio-customer-search.test.ts`: blinda el contracte perquè un pressupost de lead no torni a ensenyar els 8 acordions com a flux normal.
+- Validació tècnica: focused Vitest OK (`PresupuestoPdfStudio-customer-search`: 10 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: pressupost manual = Studio complet; pressupost de lead = revisió curta del bolo real, transport i condicions, sense catàleg/extres/brand com a passos inútils.
+- Validació humana/UX: menys soroll i menys sensació de programa pesat; l'operador revisa el bolo que ja existeix i va cap a preview/enviament.
+- `ADMIN_CHANGE_COUNTER` passa a `2022`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #2021 — 2026-07-12 — codex (FET)
 **Pressupostos: un lead formalitzat no reobre editor nou.**
 - Context: el #2020 tanca la fitxa de lead com a editor operatiu quan ja existeix reserva, però quedava una porta lateral: `/admin/presupuestos?leadId=...` podia muntar un editor nou sense `proposalId` sobre un lead formalitzat.

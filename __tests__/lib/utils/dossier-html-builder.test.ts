@@ -55,8 +55,9 @@ const copy: DossierCopy = {
   budget: {
     servicesLabel: 'Les propostes',
     travelTitle: 'Desplaçament',
-    travelNote: 'Inclòs fins a {includedKm} km; després, cost real del trajecte.',
-    travelRoute: 'El vostre esdeveniment és a {location}, a uns {km} km des de Granollers.',
+    travelNote: 'Inclòs fins a {includedKm} km anada i tornada; després, cost real del trajecte.',
+    travelRoute: 'El vostre esdeveniment és a {location}, a uns {km} km (anada i tornada). El desplaçament s\'aplica sobre aquesta ruta.',
+    travelRouteIncluded: 'El vostre esdeveniment és a {location}, a uns {km} km (anada i tornada): el desplaçament us queda inclòs.',
     travelPriceLabel: 'Cost del desplaçament',
     travelBreakdownLabel: 'Desglossament',
     travelBreakdownVehicle: 'Vehicle i combustible',
@@ -336,6 +337,26 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('Dietes de ruta llarga');
     // Tot dins la mateixa (única) pàgina de proposta.
     expect(html.match(/class="resum-page"/g)?.length).toBe(1);
+  });
+
+  it('ruta dins la franquícia (cas Vilassar, 44 km a/t): copy d\'inclòs, sense càrrec i franquícia en anada i tornada', () => {
+    const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 200 };
+    const html = build(client, [a], { travelKm: 44, location: 'Vilassar' });
+    // La nota parla en la MATEIXA unitat que la ruta: 50 km anada i tornada (INCLUDED_TRAVEL_KM), no 25 d'anada.
+    expect(html).toContain('Inclòs fins a 50 km anada i tornada');
+    expect(html).not.toContain('fins a 25 km');
+    // El cervell diu càrrec 0 → el copy diu inclòs, mai «el desplaçament s\'aplica».
+    expect(html).toContain('44 km (anada i tornada): el desplaçament us queda inclòs');
+    expect(html).not.toContain('s\'aplica sobre aquesta ruta');
+    expect(html).not.toContain('class="bud-travel-price"');
+  });
+
+  it('ruta per sobre de la franquícia: copy de càrrec aplicat coherent amb el preu pintat', () => {
+    const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 200 };
+    const html = build(client, [a], { travelKm: 180, location: 'Reus' });
+    expect(html).toContain('180 km (anada i tornada). El desplaçament s\'aplica sobre aquesta ruta');
+    expect(html).not.toContain('queda inclòs');
+    expect(html).toContain('class="bud-travel-price"');
   });
 
   it('no mostra cap recàrrec de temporada al dossier encara que hi hagi data', () => {

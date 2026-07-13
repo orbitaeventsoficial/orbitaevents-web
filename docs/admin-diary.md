@@ -1,3 +1,48 @@
+## 2026-07-13 — Catàleg Masquerade: fitxa Cantant reescrita i Bingo Musical Old Stars nou (Canvi #2023, claude)
+
+### Context
+Ordre directa del propietari (2026-07-13): dos productes de col·laborador per a Masquerade Events. La cantant ja existia a la BD («Cantant Boleros i infantil», creada pel propietari sense descripció ni foto) i calia reescriure-li el text ben fet; el Bingo musical per a gent gran era nou, amb text a refer i reutilitzant la imatge del bingo d'adults. Instrucció explícita: els preus NO van a la descripció, van a la seva casella, i el PVP surt amb un 20% de recàrrec sobre el cost.
+
+### Canvi
+- Operació de dades (BD Railway), sense codi: cap servei, ruta ni component tocat.
+- `Cantant en directe` (`cmrj227hp003axqahbnadfooc`, abans «Cantant Boleros i infantil»): descripció nova en català a partir del copy del propietari (boleros, pasdobles, balades, pop, repertori que es va creant al ritme del públic), categoria `Animació adulta`, durada `70-80 min`, cost 150 € → PVP 180 € (ja eren correctes), foto nova `/img/collaborators/masquerade/cantant-directe.jpg` (rebuda del propietari via Downloads i copiada a `public/`).
+- `Bingo Musical Old Stars` (`cmrj6auwg00014ldwqwiasybo`, nou): versió del bingo musical adaptada a la gent gran (Marisol, Antonio Machín, Raphael…, més de 8 línies en joc, minijocs musicals), categoria `Animació adulta`, crew idèntic als altres bingos, durada `70 min`, cost 200 € → PVP 240 € (20%), mateixa imatge que el bingo d'adults (`/img/collaborators/masquerade/bingo-musical.jpg`), `sortOrder` 12 (al costat de Bingo/Batalla).
+- Cap preu dins la descripció; el marge segueix el patró del catàleg (cost × 1,20, coherent amb `COLLABORATOR_DEFAULT_MARKUP`).
+
+### Validació
+- Validació tècnica: escriptura via script Prisma puntual (update + create) amb sortida confirmada; re-consulta read-only posterior mostra els dos productes amb tots els camps esperats (nom, descripció, categoria, crew, durada, cost/PVP, imatge, includes, actius i visibles a dossier/booking). Scripts temporals eliminats.
+- Validació funcional: `/admin/colaboradores` llegeix del mateix `listCollaboratorProducts`, per tant la fitxa surt directament del que s'ha verificat a BD. La foto de la cantant queda comitejada a `public/img/collaborators/masquerade/cantant-directe.jpg` perquè la URL funcioni també desplegada.
+- Fora d'abast: cap canvi de codi, schema, preus d'altres productes ni textos client-facing existents.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2023.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-13 — Pressupostos: el bolo del lead redueix l'editor a les seccions útils (Canvi #2022, codex)
+
+### Context
+Després dels talls #2019-#2021, el pressupost ja hereta el bolo real del lead i no reobre leads formalitzats. Quedava la fricció visible que havia originat la queixa del propietari: l'editor continuava ensenyant els 8 acordions complets, inclosos marca, catàleg d'extres, extres personalitzats i contracte, encara que el bolo ja vingués configurat del lead i aquests menús no fossin el flux normal.
+
+### Canvi
+- `lib/constants/admin.ts`: nou contracte `ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_ORDER` amb només `config`, `client`, `transport` i `pack`; label específic `Bolo i condicions`.
+- `app/admin/presupuestos/studio-utils.ts`: exporta l'ordre i els labels del mode bolo del lead perquè el component no fabriqui arrays locals.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: quan `shouldUseLeadBoloAsSource` és cert, `SortableList` rep `visibleSectionOrder` reduït en lloc dels 8 blocs complets. El mode contracte afegeix `contract` només si l'operador el selecciona a Configuració.
+- El mode manual continua amb l'ordre complet existent i amb `sectionOrder` desat a localStorage; el mode lead té ordre propi i no reintrodueix catàleg/extres/brand com a feina oberta.
+- `__tests__/app/admin/presupuestos/PresupuestoPdfStudio-customer-search.test.ts`: cobertura estàtica del contracte de seccions reduïdes i del label `Bolo i condicions`.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`PresupuestoPdfStudio-customer-search`: 10 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: el pressupost manual conserva el Studio complet; el pressupost que documenta `LeadServiceLine` mostra només configurar document, revisar client/esdeveniment, transport i bolo/condicions, sense menús de catàleg que ja no decideixen el bolo.
+- Validació humana/UX: l'operador passa d'una pantalla que semblava fer-lo recomprar el bolo a un flux més curt de revisió i previsualització. El contracte queda disponible només quan es tria explícitament.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2022.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-12 — Pressupostos: un lead formalitzat no reobre editor nou (Canvi #2021, codex)
 
 ### Context

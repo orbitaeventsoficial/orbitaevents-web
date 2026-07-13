@@ -21,7 +21,7 @@ import {
   type PricingCatalogResponse, type PricingCatalogCustomer, type ProfitabilityConfigResponse, type StudioProps, type StudioLeadServiceLine, type ExtraDefinition, type ServiceSlug,
   type PackDefinition,
   SECTION_LABELS, DEFAULT_SECTION_ORDER, DEFAULT_COLLAPSED_SECTIONS, STUDIO_DRAFT_KEY, CUSTOM_PACK_ID,
-  OPERATOR_PDF_EXTRA_ID, STUDIO_COPY, SERVICE_LABEL, ALL_SERVICES,
+  LEAD_BOLO_SECTION_ORDER, LEAD_BOLO_SECTION_LABELS, OPERATOR_PDF_EXTRA_ID, STUDIO_COPY, SERVICE_LABEL, ALL_SERVICES,
   quoteStudioSchema, normalizeStudioLocale, formatEUR, toFeatureLines,
   buildPackFromForm, translateBatchForPdf, buildCustomExtrasFromLeadServiceLines,
   buildLeadServiceFeatureLines, deriveStudioDurationHours, leadServiceLinesForTransport,
@@ -204,6 +204,7 @@ export default function PresupuestoPdfStudio({
   const [cancellationPolicy, setCancellationPolicy] = useState(ADMIN_PDF_STUDIO_DEFAULTS.cancellationPolicy);
   const [additionalClauses, setAdditionalClauses] = useState('');
   const [sectionOrder, setSectionOrder] = useState<SectionId[]>(DEFAULT_SECTION_ORDER);
+  const [leadBoloSectionOrder, setLeadBoloSectionOrder] = useState<SectionId[]>(LEAD_BOLO_SECTION_ORDER);
   const [collapsedSections, setCollapsedSections] = useState<Set<SectionId>>(
     () => new Set(
       initialLeadId && initialLeadServiceLines.length > 0 && (!initialProposalId || initialPreferLeadPrefill)
@@ -218,6 +219,24 @@ export default function PresupuestoPdfStudio({
       return next;
     });
   }, []);
+  const visibleSectionOrder = useMemo<SectionId[]>(() => {
+    if (!shouldUseLeadBoloAsSource) return sectionOrder;
+    const base = leadBoloSectionOrder.filter((id) => LEAD_BOLO_SECTION_ORDER.includes(id));
+    return docMode === 'contract' ? [...base, 'contract'] : base;
+  }, [docMode, leadBoloSectionOrder, sectionOrder, shouldUseLeadBoloAsSource]);
+  const handleSectionReorder = useCallback((newOrder: SectionId[]) => {
+    if (!shouldUseLeadBoloAsSource) {
+      setSectionOrder(newOrder);
+      return;
+    }
+    const nextLeadOrder = newOrder.filter((id) => LEAD_BOLO_SECTION_ORDER.includes(id));
+    setLeadBoloSectionOrder(nextLeadOrder.length > 0 ? nextLeadOrder : LEAD_BOLO_SECTION_ORDER);
+  }, [shouldUseLeadBoloAsSource]);
+  const getVisibleSectionLabel = useCallback((sectionId: SectionId) => {
+    return shouldUseLeadBoloAsSource
+      ? LEAD_BOLO_SECTION_LABELS[sectionId] || SECTION_LABELS[sectionId]
+      : SECTION_LABELS[sectionId];
+  }, [shouldUseLeadBoloAsSource]);
   const [pricingCatalog, setPricingCatalog] = useState<PricingCatalogState>({
     packNamesBySlug: {},
     extraNamesBySlug: {},
@@ -1854,9 +1873,9 @@ export default function PresupuestoPdfStudio({
         )}
 
         <SortableList
-          items={sectionOrder}
+          items={visibleSectionOrder}
           keyFn={(id) => id}
-          onReorder={(newOrder) => setSectionOrder(newOrder)}
+          onReorder={handleSectionReorder}
           className="space-y-4"
           placeholderHeight={60}
           renderItem={(sectionId, _idx, { isDragging }) => {
@@ -1866,7 +1885,7 @@ export default function PresupuestoPdfStudio({
               <div className={`rounded-2xl border p-4 transition-all ${borderTone} ${isDragging ? 'opacity-40' : ''}`}>
                 <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing select-none">
                   <span className="text-[var(--t3)] text-sm" aria-hidden>&#9776;</span>
-                  <p className="flex-1 text-xs font-semibold uppercase tracking-wide">{SECTION_LABELS[sectionId]}</p>
+                  <p className="flex-1 text-xs font-semibold uppercase tracking-wide">{getVisibleSectionLabel(sectionId)}</p>
                   <button type="button" onClick={(e) => { e.stopPropagation(); toggleCollapse(sectionId); }} className="rounded-lg px-2 py-1 text-xs hover:bg-[var(--raised)] transition-colors" aria-label={isCollapsed ? 'Expandir secció' : 'Col·lapsar secció'}>
                     {isCollapsed ? '>' : 'v'}
                   </button>
