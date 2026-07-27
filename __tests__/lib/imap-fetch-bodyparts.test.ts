@@ -44,15 +44,29 @@ describe('lib/imap.ts — fetchEmailByUid no pot regressionar a source: true', (
     expect(body).not.toMatch(/source\s*:\s*true/);
   });
 
-  it('fetchEmailByUid usa bodyParts amb keys lowercase (header) i parts numerades', () => {
+  it('fetchEmailByUid demana NOMÉS les parts que el missatge té', () => {
     const body = extractFunction('fetchEmailByUid');
-    // bodyParts pot ser inline (`[...]`) o via variable (`DEFAULT_PARTS`)
-    expect(body).toMatch(/bodyParts\s*:\s*(\[|[A-Z_][A-Z0-9_]*)/);
-    // ImapFlow normalitza les keys a lowercase
+
+    // Aquest test demanava el contrari fins al 2026-07-27: exigia que es
+    // demanessin sempre les parts '1' i '2' «per cobrir multipart». La premissa
+    // era que el servidor tornaria null per a les parts que no existissin.
+    //
+    // Producció la va desmentir: DonDominio fa fallar TOTA l'ordre amb
+    // «Command failed» si li demanes una part inexistent, i per això no es
+    // podia llegir el cos de CAP correu de la safata. Cap missatge té alhora
+    // '1', '2', '3', '1.1', '1.2', '1.3', '2.1' i '2.2'.
+    //
+    // La invariant bona: preguntar primer l'estructura i demanar després.
+    expect(body).toMatch(/bodyParts\s*:\s*(\[|[A-Za-z_$][\w$]*)/);
     expect(body).toContain("'header'");
-    // Demanem parts numerades genèriques per cobrir multipart/alternative
-    expect(body).toMatch(/'1'/);
-    expect(body).toMatch(/'2'/);
+
+    // L'estructura es consulta ABANS de demanar les parts.
+    expect(body).toMatch(/bodyStructure:\s*true/);
+    expect(body).toContain('identifyTextParts');
+
+    // I no es tornen a demanar parts numerades a l'atzar.
+    expect(body).not.toMatch(/bodyParts\s*:\s*\[[^\]]*'2\.2'/);
+    expect(body).not.toMatch(/bodyParts\s*:\s*\[[^\]]*'1\.3'/);
   });
 
   it("fetchEmailByUid llegeix bodyParts.get('header') (lowercase) i passa per identifyTextParts", () => {
