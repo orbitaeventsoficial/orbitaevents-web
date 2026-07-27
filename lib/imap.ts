@@ -464,19 +464,33 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
   try {
     const mailbox = await client.getMailboxLock(folder);
     try {
-      // 1 sol fetch IMAP: envelope + bodyStructure + flags + header + un set
-      // genèric de partKeys que cobreix 95% dels casos. ImapFlow retorna
-      // null per a parts que no existeixen, sense cost extra. Amb el
-      // bodyStructure rebut, sabem quins partKeys són text i només
-      // processem aquests. Decodifiquem manualment quoted-printable i
-      // base64 per evitar dependre del MIME multipart wrapping.
-      const DEFAULT_PARTS = ['header', '1', '2', '3', '1.1', '1.2', '1.3', '2.1', '2.2', 'text'];
+      // Es demanen NOMÉS les parts que el missatge té de veritat.
+      //
+      // Abans es demanava sempre la mateixa llista fixa
+      // (['1','2','3','1.1','1.2','1.3','2.1','2.2','text']) confiant que el
+      // servidor tornaria null per a les que no existissin. Molts servidors
+      // IMAP no ho fan: si demanes `BODY[2.2]` d'un missatge que no en té,
+      // fan fallar TOTA l'ordre amb «Command failed». Amb DonDominio passa
+      // això, i per això no es podia llegir el cos de CAP correu: no hi ha
+      // cap missatge que tingui les deu parts alhora.
+      //
+      // Primer es demana l'estructura —que tot missatge té— i amb ella a la
+      // mà es demanen les parts reals. De propina, deixa de baixar-se vuit
+      // parts fantasma per correu.
+      const structureProbe = await client.fetchOne(String(uid), { bodyStructure: true }, { uid: true });
+      const probedParts = identifyTextParts(structureProbe ? structureProbe.bodyStructure : undefined)
+        .map((part) => part.partKey)
+        .filter(Boolean);
+      // `header` sempre existeix; `text` és el recurs quan l'estructura no
+      // declara cap part de text (missatges d'una sola part).
+      const safeParts = [...new Set(['header', ...(probedParts.length > 0 ? probedParts : ['text'])])];
+
       for await (const message of client.fetch([uid], {
         uid: true,
         envelope: true,
         bodyStructure: true,
         flags: true,
-        bodyParts: DEFAULT_PARTS,
+        bodyParts: safeParts,
       }, { uid: true })) {
         const envelope = message.envelope;
         const bodyStructure: unknown = message.bodyStructure;
