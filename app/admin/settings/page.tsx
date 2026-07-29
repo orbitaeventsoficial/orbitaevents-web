@@ -105,12 +105,12 @@ export default async function SettingsPage() {
         <SettingsClient groupedSettings={settings} categoryConfig={SETTINGS_CATEGORY_CONFIG} />
       )}
 
-      <section className="rounded-2xl border admin-card-glass p-5">
+      <section className="ap-card p-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">Accessos directes</p>
-            <h2 className="mt-1 ap-h2 text-white/90">Canvis que acostumen a tenir més impacte</h2>
-            <p className="mt-1 text-sm text-white/65">Entrades ràpides a les peces de configuració que més afecten venda, marca i operativa.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Accessos directes</p>
+            <h2 className="mt-1 ap-h2 text-[var(--t)]">Canvis que acostumen a tenir més impacte</h2>
+            <p className="mt-1 text-sm text-[var(--t2)]">Entrades ràpides a les peces de configuració que més afecten venda, marca i operativa.</p>
           </div>
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -120,7 +120,7 @@ export default async function SettingsPage() {
         >
           <div className="text-2xl mb-2">🧾</div>
           <h3 className="font-semibold">Editor PDF de pressupost</h3>
-          <p className="text-sm text-white/70">Personalitza client, pack, extres i descarrega el PDF a l’instant</p>
+          <p className="text-sm text-[var(--t2)]">Personalitza client, pack, extres i descarrega el PDF a l’instant</p>
         </Link>
 
         <Link
@@ -129,7 +129,7 @@ export default async function SettingsPage() {
         >
           <div className="text-2xl mb-2">📄</div>
           <h3 className="font-semibold">Plantilla de pressupostos</h3>
-          <p className="text-sm text-white/70">Text, condicions i còpia interna dels pressupostos</p>
+          <p className="text-sm text-[var(--t2)]">Text, condicions i còpia interna dels pressupostos</p>
         </Link>
 
         <Link
@@ -138,7 +138,7 @@ export default async function SettingsPage() {
         >
           <div className="text-2xl mb-2">📦</div>
           <h3 className="font-semibold">Catàleg</h3>
-          <p className="text-sm text-white/70">Packs, extres, inventari i regles de preu</p>
+          <p className="text-sm text-[var(--t2)]">Packs, extres, inventari i regles de preu</p>
         </Link>
 
         <Link
@@ -147,7 +147,7 @@ export default async function SettingsPage() {
         >
           <div className="text-2xl mb-2">🌐</div>
           <h3 className="font-semibold">Traduccions</h3>
-          <p className="text-sm text-white/70">Gestiona el contingut multiidioma</p>
+          <p className="text-sm text-[var(--t2)]">Gestiona el contingut multiidioma</p>
         </Link>
 
         <Link
@@ -156,7 +156,7 @@ export default async function SettingsPage() {
         >
           <div className="text-2xl mb-2">🏢</div>
           <h3 className="font-semibold">Empresa i Holded</h3>
-          <p className="text-sm text-white/70">Dades fiscals, IBAN, NIF i integració Holded</p>
+          <p className="text-sm text-[var(--t2)]">Dades fiscals, IBAN, NIF i integració Holded</p>
         </Link>
 
         <Link
@@ -165,7 +165,7 @@ export default async function SettingsPage() {
         >
           <div className="text-2xl mb-2">❓</div>
           <h3 className="font-semibold">FAQs</h3>
-          <p className="text-sm text-white/70">Edita les preguntes freqüents</p>
+          <p className="text-sm text-[var(--t2)]">Edita les preguntes freqüents</p>
         </Link>
         </div>
       </section>

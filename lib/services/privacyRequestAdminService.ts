@@ -1,7 +1,10 @@
 import { Prisma, type DataResponseType } from '@prisma/client';
-import { PRIVACY_REQUEST_ARTICLES } from '@/lib/constants/privacy';
+import { DOWNLOADABLE_PRIVACY_REQUEST_TYPES, PRIVACY_REQUEST_ARTICLES } from '@/lib/constants/privacy';
 import { prisma } from '@/lib/prisma';
 import { anonymizeCustomerData, exportCustomerData, logPrivacyAction } from '@/lib/services/privacyService';
+import { sendPrivacyRequestCompletedEmail } from '@/lib/email';
+import { getAppBaseUrl } from '@/lib/site';
+import { log } from '@/lib/logger';
 
 function getArticle(requestType: string): string {
   return PRIVACY_REQUEST_ARTICLES[requestType] || '15';
@@ -40,6 +43,20 @@ export async function processPrivacyRequestById(id: string, action: 'approve' | 
       performedBy: 'admin',
       reason: `Sol·licitud rebutjada: ${notes}`,
     });
+
+    try {
+      await sendPrivacyRequestCompletedEmail({
+        to: request.requesterEmail,
+        name: request.requesterName,
+        requestType: request.requestType,
+        requestId: request.id,
+        result: 'rejected',
+        notes,
+        locale: request.customer?.preferredLocale,
+      });
+    } catch (error) {
+      log.error('[privacyRequestAdminService] sendPrivacyRequestCompletedEmail (rejected) error:', error);
+    }
 
     return { status: 200, body: { success: true, message: 'Sol·licitud rebutjada' } };
   }
@@ -124,6 +141,25 @@ export async function processPrivacyRequestById(id: string, action: 'approve' | 
     reason: `Sol·licitud ${request.requestType} aprovada i processada`,
     legalBasis: `RGPD Art. ${getArticle(request.requestType)}`,
   });
+
+  try {
+    const downloadUrl = DOWNLOADABLE_PRIVACY_REQUEST_TYPES.has(request.requestType) && responseData !== undefined
+      ? `${getAppBaseUrl()}/api/privacy/download?token=${request.verificationToken}`
+      : undefined;
+
+    await sendPrivacyRequestCompletedEmail({
+      to: request.requesterEmail,
+      name: request.requesterName,
+      requestType: request.requestType,
+      requestId: request.id,
+      result: 'approved',
+      notes,
+      downloadUrl,
+      locale: request.customer?.preferredLocale,
+    });
+  } catch (error) {
+    log.error('[privacyRequestAdminService] sendPrivacyRequestCompletedEmail (approved) error:', error);
+  }
 
   return {
     status: 200,

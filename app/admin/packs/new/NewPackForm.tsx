@@ -5,16 +5,27 @@ import { useRouter } from 'next/navigation';
 import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { PACK_SERVICE_OPTIONS } from '@/lib/constants';
 import { useAsyncForm } from '../../components/useAsyncForm';
 
-const inputClass = 'w-full ap-card px-3 py-2 text-sm text-white/90';
+const inputClass = 'w-full ap-card px-3 py-2 text-sm text-[var(--t)]';
+
+type PackServiceValue = (typeof PACK_SERVICE_OPTIONS)[number]['value'];
+
+type NewPackFormState = {
+  slug: string;
+  price: string;
+  djHours: string;
+  service: PackServiceValue;
+  nameCa: string;
+};
 
 export default function NewPackForm() {
   const router = useRouter();
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<NewPackFormState>({
     slug: '',
-    price: 0,
-    djHours: 3,
+    price: '',
+    djHours: '3',
     service: 'discomovil',
     nameCa: '',
   });
@@ -50,7 +61,7 @@ export default function NewPackForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border p-6">
+    <form onSubmit={handleSubmit} className="ap-card p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="pack-slug" className="mb-1 block text-sm">Slug</label>
@@ -78,13 +89,12 @@ export default function NewPackForm() {
           <select
             id="pack-service"
             value={form.service}
-            onChange={(e) => setForm({ ...form, service: e.target.value })}
+            onChange={(e) => setForm({ ...form, service: e.target.value as PackServiceValue })}
             className={inputClass}
           >
-            <option value="fiestas">Festes</option>
-            <option value="discomovil">Discomòbil</option>
-            <option value="bodas">Bodes</option>
-            <option value="empresas">Empreses</option>
+            {PACK_SERVICE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
           </select>
         </div>
         <div>
@@ -93,9 +103,10 @@ export default function NewPackForm() {
             id="pack-price"
             type="number"
             value={form.price}
-            onChange={(e) => setForm({ ...form, price: Number(e.target.value) || 0 })}
+            onChange={(e) => setForm({ ...form, price: e.target.value })}
             className={inputClass}
-            min={0}
+            min={1}
+            step={1}
             required
           />
         </div>
@@ -105,25 +116,30 @@ export default function NewPackForm() {
             id="pack-dj-hours"
             type="number"
             value={form.djHours}
-            onChange={(e) => setForm({ ...form, djHours: Number(e.target.value) || 1 })}
+            onChange={(e) => setForm({ ...form, djHours: e.target.value })}
             className={inputClass}
             min={1}
+            step={1}
             required
           />
         </div>
       </div>
 
-      {error && <p className="mt-3 rounded-xl border px-3 py-2 text-sm">{error}</p>}
+      {error && (
+        <p className="ap-inline-alert ap-inline-alert--danger mt-3" role="alert" aria-live="assertive">
+          Error: {error}
+        </p>
+      )}
 
       <div className="mt-5 flex gap-3">
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+          className="ap-btn ap-btn--primary disabled:opacity-60"
         >
           {submitting ? 'Creant...' : 'Crear pack'}
         </button>
-        <Link href="/admin/packs" className="rounded-xl border px-4 py-2 text-sm">
+        <Link href="/admin/packs" className="ap-btn ap-btn--secondary">
           Cancel·lar
         </Link>
       </div>

@@ -5,7 +5,25 @@ import { resolvePublicExtraDefinition } from '@/lib/services/publicExtrasService
 const SETTING_KEY = 'extras.configurator';
 
 export function getDefaultExtrasConfig(): ExtraDefinition[] {
-  return EXTRAS.map((extra) => ({ ...extra }));
+  return sanitizeExtrasConfig(EXTRAS);
+}
+
+function resolveAdminExtraText(extra: ExtraDefinition): Pick<ExtraDefinition, 'name' | 'description'> {
+  const resolved = resolvePublicExtraDefinition(
+    {
+      slug: extra.id,
+      price: typeof extra.price === 'number' ? extra.price : 0,
+      priceType: extra.consultarPrecio ? 'ON_REQUEST' : 'FIXED',
+      translationName: extra.name,
+      translationDescription: extra.description,
+    },
+    'ca'
+  );
+
+  return {
+    name: extra.name ? resolved.name : extra.name,
+    description: extra.description ? resolved.description : extra.description,
+  };
 }
 
 export function sanitizeExtrasConfig(input: unknown): ExtraDefinition[] {
@@ -14,7 +32,7 @@ export function sanitizeExtrasConfig(input: unknown): ExtraDefinition[] {
   return input
     .map((raw) => {
       const extra = raw as Partial<ExtraDefinition> | null | undefined;
-      return {
+      const sanitized: ExtraDefinition = {
         id: String(extra?.id || '').trim(),
         name: String(extra?.name || '').trim(),
         description: String(extra?.description || '').trim(),
@@ -26,6 +44,12 @@ export function sanitizeExtrasConfig(input: unknown): ExtraDefinition[] {
         popular: Boolean(extra?.popular),
         premium: Boolean(extra?.premium),
         enabled: extra?.enabled !== false,
+      };
+      const resolvedText = resolveAdminExtraText(sanitized);
+
+      return {
+        ...sanitized,
+        ...resolvedText,
       };
     })
     .filter((extra) => extra.id && extra.name);

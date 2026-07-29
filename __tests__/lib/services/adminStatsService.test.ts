@@ -86,6 +86,31 @@ describe('listAdminStats', () => {
     expect(eventsCompleted.fallback).toBe(200);
   });
 
+  it('ignora fallbacks manuals no finits o parcials', async () => {
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'stats.events_completed', value: 'Infinity' },
+      { key: 'stats.people_entertained', value: '12abc' },
+      { key: 'stats.years_experience', value: '-4' },
+      { key: 'stats.rating_average', value: '4.8' },
+    ]);
+
+    const result = await listAdminStats();
+
+    const eventsCompleted = result.find((s) => s.key === 'stats.events_completed')!;
+    const peopleEntertained = result.find((s) => s.key === 'stats.people_entertained')!;
+    const yearsExperience = result.find((s) => s.key === 'stats.years_experience')!;
+    const ratingAverage = result.find((s) => s.key === 'stats.rating_average')!;
+
+    expect(eventsCompleted.isManual).toBe(false);
+    expect(eventsCompleted.value).toBe(50);
+    expect(peopleEntertained.isManual).toBe(false);
+    expect(peopleEntertained.value).toBe(3000);
+    expect(yearsExperience.isManual).toBe(false);
+    expect(yearsExperience.value).toBeGreaterThanOrEqual(6);
+    expect(ratingAverage.isManual).toBe(true);
+    expect(ratingAverage.value).toBe(4.8);
+  });
+
   it('calcula satisfacció amb fallback 95% sense dades', async () => {
     const result = await listAdminStats();
 
@@ -139,6 +164,16 @@ describe('updateAdminStatFallback', () => {
   it('llança error amb fallback negatiu', async () => {
     await expect(
       updateAdminStatFallback({ key: 'stats.events_completed', fallback: -5 })
+    ).rejects.toThrow('El fallback ha de ser un número positiu');
+  });
+
+  it('llança error amb fallback no finit', async () => {
+    await expect(
+      updateAdminStatFallback({ key: 'stats.events_completed', fallback: Number.NaN })
+    ).rejects.toThrow('El fallback ha de ser un número positiu');
+
+    await expect(
+      updateAdminStatFallback({ key: 'stats.events_completed', fallback: Infinity })
     ).rejects.toThrow('El fallback ha de ser un número positiu');
   });
 });

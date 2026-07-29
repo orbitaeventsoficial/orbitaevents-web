@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     collaboratorProduct: {
+      findUnique: vi.fn(),
       findMany: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
@@ -11,17 +12,21 @@ const { mockPrisma } = vi.hoisted(() => ({
     collaborator: {
       findUnique: vi.fn(),
     },
+    dossier: {
+      count: vi.fn(),
+    },
   },
 }));
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 
 import {
-  computeProductMargin,
   collaboratorProductToAnimacioProduct,
   collaboratorProductToDossierProduct,
   parseDossierCollaboratorProductId,
   toDossierCollaboratorProductId,
   listCollaboratorProducts,
+  listDossierCollaboratorProducts,
+  listActiveCollaboratorProductsForBooking,
   createCollaboratorProduct,
   updateCollaboratorProduct,
   deleteCollaboratorProduct,
@@ -30,6 +35,14 @@ import {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockPrisma.collaboratorProduct.findUnique.mockResolvedValue({
+    id: 'p1',
+    name: 'Producte inactiu',
+    isActive: false,
+    visibleInDossier: false,
+    visibleInBooking: false,
+  });
+  mockPrisma.dossier.count.mockResolvedValue(0);
 });
 
 describe('stripProviderBrand', () => {
@@ -41,20 +54,6 @@ describe('stripProviderBrand', () => {
 
   it('deixa intacte el text sense marca', () => {
     expect(stripProviderBrand('Animació en directe per a adults')).toBe('Animació en directe per a adults');
-  });
-});
-
-describe('computeProductMargin', () => {
-  it('calcula profit net i % sobre el cost del col·laborador', () => {
-    const { marginNet, marginPct } = computeProductMargin(200, 240);
-    expect(marginNet).toBe(40);
-    expect(marginPct).toBeCloseTo(20, 1);
-  });
-
-  it('retorna 0% si el cost és 0', () => {
-    const { marginNet, marginPct } = computeProductMargin(0, 100);
-    expect(marginNet).toBe(100);
-    expect(marginPct).toBe(0);
   });
 });
 
@@ -78,6 +77,7 @@ describe('dossier collaborator product mapping', () => {
     category: 'Musical',
     crew: '2 actors + tècnic de so',
     durationLabel: '70 min',
+    costPrice: 320,
     sellPrice: 385,
     imageUrl: '/img/pirates.jpg',
     includes: "Vestuari d'alta qualitat · Desplaçament inclòs · Disponible en català",
@@ -99,6 +99,8 @@ describe('dossier collaborator product mapping', () => {
     expect(product.inclou).toContain('2 actors + tècnic de so');
     expect(product.inclou).toContain('Disponible en català');
     expect(product.sellPrice).toBe(385);
+    expect(product.costPrice).toBe(320);
+    expect(product.imageUrl).toBe('/img/pirates.jpg');
   });
 
   it('sanititza qualsevol menció de marca de proveïdor del text client-facing', () => {
@@ -121,6 +123,57 @@ describe('dossier collaborator product mapping', () => {
     expect(dossierProduct.nom).toBe('El secret dels pirates');
     expect(dossierProduct.inclou).toContain('Desplaçament inclòs');
     expect(dossierProduct.noInclou).toContain('IVA');
+    expect(dossierProduct.sourceCostPrice).toBe(320);
+    expect(dossierProduct.image).toBe('/img/pirates.jpg');
+  });
+
+  it('inclou qualsevol producte actiu de partner al catàleg del dossier', async () => {
+    mockPrisma.collaboratorProduct.findMany.mockResolvedValue([
+      {
+        ...rawProduct,
+        id: 'prod-nou',
+        name: 'Viatge musical pel món',
+        category: 'Animació infantil',
+        collaboratorId: 'collab-1',
+        isActive: true,
+      },
+    ]);
+
+    const products = await listDossierCollaboratorProducts();
+
+    expect(mockPrisma.collaboratorProduct.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { isActive: true, visibleInDossier: true, collaborator: { isActive: true } },
+    }));
+    expect(products).toHaveLength(1);
+    expect(products[0]).toEqual(expect.objectContaining({
+      id: 'collab:prod-nou',
+      nom: 'Viatge musical pel món',
+      categoria: 'Animació infantil',
+    }));
+  });
+
+  it('oculta del configurador el producte intern de so Isma', async () => {
+    mockPrisma.collaboratorProduct.findMany.mockResolvedValue([
+      {
+        ...rawProduct,
+        id: 'isma-altaveus',
+        name: 'Lloguer altaveus DJ',
+        category: 'Cost intern DJ',
+        collaboratorId: 'isma-lloguer-altaveus',
+        costPrice: 50,
+        sellPrice: 0,
+        visibleInDossier: false,
+        visibleInBooking: true,
+        collaborator: { name: 'Isma', company: 'Isma — lloguer altaveus', roles: ['EQUIPMENT_RENTAL', 'PROVIDER'] },
+      },
+    ]);
+
+    const products = await listActiveCollaboratorProductsForBooking();
+
+    expect(mockPrisma.collaboratorProduct.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { isActive: true, visibleInBooking: true, collaborator: { isActive: true } },
+    }));
+    expect(products).toEqual([]);
   });
 });
 
@@ -152,18 +205,22 @@ describe('createCollaboratorProduct', () => {
     mockPrisma.collaboratorProduct.create.mockResolvedValue({ id: 'p1', name: 'Bingo' });
     const res = await createCollaboratorProduct('col1', {
       name: '  Bingo  ',
-      costPrice: 200,
-      sellPrice: 250,
+      costPrice: 200.126,
+      sellPrice: 250.455,
       category: '  Bingo  ',
       crew: '',
+      sortOrder: -4,
     });
     expect(res.status).toBe(201);
     const data = mockPrisma.collaboratorProduct.create.mock.calls[0][0].data;
     expect(data.name).toBe('Bingo');
     expect(data.category).toBe('Bingo');
     expect(data.crew).toBeNull();
-    expect(data.costPrice).toBe(200);
-    expect(data.sellPrice).toBe(250);
+    expect(data.costPrice).toBe(200.13);
+    expect(data.sellPrice).toBe(250.46);
+    expect(data.sortOrder).toBe(0);
+    expect(data.visibleInDossier).toBe(true);
+    expect(data.visibleInBooking).toBe(true);
   });
 });
 
@@ -176,19 +233,83 @@ describe('updateCollaboratorProduct', () => {
 
   it('actualitza només els camps presents', async () => {
     mockPrisma.collaboratorProduct.update.mockResolvedValue({ id: 'p1', sellPrice: 300 });
-    const res = await updateCollaboratorProduct('p1', { sellPrice: 300 });
+    const res = await updateCollaboratorProduct('p1', { costPrice: '120.126', sellPrice: 300.455, sortOrder: 2.7 });
     expect(res.status).toBe(200);
     const data = mockPrisma.collaboratorProduct.update.mock.calls[0][0].data;
-    expect(data.sellPrice).toBe(300);
+    expect(data.costPrice).toBe(120.13);
+    expect(data.sellPrice).toBe(300.46);
+    expect(data.sortOrder).toBe(3);
     expect(data.name).toBeUndefined();
+  });
+
+  it('neutralitza sortOrder brut en actualitzar', async () => {
+    mockPrisma.collaboratorProduct.update.mockResolvedValue({ id: 'p1', sortOrder: 0 });
+    const res = await updateCollaboratorProduct('p1', { sortOrder: -8 });
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.collaboratorProduct.update.mock.calls[0][0].data.sortOrder).toBe(0);
   });
 });
 
 describe('deleteCollaboratorProduct', () => {
-  it('elimina el producte', async () => {
+  it('elimina el producte només si és inactiu i sense dossiers vinculats', async () => {
     mockPrisma.collaboratorProduct.delete.mockResolvedValue({});
     const res = await deleteCollaboratorProduct('p1');
     expect(res.status).toBe(200);
+    expect(mockPrisma.dossier.count).toHaveBeenCalledWith({
+      where: { productIds: { has: 'collab:p1' } },
+    });
     expect(mockPrisma.collaboratorProduct.delete).toHaveBeenCalledWith({ where: { id: 'p1' } });
+  });
+
+  it('retorna 404 si el producte no existeix', async () => {
+    mockPrisma.collaboratorProduct.findUnique.mockResolvedValueOnce(null);
+
+    const res = await deleteCollaboratorProduct('ghost');
+
+    expect(res.status).toBe(404);
+    expect(mockPrisma.collaboratorProduct.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja esborrar un producte actiu visible', async () => {
+    mockPrisma.collaboratorProduct.findUnique.mockResolvedValueOnce({
+      id: 'p1',
+      name: 'Bingo Musical KIDS',
+      isActive: true,
+      visibleInDossier: true,
+      visibleInBooking: true,
+    });
+
+    const res = await deleteCollaboratorProduct('p1');
+
+    expect(res.status).toBe(409);
+    expect(res.body.impact).toEqual(expect.objectContaining({
+      isActive: true,
+      visibleInDossier: true,
+      visibleInBooking: true,
+    }));
+    expect(mockPrisma.collaboratorProduct.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja esborrar un producte inactiu si algun dossier el referencia', async () => {
+    mockPrisma.dossier.count.mockResolvedValueOnce(2);
+
+    const res = await deleteCollaboratorProduct('p1');
+
+    expect(res.status).toBe(409);
+    expect(res.body.impact).toEqual(expect.objectContaining({ dossierRefs: 2 }));
+    expect(mockPrisma.collaboratorProduct.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja esborrar si no pot verificar dossiers vinculats', async () => {
+    mockPrisma.dossier.count.mockRejectedValueOnce(new Error('db down'));
+
+    const res = await deleteCollaboratorProduct('p1');
+
+    expect(res.status).toBe(409);
+    expect(res.body.impact).toEqual(expect.objectContaining({
+      verificationFailed: ['dossierRefs'],
+    }));
+    expect(mockPrisma.collaboratorProduct.delete).not.toHaveBeenCalled();
   });
 });

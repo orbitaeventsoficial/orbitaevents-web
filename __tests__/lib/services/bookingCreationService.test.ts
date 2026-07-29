@@ -5,7 +5,8 @@ const { mockPrisma, mockCalculateGoogleMapsDistance, mockGetFuelCostPerKmReferen
     booking: { create: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn() },
     lead: { findUnique: vi.fn(), update: vi.fn() },
     customer: { findUnique: vi.fn() },
-    collaborator: { findUnique: vi.fn() },
+    collaborator: { findUnique: vi.fn(), findFirst: vi.fn() },
+    proposal: { findUnique: vi.fn(), update: vi.fn() },
     pack: { findUnique: vi.fn(), create: vi.fn() },
     extra: { findUnique: vi.fn(), create: vi.fn() },
     packInventory: { findMany: vi.fn() },
@@ -19,16 +20,23 @@ const { mockPrisma, mockCalculateGoogleMapsDistance, mockGetFuelCostPerKmReferen
   mockGetFuelCostPerKmReference: vi.fn(),
 }));
 
+const { mockSendBookingConfirmationEmail } = vi.hoisted(() => ({
+  mockSendBookingConfirmationEmail: vi.fn().mockResolvedValue({ ok: true }),
+}));
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
+vi.mock('@/lib/services/bookingConfirmationEmailService', () => ({
+  sendBookingConfirmationEmail: mockSendBookingConfirmationEmail,
+}));
 vi.mock('@/lib/services/googleMapsDistance', () => ({
   calculateGoogleMapsDistance: mockCalculateGoogleMapsDistance,
 }));
 vi.mock('@/lib/services/fuelReferenceService', () => ({
-  getFuelCostPerKmReference: mockGetFuelCostPerKmReference,
+  getEffectiveVehicleCostPerKm: mockGetFuelCostPerKmReference,
 }));
 
 import { createBookingFromInput } from '@/lib/services/bookingCreationService';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
 
 const BASE_INPUT = {
   clientName: 'Joan Garcia',
@@ -51,6 +59,7 @@ const MOCK_PACK = {
 
 function setupDefaults() {
   mockPrisma.pack.findUnique.mockResolvedValue(MOCK_PACK);
+  mockPrisma.collaborator.findFirst.mockResolvedValue(null); // so llogat (Isma): per defecte no existeix → no afegeix línia
   mockPrisma.booking.findFirst.mockResolvedValue(null); // no previous bookings
   mockPrisma.booking.findUnique.mockResolvedValue(null); // reference doesn't exist yet
   mockPrisma.bookingInventory.groupBy.mockResolvedValue([]); // no overlapping items
@@ -68,6 +77,8 @@ function setupDefaults() {
   });
   mockPrisma.customer.findUnique.mockResolvedValue(null);
   mockPrisma.collaborator.findUnique.mockResolvedValue(null);
+  mockPrisma.proposal.findUnique.mockResolvedValue(null);
+  mockPrisma.proposal.update.mockResolvedValue({});
   mockPrisma.lead.findUnique.mockResolvedValue(null);
   mockPrisma.lead.update.mockResolvedValue({});
   mockPrisma.extra.findUnique.mockResolvedValue(null);
@@ -111,11 +122,170 @@ describe('createBookingFromInput', () => {
     expect(mockPrisma.booking.create).toHaveBeenCalledOnce();
   });
 
+  it('crea reserva des de pressupost i el vincula com a bookingId', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'proposal-1',
+      customerId: 'cust-proposal',
+      leadId: null,
+      bookingId: null,
+      total: 834,
+      vatRate: 21,
+      acceptedAt: null,
+      contractStatus: null,
+    });
+
+    const result = await createBookingFromInput({
+      ...BASE_INPUT,
+      proposalId: 'proposal-1',
+    });
+
+    expect(result.status).toBe(200);
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.customerId).toBe('cust-proposal');
+    expect(createCall.data.invoiceRequired).toBe(true);
+    expect(createCall.data.total).toBe(834);
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
+      where: { id: 'proposal-1' },
+      data: expect.objectContaining({
+        bookingId: 'booking-1',
+        status: 'ACCEPTED',
+        contractStatus: 'DRAFT',
+        contractSentAt: null,
+      }),
+    });
+  });
+
+  it('no reobre contracte existent quan vincula pressupost a reserva', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'proposal-1',
+      customerId: 'cust-proposal',
+      leadId: null,
+      bookingId: null,
+      total: 834,
+      vatRate: 21,
+      acceptedAt: new Date('2026-07-01'),
+      contractStatus: 'SENT',
+    });
+
+    const result = await createBookingFromInput({
+      ...BASE_INPUT,
+      proposalId: 'proposal-1',
+    });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
+      where: { id: 'proposal-1' },
+      data: expect.not.objectContaining({
+        contractStatus: 'DRAFT',
+        contractSentAt: null,
+      }),
+    });
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
+      where: { id: 'proposal-1' },
+      data: expect.objectContaining({
+        bookingId: 'booking-1',
+        status: 'ACCEPTED',
+      }),
+    });
+  });
+
+  it('bloqueja crear una altra reserva si el pressupost ja esta vinculat', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'proposal-1',
+      customerId: 'cust-proposal',
+      leadId: null,
+      bookingId: 'booking-existing',
+      total: 834,
+      vatRate: 21,
+      acceptedAt: new Date('2026-07-01'),
+      contractStatus: null,
+    });
+
+    const result = await createBookingFromInput({
+      ...BASE_INPUT,
+      proposalId: 'proposal-1',
+    });
+
+    expect(result.status).toBe(409);
+    expect(result.body.bookingId).toBe('booking-existing');
+    expect(mockPrisma.booking.create).not.toHaveBeenCalled();
+  });
+
+  it('crea reserves noves amb transferència com a canal de cobrament per defecte', async () => {
+    await createBookingFromInput({ ...BASE_INPUT, invoiceRequired: false });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.paymentMethod).toBe('TRANSFER');
+    expect(createCall.data.invoiceRequired).toBe(false);
+    expect(createCall.data.vatRate).toBe(0);
+  });
+
+  it('autoassigna inventari del pack només contra conflictes del mateix dia', async () => {
+    mockPrisma.packInventory.findMany.mockResolvedValueOnce([
+      { itemId: 'item-1', quantity: 1, item: { condition: 'GOOD' } },
+    ]);
+
+    await createBookingFromInput(BASE_INPUT);
+
+    expect(mockPrisma.bookingInventory.groupBy).toHaveBeenCalledWith({
+      by: ['itemId'],
+      where: expect.objectContaining({
+        itemId: { in: ['item-1'] },
+        booking: expect.objectContaining({
+          id: { not: 'booking-1' },
+          status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] },
+          eventDate: {
+            gte: new Date('2026-09-15T00:00:00.000Z'),
+            lt: new Date('2026-09-16T00:00:00.000Z'),
+          },
+        }),
+      }),
+    });
+    expect(mockPrisma.bookingInventory.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      where: { bookingId_itemId: { bookingId: 'booking-1', itemId: 'item-1' } },
+    }));
+  });
+
   it('genera referència OE-YYYY-001 sense reserves prèvies', async () => {
     await createBookingFromInput(BASE_INPUT);
 
     const createCall = mockPrisma.booking.create.mock.calls[0][0];
     expect(createCall.data.reference).toMatch(/^OE-\d{4}-001$/);
+  });
+
+  it('envia email de confirmació al client en crear la reserva', async () => {
+    await createBookingFromInput(BASE_INPUT);
+
+    expect(mockSendBookingConfirmationEmail).toHaveBeenCalledOnce();
+    const arg = mockSendBookingConfirmationEmail.mock.calls[0][0];
+    expect(arg.to).toBe('joan@example.com');
+    expect(arg.bookingId).toBe('booking-1');
+    expect(arg.leadId).toBeNull();
+    expect(arg.customerId).toBeNull();
+    expect(arg.reference).toMatch(/^OE-\d{4}-001$/);
+    expect(arg.total).toBeGreaterThan(0);
+    expect(arg.depositAmount).toBeGreaterThan(0);
+  });
+
+  it('afegeix la liquidació interna de so Isma quan el bolo porta pack', async () => {
+    mockPrisma.collaborator.findFirst.mockResolvedValue({ id: 'isma-1' });
+    await createBookingFromInput(BASE_INPUT);
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    const lines = createCall.data.serviceLines?.create ?? [];
+    const sound = lines.find((l: { collaboratorId?: string }) => l.collaboratorId === 'isma-1');
+    expect(sound).toBeDefined();
+    expect(sound.costAmount).toBe(50);
+    expect(sound.revenueAmount).toBe(0); // no es factura a part: només resta al marge
+  });
+
+  it('NO afegeix línia de so si el col·laborador intern no existeix', async () => {
+    mockPrisma.collaborator.findFirst.mockResolvedValue(null);
+    await createBookingFromInput(BASE_INPUT);
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    const lines = createCall.data.serviceLines?.create ?? [];
+    expect(lines.length).toBe(0);
   });
 
   it('genera referència incremental amb reserves prèvies', async () => {
@@ -137,6 +307,7 @@ describe('createBookingFromInput', () => {
     // Travel charge depends on distance — with Google Maps returning 60km,
     // travelCharge is calculated by calculateTravelCharge(60)
     // But we'll check the financial structure is correct
+    expect(createCall.data.invoiceRequired).toBe(true);
     expect(createCall.data.vatRate).toBe(21);
     expect(createCall.data.depositAmount).toBeGreaterThan(0);
     // remainingAmount = total - deposit, arrodonit a cèntims (#699): vat i total
@@ -189,6 +360,67 @@ describe('createBookingFromInput', () => {
     const createCall = mockPrisma.booking.create.mock.calls[0][0];
     expect(createCall.data.discount).toBe(200);
     expect(createCall.data.discountCode).toBe('PROMO');
+  });
+
+  it('normalitza descompte negatiu a 0 quan el servei rep dades brutes', async () => {
+    await createBookingFromInput({
+      ...BASE_INPUT,
+      discount: -200,
+      distanceKm: 0,
+    });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.discount).toBe(0);
+    expect(createCall.data.total).toBe(1500);
+  });
+
+  it('no permet que un descompte superior al subtotal generi totals negatius', async () => {
+    await createBookingFromInput({
+      ...BASE_INPUT,
+      discount: 2000,
+      distanceKm: 0,
+    });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.discount).toBe(2000);
+    expect(createCall.data.vatAmount).toBe(0);
+    expect(createCall.data.total).toBe(0);
+    expect(createCall.data.depositAmount).toBe(0);
+    expect(createCall.data.remainingAmount).toBe(0);
+  });
+
+  it('no suma extres que no es poden resoldre a BD', async () => {
+    mockPrisma.extra.findUnique.mockResolvedValue(null);
+
+    await createBookingFromInput({
+      ...BASE_INPUT,
+      distanceKm: 0,
+      extras: [{ extraId: 'extra-missing', price: 300, quantity: 2 }],
+    });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.subtotal).toBe(1500);
+    expect(createCall.data.total).toBe(1500);
+    expect(createCall.data.extras).toBeUndefined();
+  });
+
+  it('normalitza preu i quantitat bruts dels extres abans de sumar-los', async () => {
+    mockPrisma.extra.findUnique.mockImplementation(async ({ where }) =>
+      where.id === 'extra-ok' ? { id: 'extra-ok' } : null,
+    );
+
+    await createBookingFromInput({
+      ...BASE_INPUT,
+      distanceKm: 0,
+      extras: [{ extraId: 'extra-ok', price: -300, quantity: -2 }],
+    });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.subtotal).toBe(1500);
+    expect(createCall.data.total).toBe(1500);
+    expect(createCall.data.extras).toEqual({
+      create: [{ extraId: 'extra-ok', quantity: 1, price: 0 }],
+    });
   });
 
   it('respecta el total final acordat com a import exacte', async () => {
@@ -488,8 +720,8 @@ describe('createBookingFromInput', () => {
         customerId: null,
         sourceCollaboratorId: null,
         serviceLines: [
-          { collaboratorId: null, kind: 'DJ', label: 'DJ · 2 hores', revenueAmount: 250, costAmount: null, quantity: 1, hours: null, notes: null },
-          { collaboratorId: 'col1', kind: 'PROVIDER_SERVICE', label: 'Animació', revenueAmount: 240, costAmount: 200, quantity: 1, hours: null, notes: null },
+          { collaboratorId: null, kind: 'DJ', label: 'DJ · 2 hores', revenueAmount: 250, costAmount: null, quantity: 1, hours: 2, partyType: null, notes: null },
+          { collaboratorId: 'col1', kind: 'PROVIDER_SERVICE', label: 'Animació', revenueAmount: 240, costAmount: 200, quantity: 1, hours: 1.5, partyType: 'infantil', notes: null },
         ],
       });
 
@@ -497,7 +729,8 @@ describe('createBookingFromInput', () => {
 
       const createArg = mockPrisma.booking.create.mock.calls[0][0];
       expect(createArg.data.serviceLines?.create).toHaveLength(2);
-      expect(createArg.data.serviceLines.create[0]).toMatchObject({ kind: 'DJ', label: 'DJ · 2 hores' });
+      expect(createArg.data.serviceLines.create[0]).toMatchObject({ kind: 'DJ', label: 'DJ · 2 hores', hours: 2 });
+      expect(createArg.data.serviceLines.create[1]).toMatchObject({ label: 'Animació', hours: 1.5, partyType: 'infantil' });
     });
 
     it('si el payload porta línies, tenen prioritat sobre les del lead', async () => {
@@ -515,6 +748,34 @@ describe('createBookingFromInput', () => {
       const createArg = mockPrisma.booking.create.mock.calls[0][0];
       expect(createArg.data.serviceLines.create).toHaveLength(1);
       expect(createArg.data.serviceLines.create[0]).toMatchObject({ label: 'del payload' });
+    });
+
+    it('multiplica el preu de les línies heretades per la quantitat en el subtotal', async () => {
+      setupDefaults();
+      mockPrisma.lead.findUnique.mockResolvedValue({
+        customerId: null,
+        sourceCollaboratorId: null,
+        serviceLines: [
+          { collaboratorId: null, kind: 'DJ', label: 'DJ extra', revenueAmount: 120, costAmount: null, quantity: 3, hours: null, notes: null },
+        ],
+      });
+      mockPrisma.pack.findUnique.mockImplementation(({ where }: { where: { slug?: string; id?: string } }) => {
+        if (where.slug === 'personalitzat') return Promise.resolve({ id: 'pack-custom' });
+        if (where.id === 'pack-custom') return Promise.resolve({ ...MOCK_PACK, id: 'pack-custom', price: 0, djHours: 0, extraHourPrice: 0 });
+        return Promise.resolve(null);
+      });
+
+      await createBookingFromInput({
+        ...BASE_INPUT,
+        leadId: 'lead1',
+        packId: '__custom__',
+        distanceKm: 0,
+      });
+
+      const createArg = mockPrisma.booking.create.mock.calls[0][0];
+      expect(createArg.data.serviceLines.create[0]).toMatchObject({ label: 'DJ extra', revenueAmount: 120, quantity: 3 });
+      expect(createArg.data.subtotal).toBe(360);
+      expect(createArg.data.total).toBe(360);
     });
   });
 
@@ -556,6 +817,30 @@ describe('createBookingFromInput', () => {
       expect(result.status).toBe(200);
       expect(mockPrisma.pack.create).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.objectContaining({ slug: 'personalitzat', price: 0 }) })
+      );
+    });
+
+    it('afegeix so Isma quan un bolo personalitzat porta línia DJ', async () => {
+      setupDefaults();
+      mockPrisma.collaborator.findFirst.mockResolvedValue({ id: 'isma-1' });
+      mockPrisma.pack.findUnique.mockImplementation(({ where }: { where: { slug?: string; id?: string } }) => {
+        if (where.slug === 'personalitzat') return Promise.resolve({ id: 'pack-custom' });
+        if (where.id === 'pack-custom') return Promise.resolve({ ...MOCK_PACK, id: 'pack-custom', price: 0, djHours: 0, extraHourPrice: 0 });
+        return Promise.resolve(null);
+      });
+
+      await createBookingFromInput({
+        ...BASE_INPUT,
+        packId: '__custom__',
+        manualTotalPrice: 340,
+        serviceLines: [{ kind: 'DJ', label: 'DJ Òrbita', revenueAmount: 300, quantity: 1 }],
+      });
+
+      const createArg = mockPrisma.booking.create.mock.calls[0][0];
+      expect(createArg.data.serviceLines.create).toHaveLength(2);
+      expect(createArg.data.serviceLines.create[0]).toMatchObject({ kind: 'DJ', label: 'DJ Òrbita' });
+      expect(createArg.data.serviceLines.create).toContainEqual(
+        expect.objectContaining({ collaboratorId: 'isma-1', label: SOUND_RENTAL.label, costAmount: SOUND_RENTAL.costPerEvent, revenueAmount: 0 }),
       );
     });
   });

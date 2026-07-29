@@ -10,11 +10,50 @@ export type MarginTone = {
   tone: 'emerald' | 'amber' | 'orange' | 'rose';
 };
 
+/**
+ * Banda de salut del marge segons percentatge (0-100). FONT ÚNICA dels llindars
+ * del semàfor de marge a tot l'admin. Qualsevol pantalla que pinti el marge
+ * (fitxa de reserva, nova reserva, economia) ha de derivar d'aquí per no divergir.
+ *   ≥50 excellent · ≥30 acceptable · ≥15 watch · <15 critical
+ */
+export type MarginBand = 'excellent' | 'acceptable' | 'watch' | 'critical';
+
+export function getMarginBand(pct: number): MarginBand {
+  if (pct >= 50) return 'excellent';
+  if (pct >= 30) return 'acceptable';
+  if (pct >= 15) return 'watch';
+  return 'critical';
+}
+
 export function getMarginTone(pct: number): MarginTone {
-  if (pct >= 50) return { color: 'text-emerald-300', bg: 'bg-emerald-500/20 border-emerald-500/30', label: 'Excel·lent', tone: 'emerald' };
-  if (pct >= 30) return { color: 'text-amber-300', bg: 'bg-amber-500/20 border-amber-500/30', label: 'Acceptable', tone: 'amber' };
-  if (pct >= 15) return { color: 'text-orange-300', bg: 'bg-orange-500/20 border-orange-500/30', label: 'Vigilar', tone: 'orange' };
-  return { color: 'text-rose-300', bg: 'bg-rose-500/20 border-rose-500/30', label: 'Crític', tone: 'rose' };
+  switch (getMarginBand(pct)) {
+    case 'excellent': return { color: 'text-emerald-300', bg: 'bg-emerald-500/20 border-emerald-500/30', label: 'Excel·lent', tone: 'emerald' };
+    case 'acceptable': return { color: 'text-amber-300', bg: 'bg-amber-500/20 border-amber-500/30', label: 'Acceptable', tone: 'amber' };
+    case 'watch': return { color: 'text-orange-300', bg: 'bg-orange-500/20 border-orange-500/30', label: 'Vigilar', tone: 'orange' };
+    case 'critical': return { color: 'text-rose-300', bg: 'bg-rose-500/20 border-rose-500/30', label: 'Crític', tone: 'rose' };
+  }
+}
+
+/** Etiqueta textual canònica de la banda de marge. */
+const MARGIN_LABEL: Record<MarginBand, string> = {
+  excellent: 'Excel·lent',
+  acceptable: 'Acceptable',
+  watch: 'Vigilar',
+  critical: 'Crític',
+};
+export function getMarginLabel(pct: number): string {
+  return MARGIN_LABEL[getMarginBand(pct)];
+}
+
+/**
+ * Classes canòniques admin (tokens) per al semàfor de marge de 4 bandes.
+ * Definides a admin-shell.css (.o-margin-text--* / .o-margin-bar--*).
+ */
+export function getMarginTextClass(pct: number): string {
+  return `o-margin-text--${getMarginBand(pct)}`;
+}
+export function getMarginBarClass(pct: number): string {
+  return `o-margin-bar--${getMarginBand(pct)}`;
 }
 
 export type TravelMarginTone = {

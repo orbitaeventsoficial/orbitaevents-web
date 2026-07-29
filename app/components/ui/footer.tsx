@@ -260,7 +260,7 @@ export default function Footer() {
                     <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
                       <Mail className="w-4 h-4 text-amber-400" />
                     </div>
-                    <span className="font-medium break-all">{SITE_CONFIG.business.email}</span>
+                    <span className="font-medium">{SITE_CONFIG.business.email.split('@')[0]}@<wbr />{SITE_CONFIG.business.email.split('@')[1]}</span>
                   </a>
                 </li>
 

@@ -59,6 +59,8 @@ const allowedCatalogs = new Set([
   // Subconjunts de filtre locals de LeadStatus/BookingStatus ("actius" per al cuadrant: sense LOST / sense CANCELLED), segueix el precedent EMAIL_ACTIVITY_ACTIONS.
   'lib/services/crewScheduleService.ts::LEAD_STATUSES_ACTIVE',
   'lib/services/crewScheduleService.ts::BOOKING_STATUSES_ACTIVE',
+  // Set de validació local dels 2 estats d'informe post-event (DRAFT/COMPLETED), només per validar l'input dins el servei; no és un catàleg de domini compartit (segueix el precedent LEAD_STATUSES_ACTIVE).
+  'lib/services/postEventReportAdminService.ts::REPORT_STATUSES',
 ]);
 
 const suspiciousConst = /^(?:export\s+)?const\s+([A-Z0-9_]+)\s*=\s*(\[|\{|new Set\(|Object\.freeze\()/gm;

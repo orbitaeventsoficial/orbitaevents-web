@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 const IDLE_BUTTON = 'w-full rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors admin-tone-idle';
-const DISABLED_BUTTON = 'w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/30';
+const DISABLED_BUTTON = 'w-full cursor-not-allowed rounded-xl border border-[var(--line)] bg-[var(--raised)] px-4 py-2.5 text-sm font-medium text-[var(--t3)]';
 const PRIMARY_BUTTON = 'ap-btn ap-btn--primary';
 
 function ResultMessage({ result }: { result: { ok: boolean; message: string } }) {
@@ -21,6 +21,7 @@ function ResultMessage({ result }: { result: { ok: boolean; message: string } })
 
 export default function ManualActionsPanel() {
   const [runningCron, setRunningCron] = useState(false);
+  const [confirmCron, setConfirmCron] = useState(false);
   const [cronResult, setCronResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [runningReminder, setRunningReminder] = useState(false);
   const [reminderResult, setReminderResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -29,7 +30,16 @@ export default function ManualActionsPanel() {
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   async function runCronManually() {
+    if (!confirmCron) {
+      setConfirmCron(true);
+      setCronResult({
+        ok: true,
+        message: 'Revisa la llista de post-event pendents. Torna a clicar per enviar emails reals.',
+      });
+      return;
+    }
     setRunningCron(true);
+    setConfirmCron(false);
     setCronResult(null);
 
     try {
@@ -74,7 +84,9 @@ export default function ManualActionsPanel() {
         const pending = data.pendingCount || 0;
         setReminderResult({
           ok: true,
-          message: pending > 0 ? `✅ Recordatori enviat (${pending} pendents)` : '✅ No hi ha testimonis pendents',
+          message: data.sent
+            ? `✅ Recordatori enviat (${pending} pendents)`
+            : '✅ No hi ha testimonis pendents',
         });
       } else {
         setReminderResult({
@@ -127,21 +139,22 @@ export default function ManualActionsPanel() {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Accions manuals d'email" data-help-desc="Aquí pots forçar automatismes, enviar recordatoris o validar que el sistema de correu funciona sense esperar el cron.">
+    <section className="ap-card overflow-hidden" data-help-title="Accions manuals d'email" data-help-desc="Aquí pots forçar automatismes, enviar recordatoris o validar que el sistema de correu funciona sense esperar el cron.">
       <div className="border-b px-6 py-4">
         <h2 className="font-semibold">🔧 Accions Manuals</h2>
       </div>
 
       <div className="space-y-6 p-6">
         <div>
-          <h3 className="mb-2 text-sm font-medium">Executar Cron Post-Event</h3>
-          <p className="mb-3 text-xs">Envia correus a tots els esdeveniments completats pendents</p>
+          <h3 className="mb-2 text-sm font-medium">Enviar post-event pendents</h3>
+          <p className="mb-3 text-xs">Envia emails reals a totes les reserves completades pendents que apareixen al llistat</p>
           <button
             onClick={runCronManually}
             disabled={runningCron}
             type="button"
             aria-busy={runningCron}
-            className={runningCron ? DISABLED_BUTTON : IDLE_BUTTON}
+            aria-pressed={confirmCron}
+            className={runningCron ? DISABLED_BUTTON : confirmCron ? PRIMARY_BUTTON : IDLE_BUTTON}
           >
             {runningCron ? (
               <span className="flex items-center justify-center gap-2">
@@ -149,7 +162,7 @@ export default function ManualActionsPanel() {
                 Executant...
               </span>
             ) : (
-              '🚀 Executar ara'
+              confirmCron ? 'Confirmar enviament' : 'Preparar enviament'
             )}
           </button>
           {cronResult && <ResultMessage result={cronResult} />}

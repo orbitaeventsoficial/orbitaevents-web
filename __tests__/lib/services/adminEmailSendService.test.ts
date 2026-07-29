@@ -160,7 +160,7 @@ describe('sendAdminEmail', () => {
     });
   });
 
-  it('retorna 400 si quote sense pack vàlid', async () => {
+  it('retorna 410 si es demana adjuntar pressupost des del redactor antic', async () => {
     const result = await sendAdminEmail({
       to: 'client@test.com',
       subject: 'Pressupost',
@@ -168,10 +168,11 @@ describe('sendAdminEmail', () => {
       quote: { packId: '', price: 0 },
     });
 
-    expect(result.status).toBe(400);
+    expect(result.status).toBe(410);
+    expect(mockSendEmail).not.toHaveBeenCalled();
   });
 
-  it('adjunta pressupost si quote vàlid', async () => {
+  it('no genera adjunts HTML TMP encara que quote sigui vàlid', async () => {
     const result = await sendAdminEmail({
       to: 'client@test.com',
       subject: 'Pressupost',
@@ -179,14 +180,9 @@ describe('sendAdminEmail', () => {
       quote: { packId: 'basic', price: 500 },
     });
 
-    expect(result.ok).toBe(true);
-    expect(mockSendEmail).toHaveBeenCalledWith(
-      expect.objectContaining({
-        attachments: expect.arrayContaining([
-          expect.objectContaining({ contentType: 'text/html; charset=utf-8' }),
-        ]),
-      })
-    );
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe(410);
+    expect(mockGenerateQuoteHTML).not.toHaveBeenCalled();
   });
 
   // ─── Bug #799 fix: adminLog COMM_SENT ─────────────────────────────────────
@@ -275,6 +271,24 @@ describe('sendAdminEmail', () => {
     }));
   });
 
+  it('preserva context orbita=proposal quan la safata respon un fil de pressupost', async () => {
+    await sendAdminEmail({
+      to: 'a@test.com',
+      subject: 'S',
+      body: 'B',
+      orbita: { kind: 'proposal', id: 'prop-1', origin: 'safata-reply' },
+    });
+
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      orbita: expect.objectContaining({ kind: 'proposal', id: 'prop-1', origin: 'safata-reply' }),
+    }));
+    expect(mockRecordEmailSend).toHaveBeenCalledWith(expect.objectContaining({
+      orbitaKind: 'proposal',
+      orbitaId: 'prop-1',
+      orbitaOrigin: 'safata-reply',
+    }));
+  });
+
   it('passa context orbita=admin si no hi ha lead ni customer', async () => {
     await sendAdminEmail({ to: 'a@test.com', subject: 'S', body: 'B' });
     expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
@@ -282,15 +296,14 @@ describe('sendAdminEmail', () => {
     }));
   });
 
-  it('marca admin-compose-quote com a origin quan hi ha pressupost adjunt', async () => {
+  it('bloqueja admin-compose-quote i no envia cap correu', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({ id: 'L1', preferredLocale: 'ca' });
-    await sendAdminEmail({
+    const result = await sendAdminEmail({
       to: 'a@test.com', subject: 'S', body: 'B', leadId: 'L1',
       quote: { packId: 'basic', price: 500 },
     });
-    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
-      orbita: expect.objectContaining({ origin: 'admin-compose-quote' }),
-    }));
+    expect(result.status).toBe(410);
+    expect(mockSendEmail).not.toHaveBeenCalled();
   });
 
   it('persisteix el resultat real del canal (SMTP+IMAP) a l\'EmailSend', async () => {

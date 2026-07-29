@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { fetchWithCsrf } from '@/lib/csrf';
+import PublicPageHeader from '@/app/components/public/PublicPageHeader';
 import {
   Shield, Download, Trash2, Edit3, Eye, Mail,
   CheckCircle, AlertCircle, ArrowRight, Lock,
@@ -25,42 +26,46 @@ interface RequestTypeConfig {
   descriptionLabel?: string;
 }
 
+type PrivacyRequestSubmitResponse = {
+  success?: unknown;
+};
+
 const COLOR_CLASSES: Record<string, { bg: string; text: string; border: string; hover: string }> = {
   blue: {
-    bg: 'bg-blue-500/20',
-    text: 'text-blue-400',
-    border: 'border-blue-500/30',
-    hover: 'hover:bg-blue-500/30'
+    bg: 'bg-[color-mix(in_oklab,var(--oe-gold)_12%,transparent)]',
+    text: 'text-[var(--oe-gold)]',
+    border: 'border-[color-mix(in_oklab,var(--oe-gold)_28%,transparent)]',
+    hover: 'hover:bg-[color-mix(in_oklab,var(--oe-gold)_18%,transparent)]'
   },
   green: {
-    bg: 'bg-green-500/20',
-    text: 'text-green-400',
-    border: 'border-green-500/30',
-    hover: 'hover:bg-green-500/30'
+    bg: 'bg-[color-mix(in_oklab,var(--oe-green)_12%,transparent)]',
+    text: 'text-[var(--oe-green)]',
+    border: 'border-[color-mix(in_oklab,var(--oe-green)_28%,transparent)]',
+    hover: 'hover:bg-[color-mix(in_oklab,var(--oe-green)_18%,transparent)]'
   },
   amber: {
-    bg: 'bg-amber-500/20',
-    text: 'text-amber-400',
-    border: 'border-amber-500/30',
-    hover: 'hover:bg-amber-500/30'
+    bg: 'bg-[color-mix(in_oklab,var(--oe-amber)_12%,transparent)]',
+    text: 'text-[var(--oe-amber)]',
+    border: 'border-[color-mix(in_oklab,var(--oe-amber)_28%,transparent)]',
+    hover: 'hover:bg-[color-mix(in_oklab,var(--oe-amber)_18%,transparent)]'
   },
   red: {
-    bg: 'bg-red-500/20',
-    text: 'text-red-400',
-    border: 'border-red-500/30',
-    hover: 'hover:bg-red-500/30'
+    bg: 'bg-[color-mix(in_oklab,var(--oe-orange)_12%,transparent)]',
+    text: 'text-[color-mix(in_oklab,var(--oe-orange)_82%,white)]',
+    border: 'border-[color-mix(in_oklab,var(--oe-orange)_30%,transparent)]',
+    hover: 'hover:bg-[color-mix(in_oklab,var(--oe-orange)_18%,transparent)]'
   },
   purple: {
-    bg: 'bg-purple-500/20',
-    text: 'text-purple-400',
-    border: 'border-purple-500/30',
-    hover: 'hover:bg-purple-500/30'
+    bg: 'bg-[color-mix(in_oklab,var(--oe-gold)_12%,transparent)]',
+    text: 'text-[var(--oe-gold)]',
+    border: 'border-[color-mix(in_oklab,var(--oe-gold)_28%,transparent)]',
+    hover: 'hover:bg-[color-mix(in_oklab,var(--oe-gold)_18%,transparent)]'
   },
   orange: {
-    bg: 'bg-orange-500/20',
-    text: 'text-orange-400',
-    border: 'border-orange-500/30',
-    hover: 'hover:bg-orange-500/30'
+    bg: 'bg-[color-mix(in_oklab,var(--oe-orange)_12%,transparent)]',
+    text: 'text-[color-mix(in_oklab,var(--oe-orange)_82%,white)]',
+    border: 'border-[color-mix(in_oklab,var(--oe-orange)_30%,transparent)]',
+    hover: 'hover:bg-[color-mix(in_oklab,var(--oe-orange)_18%,transparent)]'
   },
 };
 
@@ -186,12 +191,12 @@ export default function PrivacitatClient() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null) as PrivacyRequestSubmitResponse | null;
 
-      if (data.success) {
+      if (data?.success === true) {
         setStep('success');
       } else {
-        setError(data.error || t('form.errorDefault'));
+        setError(t('form.errorDefault'));
       }
     } catch {
       setError(t('form.errorConnection'));
@@ -211,17 +216,11 @@ export default function PrivacitatClient() {
       </div>
 
       <div className="relative max-w-2xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-oe-gold to-oe-gold-light mb-6 shadow-lg shadow-oe-gold/20">
             <Shield className="w-10 h-10 text-black" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {t('title')}
-          </h1>
-          <p className="text-text-muted max-w-md mx-auto">
-            {t('subtitle')}
-          </p>
+          <PublicPageHeader title={t('title')} description={t('subtitle')} spacing="none" />
         </div>
 
         {/* Content Card */}
@@ -276,10 +275,10 @@ export default function PrivacitatClient() {
                 </div>
 
                 {/* Info box */}
-                <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                <div className="mt-6 p-4 bg-[color-mix(in_oklab,var(--oe-gold)_10%,transparent)] border border-[color-mix(in_oklab,var(--oe-gold)_24%,transparent)] rounded-xl">
                   <div className="flex gap-3">
-                    <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-blue-200">
+                    <Info className="w-5 h-5 text-[var(--oe-gold)] flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-[var(--text-secondary)]">
                       <strong>{t('selectStep.infoBox.title')}</strong> {t('selectStep.infoBox.text')}
                     </div>
                   </div>
@@ -327,7 +326,7 @@ export default function PrivacitatClient() {
                   {/* Nom */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1.5">
-                      {t('form.fullName')} <span className="text-red-400">{t('form.required')}</span>
+                      {t('form.fullName')} <span className="text-[color-mix(in_oklab,var(--oe-orange)_82%,white)]">{t('form.required')}</span>
                     </label>
                     <input
                       id="name"
@@ -345,7 +344,7 @@ export default function PrivacitatClient() {
                   {/* Email */}
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
-                      {t('form.email')} <span className="text-red-400">{t('form.required')}</span>
+                      {t('form.email')} <span className="text-[color-mix(in_oklab,var(--oe-orange)_82%,white)]">{t('form.required')}</span>
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
@@ -386,7 +385,7 @@ export default function PrivacitatClient() {
                   {selectedRequest.requiresDescription && (
                     <div>
                       <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-1.5">
-                        {selectedRequest.descriptionLabel} <span className="text-red-400">{t('form.required')}</span>
+                        {selectedRequest.descriptionLabel} <span className="text-[color-mix(in_oklab,var(--oe-orange)_82%,white)]">{t('form.required')}</span>
                       </label>
                       <textarea
                         id="description"
@@ -420,7 +419,7 @@ export default function PrivacitatClient() {
                           {t('form.privacyPolicy')}
                         </Link>
                         {' '}{t('form.gdprConsentText')}
-                        <span className="text-red-400"> {t('form.required')}</span>
+                        <span className="text-[color-mix(in_oklab,var(--oe-orange)_82%,white)]"> {t('form.required')}</span>
                       </span>
                     </label>
                   </div>
@@ -431,11 +430,11 @@ export default function PrivacitatClient() {
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-start gap-3 mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+                    className="flex items-start gap-3 mt-4 p-4 bg-[color-mix(in_oklab,var(--oe-orange)_10%,transparent)] border border-[color-mix(in_oklab,var(--oe-orange)_24%,transparent)] rounded-xl"
                   >
-                    <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-[color-mix(in_oklab,var(--oe-orange)_82%,white)] flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm text-red-400">{error}</p>
+                      <p className="text-sm text-[color-mix(in_oklab,var(--oe-orange)_82%,white)]">{error}</p>
                     </div>
                   </motion.div>
                 )}
@@ -473,8 +472,8 @@ export default function PrivacitatClient() {
                 transition={{ duration: 0.3 }}
                 className="text-center py-6"
               >
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500/20 mb-6">
-                  <CheckCircle className="w-10 h-10 text-green-400" />
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[color-mix(in_oklab,var(--oe-green)_18%,transparent)] mb-6">
+                  <CheckCircle className="w-10 h-10 text-[var(--oe-green)]" />
                 </div>
 
                 <h2 className="text-2xl font-bold text-white mb-2">{t('success.title')}</h2>
@@ -503,17 +502,17 @@ export default function PrivacitatClient() {
                   </ol>
                 </div>
 
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-6">
-                  <div className="flex items-center justify-center gap-2 text-blue-400 text-sm">
+                <div className="bg-[color-mix(in_oklab,var(--oe-gold)_10%,transparent)] border border-[color-mix(in_oklab,var(--oe-gold)_24%,transparent)] rounded-xl p-4 mb-6">
+                  <div className="flex items-center justify-center gap-2 text-[var(--oe-gold)] text-sm">
                     <Clock className="w-4 h-4" />
                     <span>{t('success.legalDeadline')} <strong>{t('success.legalDeadlineDays')}</strong></span>
                   </div>
                 </div>
 
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-6">
+                <div className="bg-[color-mix(in_oklab,var(--oe-amber)_10%,transparent)] border border-[color-mix(in_oklab,var(--oe-amber)_24%,transparent)] rounded-xl p-4 mb-6">
                   <div className="flex items-start gap-3 text-left">
-                    <Lock className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-amber-200">
+                    <Lock className="w-5 h-5 text-[var(--oe-amber)] flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-[color-mix(in_oklab,var(--oe-amber)_72%,white)]">
                       <strong>{t('success.importantTitle')}</strong> {t('success.importantText')}
                     </p>
                   </div>

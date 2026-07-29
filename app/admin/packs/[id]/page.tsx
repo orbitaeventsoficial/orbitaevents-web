@@ -129,7 +129,7 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
 
       {/* Reserves que usen aquest pack */}
       {packBookings.length > 0 && (
-        <section className="mt-6 rounded-xl border p-5">
+        <section className="mt-6 ap-card p-5">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
             Reserves amb aquest pack ({packBookings.length})
           </h2>
@@ -138,7 +138,7 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
               <Link
                 key={b.id}
                 href={buildBookingHref(b.id)}
-                className="flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors hover:bg-white/5"
+                className="flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors hover:bg-[var(--raised)]"
               >
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-xs">{b.reference}</span>

@@ -3,17 +3,28 @@ import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { generateDailyChecklistTasks } from '@/lib/services/dailyChecklist';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
-import { computeSimpleMarginPct } from '@/lib/services/costEngine';
+import { aggregateServiceLines, computeSimpleMarginPct } from '@/lib/services/costEngine';
+import {
+  computeDashboardNextEventEconomics,
+  projectDashboardEconomicRiskBookings,
+  type DashboardEconomicRiskBooking,
+} from './next-event-economics';
 import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
-import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS, TASK_SOURCE } from '@/lib/constants';
+import { formatCurrency, formatDateSimple, EVENT_TYPE_CHART_COLORS, TASK_SOURCE } from '@/lib/constants';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
 import { isBuildPrerenderPhase } from '@/lib/build-phase';
 import { getAdminHealthSnapshot, type AdminHealthSnapshot } from '@/lib/services/adminHealthService';
 import { fetchRecentCanonicalEvents, type CanonicalTimelineEvent } from '@/lib/services/timelineQueryService';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildPendingPostEventEmailBookingWhere } from '@/lib/services/postEventPendingService';
+import {
+  getAdminPostEventCronSettingKeys,
+  readAdminPostEventCronSetting,
+} from '@/lib/constants/admin';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -148,6 +159,7 @@ export interface DashboardData {
   cashFlowNet30: number;
   pipelineWeighted30: number;
   pendingPayments: number;
+  economicRiskBookings: DashboardEconomicRiskBooking[];
   // Next event ("pròxim bolo")
   nextEvent: {
     id: string;
@@ -166,6 +178,10 @@ export interface DashboardData {
     daysUntil: number;
     checklistDone: number;
     checklistTotal: number;
+    outstandingAmount: number;
+    directCost: number;
+    netMargin: number;
+    marginPct: number;
   } | null;
   // Monthly revenue
   revenueThisMonth: number;
@@ -198,11 +214,12 @@ export async function fetchDashboardData(): Promise<DashboardData> {
 
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const nextWeekEnd = new Date(now);
+  nextWeekEnd.setDate(nextWeekEnd.getDate() + 7);
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const seriesStart = new Date(now);
   seriesStart.setDate(now.getDate() - 30);
   seriesStart.setHours(0, 0, 0, 0);
-  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
   const ga4Status = getGa4ConfigStatus();
   const imapConfigured = isImapConfigured();
   const sentryConfigured = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN);
@@ -228,7 +245,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     marginBookings,
     // Blocs 4+5+6 (abans seqüencials, ara paral·lels)
     cashFlowResult, pipelineResult, pendingBookingsResult,
-    nextEventRaw, monthlyRevenueAgg, revenueTargetSetting,
+    nextEventRaw, economicRiskRows, monthlyRevenueAgg, revenueTargetSetting,
     monthlyRevenueData, eventTypeData,
   ] = await Promise.all([
     cachedQuery('admin:dashboard:leads:count', () => prisma.lead.count(), CacheTTL.SHORT).catch(() => 0),
@@ -254,8 +271,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery('admin:dashboard:leads:won', () => prisma.lead.count({ where: { status: 'WON' } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery(`admin:dashboard:leads:series:${seriesStart.toISOString().slice(0, 10)}`, () => prisma.lead.findMany({ where: { createdAt: { gte: seriesStart } }, select: { createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery(`admin:dashboard:bookings:series:${seriesStart.toISOString().slice(0, 10)}`, () => prisma.booking.findMany({ where: { eventDate: { gte: seriesStart } }, select: { eventDate: true, status: true, total: true } }), CacheTTL.SHORT).catch(() => []),
-    cachedQuery(`admin:dashboard:post-event:pending:${dayKey}`, () => prisma.booking.count({ where: { status: 'COMPLETED', eventDate: { lte: twoDaysAgo }, postEventEmailSent: false, clientEmail: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } } } }), CacheTTL.SHORT).catch(() => 0),
-    cachedQuery('admin:dashboard:cron:settings', () => prisma.setting.findMany({ where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage', 'automation.commercial.lastRun', 'automation.commercial.lastStatus'] } } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery(`admin:dashboard:post-event:pending:${dayKey}`, () => prisma.booking.count({ where: buildPendingPostEventEmailBookingWhere(now) }), CacheTTL.SHORT).catch(() => 0),
+    cachedQuery('admin:dashboard:cron:settings', () => prisma.setting.findMany({ where: { key: { in: [...getAdminPostEventCronSettingKeys(), 'automation.commercial.lastRun', 'automation.commercial.lastStatus'] } } }), CacheTTL.SHORT).catch(() => []),
     (isBuildPrerenderPhase() ? Promise.resolve(false) : prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false)),
     cachedQuery('admin:dashboard:timeline:leads', () => prisma.lead.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:timeline:bookings', () => prisma.booking.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, clientName: true, reference: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
@@ -270,7 +287,14 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery('admin:dashboard:command:bookings', () => prisma.booking.findMany({ where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } }, orderBy: [{ eventDate: 'asc' }, { createdAt: 'desc' }], take: 6, select: { id: true, reference: true, clientName: true, status: true, eventDate: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:margin:avg', () => prisma.booking.findMany({
       where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
-      select: { total: true, travelCost: true, pack: { select: { price: true } }, extras: { select: { price: true, quantity: true } } },
+      select: {
+        total: true,
+        extraHours: true,
+        travelCost: true,
+        pack: { select: { price: true, extraHourPrice: true } },
+        extras: { select: { price: true, quantity: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
+      },
     }), CacheTTL.SHORT).catch(() => []),
     // ─── Financial forecasts (abans bloc 4 seqüencial) ─────────────────
     cachedQuery('admin:dashboard:cashflow', () => buildCashFlowForecast(2), CacheTTL.SHORT).catch(() => []),
@@ -280,7 +304,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         status: { in: ['CONFIRMED', 'PREPARING'] },
         OR: [{ depositPaid: false }, { remainingPaid: false }],
       },
-      select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true },
+      select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true, cashAmount: true },
     }), CacheTTL.SHORT).catch(() => []),
     // ─── Next event + revenue (abans bloc 5 seqüencial) ────────────────
     cachedQuery(`admin:dashboard:next-event:${dayKey}`, () => prisma.booking.findFirst({
@@ -289,10 +313,31 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       select: {
         id: true, reference: true, clientName: true, eventDate: true,
         eventStartTime: true, eventLocation: true, eventVenue: true, eventType: true,
-        total: true, depositPaid: true, remainingPaid: true, status: true,
-        pack: { select: { translations: { where: { locale: 'ca' }, select: { name: true } } } },
+        total: true, depositAmount: true, remainingAmount: true, cashAmount: true,
+        depositPaid: true, remainingPaid: true, status: true,
+        extraHours: true, travelCost: true, distanceKm: true,
+        extras: { select: { price: true, quantity: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
+        pack: { select: { price: true, extraHourPrice: true, translations: { where: { locale: 'ca' }, select: { name: true } } } },
       },
     }), CacheTTL.SHORT).catch(() => null),
+    cachedQuery(`admin:dashboard:economic-risk-bookings:${dayKey}`, () => prisma.booking.findMany({
+      where: {
+        eventDate: { gte: now, lte: nextWeekEnd },
+        status: { in: ['CONFIRMED', 'PREPARING'] },
+      },
+      orderBy: { eventDate: 'asc' },
+      take: 10,
+      select: {
+        id: true, reference: true, clientName: true, eventDate: true,
+        total: true, depositAmount: true, remainingAmount: true, cashAmount: true,
+        depositPaid: true, remainingPaid: true,
+        extraHours: true, travelCost: true, distanceKm: true,
+        extras: { select: { price: true, quantity: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
+        pack: { select: { price: true, extraHourPrice: true } },
+      },
+    }), CacheTTL.SHORT).catch(() => []),
     cachedQuery(`admin:dashboard:revenue-month:${startOfMonth.toISOString().slice(0, 10)}`, () => prisma.booking.aggregate({
       where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: startOfMonth } },
       _sum: { total: true },
@@ -356,19 +401,30 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const conversionRate = leadsCount > 0 ? Math.round((wonLeads / leadsCount) * 100) : 0;
 
   // Marge mitjà de reserves confirmades/completades
-  const marginPcts = (marginBookings as Array<{ total: number; travelCost: number | null; pack: { price: number }; extras: Array<{ price: number; quantity: number }> }>)
+  const marginPcts = (marginBookings as Array<{
+    total: number;
+    extraHours: number | null;
+    travelCost: number | null;
+    pack: { price: number; extraHourPrice: number };
+    extras: Array<{ price: number; quantity: number }>;
+    serviceLines: Array<{ revenueAmount: number | null; costAmount: number | null; quantity: number | null; collaboratorId: string | null; kind?: string | null; label?: string | null; notes?: string | null }>;
+  }>)
     .filter((b) => b.total > 0)
     .map((b) => {
       const extrasTotal = b.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+      const serviceLines = aggregateServiceLines(b.serviceLines);
       return computeSimpleMarginPct(
         {
           total: b.total,
           packPrice: b.pack.price,
           extrasTotal,
-          extraHours: 0,
-          extraHourPrice: 0,
+          extraHours: b.extraHours ?? 0,
+          extraHourPrice: b.pack.extraHourPrice ?? 0,
           distanceKm: 0,
           travelCost: b.travelCost ?? 0,
+          serviceLinesRevenue: serviceLines.revenue,
+          serviceLinesCost: serviceLines.cost,
+          serviceLines: b.serviceLines,
         },
         profitConfig,
       );
@@ -432,7 +488,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     { label: 'SMTP', status: smtpConfigured ? 'OK' : 'PENDENT' },
     { label: 'IMAP', status: imapConfigured ? 'OK' : 'PENDENT' },
     { label: 'GA4', status: ga4Status.ready ? 'OK' : 'PENDENT' },
-    { label: 'Cron', status: cronMap['emails.cron.lastStatus'] || '—' },
+    { label: 'Cron', status: readAdminPostEventCronSetting(cronMap, 'lastStatus') || '—' },
     { label: 'Auto', status: cronMap['automation.commercial.lastStatus'] || '—' },
   ];
 
@@ -458,7 +514,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     ...(ga4Status.ready && !ga4 ? [{ type: 'warning', title: 'GA4 sense dades', description: 'No podem carregar mètriques. Revisa permisos o quota.', href: '/admin/analytics', action: 'Revisar' }] : []),
     ...(ga4?.realtimeFallback ? [{ type: 'warning', title: 'Realtime parcial', description: 'Algunes mètriques realtime no estan disponibles.', href: '/admin/analytics', action: 'Veure' }] : []),
     ...(!imapConfigured ? [{ type: 'info', title: 'IMAP no configurat', description: 'L\'inbox encara no està connectat.', href: '/admin/inbox/settings', action: 'Configurar' }] : []),
-    ...(postEventPending > 0 ? [{ type: 'warning', title: 'Emails post-event pendents', description: `${postEventPending} esdeveniments sense correu enviat.`, href: '/admin/emails', action: 'Gestionar' }] : []),
+    ...(postEventPending > 0 ? [{ type: 'warning', title: 'Emails post-event pendents', description: `${postEventPending} esdeveniments sense correu enviat.`, href: '/admin/post-event', action: 'Gestionar' }] : []),
     ...((inventoryMaintenance + inventoryBroken) > 0 ? [{ type: 'warning', title: 'Equip requereix atenció', description: `${inventoryMaintenance} en manteniment${inventoryBroken > 0 ? `, ${inventoryBroken} avariat` : ''}.`, href: '/admin/inventory', action: 'Revisar' }] : []),
   ];
 
@@ -472,12 +528,14 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const cashFlowNet30 = (cashFlowResult as Array<{ netFlow: number }>).length > 0 ? (cashFlowResult as Array<{ netFlow: number }>)[0].netFlow : 0;
   const pipelineWeighted30 = (pipelineResult as Array<{ combined: number }>).length > 0 ? (pipelineResult as Array<{ combined: number }>)[0].combined : 0;
   let pendingPayments = 0;
-  for (const b of pendingBookingsResult as Array<{ total: number; depositAmount: number; depositPaid: boolean; remainingPaid: boolean }>) {
-    const deposit = Number(b.depositAmount) || 0;
-    const total = Number(b.total) || 0;
-    if (!b.depositPaid && deposit > 0) pendingPayments += deposit;
-    if (!b.remainingPaid) pendingPayments += Math.max(0, total - deposit);
+  for (const b of pendingBookingsResult as Array<{ total: number; depositAmount: number; depositPaid: boolean; remainingPaid: boolean; cashAmount: number | null }>) {
+    pendingPayments += bookingOutstandingAmount(b);
   }
+  const economicRiskBookings = projectDashboardEconomicRiskBookings(
+    economicRiskRows as Parameters<typeof projectDashboardEconomicRiskBookings>[0],
+    now,
+    profitConfig,
+  );
 
   let nextEvent: DashboardData['nextEvent'] = null;
   if (nextEventRaw) {
@@ -490,6 +548,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     ).catch(() => DEFAULT_BOOKING_CHECKLIST_ITEMS);
     const checklistTotal = checklistItems.length;
     const checklistDone = checklistItems.filter((item: { checked: boolean }) => item.checked).length;
+    const economics = computeDashboardNextEventEconomics(nextEventRaw, profitConfig);
     nextEvent = {
       id: nextEventRaw.id,
       reference: nextEventRaw.reference,
@@ -507,6 +566,10 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       daysUntil,
       checklistDone,
       checklistTotal,
+      outstandingAmount: economics.outstandingAmount,
+      directCost: economics.directCost,
+      netMargin: economics.netMargin,
+      marginPct: economics.marginPct,
     };
   }
 
@@ -529,12 +592,12 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       });
     }
   }
-  // Unpaid + event in 3 days
-  if (nextEvent && nextEvent.daysUntil <= 3 && !nextEvent.depositPaid) {
+  // Pagament pendent real + event in 3 days
+  if (nextEvent && nextEvent.daysUntil <= 3 && nextEvent.outstandingAmount > 0) {
     alerts.push({
       type: 'warning',
       title: 'Pagament pendent imminent',
-      description: `${nextEvent.clientName} no ha pagat la paga i senyal i el bolo és ${nextEvent.daysUntil === 0 ? 'avui' : `d'aquí ${nextEvent.daysUntil} dies`}.`,
+      description: `${nextEvent.clientName} té ${formatCurrency(nextEvent.outstandingAmount)} pendents i el bolo és ${nextEvent.daysUntil === 0 ? 'avui' : `d'aquí ${nextEvent.daysUntil} dies`}.`,
       href: buildBookingHref(nextEvent.id),
       action: 'Gestionar pagament',
     });
@@ -574,6 +637,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cashFlowNet30,
     pipelineWeighted30,
     pendingPayments,
+    economicRiskBookings,
     nextEvent,
     revenueThisMonth,
     revenueTarget,

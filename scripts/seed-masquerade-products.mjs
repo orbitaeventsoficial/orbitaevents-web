@@ -7,13 +7,16 @@
  * Ús: node scripts/seed-masquerade-products.mjs
  */
 import { PrismaClient } from '@prisma/client';
-import { resellPrice } from '../lib/constants/pricing.ts';
+import { resellPrice, roundRecommendedSellingPrice } from '../lib/constants/pricing.ts';
 import { getIncludedTravelOneWayKm } from '../lib/services/travelCost.ts';
 
 const prisma = new PrismaClient();
 
 const COLLABORATOR_ID = 'carlos-lucas-fernandez';
 const IMG = '/img/collaborators/masquerade';
+const ADULT_ANIMATION_IMG = `${IMG}/animacio-adults-1h.jpg`;
+const BINGO_ADULT_IMG = `${IMG}/bingo-musical.jpg`;
+const BINGO_KIDS_IMG = `${IMG}/bingo-musical-kids.jpg`;
 // Km inclosos canònics (font única: travelCost). Avui 20 km/sentit des de Granollers.
 const INCLUDED_KM = getIncludedTravelOneWayKm();
 const INCLUDES = `Vestuari d'alta qualitat · Desplaçament inclòs fins a ${INCLUDED_KM} km · Disponible en català`;
@@ -23,6 +26,10 @@ const EXTRA_CATEGORY = 'Extra';
 
 function productPrice(costPrice) {
   return resellPrice(costPrice);
+}
+
+function commercialProductPrice(costPrice) {
+  return roundRecommendedSellingPrice(productPrice(costPrice));
 }
 
 const PRODUCTS = [
@@ -37,7 +44,22 @@ const PRODUCTS = [
     // Sinopsi adaptada literalment del dossier del proveïdor (to natural, en català).
     description: "Els nostres personatges més entranyables vénen a descobrir-te un nou món de màgia i de color. Una animació on els jocs i els balls són els protagonistes, en un xou totalment dinàmic i ple de música. Pregunta'ns pels personatges disponibles!",
     includes: INCLUDES,
-    sortOrder: 1,
+    sortOrder: 3,
+  },
+  {
+    name: 'Bingo Musical KIDS',
+    category: CHILDREN_CATEGORY,
+    crew: 'Presentador + tècnic de so + equip propi',
+    durationLabel: '1h',
+    costPrice: 160,
+    sellPrice: commercialProductPrice(160),
+    imageUrl: BINGO_KIDS_IMG,
+    description: "Versió infantil i familiar del Bingo Musical, especialment pensada per a nens i nenes de 6 a 12 anys i també per als pares. Una hora de música, joc i participació amb cançons enfocades al jovent actual, dinàmiques per a la mainada, dues línies i el bingo final. Manté l'energia del format gran però amb una durada més curta i un ritme adaptat a casals, escoles i festes familiars.",
+    includes: `${INCLUDES} · Cartons i gomets de bingo · Dinàmiques infantils · Dues línies i bingo final`,
+    isActive: true,
+    visibleInDossier: true,
+    visibleInBooking: true,
+    sortOrder: 2,
   },
   {
     name: 'Animació amb personatge',
@@ -49,7 +71,7 @@ const PRODUCTS = [
     imageUrl: `${IMG}/animacio-2-personatges.jpg`,
     description: "T'agradaria conèixer els teus personatges preferits? Disney, Bluey, Patrulla Canina… amb nosaltres és possible! Gaudeix de les nostres animacions amb els vostres personatges favorits, en una vetllada on els haureu d'ajudar a través de balls i dinàmiques. Esteu a punt per ballar amb ells?",
     includes: INCLUDES,
-    sortOrder: 2,
+    sortOrder: 4,
   },
   {
     name: 'El secret dels pirates',
@@ -61,7 +83,7 @@ const PRODUCTS = [
     imageUrl: `${IMG}/secret-pirates.jpg`,
     description: "Diuen les llegendes que a les profunditats del mar Mediterrani s'amaga l'illa Maragda, creada pel déu del mar, Poseidó. Allà, amagat sota la terra, hi ha el seu tresor: un tresor màgic que es transforma en allò que més desitja qui el troba. El capità William té el vent a favor per arribar-hi, però tot canvia quan es topa amb la capitana Elissabeth a l'illa i descobreix que ella guarda l'altra meitat del mapa. Arribaran a treballar junts o lluitaran per ser el pirata més ràpid? Un musical ple de cançons en directe, balls i música, on l'amistat i el treball en equip són els pilars de l'espectacle.",
     includes: INCLUDES,
-    sortOrder: 3,
+    sortOrder: 5,
   },
   {
     name: 'Animació adults 1h',
@@ -72,7 +94,7 @@ const PRODUCTS = [
     // helper canònic resellPrice (cost +20% arrodonit a múltiple de 5).
     costPrice: 160,
     sellPrice: productPrice(160),
-    imageUrl: null,
+    imageUrl: ADULT_ANIMATION_IMG,
     description: "Animació en directe pensada per al grup gran: conducció, jocs i dinàmiques participatives que mantenen el ritme de la festa sense parar-la. Un animador professional condueix l'estona perquè els adults s'hi impliquin i passin una bona estona.",
     includes: INCLUDES,
     sortOrder: 6,
@@ -80,22 +102,26 @@ const PRODUCTS = [
   {
     name: 'Bingo Musical',
     category: ADULTS_CATEGORY,
-    crew: 'DJ + Presentador/a',
+    // Cost 200 = 160 presentador/equip + 40 tècnic de so. El configurador
+    // detecta "tècnic de so" i el separa en una línia assignable a Òrbita o al
+    // proveïdor, mantenint PVP i cost total invariants.
+    crew: 'Presentador + tècnic de so + equip propi',
     durationLabel: '1h 30',
     // Cost real de Masquerade (recuperat de BD); PVP via resellPrice. isActive
     // explícit per reactivar-lo (el seed #956 l'havia desactivat: no era al Word).
     costPrice: 200,
     sellPrice: productPrice(200),
-    imageUrl: `${IMG}/bingo-musical.jpg`,
+    imageUrl: BINGO_ADULT_IMG,
     description: "Els temazos sonen des del primer minut, sempre des de la part que tothom reconeix, mentre el presentador porta l'energia. Cada participant té el seu cartró i els seus gomets; el joc acumula línies i, quan s'omplen, els guanyadors surten al davant per als reptes musicals. Tres rondes, cada cop diferent, mentre el públic canta i anima fins que algú canta bingo.",
     includes: INCLUDES,
     isActive: true,
-    sortOrder: 7,
+    sortOrder: 10,
   },
   {
     name: 'Batalla Musical',
     category: ADULTS_CATEGORY,
-    crew: 'DJ + Presentador/a',
+    // Mateixa estructura que Bingo: producte client complet, tècnic assignable.
+    crew: 'Presentador + tècnic de so + equip propi',
     durationLabel: '1h 30',
     costPrice: 200,
     sellPrice: productPrice(200),
@@ -103,7 +129,7 @@ const PRODUCTS = [
     description: "Hora i mitja de competició musical. Els participants es divideixen en equips i s'enfronten en reptes: karaoke col·lectiu, endevina la cançó, ball, preguntes musicals, concurs de talent… Cada repte suma punts i, al final, un sol equip s'emporta la Batalla Musical. Qui no vulgui competir pot fer de jurat.",
     includes: INCLUDES,
     isActive: true,
-    sortOrder: 8,
+    sortOrder: 11,
   },
   {
     name: 'Pintacares professional',
@@ -115,7 +141,7 @@ const PRODUCTS = [
     imageUrl: null,
     description: "Pintacares professional per ampliar l'experiència de la festa. Es contracta amb una animació infantil o familiar.",
     includes: null,
-    sortOrder: 4,
+    sortOrder: 7,
   },
   {
     name: 'Globoflèxia',
@@ -127,7 +153,7 @@ const PRODUCTS = [
     imageUrl: null,
     description: "Globoflèxia en acabar l'espectacle perquè cada infant marxi amb un record. Es contracta amb una animació infantil o familiar.",
     includes: null,
-    sortOrder: 5,
+    sortOrder: 8,
   },
 ];
 
@@ -177,7 +203,7 @@ async function main() {
       name: { notIn: canonicalNames },
       isActive: true,
     },
-    data: { isActive: false },
+    data: { isActive: false, visibleInDossier: false, visibleInBooking: false },
   });
   if (obsolete.count > 0) {
     console.log(`\n${obsolete.count} producte(s) antic(s) de Masquerade desactivat(s) perquè no surten al Word.`);

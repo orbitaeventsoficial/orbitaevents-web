@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockGetLeadDetail, mockUpdateLead, mockDeleteLead } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockGetLeadDetail, mockUpdateLead, mockDeleteLead } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockGetLeadDetail: vi.fn(),
   mockUpdateLead: vi.fn(),
   mockDeleteLead: vi.fn(),
@@ -19,6 +20,8 @@ vi.mock('@/lib/services/leadRouteService', () => ({
 vi.mock('@/lib/logger', () => ({
   log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { GET, PATCH, DELETE } from '@/app/api/admin/leads/[id]/route';
 
@@ -64,7 +67,7 @@ const sampleLead = {
 describe('GET /api/admin/leads/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockGetLeadDetail.mockResolvedValue({ status: 200, body: { lead: sampleLead } });
   });
 
@@ -113,7 +116,7 @@ describe('GET /api/admin/leads/[id]', () => {
 describe('PATCH /api/admin/leads/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockUpdateLead.mockResolvedValue({ status: 200, body: { lead: { ...sampleLead, status: 'QUOTE_SENT' } } });
   });
 
@@ -146,12 +149,20 @@ describe('PATCH /api/admin/leads/[id]', () => {
     const res = await PATCH(req, params);
     expect(res.status).toBe(400);
   });
+
+  it('rebutja eventDate ambigu al PATCH', async () => {
+    const { req, params } = makePatchRequest('lead-1', { eventDate: '26 Setiembre' });
+    const res = await PATCH(req, params);
+
+    expect(res.status).toBe(400);
+    expect(mockUpdateLead).not.toHaveBeenCalled();
+  });
 });
 
 describe('DELETE /api/admin/leads/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockDeleteLead.mockResolvedValue({ status: 200, body: { ok: true } });
   });
 

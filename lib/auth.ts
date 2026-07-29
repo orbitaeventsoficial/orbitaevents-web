@@ -181,21 +181,3 @@ export function requireAuth(req: NextRequest): NextResponse | null {
 
   return null;
 }
-
-/**
- * Obtenir IP del request (per logging)
- */
-export function getClientIP(req: NextRequest): string {
-  return (
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    req.headers.get('x-real-ip') ||
-    'unknown'
-  );
-}
-
-/**
- * Obtenir User Agent del request (per logging)
- */
-export function getUserAgent(req: NextRequest): string {
-  return req.headers.get('user-agent') || 'unknown';
-}

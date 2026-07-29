@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
@@ -23,8 +23,39 @@ interface TestimonialFormProps {
   onSuccess?: (code: string, percent: number) => void;
 }
 
+type TestimonialSubmitResponse = {
+  discountCode?: unknown;
+  discountPercent?: unknown;
+};
+
+type TestimonialSubmitPayload = FormData & {
+  token?: string;
+  bookingRef?: string;
+};
+
+function buildTestimonialSubmitPayload(
+  form: FormData,
+  token?: string | null,
+  bookingRef?: string | null,
+): TestimonialSubmitPayload {
+  const payload: TestimonialSubmitPayload = { ...form };
+  const safeToken = token?.trim();
+  const safeBookingRef = bookingRef?.trim();
+
+  if (safeToken) payload.token = safeToken;
+  if (safeBookingRef) payload.bookingRef = safeBookingRef;
+
+  return payload;
+}
+
 export default function TestimonialForm({ token, bookingRef, onSuccess }: TestimonialFormProps) {
   const t = useTranslations('testimonialForm');
+  const commentTitleId = useId();
+  const photoUrlId = useId();
+  const videoUrlId = useId();
+  const nameId = useId();
+  const emailId = useId();
+  const phoneId = useId();
 
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -58,14 +89,19 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
       const res = await fetch('/api/testimonials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, token, bookingRef }),
+        body: JSON.stringify(buildTestimonialSubmitPayload(form, token, bookingRef)),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || t('errors.submitError'));
-      setSuccess({ code: data.discountCode, percent: data.discountPercent });
-      onSuccess?.(data.discountCode, data.discountPercent);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.submitError'));
+      const data = await res.json().catch(() => null) as TestimonialSubmitResponse | null;
+      if (!res.ok) throw new Error('testimonial-submit-failed');
+
+      const code = typeof data?.discountCode === 'string' ? data.discountCode : null;
+      const percent = typeof data?.discountPercent === 'number' ? data.discountPercent : null;
+      if (!code || percent === null) throw new Error('testimonial-submit-failed');
+
+      setSuccess({ code, percent });
+      onSuccess?.(code, percent);
+    } catch {
+      setError(t('errors.submitError'));
     } finally {
       setLoading(false);
     }
@@ -86,11 +122,11 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white/5 backdrop-blur-sm border border-amber-500/30 rounded-3xl p-8 text-center"
+        className="bg-white/5 backdrop-blur-sm border border-amber-500/30 rounded-lg p-8 text-center"
       >
         <div className="text-8xl mb-6">🎉</div>
         <h2 className="text-3xl font-bold text-amber-400 mb-4">{t('success.title')}</h2>
-        <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/10 border-2 border-amber-500 rounded-2xl p-8 mb-6">
+        <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/10 border-2 border-amber-500 rounded-lg p-8 mb-6">
           <p className="text-white/60 mb-2">{t('success.exclusiveCode')}</p>
           <p className="text-5xl font-bold text-amber-400 tracking-widest mb-4">{success.code}</p>
           <p className="text-3xl font-bold text-white">{success.percent}% {t('success.discount')}</p>
@@ -99,7 +135,7 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
         <p className="text-white/60 mb-6">{t('success.codeByEmail')}</p>
         <Link
           href="/"
-          className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold px-8 py-4 rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+          className="inline-block rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-8 py-4 font-bold text-black transition-all hover:shadow-lg hover:shadow-amber-500/30"
         >
           {t('success.backHome')}
         </Link>
@@ -108,7 +144,7 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
   }
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8">
+    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
       {/* Progress */}
       <div className="flex justify-between mb-8">
         {STEP_KEYS.map((key, i) => (
@@ -128,11 +164,19 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
       </div>
 
       {/* Discount Preview */}
-      <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-xl p-4 mb-8 text-center">
+      <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-4 mb-8 text-center">
         <p className="text-white/60 text-sm">{t('gamified.navigation.currentReward')}</p>
         <p className="text-4xl font-bold text-amber-400">{discountPercent}%</p>
-        <p className="text-xs text-white/50 mt-1">
-          {form.photoUrl ? '✓' : `📸 +5%`} · {form.videoUrl ? '✓' : `🎬 +10%`} · {form.allowGoogleShare ? '✓' : `⭐ +5% Google`}
+        <p className="mt-3 flex flex-wrap justify-center gap-2 text-xs text-white/60">
+          <span className="rounded-md border border-white/10 px-2 py-1">
+            {form.photoUrl ? t('gamified.rewards.photoDone') : t('gamified.rewards.photo')}
+          </span>
+          <span className="rounded-md border border-white/10 px-2 py-1">
+            {form.videoUrl ? t('gamified.rewards.videoDone') : t('gamified.rewards.video')}
+          </span>
+          <span className="rounded-md border border-white/10 px-2 py-1">
+            {form.allowGoogleShare ? t('gamified.rewards.googleDone') : t('gamified.rewards.google')}
+          </span>
         </p>
       </div>
 
@@ -147,6 +191,11 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
                   key={star}
                   type="button"
                   onClick={() => updateForm('rating', star)}
+                  aria-label={t('gamified.rating.starLabel', {
+                    rating: star,
+                    label: t(`form.ratingLabels.${star}`),
+                  })}
+                  aria-pressed={star === form.rating}
                   className={`text-5xl transition-all hover:scale-110 ${star <= form.rating ? 'text-amber-400' : 'text-white/30 hover:text-white/50'}`}
                 >
                   ★
@@ -162,12 +211,13 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
         {/* Step 1: Comment */}
         {step === 1 && (
           <motion.div key="comment" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h3 className="text-2xl font-semibold text-white mb-6 text-center">{t('gamified.comment.title')}</h3>
+            <h3 id={commentTitleId} className="text-2xl font-semibold text-white mb-6 text-center">{t('gamified.comment.title')}</h3>
             <textarea
+              aria-labelledby={commentTitleId}
               value={form.comment}
               onChange={(e) => updateForm('comment', e.target.value)}
               rows={5}
-              className="w-full bg-white/5 border border-white/20 rounded-xl p-4 text-white placeholder-white/40 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 resize-none"
+              className="w-full bg-white/5 border border-white/20 rounded-lg p-4 text-white placeholder-white/40 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 resize-none"
               placeholder={t('gamified.comment.commentPlaceholder')}
             />
             <p className={`text-sm text-right mt-2 ${form.comment.length >= 10 ? 'text-green-400' : 'text-white/50'}`}>
@@ -181,21 +231,21 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
           <motion.div key="media" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
             <h3 className="text-2xl font-semibold text-white mb-6 text-center">{t('gamified.media.title')}</h3>
 
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <label className="block text-sm font-medium text-amber-400 mb-2">📸 {t('gamified.media.addPhoto')} ({t('gamified.media.photoDiscount')})</label>
-              <input type="url" value={form.photoUrl} onChange={(e) => updateForm('photoUrl', e.target.value)}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+              <label htmlFor={photoUrlId} className="block text-sm font-medium text-amber-400 mb-2">📸 {t('gamified.media.addPhoto')} ({t('gamified.media.photoDiscount')})</label>
+              <input id={photoUrlId} type="url" value={form.photoUrl} onChange={(e) => updateForm('photoUrl', e.target.value)}
                 className="w-full bg-black/30 border border-white/20 rounded-lg p-3 text-white placeholder-white/40 focus:border-amber-500"
                 placeholder="https://drive.google.com/... / Instagram" />
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <label className="block text-sm font-medium text-amber-400 mb-2">🎬 {t('gamified.media.addVideo')} ({t('gamified.media.videoDiscount')})</label>
-              <input type="url" value={form.videoUrl} onChange={(e) => updateForm('videoUrl', e.target.value)}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+              <label htmlFor={videoUrlId} className="block text-sm font-medium text-amber-400 mb-2">🎬 {t('gamified.media.addVideo')} ({t('gamified.media.videoDiscount')})</label>
+              <input id={videoUrlId} type="url" value={form.videoUrl} onChange={(e) => updateForm('videoUrl', e.target.value)}
                 className="w-full bg-black/30 border border-white/20 rounded-lg p-3 text-white placeholder-white/40 focus:border-amber-500"
                 placeholder="https://youtube.com/... / TikTok" />
             </div>
 
-            <label className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-4 cursor-pointer hover:border-amber-500/50 transition-colors">
+            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:border-amber-500/50">
               <input type="checkbox" checked={form.allowGoogleShare} onChange={(e) => updateForm('allowGoogleShare', e.target.checked)}
                 className="w-5 h-5 rounded border-white/30 text-amber-500 focus:ring-amber-500" />
               <div>
@@ -204,7 +254,7 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
               </div>
             </label>
 
-            <label className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-4 cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-4">
               <input type="checkbox" checked={form.consentPhotoPublication} onChange={(e) => updateForm('consentPhotoPublication', e.target.checked)}
                 className="w-5 h-5 rounded border-white/30 text-amber-500 focus:ring-amber-500" />
               <div>
@@ -220,27 +270,27 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
             <h3 className="text-2xl font-semibold text-white mb-6 text-center">{t('gamified.yourData.title')}</h3>
 
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-2">{t('form.name')} *</label>
-              <input type="text" value={form.name} onChange={(e) => updateForm('name', e.target.value)}
-                className="w-full bg-white/5 border border-white/20 rounded-xl p-4 text-white placeholder-white/40 focus:border-amber-500"
+              <label htmlFor={nameId} className="block text-sm font-medium text-white/70 mb-2">{t('form.name')} *</label>
+              <input id={nameId} type="text" value={form.name} onChange={(e) => updateForm('name', e.target.value)}
+                className="w-full bg-white/5 border border-white/20 rounded-lg p-4 text-white placeholder-white/40 focus:border-amber-500"
                 required />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-2">Email *</label>
-              <input type="email" value={form.email} onChange={(e) => updateForm('email', e.target.value)}
-                className="w-full bg-white/5 border border-white/20 rounded-xl p-4 text-white placeholder-white/40 focus:border-amber-500"
+              <label htmlFor={emailId} className="block text-sm font-medium text-white/70 mb-2">{t('form.email')} *</label>
+              <input id={emailId} type="email" value={form.email} onChange={(e) => updateForm('email', e.target.value)}
+                className="w-full bg-white/5 border border-white/20 rounded-lg p-4 text-white placeholder-white/40 focus:border-amber-500"
                 required />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-2">{t('form.phoneOptional')}</label>
-              <input type="tel" value={form.phone} onChange={(e) => updateForm('phone', e.target.value)}
-                className="w-full bg-white/5 border border-white/20 rounded-xl p-4 text-white placeholder-white/40 focus:border-amber-500" />
+              <label htmlFor={phoneId} className="block text-sm font-medium text-white/70 mb-2">{t('form.phoneOptional')}</label>
+              <input id={phoneId} type="tel" value={form.phone} onChange={(e) => updateForm('phone', e.target.value)}
+                className="w-full bg-white/5 border border-white/20 rounded-lg p-4 text-white placeholder-white/40 focus:border-amber-500" />
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-red-400 text-center">{error}</div>
+              <div role="alert" className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400 text-center">{error}</div>
             )}
           </motion.div>
         )}
@@ -252,18 +302,18 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
           type="button"
           onClick={() => setStep(step - 1)}
           disabled={step === 0}
-          className={`px-6 py-3 rounded-full font-medium transition-all ${
+          className={`rounded-lg px-6 py-3 font-medium transition-all ${
             step === 0 ? 'bg-white/5 text-white/30 cursor-not-allowed' : 'bg-white/10 text-white hover:bg-white/20'
           }`}
         >
-          ← {t('gamified.navigation.previous')}
+          <span aria-hidden="true">←</span> {t('gamified.navigation.previous')}
         </button>
 
         <button
           type="button"
           onClick={() => step === 3 ? handleSubmit() : setStep(step + 1)}
           disabled={!canContinue() || loading}
-          className={`px-8 py-3 rounded-full font-bold transition-all ${
+          className={`rounded-lg px-8 py-3 font-bold transition-all ${
             canContinue() && !loading
               ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black hover:shadow-lg hover:shadow-amber-500/30'
               : 'bg-white/10 text-white/50 cursor-not-allowed'
@@ -271,16 +321,20 @@ export default function TestimonialForm({ token, bookingRef, onSuccess }: Testim
         >
           {loading ? (
             <span className="flex items-center gap-2">
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <svg aria-hidden="true" className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
               {t('gamified.navigation.submitting')}
             </span>
           ) : step === 3 ? (
-            `✓ ${t('gamified.navigation.submit')}`
+            <>
+              <span aria-hidden="true">✓</span> {t('gamified.navigation.submit')}
+            </>
           ) : (
-            `${t('gamified.navigation.next')} →`
+            <>
+              {t('gamified.navigation.next')} <span aria-hidden="true">→</span>
+            </>
           )}
         </button>
       </div>

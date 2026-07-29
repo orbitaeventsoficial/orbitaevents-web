@@ -7,6 +7,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 import { getProfitabilityConfig } from './profitabilityService';
 import { computeBookingFinancialSummary } from './costEngine';
 
@@ -16,6 +17,10 @@ interface CashFlowMonth {
   costs: number;
   netFlow: number;
   cumulative: number;
+}
+
+function roundMoney(value: number): number {
+  return Math.round(value * 100) / 100;
 }
 
 export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMonth[]> {
@@ -35,10 +40,12 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
       depositPaid: true,
       remainingPaid: true,
       remainingAmount: true,
+      cashAmount: true,
       travelCost: true,
       distanceKm: true,
       pack: { select: { price: true, extraHourPrice: true } },
       extras: { select: { price: true, quantity: true } },
+      serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
       extraHours: true,
     },
   });
@@ -64,10 +71,18 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
     // Ingressos pendents de cobrar
     const total = Number(booking.total) || 0;
     const depositAmount = Number(booking.depositAmount) || 0;
-    const remainingAmount = Number(booking.remainingAmount) || Math.max(0, total - depositAmount);
-    let pendingIncome = 0;
-    if (!booking.depositPaid) pendingIncome += depositAmount;
-    if (!booking.remainingPaid) pendingIncome += Math.max(0, remainingAmount);
+    const remainingAmount = booking.remainingAmount == null
+      ? Math.max(0, total - depositAmount)
+      : Math.max(0, Number(booking.remainingAmount) || 0);
+    const cashAmount = booking.cashAmount == null ? null : Math.max(0, Number(booking.cashAmount) || 0);
+    const pendingIncome = bookingOutstandingAmount({
+      total,
+      depositAmount,
+      remainingAmount,
+      depositPaid: booking.depositPaid,
+      remainingPaid: booking.remainingPaid,
+      cashAmount,
+    });
     entry.income += pendingIncome;
 
     // Cost estimat
@@ -84,6 +99,7 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
         extraHourPrice: Number(booking.pack?.extraHourPrice) || 0,
         distanceKm: Number(booking.distanceKm) || 0,
         travelCost: typeof booking.travelCost === 'number' ? booking.travelCost : undefined,
+        serviceLines: booking.serviceLines,
       },
       config,
     );
@@ -99,10 +115,10 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
     cumulative += netFlow;
     result.push({
       month,
-      income: Math.round(data.income),
-      costs: Math.round(data.costs),
-      netFlow: Math.round(netFlow),
-      cumulative: Math.round(cumulative),
+      income: roundMoney(data.income),
+      costs: roundMoney(data.costs),
+      netFlow: roundMoney(netFlow),
+      cumulative: roundMoney(cumulative),
     });
   }
 

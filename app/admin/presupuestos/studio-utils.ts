@@ -11,15 +11,16 @@ import {
 } from '@/app/config/packs-config';
 import { z } from 'zod';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { ADMIN_PDF_STUDIO_COPY, ADMIN_PDF_STUDIO_CUSTOM_PACK_ID, ADMIN_PDF_STUDIO_DEFAULT_SECTION_ORDER, ADMIN_PDF_STUDIO_DRAFT_KEY, ADMIN_PDF_STUDIO_OPERATOR_EXTRA_ID, ADMIN_PDF_STUDIO_SECTION_LABELS, ADMIN_PDF_STUDIO_SERVICE_LABELS } from '@/lib/constants/admin';
+import { ADMIN_PDF_STUDIO_COPY, ADMIN_PDF_STUDIO_CUSTOM_PACK_ID, ADMIN_PDF_STUDIO_DEFAULT_COLLAPSED_SECTIONS, ADMIN_PDF_STUDIO_DEFAULT_SECTION_ORDER, ADMIN_PDF_STUDIO_DRAFT_KEY, ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_LABELS, ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_ORDER, ADMIN_PDF_STUDIO_OPERATOR_EXTRA_ID, ADMIN_PDF_STUDIO_SECTION_LABELS, ADMIN_PDF_STUDIO_SERVICE_LABELS } from '@/lib/constants/admin';
 import { formatCurrencyExact } from '@/lib/constants';
 import { log } from '@/lib/logger';
+import { TRAVEL_COST_LINE_MARKER, type TravelHeadcountLineLike } from '@/lib/services/travelLaborCost';
 
 // --- Types --------------------------------------------------------------
 
 export type DocMode = 'quote' | 'contract';
 
-export type SectionId = 'config' | 'client' | 'brand' | 'pack' | 'extras-catalog' | 'extras-custom' | 'contract';
+export type SectionId = 'config' | 'client' | 'brand' | 'transport' | 'pack' | 'extras-catalog' | 'extras-custom' | 'contract';
 
 import type { Locale } from '@/i18n';
 export type { Locale };
@@ -89,12 +90,19 @@ export type StudioProps = {
   initialCustomerName?: string;
   initialCustomerEmail?: string;
   initialCustomerPhone?: string;
+  initialEventType?: ServiceSlug;
   initialEventDate?: string;
   initialEventSchedule?: string;
   initialEventLocation?: string;
+  initialDistanceKm?: number;
+  initialTollsEur?: number;
+  initialVehicleCostPerKm?: number;
   initialGuests?: number;
   initialLeadId?: string;
+  initialLeadServiceLines?: StudioLeadServiceLine[];
   initialProposalId?: string;
+  initialProposalStatus?: string;
+  initialPreferLeadPrefill?: boolean;
   initialPreferredLocale?: string;
   initialBrandName?: string;
   initialBrandWebsite?: string;
@@ -104,11 +112,23 @@ export type StudioProps = {
   initialBrandLogoDataUrl?: string;
 };
 
+export type StudioLeadServiceLine = TravelHeadcountLineLike & {
+  id?: string;
+  partyType?: string | null;
+  hours?: number | null;
+};
+
 // --- Constants ----------------------------------------------------------
 
 export const SECTION_LABELS: Record<SectionId, string> = ADMIN_PDF_STUDIO_SECTION_LABELS;
 
 export const DEFAULT_SECTION_ORDER: SectionId[] = [...ADMIN_PDF_STUDIO_DEFAULT_SECTION_ORDER];
+
+export const LEAD_BOLO_SECTION_ORDER: SectionId[] = [...ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_ORDER];
+
+export const LEAD_BOLO_SECTION_LABELS: Partial<Record<SectionId, string>> = ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_LABELS;
+
+export const DEFAULT_COLLAPSED_SECTIONS: SectionId[] = [...ADMIN_PDF_STUDIO_DEFAULT_COLLAPSED_SECTIONS];
 
 export const STUDIO_DRAFT_KEY = ADMIN_PDF_STUDIO_DRAFT_KEY;
 export const CUSTOM_PACK_ID = ADMIN_PDF_STUDIO_CUSTOM_PACK_ID;
@@ -142,6 +162,118 @@ export function normalizeStudioLocale(value?: string): Locale {
 
 export function formatEUR(value: number): string {
   return formatCurrencyExact(Math.max(0, value));
+}
+
+function normalizeMatchText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+export function inferStudioServiceFromLead(input: {
+  eventType?: string | null;
+  serviceLines?: StudioLeadServiceLine[];
+}): ServiceSlug {
+  const serviceText = normalizeMatchText(
+    (input.serviceLines || [])
+      .map((line) => [line.label, line.kind, line.partyType].filter(Boolean).join(' '))
+      .join(' '),
+  );
+  const eventType = String(input.eventType || '').toUpperCase();
+  const allText = `${normalizeMatchText(eventType)} ${serviceText}`;
+
+  if (/\b(bingo|batalla|animacio|animacion)\b/.test(allText)) return 'animacion';
+  if (/\b(wedding|wedding_party|boda|bodas|casament|casaments)\b/.test(allText)) return 'bodas';
+  if (/\b(corporate|empresa|empresas|company|team\s*building)\b/.test(allText)) return 'empresas';
+  if (/\b(discomovil|disco|dj)\b/.test(allText)) return 'discomovil';
+
+  switch (eventType) {
+    case 'WEDDING':
+      return 'bodas';
+    case 'CORPORATE':
+      return 'empresas';
+    case 'BIRTHDAY':
+    case 'PRIVATE_PARTY':
+    case 'COMMUNION':
+    case 'BAPTISM':
+    case 'GRADUATION':
+    case 'ANNIVERSARY':
+      return 'fiestas';
+    default:
+      return 'fiestas';
+  }
+}
+
+function positiveQuantity(value?: number | null): number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.floor(value) : 1;
+}
+
+function isInternalTravelLine(line: { notes?: string | null }): boolean {
+  return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
+}
+
+export function leadServiceLinesForTransport(lines: StudioLeadServiceLine[]): TravelHeadcountLineLike[] {
+  return lines.filter((line) => !isInternalTravelLine(line));
+}
+
+export function buildCustomExtrasFromLeadServiceLines(lines: StudioLeadServiceLine[]): CustomExtra[] {
+  return lines
+    .filter((line) => !isInternalTravelLine(line))
+    .map((line, index) => {
+      const label = line.label?.trim() || '';
+      const quantity = positiveQuantity(line.quantity);
+      const revenue = typeof line.revenueAmount === 'number' && Number.isFinite(line.revenueAmount)
+        ? line.revenueAmount
+        : 0;
+      return {
+        id: line.id ? `lead-line-${line.id}` : `lead-line-${index + 1}`,
+        name: quantity > 1 ? `${label} x${quantity}` : label,
+        price: Math.max(0, revenue * quantity),
+      };
+    })
+    .filter((line) => line.name && line.price > 0);
+}
+
+export function buildLeadServiceFeatureLines(lines: StudioLeadServiceLine[]): string[] {
+  return lines
+    .filter((line) => !isInternalTravelLine(line))
+    .map((line) => line.label?.trim() || '')
+    .filter(Boolean);
+}
+
+export function deriveLeadDurationHours(lines: StudioLeadServiceLine[], fallback = 1): number {
+  const hours = lines.reduce((sum, line) => {
+    const value = typeof line.hours === 'number' && Number.isFinite(line.hours) && line.hours > 0 && line.hours <= 24 ? line.hours : 0;
+    return sum + value;
+  }, 0);
+  return Math.max(1, Math.round((hours || fallback) * 100) / 100);
+}
+
+export function deriveEventScheduleDurationHours(schedule?: string | null): number | null {
+  const text = typeof schedule === 'string' ? schedule.trim() : '';
+  if (!text) return null;
+
+  const times = Array.from(text.matchAll(/\b([01]?\d|2[0-3])(?:[:.h])([0-5]\d)\b/g))
+    .map((match) => Number(match[1]) * 60 + Number(match[2]));
+  if (times.length < 2) return null;
+
+  const start = times[0];
+  const end = times[1];
+  let diff = end - start;
+  if (diff <= 0) diff += 24 * 60;
+  const hours = Math.round((diff / 60) * 100) / 100;
+  return hours > 0 && hours <= 24 ? hours : null;
+}
+
+export function deriveStudioDurationHours(params: {
+  eventSchedule?: string | null;
+  lines?: StudioLeadServiceLine[];
+  fallback?: number;
+}): number {
+  const scheduleHours = deriveEventScheduleDurationHours(params.eventSchedule);
+  if (scheduleHours !== null) return scheduleHours;
+  return deriveLeadDurationHours(params.lines || [], params.fallback ?? 1);
 }
 
 export function toFeatureLines(text: string): string[] {

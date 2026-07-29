@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockExportData, mockAnonymize, mockLogAction } = vi.hoisted(() => ({
+const { mockPrisma, mockExportData, mockAnonymize, mockLogAction, mockSendCompletedEmail } = vi.hoisted(() => ({
   mockPrisma: {
     dataRequest: {
       findUnique: vi.fn(),
@@ -12,6 +12,7 @@ const { mockPrisma, mockExportData, mockAnonymize, mockLogAction } = vi.hoisted(
   mockExportData: vi.fn(),
   mockAnonymize: vi.fn(),
   mockLogAction: vi.fn(),
+  mockSendCompletedEmail: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -20,8 +21,23 @@ vi.mock('@/lib/services/privacyService', () => ({
   anonymizeCustomerData: mockAnonymize,
   logPrivacyAction: mockLogAction,
 }));
+vi.mock('@/lib/email', () => ({
+  sendPrivacyRequestCompletedEmail: mockSendCompletedEmail,
+}));
+vi.mock('@/lib/site', () => ({
+  getAppBaseUrl: () => 'https://test.orbita.events',
+}));
 
 import { processPrivacyRequestById } from '@/lib/services/privacyRequestAdminService';
+
+const BASE_REQUEST = {
+  id: 'req1',
+  status: 'VERIFIED',
+  requesterEmail: 'ana@example.com',
+  requesterName: 'Ana Pérez',
+  verificationToken: 'tok-abc',
+  customer: null,
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -32,6 +48,7 @@ beforeEach(() => {
   mockExportData.mockResolvedValue({ name: 'Test', email: 'test@test.com' });
   mockAnonymize.mockResolvedValue(undefined);
   mockLogAction.mockResolvedValue(undefined);
+  mockSendCompletedEmail.mockResolvedValue(undefined);
 });
 
 describe('processPrivacyRequestById', () => {
@@ -142,5 +159,81 @@ describe('processPrivacyRequestById', () => {
         legalBasis: 'RGPD Art. 15',
       })
     );
+  });
+
+  it('envia email de resolució amb enllaç de descàrrega en aprovar ACCESS', async () => {
+    mockPrisma.dataRequest.findUnique.mockResolvedValue({
+      ...BASE_REQUEST,
+      requestType: 'ACCESS',
+      customerId: 'c1',
+    });
+
+    await processPrivacyRequestById('req1', 'approve', undefined, 'admin');
+
+    expect(mockSendCompletedEmail).toHaveBeenCalledWith(expect.objectContaining({
+      to: 'ana@example.com',
+      name: 'Ana Pérez',
+      requestType: 'ACCESS',
+      requestId: 'req1',
+      result: 'approved',
+      downloadUrl: 'https://test.orbita.events/api/privacy/download?token=tok-abc',
+    }));
+  });
+
+  it('envia email de resolució SENSE enllaç de descàrrega en aprovar ERASURE', async () => {
+    mockPrisma.dataRequest.findUnique.mockResolvedValue({
+      ...BASE_REQUEST,
+      requestType: 'ERASURE',
+      customerId: 'c1',
+    });
+
+    await processPrivacyRequestById('req1', 'approve', undefined, 'admin');
+
+    expect(mockSendCompletedEmail).toHaveBeenCalledWith(expect.objectContaining({
+      result: 'approved',
+      downloadUrl: undefined,
+    }));
+  });
+
+  it('envia email de rebuig quan es rebutja la sol·licitud', async () => {
+    mockPrisma.dataRequest.findUnique.mockResolvedValue({
+      ...BASE_REQUEST,
+      requestType: 'ACCESS',
+      customerId: 'c1',
+    });
+
+    await processPrivacyRequestById('req1', 'reject', 'No compleix requisits', 'admin');
+
+    expect(mockSendCompletedEmail).toHaveBeenCalledWith(expect.objectContaining({
+      to: 'ana@example.com',
+      result: 'rejected',
+      notes: 'No compleix requisits',
+    }));
+  });
+
+  it('usa el locale preferit del client si hi ha vincle', async () => {
+    mockPrisma.dataRequest.findUnique.mockResolvedValue({
+      ...BASE_REQUEST,
+      requestType: 'ACCESS',
+      customerId: 'c1',
+      customer: { preferredLocale: 'en' },
+    });
+
+    await processPrivacyRequestById('req1', 'approve', undefined, 'admin');
+
+    expect(mockSendCompletedEmail).toHaveBeenCalledWith(expect.objectContaining({ locale: 'en' }));
+  });
+
+  it('no trenca el processament si l\'enviament d\'email falla', async () => {
+    mockPrisma.dataRequest.findUnique.mockResolvedValue({
+      ...BASE_REQUEST,
+      requestType: 'ACCESS',
+      customerId: 'c1',
+    });
+    mockSendCompletedEmail.mockRejectedValueOnce(new Error('SMTP down'));
+
+    const result = await processPrivacyRequestById('req1', 'approve', undefined, 'admin');
+
+    expect(result.status).toBe(200);
   });
 });

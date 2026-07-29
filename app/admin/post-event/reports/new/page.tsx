@@ -7,6 +7,7 @@ import { log } from '@/lib/logger';
 import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../../../components/AdminPage';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { normalizePostEventInventoryItems, type PostEventInventoryItem } from './inventory-payload';
 
 type BookingSummary = {
   id: string;
@@ -23,13 +24,7 @@ export default function NewReportPage() {
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [booking, setBooking] = useState<BookingSummary | null>(null);
-  const [inventoryItems, setInventoryItems] = useState<Array<{
-    id: string;
-    inventoryItem: { id: string; code: string; name: string; category: string; condition: string };
-    checkedOut: boolean;
-    checkedIn: boolean;
-    conditionAfter: string | null;
-  }>>([]);
+  const [inventoryItems, setInventoryItems] = useState<PostEventInventoryItem[]>([]);
 
   useEffect(() => {
     if (bookingId) {
@@ -45,9 +40,7 @@ export default function NewReportPage() {
       fetchWithCsrf(`/api/admin/bookings/${bookingId}/inventory`)
         .then(res => res.json())
         .then(data => {
-          if (data.assignedItems) {
-            setInventoryItems(data.assignedItems);
-          }
+          setInventoryItems(normalizePostEventInventoryItems(data));
         })
         .catch(() => { /* inventory not available */ });
     }
@@ -303,7 +296,6 @@ export default function NewReportPage() {
     </AdminPage>
   );
 }
-
 
 
 

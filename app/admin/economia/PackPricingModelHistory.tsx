@@ -14,6 +14,8 @@ type PackHistoryEntry = {
   after: PackPricingModelConfig;
 };
 
+type Notice = { type: 'success' | 'error'; text: string };
+
 function changedNumber(before: number, after: number): boolean {
   return Math.abs(before - after) > 0.000001;
 }
@@ -27,7 +29,7 @@ function formatDelta(before: number, after: number, suffix = ''): string {
 export default function PackPricingModelHistory({ entries }: { entries: PackHistoryEntry[] }) {
   const router = useRouter();
   const [restoringId, setRestoringId] = useState<string | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'OWNER' | 'MANAGER' | 'VIEWER'>('ALL');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -57,7 +59,7 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
 
   async function restore(entry: PackHistoryEntry) {
     setRestoringId(entry.id);
-    setMsg(null);
+    setNotice(null);
     try {
       const res = await fetchWithCsrf('/api/admin/pricing/model-config', {
         method: 'POST',
@@ -68,10 +70,10 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || 'No s\'ha pogut restaurar el model');
       }
-      setMsg('Model de packs restaurat');
+      setNotice({ type: 'success', text: 'Model de packs restaurat' });
       router.refresh();
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Error restaurant');
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Error restaurant' });
     } finally {
       setRestoringId(null);
     }
@@ -113,7 +115,7 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
           <p className="text-sm">Encara no hi ha versions desades del model de packs.</p>
         ) : (
           filteredEntries.map((entry) => (
-            <div key={entry.id} className="rounded-xl border border-white/10 p-3">
+            <div key={entry.id} className="rounded-xl border border-[var(--line)] p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">{formatDateTimeFull(entry.createdAt)}</p>
                 <button
@@ -155,8 +157,15 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
           ))
         )}
       </div>
-      {msg && <p className="mt-3 text-sm">{msg}</p>}
+      {notice && (
+        <p
+          role={notice.type === 'error' ? 'alert' : 'status'}
+          aria-live={notice.type === 'error' ? 'assertive' : 'polite'}
+          className={`mt-3 text-sm ${notice.type === 'error' ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}
+        >
+          {notice.text}
+        </p>
+      )}
     </section>
   );
 }
-

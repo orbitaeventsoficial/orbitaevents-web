@@ -1,5 +1,5 @@
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { sendEmail } from '@/lib/email';
+import { sendTrackedStandaloneEmail } from '@/lib/email';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { buildExecutiveReport } from '@/lib/services/executiveReportService';
@@ -25,10 +25,12 @@ export async function sendExecutiveReport() {
     </div>
   `;
 
-  await sendEmail({
+  await sendTrackedStandaloneEmail({
+    templateKey: 'executive-report',
     to: recipient,
     subject: `Executive Report Òrbita · ${new Date().toLocaleDateString('ca-ES')}`,
     html,
+    orbita: { kind: 'admin', origin: 'executive-report' },
   });
 
   if (process.env.WHATSAPP_API_URL && process.env.WHATSAPP_API_TOKEN) {

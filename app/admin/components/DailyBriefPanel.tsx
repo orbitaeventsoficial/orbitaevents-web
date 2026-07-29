@@ -10,7 +10,7 @@ const ALERT_TONE: Record<AlertLevel, string> = {
 
 export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
   return (
-    <section className="admin-cr-daily-brief rounded-2xl border p-5 space-y-4">
+    <section className="ap-card p-5 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold">Resum del dia</h2>
@@ -18,7 +18,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
         </div>
         <Link
           href="/admin/reporting"
-          className="rounded-lg border border-white/10 px-2.5 py-1 text-xs hover:bg-white/5"
+          className="rounded-lg border border-[var(--line)] px-2.5 py-1 text-xs hover:bg-[var(--raised)]"
         >
           Reporting →
         </Link>
@@ -34,7 +34,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Leads oberts</p>
           <p className="text-lg font-bold">{brief.kpis.openLeads}</p>
         </div>
-        <div className={`rounded-lg border p-2 text-center ${brief.kpis.overdueTasksCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+        <div className={`ap-card p-2 text-center ${brief.kpis.overdueTasksCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : ''}`}>
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Vençudes</p>
           <p className={`text-lg font-bold ${brief.kpis.overdueTasksCount > 0 ? 'admin-tone-text-danger' : ''}`}>{brief.kpis.overdueTasksCount}</p>
         </div>
@@ -42,7 +42,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Reserves 7d</p>
           <p className="text-lg font-bold">{brief.kpis.upcomingBookings7d}</p>
         </div>
-        <div className={`rounded-lg border p-2 text-center ${brief.kpis.pendingPaymentsCount > 0 ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+        <div className={`ap-card p-2 text-center ${brief.kpis.pendingPaymentsCount > 0 ? 'admin-tone-border-warning admin-tone-bg-warning' : ''}`}>
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Cobraments</p>
           <p className={`text-lg font-bold ${brief.kpis.pendingPaymentsCount > 0 ? 'admin-tone-text-warning' : ''}`}>{brief.kpis.pendingPaymentsCount}</p>
         </div>
@@ -59,9 +59,9 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
             <Link
               key={i}
               href={alert.href}
-              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-xs transition-colors hover:bg-white/5 ${ALERT_TONE[alert.level]}`}
+              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-xs transition-colors hover:bg-[var(--raised)] ${ALERT_TONE[alert.level]}`}
             >
-              <span className="admin-cr-alert-mark" aria-hidden="true" />
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--gold)] shrink-0" aria-hidden="true" />
               <div className="min-w-0 flex-1">
                 <span className="font-semibold">{alert.title}</span>
                 <span className="ml-1.5 opacity-70">{alert.detail}</span>

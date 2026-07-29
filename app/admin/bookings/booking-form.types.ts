@@ -12,6 +12,7 @@ export type BookingFormData = {
   packId: string;
   extraHours: string;
   distanceKm: string;
+  tollsEur: string;
   fuelCostPerKm: string;
   discount: string;
   discountCode: string;
@@ -32,6 +33,7 @@ export const INITIAL_BOOKING_FORM: BookingFormData = {
   packId: '',
   extraHours: '0',
   distanceKm: '',
+  tollsEur: '',
   fuelCostPerKm: '0.19',
   discount: '0',
   discountCode: '',
@@ -73,6 +75,8 @@ export type BookingLeadData = {
   eventEndTime?: string | null;
   eventLocation: string | null;
   eventAddress?: string | null;
+  distanceKm?: number | null;
+  tollsEur?: number | null;
   guestCount: number | null;
   budget: string | null;
   interestedPackId?: string | null;
@@ -97,7 +101,11 @@ export type BookingServiceLineFormInput = {
   revenueAmount?: number;
   costAmount?: number;
   quantity?: number;
+  hours?: number;
+  partyType?: string;
   notes?: string;
+  /** Persones que aquesta línia aporta al desplaçament. UI-only: l'API ho ignora. */
+  travelHeadcount?: number;
 };
 
 export type RawExtraConfig = {

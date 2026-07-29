@@ -22,8 +22,6 @@ export interface ApiErrorResponse {
   details?: unknown;
 }
 
-export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
-
 // ═══════════════════════════════════════════════════════════════════════════
 // HELPER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════

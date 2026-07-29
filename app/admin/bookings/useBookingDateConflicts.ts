@@ -6,10 +6,12 @@ import type { BookingConflictRow, BookingDateConflict } from './booking-form.typ
 
 export function useBookingDateConflicts(eventDate: string) {
   const [dateConflicts, setDateConflicts] = useState<BookingDateConflict[]>([]);
+  const [dateConflictError, setDateConflictError] = useState('');
 
   useEffect(() => {
     if (!eventDate) {
       setDateConflicts([]);
+      setDateConflictError('');
       return;
     }
 
@@ -19,8 +21,10 @@ export function useBookingDateConflicts(eventDate: string) {
         const res = await fetchWithCsrf(`/api/admin/bookings?fromDate=${eventDate}&toDate=${eventDate}&limit=10`, {
           signal: controller.signal,
         });
-        if (!res.ok) return;
-        const data = await res.json();
+        const data = (await res.json().catch(() => ({}))) as { bookings?: BookingConflictRow[]; error?: string; message?: string };
+        if (!res.ok) {
+          throw new Error(data.error || data.message || 'No s\'ha pogut verificar la disponibilitat del dia.');
+        }
         const active = ((data.bookings || []) as BookingConflictRow[]).filter((booking) =>
           ['PENDING', 'CONFIRMED', 'PREPARING'].includes(booking.status)
         );
@@ -32,13 +36,18 @@ export function useBookingDateConflicts(eventDate: string) {
             eventStartTime: booking.eventStartTime || null,
           }))
         );
-      } catch {
-        // ignore abort
+        setDateConflictError('');
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        console.error('[useBookingDateConflicts] Error carregant conflictes de data', { eventDate, error });
+        setDateConflictError(
+          error instanceof Error ? error.message : 'No s\'ha pogut verificar la disponibilitat del dia.'
+        );
       }
     })();
 
     return () => controller.abort();
   }, [eventDate]);
 
-  return dateConflicts;
+  return { dateConflicts, dateConflictError };
 }

@@ -68,11 +68,14 @@ describe('generateCampaigns', () => {
     expect(campaign!.estimatedImpact).toContain('leads');
   });
 
-  it('genera campanya feedback recent', () => {
+  it('genera campanya de ressenya recent sense tipus feedback', () => {
     const result = generateCampaigns(makeInput({ recentMonth: 6 }));
-    const campaign = result.find((c) => c.type === 'FEEDBACK_REQUEST');
+    const campaign = result.find((c) => c.type === 'REVIEW_REQUEST');
     expect(campaign).toBeDefined();
+    expect(campaign!.id).toBe('campaign:review-recent');
     expect(campaign!.bodyTemplate).toContain('{link_ressenya}');
+    expect(result.map((c) => c.type)).not.toContain('FEEDBACK_REQUEST');
+    expect(result.map((c) => c.id)).not.toContain('campaign:feedback-recent');
   });
 
   it('genera campanya seasonal a l\'abril (primavera-estiu)', () => {
@@ -129,7 +132,7 @@ describe('generateCampaigns', () => {
     expect(types).toContain('UPSELL');
     expect(types).toContain('LOYALTY');
     expect(types).toContain('REFERRAL');
-    expect(types).toContain('FEEDBACK_REQUEST');
+    expect(types).toContain('REVIEW_REQUEST');
     expect(types).toContain('SEASONAL');
     expect(result.length).toBeGreaterThanOrEqual(7); // 2 reactivation + 5 others
   });

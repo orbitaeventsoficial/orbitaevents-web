@@ -8,7 +8,7 @@
  *
  * 1. DANGER (prioritat 1): Situacions crítiques que requereixen acció immediata.
  *    - Leads sense resposta >48h (staleLeadsCount > 0)
- *    - Event proper sense cobrar (nextEvent ≤3 dies i !remainingPaid)
+ *    - Event proper sense cobrar (nextEvent ≤3 dies i outstandingAmount > 0)
  *    - Flux de caixa negatiu (cashFlowNet30 < 0)
  *
  * 2. WARNING (prioritat 2-4): Alertes que cal vigilar.
@@ -340,6 +340,7 @@ describe('dashboardInsightsService', () => {
           clientName: 'Maria Garcia',
           depositPaid: true,
           remainingPaid: false,
+          outstandingAmount: 1200,
         },
       });
       const insight = result.find((i) => i.id === 'next-event-payment');
@@ -399,6 +400,21 @@ describe('dashboardInsightsService', () => {
       // No hauria de sortir l'alerta de pagament
       expect(result.find((i) => i.id === 'next-event-payment')).toBeUndefined();
       // Però sí l'info de pròxim event (≤7 dies)
+      expect(result.find((i) => i.id === 'next-event-soon')).toBeDefined();
+    });
+
+    it('event ≤3 dies cobert amb efectiu → no es mostra danger encara que flags siguin falsos', () => {
+      const result = generateDashboardInsights({
+        ...baseInput(),
+        nextEvent: {
+          daysUntil: 1,
+          clientName: 'Anna Cash',
+          depositPaid: false,
+          remainingPaid: false,
+          outstandingAmount: 0,
+        },
+      });
+      expect(result.find((i) => i.id === 'next-event-payment')).toBeUndefined();
       expect(result.find((i) => i.id === 'next-event-soon')).toBeDefined();
     });
   });

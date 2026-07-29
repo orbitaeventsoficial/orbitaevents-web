@@ -12,6 +12,7 @@ interface ScriptInfo {
   description: string;
   args?: string;
   danger?: boolean;
+  mutatesData?: boolean;
 }
 
 const SCRIPTS: ScriptInfo[] = [
@@ -21,6 +22,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx prisma/seed.ts',
     category: 'seed',
     description: 'Insereix totes les dades inicials: settings, inventari, packs, extras, FAQs, traduccions, leads de prova i reserves de prova.',
+    mutatesData: true,
   },
   {
     name: 'Seed plantilles email',
@@ -28,6 +30,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx prisma/seed-email-templates.ts',
     category: 'seed',
     description: 'Insereix les 24 plantilles email (8 tipus × 3 idiomes) a la BD. Upsert: si ja existeix, actualitza.',
+    mutatesData: true,
   },
   {
     name: 'Seed blog',
@@ -35,6 +38,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx prisma/seed-blog.ts',
     category: 'seed',
     description: 'Insereix articles de blog de prova amb traduccions.',
+    mutatesData: true,
   },
   {
     name: 'Sync preu benzina MITECO',
@@ -42,6 +46,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx scripts/sync-fuel-price.ts',
     category: 'sync',
     description: 'Consulta el preu real de la benzina via MITECO (mitjana Barcelona) i actualitza el cost per km del vehicle a la BD.',
+    mutatesData: true,
   },
   {
     name: 'Sync packs → BD',
@@ -49,6 +54,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx scripts/sync-packs-to-db.ts',
     category: 'sync',
     description: 'Sincronitza la configuració de packs des del codi cap a la BD (Prisma).',
+    mutatesData: true,
   },
   {
     name: 'Sync ressenyes Google',
@@ -56,6 +62,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'node scripts/sync-reviews.mjs',
     category: 'sync',
     description: 'Obté les ressenyes de Google Business via SerpAPI i les desa a la BD.',
+    mutatesData: true,
   },
   {
     name: 'Health check BD',
@@ -106,6 +113,7 @@ const SCRIPTS: ScriptInfo[] = [
     category: 'report',
     description: 'Mostra els PVP actuals de tots els packs. Amb arguments, permet canviar el preu.',
     args: '<slug> <preu>',
+    mutatesData: true,
   },
   {
     name: 'Recalcular scores leads',
@@ -113,6 +121,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx scripts/recalculate-scores.ts',
     category: 'fix',
     description: 'Recalcula el cachedScore de tots els leads actius basant-se en tipus event, data, convidats, pressupost i font.',
+    mutatesData: true,
   },
   {
     name: 'Recalcular marges reserves',
@@ -120,6 +129,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx scripts/recalculate-margins.ts',
     category: 'fix',
     description: 'Recalcula IVA, total, dipòsit i import pendent de totes les reserves actives. Detecta anomalies financeres.',
+    mutatesData: true,
   },
   {
     name: 'Netejar registres orfes',
@@ -128,6 +138,7 @@ const SCRIPTS: ScriptInfo[] = [
     category: 'fix',
     description: 'Detecta registres orfes. Dry-run per defecte, afegeix --fix per netejar.',
     args: '--fix',
+    mutatesData: true,
   },
   {
     name: 'Reset plantilles email',
@@ -137,6 +148,7 @@ const SCRIPTS: ScriptInfo[] = [
     description: 'Elimina les personalitzacions de plantilles email de la BD. Torna als defaults del codi.',
     args: '<slug>',
     danger: true,
+    mutatesData: true,
   },
   {
     name: 'Actualitzar PVP pack',
@@ -145,6 +157,7 @@ const SCRIPTS: ScriptInfo[] = [
     category: 'fix',
     description: "Canvia el preu base d'un pack.",
     args: '<slug> <preu>',
+    mutatesData: true,
   },
   {
     name: 'Leads estancats',
@@ -174,6 +187,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx scripts/autofix-master.ts',
     category: 'audit',
     description: 'Orquestrador que executa 5 autofix: system health, finances, CSS, GA4 i health check general.',
+    mutatesData: true,
   },
   {
     name: 'Autofix finances',
@@ -181,6 +195,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx scripts/autofix-finance-health.ts',
     category: 'audit',
     description: 'Verifica i corregeix configuració econòmica: pricing model, profitabilitat i cost engine.',
+    mutatesData: true,
   },
   {
     name: 'Autofix sistema',
@@ -188,6 +203,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'npx tsx scripts/autofix-system-health.ts',
     category: 'audit',
     description: 'Valida CSS admin, costos horaris inventari, marges packs i salut econòmica general.',
+    mutatesData: true,
   },
   {
     name: 'Scan hardcoded',
@@ -216,6 +232,7 @@ const SCRIPTS: ScriptInfo[] = [
     command: 'node scripts/admin-theme-autofix.mjs',
     category: 'audit',
     description: "Auto-fix colors Tailwind de l'admin i opacitats inconsistents.",
+    mutatesData: true,
   },
   {
     name: 'Auditoria visual',
@@ -230,6 +247,7 @@ const SCRIPTS: ScriptInfo[] = [
 export default function ScriptsClient() {
   const [filter, setFilter] = useState<string | null>(null);
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<{ command: string; message: string } | null>(null);
 
   const filtered = useMemo(() => {
     if (!filter) return SCRIPTS;
@@ -244,6 +262,7 @@ export default function ScriptsClient() {
     }
     return groups;
   }, [filtered]);
+  const sensitiveCount = SCRIPTS.filter((script) => script.mutatesData || script.danger).length;
   const dangerousCount = SCRIPTS.filter((script) => script.danger).length;
   const activeCategoryInfo = filter ? ADMIN_SCRIPT_CATEGORY_INFO[filter as ScriptInfo['category']] : null;
   const actionTitle = !filter
@@ -258,12 +277,18 @@ export default function ScriptsClient() {
       : 'Amb la categoria acotada, el següent pas bo és copiar la comanda correcta i executar-la al terminal amb el context adequat.';
 
   const copyCommand = async (cmd: string) => {
+    setCopyError(null);
     try {
       await navigator.clipboard.writeText(cmd);
       setCopiedCommand(cmd);
       setTimeout(() => setCopiedCommand(null), 2000);
-    } catch {
+    } catch (error) {
+      console.error('[ScriptsClient] Error copiant comanda de script', { command: cmd, error });
       setCopiedCommand(null);
+      setCopyError({
+        command: cmd,
+        message: "No s'ha pogut copiar la comanda.",
+      });
     }
   };
 
@@ -277,7 +302,7 @@ export default function ScriptsClient() {
           stats: [
             { label: 'Scripts', value: SCRIPTS.length, hint: 'catàleg total' },
             { label: 'Categories', value: Object.keys(ADMIN_SCRIPT_CATEGORY_INFO).length, hint: 'blocs operatius' },
-            { label: 'Destructius', value: dangerousCount, tone: dangerousCount > 0 ? 'warning' : 'success', hint: 'requereixen criteri' },
+            { label: 'Toca dades', value: sensitiveCount, tone: sensitiveCount > 0 ? 'warning' : 'success', hint: 'requereixen criteri' },
           ],
         }}
         status={{
@@ -288,11 +313,13 @@ export default function ScriptsClient() {
             filter
               ? `Filtre actiu sobre ${activeCategoryInfo?.label || filter}: ${filtered.length} scripts visibles.`
               : 'Sense filtre actiu: estàs veient el catàleg complet de scripts i eines.',
-            dangerousCount > 0
-              ? `${dangerousCount} scripts estan marcats com a destructius o de correcció delicada.`
-              : 'No hi ha scripts marcats com a destructius.',
+            sensitiveCount > 0
+              ? `${sensitiveCount} scripts poden tocar dades/config; ${dangerousCount} està marcat com a destructiu.`
+              : 'No hi ha scripts marcats com a sensibles.',
             copiedCommand
               ? `Última comanda copiada: ${copiedCommand}`
+              : copyError
+                ? `No s'ha pogut copiar: ${copyError.command}`
               : 'Encara no has copiat cap comanda en aquesta sessió.',
           ],
         }}
@@ -348,14 +375,35 @@ export default function ScriptsClient() {
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold">{s.name}</span>
                         {s.danger && <span className="ap-badge ap-badge--danger">destructiu</span>}
+                        {!s.danger && s.mutatesData && <span className="ap-badge ap-badge--warning">toca dades</span>}
                       </div>
                       <p className="mt-1 text-xs leading-relaxed admin-tone-text-neutral">{s.description}</p>
                       <div className="mt-2 flex items-center gap-2">
                         <code className="ap-badge rounded-lg border px-2 py-1 font-mono text-xs">{s.command}</code>
-                        <button type="button" onClick={() => copyCommand(s.command)} className="ap-btn ap-btn--secondary px-2 py-1 text-xs" title="Copiar comanda">
+                        <button
+                          type="button"
+                          onClick={() => copyCommand(s.command)}
+                          aria-invalid={copyError?.command === s.command ? true : undefined}
+                          aria-describedby={
+                            copyError?.command === s.command
+                              ? `script-copy-error-${s.file.replace(/[^a-zA-Z0-9_-]/g, '-')}-${s.name.replace(/[^a-zA-Z0-9_-]/g, '-')}`
+                              : undefined
+                          }
+                          className="ap-btn ap-btn--secondary px-2 py-1 text-xs"
+                          title="Copiar comanda"
+                        >
                           {copiedCommand === s.command ? 'Copiat' : 'Copiar'}
                         </button>
                       </div>
+                      {copyError?.command === s.command && (
+                        <p
+                          id={`script-copy-error-${s.file.replace(/[^a-zA-Z0-9_-]/g, '-')}-${s.name.replace(/[^a-zA-Z0-9_-]/g, '-')}`}
+                          role="alert"
+                          className="mt-2 text-xs admin-tone-text-danger"
+                        >
+                          {copyError.message}
+                        </p>
+                      )}
                       {s.args && (
                         <div className="mt-1 text-xs admin-tone-text-slate">
                           Arguments opcionals: <code className="font-mono">{s.args}</code>

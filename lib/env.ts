@@ -6,8 +6,6 @@
  */
 
 import { z } from 'zod';
-import { getSiteUrl } from '@/lib/site';
-
 
 // Schema for server-side env vars (not exposed to client)
 const serverSchema = z.object({
@@ -110,15 +108,6 @@ function validateEnv(): Env {
 
 // Validate on import (runs once at startup)
 export const env = validateEnv();
-
-// Type-safe getters for common env vars
-export const getEnv = {
-  isDev: () => process.env.NODE_ENV === 'development',
-  isProd: () => process.env.NODE_ENV === 'production',
-  isTest: () => process.env.NODE_ENV === 'test',
-  siteUrl: () => getSiteUrl(),
-  databaseUrl: () => process.env.DATABASE_URL,
-};
 
 // ── Integration checks ──────────────────────────────────────────────
 export function isImapConfigured(): boolean {

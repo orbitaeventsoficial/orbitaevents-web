@@ -5,7 +5,7 @@
  * Òrbita Events - 2024
  */
 
-import { sendEmail } from '@/lib/email';
+import { sendTrackedStandaloneEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
 import { escapeHtml } from '@/lib/utils/sanitize';
@@ -106,11 +106,14 @@ async function sendLeadEmailNotification(lead: LeadNotificationData): Promise<No
     const adminEmailHtml = generateAdminEmailHTML(lead, eventLabel, sourceLabel, timestamp);
 
     const to = await getRecipientsAsString('leads');
-    await sendEmail({
+    await sendTrackedStandaloneEmail({
+      templateKey: 'new-lead-admin-notification',
       to: to || SITE_CONFIG.business.email,
       subject: `🚀 NOU LEAD: ${lead.name} - ${eventLabel} ${lead.estimatedPrice ? `(${lead.estimatedPrice}€)` : ''}`,
       html: adminEmailHtml,
+      leadId: lead.id,
       replyTo: lead.email.includes('@') && !lead.email.includes('temp-') ? lead.email : undefined,
+      orbita: { kind: 'lead', id: lead.id, origin: 'new-lead-admin-notification' },
     });
 
     return { success: true, channel: 'email' };
@@ -439,4 +442,3 @@ function generateAdminEmailHTML(
 </html>
   `;
 }
-

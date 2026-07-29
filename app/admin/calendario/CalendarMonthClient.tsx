@@ -5,15 +5,15 @@ import Link from 'next/link';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { buildSocialWorkspaceHref } from '@/lib/admin/socialWorkspaceHref';
+import { useRouter } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse, MonthYear, CalendarCell } from './calendar-utils';
-import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, formatKey, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
+import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, getCalendarEconomicRiskClasses, summarizeCalendarEconomicRisk, selectCalendarEconomicRiskBooking, formatCalendarEconomicRiskActionReason, resolveCalendarEconomicRiskActionHash, formatCalendarEconomicRiskSummary, resolveWorkTimeLabel } from './calendar-utils';
 
 type OwnerTone = 'info' | 'warning' | 'success';
 type OwnerStripConfig = {
@@ -224,6 +224,10 @@ export default function CalendarMonthClient() {
         mixedDays: 0,
         totalTasks: 0,
         totalSocialPosts: 0,
+        economicRisk: { total: 0, critical: 0, warning: 0 },
+        economicRiskBookingId: null as string | null,
+        economicRiskActionReason: null as string | null,
+        economicRiskActionHash: null as 'sec-finances' | 'sec-marge' | null,
         workDays: 0,
       };
     }
@@ -237,6 +241,11 @@ export default function CalendarMonthClient() {
     let mixedDays = 0;
     let totalTasks = 0;
     let totalSocialPosts = 0;
+    const economicRisk = { total: 0, critical: 0, warning: 0 };
+    let economicRiskBookingId: string | null = null;
+    let economicRiskBookingLevel: 'critical' | 'warning' | null = null;
+    let economicRiskActionReason: string | null = null;
+    let economicRiskActionHash: 'sec-finances' | 'sec-marge' | null = null;
     let workDays = 0;
 
     for (const cell of cells) {
@@ -261,6 +270,20 @@ export default function CalendarMonthClient() {
       totalBloqueos += dayData.bloqueos.length;
       totalTasks += dayData.tasks.length;
       totalSocialPosts += dayData.socialPosts.length;
+      const dayEconomicRisk = summarizeCalendarEconomicRisk(dayData);
+      economicRisk.total += dayEconomicRisk.total;
+      economicRisk.critical += dayEconomicRisk.critical;
+      economicRisk.warning += dayEconomicRisk.warning;
+      const actionBooking = selectCalendarEconomicRiskBooking(dayData);
+      if (
+        actionBooking?.economicRisk &&
+        (!economicRiskBookingId || (economicRiskBookingLevel !== 'critical' && actionBooking.economicRisk.level === 'critical'))
+      ) {
+        economicRiskBookingId = actionBooking.id;
+        economicRiskBookingLevel = actionBooking.economicRisk.level;
+        economicRiskActionReason = formatCalendarEconomicRiskActionReason(actionBooking);
+        economicRiskActionHash = resolveCalendarEconomicRiskActionHash(actionBooking);
+      }
       if (hasWork) workDays += 1;
 
       if (!hasReservas && !hasBloqueos) {
@@ -278,6 +301,10 @@ export default function CalendarMonthClient() {
       totalReservas,
       totalLeads,
       totalBloqueos,
+      economicRisk,
+      economicRiskBookingId,
+      economicRiskActionReason,
+      economicRiskActionHash,
       freeDays,
       reservaDays,
       bloqueadoDays,
@@ -288,120 +315,16 @@ export default function CalendarMonthClient() {
     };
   }, [cells, data]);
 
-  const strip = useMemo<OwnerStripConfig>(() => {
-    const hiddenLayers = Object.entries(visibleLayers)
-      .filter(([, visible]) => !visible)
-      .map(([layer]) => layer);
-    const selectedPayload = selectedDayData.payload;
-    const selectedHasItems = selectedPayload
-      ? (selectedPayload.leads?.length ?? 0) +
-          selectedPayload.reservas.length +
-          selectedPayload.bloqueos.length +
-          selectedPayload.tasks.length +
-          selectedPayload.socialPosts.length +
-          selectedPayload.followUps.length
-      : 0;
-
-    const systemItems: string[] = [];
-    systemItems.push(`${stats.totalReservas} reserves · ${stats.totalLeads} entrades · ${stats.totalBloqueos} bloquejos al rang visible`);
-    systemItems.push(`${stats.freeDays} dies lliures · ${stats.mixedDays} dies mixtes · ${stats.workDays} dies amb feina`);
-    if (stats.totalTasks > 0 || stats.totalSocialPosts > 0) {
-      systemItems.push(`${stats.totalTasks} tasques · ${stats.totalSocialPosts} posts socials`);
-    }
-
-    const manualItems: string[] = [];
-    if (stats.mixedDays > 0) {
-      manualItems.push(`${stats.mixedDays} ${stats.mixedDays === 1 ? 'dia mixt' : 'dies mixtes'} amb reserva i bloqueig`);
-    }
-    if (hiddenLayers.length > 0) {
-      manualItems.push(`${hiddenLayers.length} ${hiddenLayers.length === 1 ? 'capa amagada' : 'capes amagades'} a la lectura actual`);
-    }
-    if (selectedDayData.key && selectedHasItems > 0) {
-      manualItems.push(`${selectedHasItems} elements oberts al detall del ${formatDateShort(selectedDayData.key)}`);
-    }
-    if (showBlockForm && selectedDayData.key) {
-      manualItems.push(`Bloqueig manual en preparació per al ${formatDateShort(selectedDayData.key)}`);
-    }
-    if (draggingBookingId) {
-      manualItems.push('Hi ha una reserva en moviment via drag & drop');
-    }
-
-    const nextStep =
-      stats.mixedDays > 0
-        ? {
-            eyebrow: 'Següent pas · Conflicte',
-            title: `Revisar ${stats.mixedDays} ${stats.mixedDays === 1 ? 'dia mixt' : 'dies mixtes'}`,
-            detail: 'Els dies mixtes combinen reserva i bloqueig. Revisa el detall del calendari abans de moure o tancar disponibilitat.',
-            href: '/admin/calendario?view=day',
-            ctaLabel: 'Obrir vista dia',
-            secondaryAction: { href: '/admin/calendario?view=week', label: 'Vista setmana' },
-          }
-        : stats.totalReservas === 0 && stats.totalBloqueos === 0
-          ? {
-              eyebrow: 'Següent pas · Disponibilitat',
-              title: 'Calendari visible sense ocupació',
-              detail: 'El rang visible no té reserves ni bloquejos. Pots bloquejar absències o preparar la propera planificació comercial.',
-              href: '#calendar-detail',
-              ctaLabel: 'Obrir detall',
-            }
-          : selectedDayData.key && selectedHasItems > 0
-            ? {
-                eyebrow: 'Següent pas · Dia obert',
-                title: `Treballar el ${formatDateShort(selectedDayData.key)}`,
-                detail: 'Ja tens un dia seleccionat amb activitat. Tanca moviments, bloquejos o accions ràpides des del panell de detall.',
-                href: '#calendar-detail',
-                ctaLabel: 'Anar al detall',
-              }
-            : {
-                eyebrow: 'Següent pas',
-                title: 'Ocupació visible sota control',
-                detail: 'El mes visible no mostra conflictes forts. Si vols més precisió operativa, baixa a setmana o dia.',
-                href: '/admin/calendario?view=week',
-                ctaLabel: 'Obrir vista setmana',
-                secondaryAction: { href: '/admin/calendario?view=day', label: 'Vista dia' },
-              };
-
-    return {
-      system: {
-        eyebrow: 'Automàtic · Ocupació',
-        title: stats.totalReservas > 0 || stats.totalBloqueos > 0 ? 'Mapa d’ocupació visible' : 'Calendari visible buit',
-        tone: stats.mixedDays > 0 ? 'warning' : stats.totalReservas > 0 || stats.totalBloqueos > 0 ? 'info' : 'success',
-        items: systemItems,
-        emptyText: 'Sense ocupació visible al rang carregat.',
-      },
-      manual: {
-        eyebrow: 'Manual · Operativa',
-        title: manualItems.length === 0 ? 'Cap tensió manual' : `${manualItems.length} senyals per revisar`,
-        tone: stats.mixedDays > 0 || showBlockForm || draggingBookingId ? 'warning' : manualItems.length > 0 ? 'info' : 'success',
-        items: manualItems,
-        emptyText: 'Sense conflictes, capes amagades ni moviments manuals oberts.',
-      },
-      nextStep,
-    };
-  }, [
-    draggingBookingId,
-    selectedDayData.key,
-    selectedDayData.payload,
-    showBlockForm,
-    stats,
-    visibleLayers,
-  ]);
 
   return (
     <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i feina planificada per executar el negoci.">
-      <OwnerControlStrip
-        system={strip.system}
-        manual={strip.manual}
-        nextStep={strip.nextStep}
-      />
-
       {/* Barra superior: selector de mes + meta info */}
-      <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.monthNavigation)}>
+      <div className="ap-card flex flex-col gap-2 p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.monthNavigation)}>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, -1))}
-            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-[var(--raised)] active:scale-[0.98]"
           >
             ← Anterior
           </button>
@@ -420,7 +343,7 @@ export default function CalendarMonthClient() {
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, 1))}
-            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-[var(--raised)] active:scale-[0.98]"
           >
             Mes següent →
           </button>
@@ -431,14 +354,14 @@ export default function CalendarMonthClient() {
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=week')}
-              className="inline-flex min-h-[40px] flex-1 items-center justify-center border-r px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 sm:flex-none"
+              className="inline-flex min-h-[40px] flex-1 items-center justify-center border-r px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-[var(--raised)] sm:flex-none"
             >
               Setmana
             </button>
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=day')}
-              className="inline-flex min-h-[40px] flex-1 items-center justify-center px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 sm:flex-none"
+              className="inline-flex min-h-[40px] flex-1 items-center justify-center px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-[var(--raised)] sm:flex-none"
             >
               Dia
             </button>
@@ -467,7 +390,7 @@ export default function CalendarMonthClient() {
       </div>
 
 
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
+      <div className="ap-card flex flex-wrap items-center gap-2 px-3 py-2 text-xs">
         <span className="font-semibold opacity-60">Capes:</span>
         {[
           ['bookings', 'Reserves'],
@@ -481,91 +404,113 @@ export default function CalendarMonthClient() {
             key={key}
             type="button"
             onClick={() => toggleLayer(key as 'leads' | 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps')}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] opacity-45'}`}
           >
             {label}
           </button>
         ))}
       </div>
       {/* Stats ràpids del mes visible */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-6" {...helpAttrs(ADMIN_CALENDAR_HELP.stats)}>
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4 xl:grid-cols-7" {...helpAttrs(ADMIN_CALENDAR_HELP.stats)}>
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-success">Reserves</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-success">{stats.totalReservas}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-success admin-tone-border-success admin-tone-text-success">
+            <span className="ap-badge ap-badge--success">
               {stats.reservaDays + stats.mixedDays} dies
             </span>
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-danger admin-tone-border-danger">
+        <div className={`ap-card p-2.5 sm:p-3 transition-all ${stats.economicRisk.critical > 0 ? 'admin-tone-soft-danger admin-tone-border-danger' : 'admin-tone-soft-warning admin-tone-border-warning'}`}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 flex-col">
+              <span className={`text-xs uppercase tracking-wide ${stats.economicRisk.critical > 0 ? 'admin-tone-text-danger' : 'admin-tone-text-warning'}`}>Risc econòmic</span>
+              <span className={`text-xl sm:text-2xl font-bold ${stats.economicRisk.critical > 0 ? 'admin-tone-text-danger' : 'admin-tone-text-warning'}`}>{stats.economicRisk.total}</span>
+            </div>
+            <span className={`ap-badge ${stats.economicRisk.critical > 0 ? 'ap-badge--danger' : 'ap-badge--warning'}`}>
+              {formatCalendarEconomicRiskSummary(stats.economicRisk)}
+            </span>
+          </div>
+          {stats.economicRiskBookingId && (
+            <div className="mt-2 space-y-1 text-xs">
+              {stats.economicRiskActionReason && (
+                <p className="m-0 font-medium opacity-80">Motiu: {stats.economicRiskActionReason}</p>
+              )}
+              <Link href={buildBookingHref(stats.economicRiskBookingId, stats.economicRiskActionHash)} className="inline-flex font-semibold text-[var(--gold)] no-underline hover:text-[var(--gold-bright)]">
+                Obrir reserva amb risc →
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-danger admin-tone-border-danger">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-danger">Bloquejos</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-danger">{stats.totalBloqueos}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">
+            <span className="ap-badge ap-badge--danger">
               {stats.bloqueadoDays + stats.mixedDays} dies
             </span>
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-info">Dies lliures</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-info">{stats.freeDays}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
+            <span className="ap-badge ap-badge--info">
               Disponibles
             </span>
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Dies mixtes</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-warning">{stats.mixedDays}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
+            <span className="ap-badge ap-badge--warning">
               Reserva + bloqueig
             </span>
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-info">Tasques</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-info">{stats.totalTasks}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
+            <span className="ap-badge ap-badge--info">
               {stats.workDays} dies
             </span>
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Social</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-warning">{stats.totalSocialPosts}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
+            <span className="ap-badge ap-badge--warning">
               Posts
             </span>
           </div>
         </div>      </div>
 
       {/* Llegenda */}
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl admin-card-glass border px-3 sm:px-4 py-2 text-sm" {...helpAttrs(ADMIN_CALENDAR_HELP.legend)}>
+      <div className="ap-card flex flex-wrap items-center gap-3 sm:gap-4 px-3 sm:px-4 py-2 text-sm" {...helpAttrs(ADMIN_CALENDAR_HELP.legend)}>
         <span className="font-medium">Llegenda:</span>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-sm bg-white/15 border border-white/20" />
+          <span className="h-3 w-3 rounded-sm bg-[var(--raised)] border border-[var(--line)]" />
           <span className="text-xs sm:text-sm">Lliure</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -594,7 +539,7 @@ export default function CalendarMonthClient() {
           </div>
 
           {/* Graella del calendari */}
-          <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-y-hidden overflow-x-auto rounded-2xl border p-0" {...helpAttrs(ADMIN_CALENDAR_HELP.monthGrid)}>
+          <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-y-hidden overflow-x-auto ap-card p-0" {...helpAttrs(ADMIN_CALENDAR_HELP.monthGrid)}>
         {cells.map((cell) => {
           const dayData =
             data?.days?.[cell.key] ??
@@ -688,6 +633,11 @@ export default function CalendarMonthClient() {
                         <div className="truncate">
                           {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
                         </div>
+                        {r.economicRisk && (
+                          <div className={`mt-0.5 truncate rounded border px-1 py-0.5 text-[length:var(--o-text-2xs)] font-semibold ${getCalendarEconomicRiskClasses(r.economicRisk)}`}>
+                            {r.economicRisk.label}
+                          </div>
+                        )}
                       </div>
                     ))}
                     {dayData.reservas.length > 2 && (
@@ -698,7 +648,9 @@ export default function CalendarMonthClient() {
 
                 {visibleLayers.leads && hasLeads && (
                   <div className="mt-0.5 space-y-0.5 text-xs sm:text-xs overflow-hidden">
-                    {dayLeads.slice(0, 2).map((leadItem) => (
+                    {dayLeads.slice(0, 2).map((leadItem) => {
+                      const isLost = leadItem.status === 'LOST';
+                      return (
                       <Link
                         key={leadItem.id}
                         href={buildLeadCustomerHref({
@@ -706,11 +658,14 @@ export default function CalendarMonthClient() {
                           customerId: leadItem.customerId,
                         })}
                         onClick={(event) => event.stopPropagation()}
-                        className="block truncate rounded-md px-1 py-0.5 admin-tone-soft-info admin-tone-text-info hover:underline"
+                        className={isLost
+                          ? 'block truncate rounded px-1 py-0.5 text-xs opacity-60 admin-tone-bg-neutral hover:underline'
+                          : 'block truncate rounded-md px-1 py-0.5 admin-tone-soft-info admin-tone-text-info hover:underline'}
                       >
-                        Entrada · {leadItem.name}
+                        {isLost ? 'Perdut' : 'Entrada'} · {leadItem.name}
                       </Link>
-                    ))}
+                      );
+                    })}
                     {dayLeads.length > 2 && (
                       <div>+{dayLeads.length - 2} entrades</div>
                     )}
@@ -753,7 +708,7 @@ export default function CalendarMonthClient() {
 
       {/* Panell de detalls */}
       {selectedDayData.date && (
-        <div id="calendar-detail" className="rounded-2xl border admin-card-glass p-4 sm:p-5" {...helpAttrs(ADMIN_CALENDAR_HELP.monthDayDetail)}>
+        <div id="calendar-detail" className="ap-card p-4 sm:p-5" {...helpAttrs(ADMIN_CALENDAR_HELP.monthDayDetail)}>
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-base sm:ap-h2">
@@ -801,7 +756,7 @@ export default function CalendarMonthClient() {
 
           {/* Formulari bloqueig inline */}
           {showBlockForm && selectedDayData.key && (
-            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl border p-3">
+            <div className="mt-3 flex flex-wrap items-end gap-2 ap-card p-3">
               <div className="flex-1 min-w-[200px]">
                 <label htmlFor="block-note" className="block text-xs font-medium mb-1">
                   Motiu del bloqueig (opcional)
@@ -842,28 +797,35 @@ export default function CalendarMonthClient() {
                 </h3>
                 <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
                   {selectedDayData.payload?.leads?.length ? (
-                    selectedDayData.payload.leads.map((leadItem) => (
+                    selectedDayData.payload.leads.map((leadItem) => {
+                      const isLost = leadItem.status === 'LOST';
+                      return (
                       <Link
                         key={leadItem.id}
                         href={buildLeadCustomerHref({
                           leadId: leadItem.id,
                           customerId: leadItem.customerId,
                         })}
-                        className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass"
+                        className={isLost
+                          ? 'block rounded-lg border px-2 py-1.5 text-xs opacity-60 transition-all'
+                          : 'block rounded-xl border px-3 py-2.5 transition-all'}
                       >
-                        <div className="truncate text-sm font-medium">{leadItem.name}</div>
-                        <div className="mt-1 text-xs opacity-70">
+                        <div className={isLost ? 'truncate font-medium' : 'truncate text-sm font-medium'}>
+                          {isLost ? 'Perdut · ' : ''}{leadItem.name}
+                        </div>
+                        <div className={isLost ? 'mt-0.5 opacity-70' : 'mt-1 text-xs opacity-70'}>
                           {(leadItem.eventStartTime || leadItem.eventEndTime)
                             ? `${leadItem.eventStartTime || '--:--'} - ${leadItem.eventEndTime || '--:--'}`
                             : resolveWorkTimeLabel(leadItem.eventDate)}
                           {leadItem.eventType ? ` · ${leadItem.eventType}` : ''}
                           {leadItem.status ? ` · ${leadItem.status}` : ''}
                         </div>
-                        {leadItem.eventLocation && (
+                        {!isLost && leadItem.eventLocation && (
                           <div className="mt-1 truncate text-xs opacity-60">{leadItem.eventLocation}</div>
                         )}
                       </Link>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
                       Cap entrada en aquest dia
@@ -882,7 +844,7 @@ export default function CalendarMonthClient() {
                 <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
                   {selectedDayData.payload?.reservas?.length ? (
                     selectedDayData.payload.reservas.map((r) => (
-                      <div key={r.id} className="rounded-xl border px-3 py-2.5 transition-all">
+                      <div key={r.id} className="ap-card px-3 py-2.5 transition-all">
                         <div className="flex items-center justify-between gap-2">
                           <div className="font-medium text-sm">{r.clientName ?? 'Client sense nom'}</div>
                           {r.estado && (
@@ -895,6 +857,11 @@ export default function CalendarMonthClient() {
                           {r.ubicacion && <>{r.ubicacion}{' · '}</>}
                           {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
                         </div>
+                        {r.economicRisk && (
+                          <div className={`mt-2 rounded-lg border px-2 py-1 text-xs font-semibold ${getCalendarEconomicRiskClasses(r.economicRisk)}`}>
+                            Risc econòmic · {r.economicRisk.label}
+                          </div>
+                        )}
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                           <Link href={buildBookingHref(r.id)} onClick={(e) => e.stopPropagation()} className="text-xs font-medium hover:underline">
                             Reserva →
@@ -960,13 +927,13 @@ export default function CalendarMonthClient() {
                 </h3>
                 <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
                   {visibleLayers.tasks && selectedDayData.payload?.tasks?.map((task) => (
-                    <Link key={task.id} href="/admin/tasks" className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass">
+                    <Link key={task.id} href="/admin/tasks" className="ap-card block px-3 py-2.5 transition-all">
                       <div className="truncate text-sm font-medium">{task.title}</div>
                       <div className="mt-1 text-xs opacity-70">Tasca · {resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
                     </Link>
                   ))}
                   {visibleLayers.social && selectedDayData.payload?.socialPosts?.map((post) => (
-                    <Link key={post.id} href="/admin/social" className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass">
+                    <Link key={post.id} href={buildSocialWorkspaceHref(post.id)} className="ap-card block px-3 py-2.5 transition-all">
                       <div className="truncate text-sm font-medium">{post.title}</div>
                       <div className="mt-1 text-xs opacity-70">Social · {resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
                     </Link>
@@ -1003,7 +970,7 @@ export default function CalendarMonthClient() {
                 <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
                   {selectedDayData.payload?.bloqueos?.length ? (
                     selectedDayData.payload.bloqueos.map((b) => (
-                      <div key={b.id} className="rounded-xl border px-3 py-2.5">
+                      <div key={b.id} className="ap-card px-3 py-2.5">
                         <div className="flex items-center justify-between gap-2">
                           <div className="font-medium text-sm">Bloqueig</div>
                           <button type="button" onClick={() => unblockDay(b.fecha.slice(0, 10))} className="rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors admin-tone-idle">
@@ -1024,7 +991,7 @@ export default function CalendarMonthClient() {
           </div>
 
           {selectedDayData.payload?.reservas?.[0] && (
-            <div className="mt-4 rounded-xl border p-4">
+            <div className="mt-4 ap-card p-4">
               <h3 className="text-sm font-semibold">Fitxa de l&apos;esdeveniment</h3>
               <div className="mt-2 grid gap-2 text-sm sm:grid-cols-2">
                 <p><span className="">Client:</span> {selectedDayData.payload.reservas[0].clientName || '-'}</p>

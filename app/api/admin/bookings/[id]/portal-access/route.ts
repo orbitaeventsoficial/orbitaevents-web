@@ -7,36 +7,48 @@ import {
   issueClientPortalAccess,
   normalizePortalLocale,
   revokeActiveClientPortalAccess,
-  type PortalPersonalization,
 } from '@/lib/services/clientPortalAccess';
+import {
+  CLIENT_PORTAL_PERSONALIZATION_LIMITS,
+  type PortalPersonalization,
+} from '@/lib/constants/clientPortalPersonalization';
+import { normalizePortalAccentHex } from '@/lib/clientPortalUtils';
 
 interface Params {
   params: { id: string };
 }
 
-function sanitizePersonalization(input: unknown): PortalPersonalization | undefined {
-  if (!input || typeof input !== 'object') return undefined;
-  const source = input as Record<string, unknown>;
+function toRecord(input: unknown): Record<string, unknown> {
+  return input && typeof input === 'object' && !Array.isArray(input)
+    ? input as Record<string, unknown>
+    : {};
+}
 
-  const toOptionalString = (value: unknown, max = 300): string | undefined => {
+function sanitizePersonalization(input: unknown): PortalPersonalization | undefined {
+  const source = toRecord(input);
+
+  const toOptionalString = (value: unknown, max: number): string | undefined => {
     if (typeof value !== 'string') return undefined;
     const trimmed = value.trim();
     if (!trimmed) return undefined;
     return trimmed.slice(0, max);
   };
 
-  const toOptionalBool = (value: unknown): boolean | undefined => {
-    return typeof value === 'boolean' ? value : undefined;
+  const toHiddenFlag = (value: unknown): false | undefined => {
+    return value === false ? false : undefined;
   };
 
   const personalization: PortalPersonalization = {
-    headline: toOptionalString(source.headline, 120),
-    introMessage: toOptionalString(source.introMessage, 1200),
-    accentColor: toOptionalString(source.accentColor, 20),
-    showTimeline: toOptionalBool(source.showTimeline),
-    showPayments: toOptionalBool(source.showPayments),
-    showDocuments: toOptionalBool(source.showDocuments),
-    showPostEvent: toOptionalBool(source.showPostEvent),
+    headline: toOptionalString(source.headline, CLIENT_PORTAL_PERSONALIZATION_LIMITS.headline),
+    introMessage: toOptionalString(source.introMessage, CLIENT_PORTAL_PERSONALIZATION_LIMITS.introMessage),
+    accentColor: normalizePortalAccentHex(
+      toOptionalString(source.accentColor, CLIENT_PORTAL_PERSONALIZATION_LIMITS.accentColor),
+    ),
+    showTimeline: toHiddenFlag(source.showTimeline),
+    showPayments: toHiddenFlag(source.showPayments),
+    showDocuments: toHiddenFlag(source.showDocuments),
+    showPostEvent: toHiddenFlag(source.showPostEvent),
+    showQuestionnaire: toHiddenFlag(source.showQuestionnaire),
   };
 
   const hasAnyValue = Object.values(personalization).some((value) => typeof value !== 'undefined');
@@ -67,11 +79,11 @@ export async function POST(req: NextRequest, { params }: Params) {
   if (permissionError) return permissionError;
 
   try {
-    const body = await req.json().catch(() => ({}));
-    const expiresInDaysRaw = Number((body as { expiresInDays?: unknown })?.expiresInDays);
+    const body = toRecord(await req.json().catch(() => ({})));
+    const expiresInDaysRaw = Number(body.expiresInDays);
     const expiresInDays = Number.isFinite(expiresInDaysRaw) ? Math.round(expiresInDaysRaw) : undefined;
-    const locale = normalizePortalLocale((body as { locale?: string }).locale);
-    const personalization = sanitizePersonalization((body as { personalization?: unknown }).personalization);
+    const locale = normalizePortalLocale(typeof body.locale === 'string' ? body.locale : undefined);
+    const personalization = sanitizePersonalization(body.personalization);
 
     const result = await issueClientPortalAccess({
       bookingId: params.id,

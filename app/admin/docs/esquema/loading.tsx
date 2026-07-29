@@ -1,14 +1,14 @@
-import '../docs-view.css';
+const SKEL = 'bg-[var(--ax-raised)] rounded-[var(--o-r-md)] motion-safe:animate-pulse';
 
 export default function Loading() {
   return (
-    <div className="dmd__skel" aria-busy="true" aria-label="Carregant esquema…">
-      <div className="dmd__skel-h" />
-      <div className="dmd__skel-line" />
-      <div className="dmd__skel-line dmd__skel-line--short" />
-      <div className="dmd__skel-block" />
-      <div className="dmd__skel-line" />
-      <div className="dmd__skel-block" />
+    <div className="mx-auto max-w-[64rem]" aria-busy="true" aria-label="Carregant esquema…">
+      <div className={`${SKEL} h-8 w-2/5 mb-6`} />
+      <div className={`${SKEL} h-3.5 mb-2.5`} />
+      <div className={`${SKEL} h-3.5 w-3/5 mb-2.5`} />
+      <div className={`${SKEL} h-32 my-4`} />
+      <div className={`${SKEL} h-3.5 mb-2.5`} />
+      <div className={`${SKEL} h-32 my-4`} />
     </div>
   );
 }

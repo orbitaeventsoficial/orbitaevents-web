@@ -1,12 +1,17 @@
 // app/admin/inbox/compose/ComposeForm.tsx
-// Canvi #801 — reconstrucció des de zero (cx- classes, cap ap-*)
+// Redactor de correu — 100% canònic (AdminPage + .ap-*/.adm-input)
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatDateSimple, formatCurrency, getEventLabel } from '@/lib/constants';
+import { formatDateSimple, getEventLabel } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { generateSmartTemplates, generateAllTemplates, type SmartTemplate } from '@/lib/services/inboxTemplateService';
+import {
+  generateSmartTemplates,
+  generateAllTemplates,
+  type SmartTemplate,
+  type TemplateKey,
+} from '@/lib/services/inboxTemplateService';
 import type { BulkComposeSegmentAudience } from '@/lib/services/bulkComposeSegmentService';
 
 interface Lead {
@@ -25,15 +30,9 @@ interface Lead {
   message: string | null;
 }
 
-interface Pack {
-  id: string;
-  price: number;
-  translations: { locale: string; name: string; description: string | null; features: string[] }[];
-}
-
 interface Props {
   leads: Lead[];
-  packs: Pack[];
+  packs: unknown[];
   returnHref: string;
   initialLeadId?: string;
   initialCustomer?: {
@@ -47,9 +46,30 @@ interface Props {
   initialSegmentAudience?: BulkComposeSegmentAudience;
 }
 
+const TEMPLATE_QUERY_ALIASES: Record<string, TemplateKey> = {
+  recordatori: 'seguiment',
+};
+
+function normalizeInitialTemplateKey(value?: string): TemplateKey | null {
+  if (!value) return null;
+  const normalized = value.trim();
+  if (!normalized) return null;
+  if (normalized in TEMPLATE_QUERY_ALIASES) return TEMPLATE_QUERY_ALIASES[normalized];
+  const allowed: TemplateKey[] = [
+    'primer-contacte',
+    'seguiment',
+    'seguiment-pressupost',
+    'confirmacio-data',
+    'agraiment-post-event',
+    'reactivacio',
+    'referral',
+  ];
+  return allowed.includes(normalized as TemplateKey) ? (normalized as TemplateKey) : null;
+}
+
 export default function ComposeForm({
   leads,
-  packs,
+  packs: _packs,
   returnHref,
   initialLeadId,
   initialCustomer,
@@ -59,25 +79,22 @@ export default function ComposeForm({
 }: Props) {
   const router = useRouter();
   const lastAppliedTemplateRef = useRef<{ key: string; subject: string; body: string } | null>(null);
-  const [mode, setMode] = useState<'email' | 'quote'>('email');
   const [selectedLeadId, setSelectedLeadId] = useState(initialLeadId || '');
   const [to, setTo] = useState(initialTo || '');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [activeTemplateKey, setActiveTemplateKey] = useState<string | null>(null);
   const [locale, setLocale] = useState('ca');
-  const [selectedPackId, setSelectedPackId] = useState('');
-  const [price, setPrice] = useState('');
-  const [extras, setExtras] = useState<string[]>([]);
-  const [notes, setNotes] = useState('');
-  const [customMessage, setCustomMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const isBulkSegmentMode = Boolean(initialSegmentAudience);
 
   const selectedLead = leads.find((lead) => lead.id === selectedLeadId);
-  const selectedPack = packs.find((pack) => pack.id === selectedPackId);
+  const normalizedInitialTemplateKey = useMemo(
+    () => normalizeInitialTemplateKey(initialTemplate),
+    [initialTemplate]
+  );
 
   useEffect(() => {
     if (initialLeadId) setSelectedLeadId(initialLeadId);
@@ -115,16 +132,12 @@ export default function ComposeForm({
     setSubject(template.subject);
     setBody(template.body);
     setActiveTemplateKey(template.key);
-    if (template.mode === 'quote') setMode('quote');
-    else setMode('email');
   }
 
   useEffect(() => {
     if (selectedLead) {
       setTo(selectedLead.email);
       setLocale(selectedLead.preferredLocale || 'ca');
-      if (selectedLead.interestedPackId) setSelectedPackId(selectedLead.interestedPackId);
-      if (selectedLead.interestedExtras?.length) setExtras(selectedLead.interestedExtras);
     }
   }, [selectedLeadId, selectedLead]);
 
@@ -144,13 +157,16 @@ export default function ComposeForm({
     };
     if (subject !== activeTemplate.subject) setSubject(activeTemplate.subject);
     if (body !== activeTemplate.body) setBody(activeTemplate.body);
-    if (mode !== activeTemplate.mode) setMode(activeTemplate.mode as 'email' | 'quote');
-  }, [activeTemplateKey, smartTemplates, subject, body, mode]);
+  }, [activeTemplateKey, smartTemplates, subject, body]);
 
   useEffect(() => {
-    if (initialTemplate === 'enviament-pressupost') { setMode('quote'); return; }
-    if (initialTemplate === 'primer-contacte' || initialTemplate === 'recordatori') setMode('email');
-  }, [initialTemplate]);
+    if (!normalizedInitialTemplateKey) return;
+    if (activeTemplateKey) return;
+    if (subject.trim() || body.trim()) return;
+    const template = smartTemplates.find((tpl) => tpl.key === normalizedInitialTemplateKey);
+    if (!template) return;
+    applyTemplate(template);
+  }, [activeTemplateKey, body, normalizedInitialTemplateKey, smartTemplates, subject]);
 
   useEffect(() => {
     if (selectedLeadId) return;
@@ -171,50 +187,8 @@ export default function ComposeForm({
     }
   }, [initialCustomer, initialTemplate, selectedLeadId, subject, body]);
 
-  useEffect(() => {
-    if (selectedPack) setPrice(selectedPack.price.toString());
-  }, [selectedPackId, selectedPack]);
-
   async function handleSend() {
     setError('');
-
-    if (mode === 'quote') {
-      const hasRecipient = selectedLeadId || to.trim();
-      if (!hasRecipient || !selectedPackId || !price) {
-        setError('Selecciona un lead o escriu un email, pack i preu');
-        return;
-      }
-      setSending(true);
-      try {
-        const res = await fetchWithCsrf('/api/admin/emails/quote', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            leadId: selectedLeadId || undefined,
-            customerId: initialCustomer?.id || undefined,
-            to: selectedLeadId ? undefined : to.trim(),
-            packId: selectedPackId,
-            price: parseFloat(price),
-            extras,
-            notes,
-            customMessage,
-            locale,
-          }),
-        });
-        if (res.ok) {
-          setSent(true);
-          setTimeout(() => router.push(returnHref), 1500);
-        } else {
-          const data = await res.json();
-          setError(data.error || 'Error enviant pressupost');
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error de connexió');
-      } finally {
-        setSending(false);
-      }
-      return;
-    }
 
     if ((!isBulkSegmentMode && !to) || !subject || !body) {
       setError('Omple tots els camps');
@@ -259,87 +233,84 @@ export default function ComposeForm({
 
   if (sent) {
     return (
-      <div className="cx__success">
-        ✓ {mode === 'quote' ? 'Pressupost enviat!' : isBulkSegmentMode ? 'Campanya enviada!' : 'Correu enviat!'}
+      <div className="ap-inline-alert ap-inline-alert--success" role="status">
+        ✓ {isBulkSegmentMode ? 'Campanya enviada!' : 'Correu enviat!'}
       </div>
     );
   }
 
-  return (
-    <div>
-      {/* Toggle mode */}
-      <div className="cx__modetoggle">
-        <button
-          type="button"
-          onClick={() => setMode('email')}
-          aria-pressed={mode === 'email'}
-          className={`cx__modebtn${mode === 'email' ? ' is-on' : ''}`}
-        >
-          ✉ Correu normal
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode('quote')}
-          aria-pressed={mode === 'quote'}
-          className={`cx__modebtn${mode === 'quote' ? ' is-on' : ''}`}
-        >
-          Pressupost
-        </button>
-      </div>
+  const labelClass = 'text-xs font-bold uppercase tracking-[0.1em] text-[var(--t2)]';
 
+  return (
+    <div className="grid gap-4">
       {/* Plantilles intel·ligents (mode email) */}
-      {mode === 'email' && smartTemplates.length > 0 && (
-        <div className="cx__tplcard">
-          <p className="cx__tpllabel">Plantilles intel·ligents</p>
-          <div className="cx__tplgrid">
-            {smartTemplates.map((tpl) => (
-              <button
-                key={tpl.key}
-                type="button"
-                onClick={() => applyTemplate(tpl)}
-                className={`cx__tplitem${activeTemplateKey === tpl.key ? ' is-on' : ''}`}
-              >
-                <p className="cx__tplname">{tpl.icon} {tpl.label}</p>
-                <p className="cx__tpldesc">{tpl.description}</p>
-              </button>
-            ))}
+      {smartTemplates.length > 0 && (
+        <section className="ap-card">
+          <div className="ap-card-body">
+            <p className={labelClass}>Plantilles intel·ligents</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {smartTemplates.map((tpl) => {
+                const isActive = activeTemplateKey === tpl.key;
+                return (
+                  <button
+                    key={tpl.key}
+                    type="button"
+                    onClick={() => applyTemplate(tpl)}
+                    aria-pressed={isActive}
+                    className={`rounded-[var(--o-r-sm)] border p-3 text-left transition-colors ${
+                      isActive
+                        ? 'border-[var(--hair-gold)] bg-[var(--raised)] text-[var(--gold-bright)]'
+                        : 'border-[var(--line)] bg-[var(--sunk)] text-[var(--t2)] hover:bg-[var(--raised)] hover:text-[var(--t)]'
+                    }`}
+                  >
+                    <p className="text-sm font-bold">{tpl.icon} {tpl.label}</p>
+                    <p className="mt-0.5 truncate text-xs opacity-60">{tpl.description}</p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Audiència segmentada */}
-      {mode === 'email' && initialSegmentAudience && (
-        <div className="cx__segcard">
-          <p className="cx__segcard-label">Audiència segmentada</p>
-          <p className="cx__segcard-name">{initialSegmentAudience.label}</p>
-          <p className="cx__segcard-desc">{initialSegmentAudience.description}</p>
-          <p className="cx__segcard-count">
-            {initialSegmentAudience.recipients.length} destinataris preparats per l&apos;enviament massiu.
-          </p>
-          <div className="cx__segrecipgrid">
-            {initialSegmentAudience.recipients.slice(0, 4).map((recipient) => (
-              <div key={recipient.id} className="cx__segrecip">
-                <p className="cx__segrecip-name">{recipient.name}</p>
-                <p className="cx__segrecip-email">{recipient.email}</p>
-              </div>
-            ))}
+      {initialSegmentAudience && (
+        <section className="ap-card">
+          <div className="ap-card-body">
+            <p className={labelClass}>Audiència segmentada</p>
+            <p className="mt-1 text-base font-bold text-[var(--t)]">{initialSegmentAudience.label}</p>
+            <p className="mt-0.5 text-xs text-[var(--t2)]">{initialSegmentAudience.description}</p>
+            <p className="mt-2 text-sm font-semibold text-[var(--gold-bright)]">
+              {initialSegmentAudience.recipients.length} destinataris preparats per l&apos;enviament massiu.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {initialSegmentAudience.recipients.slice(0, 4).map((recipient) => (
+                <div
+                  key={recipient.id}
+                  className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] p-2"
+                >
+                  <p className="text-xs font-semibold text-[var(--t)]">{recipient.name}</p>
+                  <p className="text-xs text-[var(--t3)]">{recipient.email}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Formulari principal */}
-      <div className="cx__formcard">
-        <div className="cx__forminner">
+      <section className="ap-card">
+        <div className="ap-card-body grid gap-4">
           {/* Selecció de lead (mode individual) */}
           {!isBulkSegmentMode && (
-            <div className="cx__field">
-              <label htmlFor="cf-lead" className="cx__label">Entrada (opcional)</label>
+            <div className="grid gap-1.5">
+              <label htmlFor="cf-lead" className={labelClass}>Entrada (opcional)</label>
               <select
                 id="cf-lead"
                 value={selectedLeadId}
                 onChange={(e) => setSelectedLeadId(e.target.value)}
                 aria-label="Selecciona entrada"
-                className="cx__select"
+                className="adm-input"
               >
                 <option value="">-- Escriu email manualment --</option>
                 {leads.map((lead) => (
@@ -353,40 +324,40 @@ export default function ComposeForm({
 
           {/* Detalls del lead seleccionat */}
           {selectedLead && (
-            <div className="cx__leaddetail">
-              <p className="cx__leaddetail-title">Detalls de l&apos;entrada</p>
-              <div className="cx__leaddetail-grid">
+            <div className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] p-4">
+              <p className={labelClass}>Detalls de l&apos;entrada</p>
+              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div>
-                  <p className="cx__leaddetail-label">Tipus</p>
-                  <p className="cx__leaddetail-value">
+                  <p className="text-xs text-[var(--t3)]">Tipus</p>
+                  <p className="text-sm font-semibold text-[var(--t)]">
                     {getEventLabel(selectedLead.eventType || '', 'No especificat')}
                   </p>
                 </div>
                 <div>
-                  <p className="cx__leaddetail-label">Data</p>
-                  <p className="cx__leaddetail-value">
+                  <p className="text-xs text-[var(--t3)]">Data</p>
+                  <p className="text-sm font-semibold text-[var(--t)]">
                     {selectedLead.eventDate
                       ? formatDateSimple(selectedLead.eventDate)
                       : 'No especificat'}
                   </p>
                 </div>
                 <div>
-                  <p className="cx__leaddetail-label">Ubicació</p>
-                  <p className="cx__leaddetail-value">
+                  <p className="text-xs text-[var(--t3)]">Ubicació</p>
+                  <p className="text-sm font-semibold text-[var(--t)]">
                     {selectedLead.eventLocation || 'No especificat'}
                   </p>
                 </div>
                 <div>
-                  <p className="cx__leaddetail-label">Convidats</p>
-                  <p className="cx__leaddetail-value">
+                  <p className="text-xs text-[var(--t3)]">Convidats</p>
+                  <p className="text-sm font-semibold text-[var(--t)]">
                     {selectedLead.guestCount || 'No especificat'}
                   </p>
                 </div>
               </div>
               {selectedLead.message && (
-                <div className="cx__leaddetail-msg">
-                  <p className="cx__leaddetail-label">Missatge</p>
-                  <p className="cx__leaddetail-msgtext">
+                <div className="mt-3 border-t border-[var(--line)] pt-3">
+                  <p className="text-xs text-[var(--t3)]">Missatge</p>
+                  <p className="mt-1 text-sm text-[var(--t2)]">
                     {selectedLead.message}
                   </p>
                 </div>
@@ -394,207 +365,66 @@ export default function ComposeForm({
             </div>
           )}
 
-          {/* MODE PRESSUPOST */}
-          {mode === 'quote' ? (
-            <>
-              {!selectedLeadId && (
-                <div className="cx__field">
-                  <label htmlFor="cf-email-q" className="cx__label">Correu del client *</label>
-                  <input
-                    id="cf-email-q"
-                    type="email"
-                    value={to}
-                    onChange={(e) => setTo(e.target.value)}
-                    className="cx__input"
-                    placeholder="email@exemple.com"
-                  />
-                </div>
-              )}
+          <div className="grid gap-1.5">
+            <label htmlFor="cf-to" className={labelClass}>Per a *</label>
+            {isBulkSegmentMode ? (
+              <div className="adm-input flex items-center justify-between">
+                <span>{initialSegmentAudience?.label}</span>
+                <span className="text-xs text-[var(--t3)]">
+                  {initialSegmentAudience?.recipients.length} contactes
+                </span>
+              </div>
+            ) : (
+              <input
+                id="cf-to"
+                type="email"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                className="adm-input"
+                placeholder="email@exemple.com"
+              />
+            )}
+          </div>
 
-              <div className="cx__field">
-                <label className="cx__label">Pack recomanat *</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
-                  {packs.map((pack) => {
-                    const name =
-                      pack.translations.find((t) => t.locale === locale)?.name ||
-                      pack.translations[0]?.name;
-                    const isSelected = selectedPackId === pack.id;
-                    return (
-                      <button
-                        key={pack.id}
-                        type="button"
-                        onClick={() => setSelectedPackId(pack.id)}
-                        aria-pressed={isSelected}
-                        style={{
-                          padding: '14px 16px',
-                          border: `2px solid ${isSelected ? 'var(--ax-hair-gold)' : 'var(--ax-line2)'}`,
-                          borderRadius: 10,
-                          background: isSelected
-                            ? 'color-mix(in oklab, var(--ax-gold) 10%, var(--ax-panel))'
-                            : 'var(--ax-sunk)',
-                          color: isSelected ? 'var(--ax-gold-bright)' : 'var(--ax-t)',
-                          textAlign: 'left',
-                          cursor: 'pointer',
-                          transition: 'border-color 120ms ease, background 120ms ease, color 120ms ease',
-                        }}
-                      >
-                        <p className="cx__packname">{name}</p>
-                        <p className="cx__packprice">
-                          {formatCurrency(pack.price)}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+          <div className="grid gap-1.5">
+            <label htmlFor="cf-subj" className={labelClass}>Assumpte *</label>
+            <input
+              id="cf-subj"
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              className="adm-input"
+              placeholder="Assumpte de l'email"
+            />
+          </div>
 
-              <div className="cx__field">
-                <label htmlFor="cf-price" className="cx__label">Preu total (€) *</label>
-                <input
-                  id="cf-price"
-                  type="number"
-                  min={0}
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  className="cx__input cx__priceinput"
-                  placeholder="0"
-                />
-              </div>
-
-              <div className="cx__field">
-                <label htmlFor="cf-extras" className="cx__label">Extras inclosos</label>
-                <textarea
-                  id="cf-extras"
-                  value={extras.join('\n')}
-                  onChange={(e) => setExtras(e.target.value.split('\n').filter(Boolean))}
-                  rows={3}
-                  className="cx__textarea"
-                  placeholder="Un extra per línia..."
-                />
-              </div>
-
-              <div className="cx__field">
-                <label htmlFor="cf-custmsg" className="cx__label">Missatge personalitzat (opcional)</label>
-                <textarea
-                  id="cf-custmsg"
-                  value={customMessage}
-                  onChange={(e) => setCustomMessage(e.target.value)}
-                  rows={4}
-                  className="cx__textarea"
-                  placeholder="Afegeix un missatge personalitzat..."
-                />
-              </div>
-
-              <div className="cx__field">
-                <label htmlFor="cf-notes" className="cx__label">Notes addicionals</label>
-                <textarea
-                  id="cf-notes"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={2}
-                  className="cx__textarea"
-                  placeholder="Notes que apareixeran al pressupost..."
-                />
-              </div>
-
-              <div className="cx__field">
-                <label className="cx__label">Idioma del pressupost</label>
-                <div className="cx__localepicker">
-                  {[
-                    { code: 'ca', label: 'Català' },
-                    { code: 'es', label: 'Castellà' },
-                  ].map((lang) => (
-                    <button
-                      key={lang.code}
-                      type="button"
-                      onClick={() => setLocale(lang.code)}
-                      aria-pressed={locale === lang.code}
-                      className={`cx__localebtn${locale === lang.code ? ' is-on' : ''}`}
-                    >
-                      {lang.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>
-          ) : (
-            /* MODE CORREU NORMAL */
-            <>
-              <div className="cx__field">
-                <label htmlFor="cf-to" className="cx__label">Per a *</label>
-                {isBulkSegmentMode ? (
-                  <div
-                    className="cx__input"
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                  >
-                    <span>{initialSegmentAudience?.label}</span>
-                    <span className="cx__recipcount">
-                      {initialSegmentAudience?.recipients.length} contactes
-                    </span>
-                  </div>
-                ) : (
-                  <input
-                    id="cf-to"
-                    type="email"
-                    value={to}
-                    onChange={(e) => setTo(e.target.value)}
-                    className="cx__input"
-                    placeholder="email@exemple.com"
-                  />
-                )}
-              </div>
-
-              <div className="cx__field">
-                <label htmlFor="cf-subj" className="cx__label">Assumpte *</label>
-                <input
-                  id="cf-subj"
-                  type="text"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  className="cx__input"
-                  placeholder="Assumpte de l'email"
-                />
-              </div>
-
-              <div className="cx__field">
-                <label htmlFor="cf-body" className="cx__label">Missatge *</label>
-                <textarea
-                  id="cf-body"
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  rows={10}
-                  className="cx__textarea"
-                  placeholder="Escriu el teu missatge..."
-                />
-              </div>
-            </>
-          )}
+          <div className="grid gap-1.5">
+            <label htmlFor="cf-body" className={labelClass}>Missatge *</label>
+            <textarea
+              id="cf-body"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={10}
+              className="adm-input adm-input--textarea"
+              placeholder="Escriu el teu missatge..."
+            />
+          </div>
         </div>
 
         {/* Barra d'enviament */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            flexWrap: 'wrap',
-            padding: '14px 22px',
-            borderTop: '1px solid var(--ax-line)',
-          }}
-        >
+        <div className="ap-card-body flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)]">
           <div>
             {error && (
-              <div className="cx__error" role="alert">
+              <div className="ap-inline-alert ap-inline-alert--danger" role="alert">
                 {error}
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => router.push(returnHref)}
-              className="ix__btn ix__btn--ghost"
+              className="ap-btn ap-btn--secondary"
             >
               Cancel·lar
             </button>
@@ -603,20 +433,17 @@ export default function ComposeForm({
               onClick={handleSend}
               disabled={sending}
               aria-busy={sending}
-              className="ix__btn ix__btn--primary"
-              style={sending ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
+              className="ap-btn ap-btn--primary"
             >
               {sending
                 ? 'Enviant...'
-                : mode === 'quote'
-                  ? 'Envia pressupost'
-                  : isBulkSegmentMode
+                : isBulkSegmentMode
                     ? 'Envia campanya'
                     : 'Envia correu'}
             </button>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

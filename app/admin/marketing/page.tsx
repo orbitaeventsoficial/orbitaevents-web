@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import {
   loadMarketingHubSummary,
   type MarketingHubIntegrationStatus,
@@ -64,34 +63,12 @@ export default async function MarketingPage() {
           <Link href="/admin/analytics" className="ap-btn ap-btn--secondary text-xs">
             Analítica
           </Link>
+          <Link href="/admin/campaigns" className="ap-btn ap-btn--secondary text-xs">
+            Campanyes CRM
+          </Link>
         </div>
       }
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: summary.headline,
-          tone: summary.readiness === 'PAID_BLOCKED' || summary.readiness === 'FOUNDATION' ? 'warning' : 'info',
-          items: summary.systemItems,
-          emptyText: 'Sense dades de captació encara.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'Decisions que no pot prendre el sistema',
-          tone: summary.readiness === 'READY_TO_MEASURE' ? 'success' : 'warning',
-          items: summary.manualItems,
-          emptyText: 'No hi ha decisions manuals pendents.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent moviment',
-          title: summary.nextStep.title,
-          detail: summary.nextStep.detail,
-          href: summary.nextStep.href,
-          ctaLabel: summary.nextStep.label,
-          secondaryAction: { href: '/admin/manual', label: 'Veure playbook' },
-        }}
-      />
-
       <section className="ap-card rounded-2xl p-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
@@ -137,7 +114,7 @@ export default async function MarketingPage() {
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {summary.channelDiagnostics.map((diagnostic) => (
-            <div key={diagnostic.source} className={`rounded-xl border p-4 ${diagnosticTone[diagnostic.tone]}`}>
+            <div key={diagnostic.source} className={`ap-card p-4 ${diagnosticTone[diagnostic.tone]}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="font-semibold">{diagnostic.label}</h3>
@@ -172,7 +149,7 @@ export default async function MarketingPage() {
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
           {summary.measurementGaps.map((gap) => (
-            <div key={gap.id} className={`rounded-xl border p-4 ${measurementGapTone[gap.status]}`}>
+            <div key={gap.id} className={`ap-card p-4 ${measurementGapTone[gap.status]}`}>
               <div className="flex items-start justify-between gap-3">
                 <h3 className="text-sm font-semibold">{gap.label}</h3>
                 <span className="shrink-0 text-xs font-bold">{measurementGapLabel[gap.status]}</span>

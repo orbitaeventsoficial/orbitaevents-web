@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { getRequestId } from '@/lib/request-context';
 import { timingSafeEqual } from 'crypto';
-import { fetchFromSerpAPI } from '@/lib/services/reviewsSyncService';
-import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
-import { writeGoogleReviewsCache } from '@/lib/services/googleReviewsCacheService';
+import { runReviewsSync } from '@/lib/services/reviewsSyncService';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -33,38 +31,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const data = await fetchFromSerpAPI();
-
-    if (!data) {
-      log.warn('reviews-sync: No s\'han pogut obtenir ressenyes de SerpAPI', {
-        context: { requestId },
-      });
-      return NextResponse.json({ ok: false, error: 'SerpAPI no ha retornat resultats' });
-    }
-
-    await writeGoogleReviewsCache({
-      rating: data.rating,
-      total: data.total,
-      reviews: data.reviews,
-    });
-
-    log.info(`reviews-sync: ${data.reviews.length} ressenyes sincronitzades (${data.total} total, ${data.rating}★)`, {
-      context: { requestId },
-    });
-
-    await saveCronRunStatus({ prefix: 'automation.reviewsSync', status: 'ok', summary: { rating: data.rating, total: data.total, synced: data.reviews.length } });
-
-    return NextResponse.json({
-      ok: true,
-      rating: data.rating,
-      total: data.total,
-      synced: data.reviews.length,
-    });
+    const result = await runReviewsSync(`reviews-sync:${requestId}`);
+    return NextResponse.json(result);
   } catch (error) {
     log.error('reviews-sync: Error', error instanceof Error ? error : undefined, {
       context: { requestId },
     });
-    await saveCronRunStatus({ prefix: 'automation.reviewsSync', status: 'error', summary: {}, message: error instanceof Error ? error.message : 'Error intern' }).catch(() => {});
     return NextResponse.json({ ok: false, error: 'Error intern' }, { status: 500 });
   }
 }

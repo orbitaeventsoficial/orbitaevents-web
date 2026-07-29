@@ -134,9 +134,20 @@ describe('createAdminLead', () => {
 
     expect(mockPrisma.lead.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
-        eventDate: expect.any(Date),
+        eventDate: new Date('2026-06-15T12:00:00.000Z'),
       }),
     });
+  });
+
+  it('rebutja eventDate amb format ambigu', async () => {
+    await expect(createAdminLead({
+      name: 'Test',
+      email: 'test@test.com',
+      eventType: 'BIRTHDAY',
+      eventDate: '26 Setiembre',
+    })).rejects.toThrow('INVALID_EVENT_DATE_FORMAT');
+
+    expect(mockPrisma.lead.create).not.toHaveBeenCalled();
   });
 
   it('marca contactedAt quan el lead manual neix com a CONTACTED', async () => {

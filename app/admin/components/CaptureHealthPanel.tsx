@@ -20,7 +20,7 @@ const TREND_ICON: Record<CaptureTrend, string> = {
 const TREND_COLOR: Record<CaptureTrend, string> = {
   UP: 'admin-tone-text-success',
   DOWN: 'admin-tone-text-danger',
-  FLAT: 'admin-cr-meta',
+  FLAT: 'text-[var(--t3)]',
 };
 
 function formatTrendPct(trend: CaptureTrend, pct: number): string {
@@ -34,7 +34,7 @@ export default function CaptureHealthPanel({ report }: { report: CaptureHealthRe
   const isCritical = report.status === 'DROUGHT' || report.status === 'FAMINE';
 
   return (
-    <section className={`admin-cr-panel admin-cr-capture-panel ${style.border} ${style.bg}`}>
+    <section className={`ap-card grid gap-4 p-4 ${style.border} ${style.bg}`}>
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -46,7 +46,7 @@ export default function CaptureHealthPanel({ report }: { report: CaptureHealthRe
         </div>
         <Link
           href={report.suggestedAction.href}
-          className={`admin-cr-action-link ${isCritical ? 'admin-tone-border-danger' : ''}`}
+          className={`ap-btn ap-btn--secondary ap-btn--xs ${isCritical ? 'admin-tone-border-danger' : ''}`}
         >
           {report.suggestedAction.label} →
         </Link>

@@ -34,7 +34,8 @@ import {
 } from '@/lib/admin/customerWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { getLeadPriorityColorDisplay } from '@/app/admin/leads/colorTheme';
-import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
+import { isSentLikeProposalStatus } from '@/lib/proposals/status';
 
 type CustomerEditableFields = {
   name: string;
@@ -43,6 +44,27 @@ type CustomerEditableFields = {
   instagram?: string;
   preferredLocale: string;
 };
+
+type TopLeadBooking = NonNullable<CustomerHubDTO['leads'][number]['booking']>;
+
+function getTopLeadBookingPaymentState(booking: TopLeadBooking) {
+  const depositAmount = booking.depositAmount ?? 0;
+  const breakdown = bookingOutstandingBreakdown({
+    total: booking.total,
+    depositAmount,
+    remainingAmount: booking.remainingAmount,
+    depositPaid: booking.depositPaid === true,
+    remainingPaid: booking.remainingPaid === true,
+    cashAmount: booking.cashAmount,
+  });
+  const hasDeposit = depositAmount > 0;
+  const label = breakdown.total <= 0
+    ? 'tancat'
+    : hasDeposit && breakdown.depositAmount <= 0
+      ? 'parcial'
+      : 'pendent';
+  return { breakdown, label };
+}
 
 export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
@@ -59,7 +81,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
   const openTasks = data.tasks.filter((t) => !t.done).length;
   const urgentTasks = data.tasks.filter((t) => !t.done && t.priority === 'HIGH').length;
   const draftProposals = data.proposals.filter((p) => p.status === 'DRAFT').length;
-  const sentProposals = data.proposals.filter((p) => p.status === 'SENT').length;
+  const sentProposals = data.proposals.filter((p) => isSentLikeProposalStatus(p.status)).length;
   const acceptedProposals = data.proposals.filter((p) => p.status === 'ACCEPTED').length;
   const confirmedBookings = data.bookings.filter((b) => b.status === 'CONFIRMED').length;
   const upcomingBookings = data.bookings.filter(
@@ -109,20 +131,17 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         ? 'Prioritat del pas: Informativa'
         : null;
   const topLeadBookingDaysUntil = topLead?.booking?.date ? getDaysUntil(topLead.booking.date) : null;
+  const topLeadPaymentState = topLead?.booking ? getTopLeadBookingPaymentState(topLead.booking) : null;
   const topLeadPaymentRisk = topLead?.booking
-    && typeof topLead.booking.remainingAmount === 'number'
-    && topLead.booking.remainingAmount > 0
-    && topLead.booking.remainingPaid !== true
+    && topLeadPaymentState
+    && topLeadPaymentState.breakdown.total > 0
     && topLeadBookingDaysUntil !== null
     && topLeadBookingDaysUntil <= 14
-      ? `Risc temporal: queden ${topLeadBookingDaysUntil} dies i ${formatCurrency(topLead.booking.remainingAmount)} pendents`
-      : null;
+      ? `Risc temporal: queden ${topLeadBookingDaysUntil} dies i ${formatCurrency(topLeadPaymentState.breakdown.total)} pendents`
+    : null;
   const topLeadPaymentSummary = topLead?.booking
-    ? topLead.booking.remainingPaid === true || topLead.booking.remainingAmount === 0
-      ? 'Estat econòmic: cobrament tancat'
-      : topLead.booking.depositPaid
-        ? 'Estat econòmic: cobrament parcial'
-        : 'Estat econòmic: cobrament pendent'
+    && topLeadPaymentState
+    ? `Estat econòmic: cobrament ${topLeadPaymentState.label}`
     : null;
   const reactivationTaskHref = data.reactivation
     ? buildReactivationTaskHref(data.customer.id, data.customer.name, data.reactivation)
@@ -193,76 +212,8 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
     alerts.push({ type: 'info', text: `${activeDiscounts.length} codi${activeDiscounts.length > 1 ? 's' : ''} de descompte actiu${activeDiscounts.length > 1 ? 's' : ''} (${activeDiscounts.map(d => d.code).join(', ')})` });
   }
 
-  const ownerAutomaticSignals = [
-    data.insights.commercialRisk.level !== 'NONE'
-      ? `${data.insights.commercialRisk.label}${data.insights.commercialRisk.context ? ` · ${data.insights.commercialRisk.context}` : ''}`
-      : null,
-    data.reactivation
-      ? `Reactivació detectada: ${data.reactivation.reasonLabel}`
-      : null,
-    nextEvent?.date
-      ? `Pròxim esdeveniment en ${getDaysUntil(nextEvent.date)} dies`
-      : null,
-    activeDiscounts.length > 0
-      ? `${activeDiscounts.length} codi${activeDiscounts.length > 1 ? 's' : ''} actiu${activeDiscounts.length > 1 ? 's' : ''}`
-      : null,
-  ].filter(Boolean) as string[];
 
-  const ownerManualSignals = [
-    urgentTasks > 0
-      ? `${urgentTasks} tasca${urgentTasks > 1 ? 'ques' : ''} urgent${urgentTasks > 1 ? 's' : ''}`
-      : null,
-    draftProposals > 0
-      ? `${draftProposals} pressupost${draftProposals > 1 ? 's' : ''} en esborrany`
-      : null,
-    sentProposals > 0 && acceptedProposals === 0
-      ? `${sentProposals} pressupost${sentProposals > 1 ? 's' : ''} pendent${sentProposals > 1 ? 's' : ''} de resposta`
-      : null,
-    topLeadAction && topLead
-      ? `Hi ha una oportunitat viva: ${topLead.name || 'lead activa'}`
-      : null,
-  ].filter(Boolean) as string[];
 
-  const ownerNextStep = topLeadAction
-    ? {
-        title: topLeadAction.label,
-        detail: topLead?.commercialBlocker?.label || topLeadActionChannel || 'Acció comercial assistida',
-        href: topLeadAction.href,
-        external: topLeadAction.external,
-      }
-    : reactivationTaskHref
-      ? {
-          title: 'Crear tasca de reactivació',
-          detail: data.reactivation
-            ? `${data.reactivation.reasonLabel} · prioritat ${data.reactivation.priority.toLowerCase()}`
-            : 'Seguiment suggerit per al client',
-          href: reactivationTaskHref,
-          external: false,
-        }
-      : nextTask
-        ? {
-            title: nextTask.title,
-            detail: nextTask.dueDate
-              ? `Tasques pendents · venciment ${formatDateSimple(nextTask.dueDate)}`
-              : 'Tasques pendents per revisar',
-            href: customerTaskCreateHref,
-            external: false,
-          }
-        : nextEvent
-          ? {
-              title: nextEvent.reference || 'Obrir reserva',
-              detail: nextEvent.date
-                ? `Pròxim esdeveniment · ${formatDateFull(nextEvent.date)}`
-                : 'Reserva vinculada al client',
-              href: buildBookingHref(nextEvent.id),
-              external: false,
-            }
-          : {
-              title: 'Enviar missatge',
-              detail: 'No hi ha bloqueig crític, però convé mantenir el client actiu',
-              href: customerComposeHref,
-              external: false,
-            };
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -298,7 +249,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
   }, [data.customer]);
 
   return (
-    <section className="admin-customer-summary space-y-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.root)}>
+    <section className="space-y-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.root)}>
       {alerts.length > 0 && (
         <div className="space-y-2">
           {alerts.map((alert, i) => (
@@ -321,37 +272,9 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         </div>
       )}
 
-      <OwnerControlStrip
-        className="xl:grid-cols-[1.1fr_1.1fr_1.3fr]"
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què està vigilant el sistema',
-          tone: 'info',
-          items: ownerAutomaticSignals,
-          emptyText: 'Sense senyals automàtiques destacades ara mateix.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'Què et reclama decisió',
-          tone: ownerManualSignals.length > 0 ? 'warning' : 'success',
-          items: ownerManualSignals,
-          emptyText: 'No hi ha cap front manual calent ara mateix.',
-        }}
-        nextStep={{
-          title: ownerNextStep.title,
-          detail: ownerNextStep.detail,
-          href: ownerNextStep.href,
-          external: ownerNextStep.external,
-          secondaryAction: {
-            href: customerTaskCreateHref,
-            label: 'Preparar tasca',
-          },
-        }}
-      />
-
       <CrmStatusBar customer={data.customer} onTagsChange={() => router.refresh()} />
 
-      <div className="admin-customer-card admin-customer-card--contact rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.contact)}>
+      <div className="ap-card p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.contact)}>
         <div className="flex items-center justify-between">
           <h2 className="ap-h2">Informació de contacte</h2>
           {!editing ? (
@@ -369,7 +292,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 type="button"
                 onClick={cancelEdit}
                 disabled={saving}
-                className="rounded-xl border px-3 py-1.5 text-xs disabled:opacity-50"
+                className="ap-btn ap-btn--xs disabled:opacity-50"
                 {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.cancelEdit)}
               >
                 Cancel·la
@@ -431,7 +354,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
 
       <ContactsSection customerId={data.customer.id} contacts={data.contacts ?? []} />
 
-      <div className="admin-customer-card admin-customer-card--ops rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.operations)}>
+      <div className="ap-card p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.operations)}>
         <h2 className="ap-h2">Resum operatiu</h2>
         <p className="mt-1 text-sm">
           Client des de {formatDate(data.customer.createdAt)}
@@ -455,7 +378,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         const paid = data.kpis.totalPaid ?? 0;
         const pct = quoted > 0 ? Math.round((paid / quoted) * 100) : 0;
         return (
-          <div className="rounded-2xl border p-5">
+          <div className="ap-card p-5">
             <h2 className="ap-h2">Resum financer</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <div>
@@ -477,8 +400,8 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                   <span>Cobrament</span>
                   <span>{pct}%</span>
                 </div>
-                <div className="ch__summary-progress">
-                  <div className="ch__summary-progress-bar" style={{ width: `${Math.min(100, pct)}%` }} />
+                <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--ax-fill-5)]">
+                  <div className="h-full rounded-full bg-[var(--gold)] transition-[width] duration-500" style={{ width: `${Math.min(100, pct)}%` }} />
                 </div>
               </div>
             )}
@@ -487,7 +410,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       })()}
 
       {nextEvent && nextEvent.date && (
-        <div className="rounded-2xl border p-5">
+        <div className="ap-card p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-wider">Pròxim esdeveniment</p>
@@ -628,11 +551,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 )}
                 {topLead.booking && (
                   <p className="mt-1 text-xs opacity-60">
-                    Cobrament: {topLead.booking.depositPaid && topLead.booking.remainingPaid
-                      ? 'Pagada'
-                      : topLead.booking.depositPaid
-                        ? 'Bestreta cobrada'
-                        : 'Pagament pendent'}
+                    Cobrament: {topLeadPaymentState?.label ?? 'cobrament pendent'}
                   </p>
                 )}
                 {topLeadActionChannel && (
@@ -785,7 +704,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
             nextEvents.length > 0 && (
               <div className="space-y-3">
                 {nextEvents.map((ev) => (
-                  <div key={ev.id} className="rounded-xl border p-2">
+                  <div key={ev.id} className="ap-card p-2">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium">{ev.reference || 'Reserva'}</p>
                       <a href={buildBookingHref(ev.id)} className="text-xs">Obrir →</a>
@@ -802,7 +721,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       </div>
 
       <div
-        className="admin-customer-card admin-customer-card--quick rounded-2xl border p-5"
+        className="ap-card p-5"
         data-testid="customer-summary-quick-actions"
         {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.quickActions)}
       >
@@ -867,7 +786,7 @@ function StatCard({ label, value, detail, color }: { label: string; value: numbe
   };
 
   return (
-    <div className={`admin-customer-stat rounded-xl border p-3 ${colorStyles[color]}`} {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.stat(label))}>
+    <div className={`ap-card p-3 ${colorStyles[color]}`} {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.stat(label))}>
       <p className="text-xs">{label}</p>
       <p className="mt-1 text-2xl font-semibold">{value}</p>
       {detail && <p className="mt-0.5 text-xs">{detail}</p>}
@@ -877,7 +796,7 @@ function StatCard({ label, value, detail, color }: { label: string; value: numbe
 
 function ActionCard({ title, isEmpty, emptyText, content, action }: { title: string; isEmpty: boolean; emptyText: string; content: React.ReactNode; action?: React.ReactNode; }) {
   return (
-    <div className="admin-customer-action-card rounded-2xl border p-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.actionCard(title))}>
+    <div className="ap-card p-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.actionCard(title))}>
       <div className="flex items-center justify-between">
         <p className="text-xs uppercase tracking-wider">{title}</p>
         {action}
@@ -888,12 +807,13 @@ function ActionCard({ title, isEmpty, emptyText, content, action }: { title: str
 }
 
 function QuickAction({ href, label, color, external }: { href: string; label: string; color: 'cyan' | 'amber' | 'emerald' | 'indigo' | 'slate'; external?: boolean; }) {
+  const QUICK_BASE = 'inline-flex items-center rounded-[var(--o-r-xl)] border px-3 py-1.5 text-xs font-semibold leading-tight no-underline transition-colors hover:bg-[var(--ax-fill-3)]';
   const colorStyles = {
-    cyan: 'ch__summary-quick--info',
-    amber: 'ch__summary-quick--warning',
-    emerald: 'ch__summary-quick--success',
-    indigo: 'ch__summary-quick--vip',
-    slate: 'ch__summary-quick--muted',
+    cyan: 'border-[var(--ax-info-border)] text-[var(--o-info)]',
+    amber: 'border-[var(--ax-warning-border)] text-[var(--o-warning)]',
+    emerald: 'border-[var(--ax-success-border)] text-[var(--o-success)]',
+    indigo: 'border-[var(--ax-vip)] text-[var(--ax-vip)]',
+    slate: 'border-[var(--line2)] text-[var(--t2)]',
   };
 
   return (
@@ -901,7 +821,7 @@ function QuickAction({ href, label, color, external }: { href: string; label: st
       href={href}
       target={external ? '_blank' : undefined}
       rel={external ? 'noopener noreferrer' : undefined}
-      className={`ch__summary-quick ${colorStyles[color]}`}
+      className={`${QUICK_BASE} ${colorStyles[color]}`}
       {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.quickAction(label))}
     >
       {label}
@@ -996,8 +916,8 @@ function RouteSnapshotCard({
       {venue && location && <p className="mt-1 text-xs">{location}</p>}
       <div className="mt-3 flex flex-wrap gap-2 text-xs">
         {distanceLabel && <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 admin-tone-text-cyan">🚗 {distanceLabel}</span>}
-        {oneWayLabel && <span className="ch__summary-route-pill">{oneWayLabel}</span>}
-        {liveRoute?.durationText && <span className="ch__summary-route-pill">⏱️ {liveRoute.durationText}</span>}
+        {oneWayLabel && <span className="ap-badge">{oneWayLabel}</span>}
+        {liveRoute?.durationText && <span className="ap-badge">⏱️ {liveRoute.durationText}</span>}
       </div>
       {sourceLabel && <p className="mt-2 text-xs opacity-70">{sourceLabel}</p>}
       {liveRoute?.originResolved && <p className="mt-1 text-xs opacity-60">Base Òrbita: {liveRoute.originResolved}</p>}
@@ -1066,6 +986,18 @@ function buildReactivationTaskHref(
 // CRM STATUS BAR — Lifecycle badge, health score, tags
 // ═══════════════════════════════════════════════════════════════════════════
 
+type CustomerTagMutationPayload = {
+  ok?: boolean;
+  error?: unknown;
+  message?: unknown;
+};
+
+function readCustomerTagMutationError(data: CustomerTagMutationPayload, fallback: string) {
+  if (typeof data.error === 'string' && data.error.trim()) return data.error;
+  if (typeof data.message === 'string' && data.message.trim()) return data.message;
+  return fallback;
+}
+
 function CrmStatusBar({
   customer,
   onTagsChange,
@@ -1076,6 +1008,7 @@ function CrmStatusBar({
   const [addingTag, setAddingTag] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [saving, setSaving] = useState(false);
+  const [tagError, setTagError] = useState('');
 
   const lifecycle = (customer.lifecycleStage || 'NEW') as CustomerLifecycleValue;
   const healthScore = customer.healthScore;
@@ -1084,37 +1017,52 @@ function CrmStatusBar({
   const handleAddTag = useCallback(async (tag: string) => {
     if (!tag.trim()) return;
     setSaving(true);
+    setTagError('');
     try {
-      await fetchWithCsrf(`/api/admin/customers/${customer.id}/tags`, {
+      const res = await fetchWithCsrf(`/api/admin/customers/${customer.id}/tags`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'add', tags: [tag.trim()] }),
       });
+      const data = await res.json().catch(() => ({})) as CustomerTagMutationPayload;
+      if (!res.ok || data.ok === false) {
+        throw new Error(readCustomerTagMutationError(data, "No s'ha pogut afegir el tag"));
+      }
       setNewTag('');
       setAddingTag(false);
       onTagsChange();
-    } catch {
-      console.error('Error afegint tag');
+    } catch (err) {
+      console.error('Error afegint tag', err);
+      setTagError(err instanceof Error ? err.message : "No s'ha pogut afegir el tag");
     } finally {
       setSaving(false);
     }
   }, [customer.id, onTagsChange]);
 
   const handleRemoveTag = useCallback(async (tag: string) => {
+    setSaving(true);
+    setTagError('');
     try {
-      await fetchWithCsrf(`/api/admin/customers/${customer.id}/tags`, {
+      const res = await fetchWithCsrf(`/api/admin/customers/${customer.id}/tags`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'remove', tags: [tag] }),
       });
+      const data = await res.json().catch(() => ({})) as CustomerTagMutationPayload;
+      if (!res.ok || data.ok === false) {
+        throw new Error(readCustomerTagMutationError(data, "No s'ha pogut eliminar el tag"));
+      }
       onTagsChange();
-    } catch {
-      console.error('Error eliminant tag');
+    } catch (err) {
+      console.error('Error eliminant tag', err);
+      setTagError(err instanceof Error ? err.message : "No s'ha pogut eliminar el tag");
+    } finally {
+      setSaving(false);
     }
   }, [customer.id, onTagsChange]);
 
   return (
-    <div className="rounded-2xl border p-4 space-y-3">
+    <div className="ap-card p-4 space-y-3">
       <div className="flex flex-wrap items-center gap-3">
         {/* Lifecycle badge */}
         <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${CUSTOMER_LIFECYCLE_COLORS[lifecycle]}`}>
@@ -1134,19 +1082,22 @@ function CrmStatusBar({
         {customer.referredBy && (
           <a
             href={buildCustomerHubHref(customer.referredBy.id)}
-            className="ch__summary-referral-link"
+            className="inline-flex items-center gap-1 text-xs text-[var(--t3)] no-underline transition-colors hover:text-[var(--t2)]"
           >
-            Referit per: <span>{customer.referredBy.name}</span>
+            Referit per: <span className="font-semibold text-[var(--t2)]">{customer.referredBy.name}</span>
           </a>
         )}
 
         {/* Referrals count */}
         {customer.referrals && customer.referrals.length > 0 && (
-          <span className="ch__summary-referral-count">
+          <span className="text-xs text-[var(--t3)]">
             Ha referit {customer.referrals.length} client{customer.referrals.length > 1 ? 's' : ''}
           </span>
         )}
       </div>
+      {tagError && (
+        <p role="alert" className="rounded-lg border admin-tone-border-danger px-3 py-2 text-xs admin-tone-text-danger">{tagError}</p>
+      )}
 
       {/* Tags */}
       <div className="flex flex-wrap items-center gap-1.5">
@@ -1171,7 +1122,7 @@ function CrmStatusBar({
           <button
             type="button"
             onClick={() => setAddingTag(true)}
-            className="ch__summary-add-tag"
+            className="rounded-full border border-dashed border-[var(--line2)] bg-transparent px-2.5 py-0.5 text-xs text-[var(--t3)] transition-colors hover:border-[var(--o-admin-line-2)] hover:text-[var(--t2)]"
           >
             + tag
           </button>
@@ -1186,7 +1137,7 @@ function CrmStatusBar({
                 if (e.key === 'Escape') { setAddingTag(false); setNewTag(''); }
               }}
               placeholder="Nou tag..."
-              className="ch__summary-tag-input"
+              className="w-24 rounded-[var(--o-r-lg)] border border-[var(--line2)] bg-transparent px-2 py-0.5 text-xs text-[var(--t)] placeholder:text-[var(--t3)] focus:border-[var(--o-admin-hair-gold)] focus:outline-none"
               autoFocus
               disabled={saving}
               list="tag-presets"
@@ -1207,7 +1158,7 @@ function CrmStatusBar({
             <button
               type="button"
               onClick={() => { setAddingTag(false); setNewTag(''); }}
-              className="ch__summary-tag-cancel"
+              className="border-none bg-transparent text-xs text-[var(--t3)] transition-colors hover:text-[var(--t2)]"
             >
               ×
             </button>
@@ -1229,6 +1180,19 @@ type ContactForm = {
 };
 
 const EMPTY_FORM: ContactForm = { name: '', role: '', email: '', phone: '', notes: '', isPrimary: false };
+
+type ContactMutationPayload = {
+  ok?: boolean;
+  contact?: CustomerContactDTO;
+  error?: unknown;
+  message?: unknown;
+};
+
+function readContactMutationError(data: ContactMutationPayload, fallback: string) {
+  if (typeof data.error === 'string' && data.error.trim()) return data.error;
+  if (typeof data.message === 'string' && data.message.trim()) return data.message;
+  return fallback;
+}
 
 function ContactsSection({ customerId, contacts: initialContacts }: { customerId: string; contacts: CustomerContactDTO[] }) {
   const [contacts, setContacts] = useState<CustomerContactDTO[]>(initialContacts);
@@ -1257,8 +1221,8 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, email: form.email || null }),
       });
-      const data = await res.json() as { ok: boolean; contact?: CustomerContactDTO; error?: string };
-      if (!data.ok) { setError(data.error || 'Error'); return; }
+      const data = await res.json().catch(() => ({})) as ContactMutationPayload;
+      if (!res.ok || !data.ok) { setError(readContactMutationError(data, 'Error')); return; }
       if (data.contact) {
         if (editId) {
           setContacts(prev => prev.map(c => c.id === editId ? data.contact! : c));
@@ -1279,12 +1243,18 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
 
   const handleDelete = async (id: string) => {
     setSaving(true);
+    setError('');
     try {
-      await fetchWithCsrf(`/api/admin/customers/${customerId}/contacts/${id}`, { method: 'DELETE' });
+      const res = await fetchWithCsrf(`/api/admin/customers/${customerId}/contacts/${id}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => ({})) as ContactMutationPayload;
+      if (!res.ok || data.ok === false) {
+        throw new Error(readContactMutationError(data, "No s'ha pogut eliminar el contacte"));
+      }
       setContacts(prev => prev.filter(c => c.id !== id));
       if (editId === id) { setEditId(null); setForm(EMPTY_FORM); }
     } catch (err) {
       console.error('[ContactsSection] delete error:', err);
+      setError(err instanceof Error ? err.message : 'Error eliminant contacte');
     } finally {
       setSaving(false);
     }
@@ -1293,7 +1263,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
   const isEditing = adding || editId !== null;
 
   return (
-    <div className="rounded-2xl border p-5">
+    <div className="ap-card p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="ap-h2">Persones de contacte</h2>
         {!isEditing && (
@@ -1310,10 +1280,13 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
       {contacts.length === 0 && !adding && (
         <p className="text-sm opacity-50">Cap contacte addicional registrat.</p>
       )}
+      {error && !isEditing && (
+        <p role="alert" className="mb-3 rounded-lg border admin-tone-border-danger px-3 py-2 text-xs admin-tone-text-danger">{error}</p>
+      )}
 
       <div className="flex flex-col gap-3">
         {contacts.map(c => (
-          <div key={c.id} className="flex items-start justify-between gap-3 rounded-xl border p-3">
+          <div key={c.id} className="flex items-start justify-between gap-3 ap-card p-3">
             <div className="flex flex-col gap-0.5 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-sm">{c.name}</span>
@@ -1333,7 +1306,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
       </div>
 
       {isEditing && (
-        <div className="mt-4 rounded-xl border p-4 flex flex-col gap-3">
+        <div className="mt-4 ap-card p-4 flex flex-col gap-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="contact-name" className="text-xs font-semibold uppercase tracking-wider opacity-60 block mb-1">Nom *</label>
@@ -1368,7 +1341,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
           {error && <p className="text-xs admin-tone-text-danger">{error}</p>}
           <div className="flex gap-2">
             <button type="button" onClick={handleSave} disabled={saving || !form.name.trim()}
-              className="rounded-xl px-4 py-2 text-sm font-semibold border border-[var(--ax-hair-gold)] text-[var(--ax-gold-bright)] disabled:opacity-50">
+              className="ap-btn disabled:opacity-50">
               {saving ? 'Desant...' : editId ? 'Desar canvis' : 'Afegir'}
             </button>
             <button type="button" onClick={() => { setAdding(false); setEditId(null); setForm(EMPTY_FORM); setError(''); }}

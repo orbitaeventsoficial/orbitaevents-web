@@ -3,6 +3,9 @@ import { prisma } from '@/lib/prisma';
 type CronRunStatus = 'ok' | 'error';
 type SettingType = 'STRING' | 'JSON';
 type CronHealth = 'ok' | 'warning' | 'error' | 'unknown';
+type CronStatusDefinition = { prefix: string; maxAgeHours?: number };
+
+const DEFAULT_CRON_MAX_AGE_HOURS = 26;
 
 type CronRunSnapshot = {
   lastRun: string | null;
@@ -29,12 +32,17 @@ function parseCronSummary(raw: string | null): unknown {
   }
 }
 
-function getCronHealth(lastRun: string | null, lastStatus: string | null, now: Date = new Date()): CronHealth {
+function getCronHealth(
+  lastRun: string | null,
+  lastStatus: string | null,
+  now: Date = new Date(),
+  maxAgeHours: number = DEFAULT_CRON_MAX_AGE_HOURS,
+): CronHealth {
   if (!lastRun) return 'unknown';
   if (lastStatus === 'error') return 'error';
 
   const hoursSinceRun = (now.getTime() - new Date(lastRun).getTime()) / (1000 * 60 * 60);
-  return hoursSinceRun <= 26 ? 'ok' : 'warning';
+  return hoursSinceRun <= maxAgeHours ? 'ok' : 'warning';
 }
 
 export async function saveCronRunStatus(input: {
@@ -67,7 +75,7 @@ export async function readCronRunStatus(prefix: string, now?: Date): Promise<Cro
   return snapshot;
 }
 
-export async function readCronRunStatuses<T extends { prefix: string }>(definitions: T[], now: Date = new Date()): Promise<Array<T & CronRunSnapshot>> {
+export async function readCronRunStatuses<T extends CronStatusDefinition>(definitions: T[], now: Date = new Date()): Promise<Array<T & CronRunSnapshot>> {
   if (definitions.length === 0) {
     return [];
   }
@@ -97,7 +105,7 @@ export async function readCronRunStatuses<T extends { prefix: string }>(definiti
       lastStatus,
       lastSummary,
       lastMessage,
-      health: getCronHealth(lastRun, lastStatus, now),
+      health: getCronHealth(lastRun, lastStatus, now, definition.maxAgeHours),
     };
   });
 }

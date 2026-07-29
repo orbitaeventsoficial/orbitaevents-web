@@ -10,4 +10,12 @@ describe('app analytics dataLayer fallback', () => {
     expect(source.match(/Array\.isArray\(window\.dataLayer\)/g)).toHaveLength(2);
     expect(source).not.toContain('if (window.dataLayer)');
   });
+
+  it('does not reintroduce legacy orphan analytics exports', () => {
+    expect(source).not.toContain('export const initAnalytics');
+    expect(source).not.toContain('export const trackCalculatorUse');
+    expect(source).not.toContain('export const trackPackSelection');
+    expect(source).not.toContain('export const trackVideoView');
+    expect(source).toContain('export const trackPublicServiceEvent');
+  });
 });

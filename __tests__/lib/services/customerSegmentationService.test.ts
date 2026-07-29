@@ -26,10 +26,6 @@ import {
   removeCustomerTags,
   setCustomerTags,
   updateCustomerPreferences,
-  querySegment,
-  getLifecycleDistribution,
-  getTopTags,
-  getHealthDistribution,
   recalculateAllCustomers,
 } from '@/lib/services/customerSegmentationService';
 
@@ -338,106 +334,6 @@ describe('updateCustomerPreferences', () => {
       data: { preferences: prefs },
     });
     expect(result.preferences).toEqual(prefs);
-  });
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Segment queries
-// ═══════════════════════════════════════════════════════════════════════════
-
-describe('querySegment', () => {
-  it('filtra per lifecycle stage', async () => {
-    mockPrisma.customer.findMany.mockResolvedValue([]);
-    mockPrisma.customer.count.mockResolvedValue(0);
-
-    await querySegment({ lifecycleStage: 'VIP' });
-    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({ lifecycleStage: 'VIP' }),
-      }),
-    );
-  });
-
-  it('filtra per tag', async () => {
-    mockPrisma.customer.findMany.mockResolvedValue([]);
-    mockPrisma.customer.count.mockResolvedValue(0);
-
-    await querySegment({ tag: 'Corporatiu' });
-    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({ tags: { has: 'Corporatiu' } }),
-      }),
-    );
-  });
-
-  it('filtra per healthScore max', async () => {
-    mockPrisma.customer.findMany.mockResolvedValue([]);
-    mockPrisma.customer.count.mockResolvedValue(0);
-
-    await querySegment({ healthScoreMax: 40 });
-    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({ healthScore: { lte: 40 } }),
-      }),
-    );
-  });
-
-  it('pagina resultats correctament', async () => {
-    mockPrisma.customer.findMany.mockResolvedValue([]);
-    mockPrisma.customer.count.mockResolvedValue(100);
-
-    const result = await querySegment({}, 2, 25);
-    expect(result.page).toBe(2);
-    expect(result.totalPages).toBe(4);
-    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ skip: 25, take: 25 }),
-    );
-  });
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Distribution queries
-// ═══════════════════════════════════════════════════════════════════════════
-
-describe('getLifecycleDistribution', () => {
-  it('retorna comptadors per lifecycle stage', async () => {
-    mockPrisma.customer.groupBy.mockResolvedValue([
-      { lifecycleStage: 'VIP', _count: { id: 5 } },
-      { lifecycleStage: 'NEW', _count: { id: 10 } },
-    ]);
-
-    const result = await getLifecycleDistribution();
-    expect(result).toEqual({ VIP: 5, NEW: 10 });
-  });
-});
-
-describe('getTopTags', () => {
-  it('retorna tags amb comptadors', async () => {
-    mockPrisma.$queryRaw.mockResolvedValue([
-      { tag: 'VIP', count: BigInt(15) },
-      { tag: 'Corporatiu', count: BigInt(8) },
-    ]);
-
-    const result = await getTopTags(10);
-    expect(result).toEqual([
-      { tag: 'VIP', count: 15 },
-      { tag: 'Corporatiu', count: 8 },
-    ]);
-  });
-});
-
-describe('getHealthDistribution', () => {
-  it('retorna distribució per buckets', async () => {
-    mockPrisma.$queryRaw.mockResolvedValue([
-      { bucket: 'EXCELLENT', count: BigInt(20) },
-      { bucket: 'AT_RISK', count: BigInt(5) },
-    ]);
-
-    const result = await getHealthDistribution();
-    expect(result).toEqual([
-      { bucket: 'EXCELLENT', count: 20 },
-      { bucket: 'AT_RISK', count: 5 },
-    ]);
   });
 });
 

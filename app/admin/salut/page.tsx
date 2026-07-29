@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import { ADMIN_SALUT_HELP, helpAttrs } from '../components/adminHelpContent';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { AdminEmptyState, AdminKpi, AdminKpiRow, AdminPage, AdminSection } from '../components/AdminPage';
 import { formatDateTimeFull } from '@/lib/constants';
 import {
@@ -168,8 +167,8 @@ function renderFilterChip(label: string, href: string, active: boolean) {
       href={href}
       className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
         active
-          ? 'border-white/25 bg-white/12 text-white'
-          : 'border-white/10 bg-white/5 text-white/65 hover:bg-white/10 hover:text-white/85'
+          ? 'border-[var(--line)] bg-[var(--raised)] text-[var(--t)]'
+          : 'border-[var(--line)] bg-[var(--raised)] text-[var(--t2)] hover:bg-[var(--raised)] hover:text-[var(--t2)]'
       }`}
     >
       {label}
@@ -204,32 +203,32 @@ function renderHealthCard(item: AdminHealthItem, sectionLabel: string) {
   return (
     <article
       key={item.id}
-      className={`rounded-2xl border p-4 admin-card-glass ${STATUS_TONE[item.status]}`}
+      className={`ap-card p-4 ${STATUS_TONE[item.status]}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className={`inline-block h-2.5 w-2.5 rounded-full ${STATUS_DOT[item.status]}`} />
-            <p className="text-xs font-semibold uppercase tracking-wide text-white/55">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">
               {STATUS_LABEL[item.status]}
             </p>
           </div>
-          <h3 className="text-base font-semibold text-white/90">{item.title}</h3>
+          <h3 className="text-base font-semibold text-[var(--t)]">{item.title}</h3>
         </div>
         {typeof item.count === 'number' ? (
-          <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs font-medium text-white/70">
+          <span className="ap-badge">
             {item.count}
           </span>
         ) : null}
       </div>
 
-      <div className="mt-4 space-y-3 text-sm text-white/72">
+      <div className="mt-4 space-y-3 text-sm text-[var(--t2)]">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Què passa</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">Què passa</p>
           <p>{item.reason}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Per què importa</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">Per què importa</p>
           <p>{item.impact}</p>
         </div>
       </div>
@@ -238,7 +237,7 @@ function renderHealthCard(item: AdminHealthItem, sectionLabel: string) {
         <Link href={item.href} className="ap-btn ap-btn--secondary text-sm">
           {item.actionLabel}
         </Link>
-        <span className="text-xs text-white/45">{sectionLabel}</span>
+        <span className="text-xs text-[var(--t3)]">{sectionLabel}</span>
       </div>
     </article>
   );
@@ -278,38 +277,6 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
   const hasActiveFilters = activeStatus !== 'all' || activeFocus !== 'all';
   const priorityItems = buildPriorityItems(filteredSections);
   const summary = hasActiveFilters ? filteredSummary : snapshot.summary;
-  const systemItems = [
-    `${summary.ok} blocs estan correctes segons l'últim càlcul`,
-    summary.warning > 0 ? `${summary.warning} punts estan en ambre i convé revisar-los abans que creixin` : '',
-    summary.critical > 0 ? `${summary.critical} incidències crítiques poden tocar operativa, diners o qualitat` : '',
-    `Últim càlcul registrat a ${formatDateTimeFull(snapshot.generatedAt)}`,
-  ].filter(Boolean);
-  const manualItems = [
-    priorityItems[0] ? `${priorityItems[0].item.title}: ${priorityItems[0].item.impact}` : '',
-    priorityItems[1] ? `${priorityItems[1].item.title}: ${priorityItems[1].item.impact}` : '',
-    priorityItems[2] ? `${priorityItems[2].item.title}: ${priorityItems[2].item.impact}` : '',
-    priorityItems.length === 0 ? 'No hi ha focus manual urgent ara mateix. Pots usar la pantalla per control preventiu.' : '',
-  ].filter(Boolean);
-  const nextStep =
-    priorityItems[0]
-      ? {
-          title: `Atacar primer ${priorityItems[0].item.title}`,
-          detail: `${priorityItems[0].item.impact} El primer tall no és llegir-ho tot, sinó obrir directament el bloc que aquest senyal ja marca com a prioritari.`,
-          href: priorityItems[0].item.href,
-          ctaLabel: priorityItems[0].item.actionLabel,
-          secondaryAction: priorityItems[1]
-            ? { href: priorityItems[1].item.href, label: priorityItems[1].item.actionLabel }
-            : undefined,
-        }
-      : {
-          title: 'Mantenir control preventiu, no apagar focs',
-          detail: 'Ara mateix no hi ha un focus crític clar. El millor següent pas és mantenir observació i usar els filtres per revisar àrees sensibles abans que es degradin.',
-          href: activeStatus !== 'all' || activeFocus !== 'all' ? '/admin/salut' : '/admin/crons',
-          ctaLabel: activeStatus !== 'all' || activeFocus !== 'all' ? 'Veure salut completa' : 'Obrir Crons',
-          secondaryAction: activeStatus !== 'all' || activeFocus !== 'all'
-            ? { href: '/admin/crons', label: 'Obrir Crons' }
-            : undefined,
-        };
 
   return (
     <AdminPage
@@ -343,32 +310,11 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
         ]}
       />
 
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què vigila el sistema',
-          tone: summary.critical > 0 ? 'warning' : 'info',
-          items: systemItems,
-          emptyText: 'Sense senyals rellevants de salut ara mateix.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: priorityItems.length > 0 ? 'warning' : 'success',
-          items: manualItems,
-          emptyText: 'Sense focus manual urgent ara mateix.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          ...nextStep,
-        }}
-      />
-
-      <section className="rounded-2xl border border-white/10 p-4 admin-card-glass" {...helpAttrs(ADMIN_SALUT_HELP.filters)}>
+      <section className="ap-card p-4" {...helpAttrs(ADMIN_SALUT_HELP.filters)}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-sm font-semibold text-white/85">Filtra el que vols veure</p>
-            <p className="mt-1 text-sm text-white/60">Pots quedar-te només amb crítics o anar directe a inventari, packs, extres, reserves o tasques.</p>
+            <p className="text-sm font-semibold text-[var(--t2)]">Filtra el que vols veure</p>
+            <p className="mt-1 text-sm text-[var(--t2)]">Pots quedar-te només amb crítics o anar directe a inventari, packs, extres, reserves o tasques.</p>
           </div>
           {hasActiveFilters ? (
             <Link href="/admin/salut" className="ap-btn ap-btn--secondary text-sm">
@@ -378,13 +324,13 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
         </div>
         <div className="mt-4 space-y-3">
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/45">Estat</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">Estat</p>
             <div className="flex flex-wrap gap-2">
               {ADMIN_SALUT_STATUS_FILTER_OPTIONS.map((option) => renderFilterChip(option.label, buildFilterHref(option.id, activeFocus), activeStatus === option.id))}
             </div>
           </div>
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/45">Focus</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">Focus</p>
             <div className="flex flex-wrap gap-2">
               {ADMIN_SALUT_FOCUS_FILTER_OPTIONS.map((option) => renderFilterChip(option.label, buildFilterHref(activeStatus, option.id), activeFocus === option.id))}
             </div>
@@ -393,29 +339,29 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
       </section>
 
       {priorityItems.length > 0 ? (
-        <section className="rounded-2xl border border-white/10 p-4 admin-card-glass" {...helpAttrs(ADMIN_SALUT_HELP.priorities)}>
+        <section className="ap-card p-4" {...helpAttrs(ADMIN_SALUT_HELP.priorities)}>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Prioritat d’avui</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">Prioritat d’avui</p>
               <h2 className="ap-h2">Què convé atacar primer</h2>
-              <p className="mt-1 text-sm text-white/60">Lectura curta perquè no hagis d’escanejar tota la pantalla abans de decidir.</p>
+              <p className="mt-1 text-sm text-[var(--t2)]">Lectura curta perquè no hagis d’escanejar tota la pantalla abans de decidir.</p>
             </div>
-            <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-white/60">{priorityItems.length} focus</span>
+            <span className="ap-badge">{priorityItems.length} focus</span>
           </div>
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
             {priorityItems.map(({ item, sectionLabel, groupLabel }) => (
-              <article key={item.id} className={`rounded-2xl border p-4 ${STATUS_TONE[item.status]}`}>
+              <article key={item.id} className={`ap-card p-4 ${STATUS_TONE[item.status]}`}>
                 <div className="flex items-center gap-2">
                   <span className={`inline-block h-2.5 w-2.5 rounded-full ${STATUS_DOT[item.status]}`} />
-                  <p className="text-xs font-semibold uppercase tracking-wide text-white/55">{STATUS_LABEL[item.status]}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">{STATUS_LABEL[item.status]}</p>
                 </div>
-                <p className="mt-3 text-base font-semibold text-white/90">{item.title}</p>
-                <p className="mt-2 text-sm text-white/68">{item.impact}</p>
-                <p className="mt-3 text-xs text-white/45">{sectionLabel} · {groupLabel}</p>
+                <p className="mt-3 text-base font-semibold text-[var(--t)]">{item.title}</p>
+                <p className="mt-2 text-sm text-[var(--t2)]">{item.impact}</p>
+                <p className="mt-3 text-xs text-[var(--t3)]">{sectionLabel} · {groupLabel}</p>
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <Link href={item.href} className="ap-btn ap-btn--secondary text-sm">{item.actionLabel}</Link>
                   {typeof item.count === 'number' ? (
-                    <span className="rounded-full border border-white/10 px-2 py-1 text-xs text-white/65">{item.count}</span>
+                    <span className="ap-badge">{item.count}</span>
                   ) : null}
                 </div>
               </article>
@@ -443,7 +389,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
               title={section.label}
               description={section.description}
               actions={(
-                <div className="flex flex-wrap gap-2 text-xs text-white/60">
+                <div className="flex flex-wrap gap-2 text-xs text-[var(--t2)]">
                   <span>{section.counts.critical} crítics</span>
                   <span>{section.counts.warning} per revisar</span>
                   <span>{section.counts.ok} correctes</span>
@@ -453,14 +399,14 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
               {hasSubgroups ? (
                 <div className="space-y-4">
                   {groups.map((group) => (
-                    <section key={group.id} className="rounded-2xl border border-white/10 p-4 admin-card-glass">
+                    <section key={group.id} className="ap-card p-4">
                       <div className="mb-4 flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-white/45">{section.label}</p>
-                          <h3 className="text-base font-semibold text-white/90">{group.label}</h3>
-                          <p className="mt-1 text-sm text-white/60">{group.description}</p>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">{section.label}</p>
+                          <h3 className="text-base font-semibold text-[var(--t)]">{group.label}</h3>
+                          <p className="mt-1 text-sm text-[var(--t2)]">{group.description}</p>
                         </div>
-                        <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-white/60">
+                        <span className="ap-badge">
                           {group.items.length}
                         </span>
                       </div>

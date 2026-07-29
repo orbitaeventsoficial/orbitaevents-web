@@ -54,22 +54,22 @@ export default function BookingFieldNotesComposer({ bookingId }: { bookingId: st
   };
 
   return (
-    <section className="bd__fieldnotes">
-      <div className="bd__fieldnotes-head">
+    <section className="grid grid-cols-1 items-end gap-3 rounded-[var(--o-r-lg)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-1)] p-3 sm:grid-cols-[1fr_1.5fr_auto]">
+      <div className="flex flex-col gap-0.5">
         <div>
-          <p className="bd__fieldnotes-kicker">Field notes</p>
-          <h3 className="bd__fieldnotes-title">Foto + nota de bolo</h3>
+          <p className="m-0 mb-1 font-mono text-xs font-extrabold uppercase tracking-[0.08em] text-[var(--t3)]">Field notes</p>
+          <h3 className="m-0 text-base font-bold text-[var(--t)]">Foto + nota de bolo</h3>
         </div>
       </div>
 
-      <label className="bd__fieldnotes-label">
-        <span>Nota curta</span>
+      <label className="block min-w-0">
+        <span className="m-0 mb-1 block font-mono text-xs font-extrabold uppercase tracking-[0.08em] text-[var(--t3)]">Nota curta</span>
         <textarea
           value={note}
           onChange={(event) => setNote(event.target.value)}
           rows={2}
           placeholder="Muntatge llest, canvi d'entrada, focus extra..."
-          className="bd__fieldnotes-textarea"
+          className="adm-input adm-input--textarea w-full"
         />
       </label>
 
@@ -82,19 +82,20 @@ export default function BookingFieldNotesComposer({ bookingId }: { bookingId: st
         onChange={handleFileChange}
       />
 
-      <div className="bd__fieldnotes-actions">
+      <div className="flex justify-end">
         <button
           type="button"
           onClick={handlePickPhoto}
           disabled={sending}
-          className="bd__btn bd__btn--gold"
+          aria-invalid={error ? true : undefined}
+          className="ap-btn ap-btn--primary ap-btn--xs"
         >
           {sending ? 'Guardant...' : '+ Foto'}
         </button>
       </div>
 
-      {error && <p className="bd__fieldnotes-alert bd__fieldnotes-alert--err">{error}</p>}
-      {success && <p className="bd__fieldnotes-alert bd__fieldnotes-alert--ok">{success}</p>}
+      {error && <p role="alert" className="col-span-full m-0 rounded-[var(--o-r-md)] border border-[var(--ax-danger-border)] px-2.5 py-1.5 text-xs font-bold text-[var(--o-danger)]">{error}</p>}
+      {success && <p role="status" className="col-span-full m-0 rounded-[var(--o-r-md)] border border-[var(--ax-success-border)] px-2.5 py-1.5 text-xs font-bold text-[var(--o-success)]">{success}</p>}
     </section>
   );
 }

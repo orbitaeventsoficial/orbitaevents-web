@@ -277,8 +277,3 @@ export const openAPISchema = {
     },
   },
 };
-
-// Export as JSON for external tools
-export function getOpenAPIJSON(): string {
-  return JSON.stringify(openAPISchema, null, 2);
-}

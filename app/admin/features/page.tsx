@@ -1,9 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import {
+  CalendarDays,
+  FileText,
+  Gift,
+  MessageCircle,
+  SlidersHorizontal,
+  Star,
+  type LucideIcon,
+} from 'lucide-react';
 import { log } from '@/lib/logger';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -13,6 +21,28 @@ interface Feature {
   description: string;
   icon: string;
   enabled: boolean;
+}
+
+const FEATURE_ICON_MAP: Record<string, LucideIcon> = {
+  star: Star,
+  calendar: CalendarDays,
+  gift: Gift,
+  chat: MessageCircle,
+  note: FileText,
+  controls: SlidersHorizontal,
+};
+
+function FeatureIcon({ icon }: { icon: string }) {
+  const Icon = FEATURE_ICON_MAP[icon] ?? SlidersHorizontal;
+  return (
+    <span
+      aria-hidden="true"
+      data-feature-icon={icon}
+      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--raised)]"
+    >
+      <Icon className="h-5 w-5" strokeWidth={1.8} />
+    </span>
+  );
 }
 
 export default function FeaturesPage() {
@@ -100,83 +130,27 @@ export default function FeaturesPage() {
   }
 
   const activeCount = features.filter(f => f.enabled).length;
-  const inactiveCount = features.length - activeCount;
-  const firstDisabled = features.find((feature) => !feature.enabled);
-  const firstEnabled = features.find((feature) => feature.enabled);
-  const systemItems = [
-    `${features.length} funcionalitats governades des d'aquest panell`,
-    `${activeCount} actives i ${inactiveCount} desactivades ara mateix`,
-    firstEnabled ? `La primera funcionalitat activa visible és ${firstEnabled.label}` : '',
-    saving ? `Canvi en curs sobre ${features.find((feature) => feature.key === saving)?.label || saving}` : '',
-  ].filter(Boolean);
-  const manualItems = [
-    inactiveCount > 0 ? `${inactiveCount} ${inactiveCount === 1 ? 'funcionalitat desactivada' : 'funcionalitats desactivades'} demanen criteri de producte` : '',
-    firstDisabled ? `La següent peça desactivada és ${firstDisabled.label}` : '',
-    saving ? 'Hi ha una mutació en curs; convé esperar abans d’encadenar més canvis' : '',
-  ].filter(Boolean);
-  const nextStep =
-    saving
-      ? {
-          title: 'Deixar acabar el canvi abans de tocar res més',
-          detail: 'Hi ha una funcionalitat canviant d’estat ara mateix. El primer pas és deixar tancar la mutació abans d’engegar una segona decisió de producte.',
-          href: '/admin/features',
-          ctaLabel: 'Esperar i revisar',
-        }
-      : firstDisabled
-        ? {
-            title: `Decidir si ${firstDisabled.label} ha d’entrar ja`,
-            detail: `El panell no mostra un incendi tècnic; el següent pas útil és revisar la primera funcionalitat apagada i confirmar si continua sent una decisió vàlida de producte.`,
-            href: '/admin/features',
-            ctaLabel: 'Revisar funcionalitats',
-          }
-        : {
-            title: 'Mantenir el catàleg estable, no canviar per inèrcia',
-            detail: 'Tot el catàleg visible està actiu. Si no hi ha una decisió de negoci clara, el millor següent pas és mantenir estabilitat.',
-            href: '/admin',
-            ctaLabel: 'Tornar al panell',
-          };
 
   return (
     <AdminPage title="Funcionalitats" subtitle="Activa o desactiva funcionalitats del web">
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què governa aquest catàleg',
-          tone: inactiveCount > 0 ? 'warning' : 'info',
-          items: systemItems,
-          emptyText: 'Sense senyals rellevants al catàleg de funcionalitats.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal decidir',
-          tone: manualItems.length > 0 ? 'warning' : 'success',
-          items: manualItems,
-          emptyText: 'Cap decisió manual urgent visible ara mateix.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          ...nextStep,
-        }}
-      />
-
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <div className="text-xs font-medium uppercase">Total funcionalitats</div>
           <div className="text-3xl font-bold mt-2">{features.length}</div>
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <div className="text-xs font-medium uppercase">Actives</div>
           <div className="text-3xl font-bold mt-2">{activeCount}</div>
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
               <div className="text-xs font-medium uppercase">Desactivades</div>
           <div className="text-3xl font-bold mt-2">{features.length - activeCount}</div>
         </div>
       </div>
 
       {/* Features List */}
-      <div className="rounded-2xl border admin-card-glass p-6">
+      <div className="ap-card p-6">
         <h2 className="ap-h2 mb-4">Funcionalitats</h2>
         <div className="space-y-3">
           {features.map((feature) => (
@@ -185,7 +159,7 @@ export default function FeaturesPage() {
               className="border rounded-xl p-4 flex items-center justify-between"
             >
               <div className="flex items-start gap-3 flex-1">
-                <span className="text-2xl">{feature.icon}</span>
+                <FeatureIcon icon={feature.icon} />
                 <div className="flex-1">
                   <h3 className="font-medium">{feature.label}</h3>
                   <p className="text-sm mt-0.5">{feature.description}</p>
@@ -218,5 +192,4 @@ export default function FeaturesPage() {
     </AdminPage>
   );
 }
-
 

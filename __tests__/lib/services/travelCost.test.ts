@@ -32,7 +32,6 @@ import {
   calculateBillableTravelKm,
   calculateTravelBlocks,
   calculateTravelCost,
-  calculateTravelCharge,
   getIncludedTravelOneWayKm,
   DEFAULT_VEHICLE_COST_PER_KM,
   INCLUDED_TRAVEL_KM,
@@ -162,31 +161,9 @@ describe('travelCost', () => {
     });
   });
 
-  // ─── calculateTravelCharge ──────────────────────────────────────────────────
-  // El que es COBRA AL CLIENT per desplaçament.
-  // Depèn dels trams (blocs de 20 km) × preu per tram (10 €).
-
-  describe('calculateTravelCharge', () => {
-    it('50 km → 0 € (tot inclòs, no es cobra res)', () => {
-      expect(calculateTravelCharge(50)).toBe(0);
-    });
-
-    it('70 km → 10 € (1 tram × 10 €)', () => {
-      expect(calculateTravelCharge(70)).toBe(10);
-    });
-
-    it('71 km → 20 € (2 trams × 10 €, perquè el 2n tram ja s\'ha iniciat)', () => {
-      expect(calculateTravelCharge(71)).toBe(20);
-    });
-
-    it('91 km → 30 € (3 trams × 10 €)', () => {
-      expect(calculateTravelCharge(91)).toBe(30);
-    });
-
-    it('0 km → 0 € (sense viatge)', () => {
-      expect(calculateTravelCharge(0)).toBe(0);
-    });
-  });
+  // `calculateTravelCharge` (fórmula de trams) ELIMINADA (#1369): el càrrec al client
+  // és ara font única a `computeBoloTransport` (cost real de dues potes). Vegeu
+  // travelLaborCost.test.ts. Aquí només queden els helpers de km informatius.
 
   // ─── getIncludedTravelOneWayKm ──────────────────────────────────────────────
   // Calcula quants km d'anada estan inclosos (la meitat del total inclòs).
@@ -209,8 +186,8 @@ describe('travelCost', () => {
       expect(INCLUDED_TRAVEL_KM).toBe(50);
     });
 
-    it('el cost vehicle per defecte és 0.19 €/km', () => {
-      expect(DEFAULT_VEHICLE_COST_PER_KM).toBe(0.19);
+    it('el cost vehicle per defecte és 0.26 €/km (barem IRPF vigent, #1369)', () => {
+      expect(DEFAULT_VEHICLE_COST_PER_KM).toBe(0.26);
     });
 
     it('un tram és de 20 km', () => {

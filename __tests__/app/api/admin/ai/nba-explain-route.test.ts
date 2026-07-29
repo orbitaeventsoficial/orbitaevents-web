@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockRequireAuth, mockLoadNBA, mockExplain } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
@@ -10,6 +10,7 @@ const { mockRequireAuth, mockLoadNBA, mockExplain } = vi.hoisted(() => ({
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
 vi.mock('@/lib/services/nextBestActionService', () => ({ loadNextBestActions: mockLoadNBA }));
 vi.mock('@/lib/services/nbaAiExplainService', () => ({ generateNBAExplanation: mockExplain }));
+vi.mock('@/lib/logger', () => ({ log: { error: vi.fn() } }));
 
 import { GET } from '@/app/api/admin/ai/nba-explain/route';
 
@@ -26,8 +27,16 @@ function makeReq() {
 }
 
 describe('GET /api/admin/ai/nba-explain', () => {
+  const prevAiEnabled = process.env.ADMIN_AI_ENABLED;
+
+  afterEach(() => {
+    if (prevAiEnabled === undefined) delete process.env.ADMIN_AI_ENABLED;
+    else process.env.ADMIN_AI_ENABLED = prevAiEnabled;
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.ADMIN_AI_ENABLED = '1';
     mockRequireAuth.mockReturnValue(null);
     mockLoadNBA.mockResolvedValue({
       actions: Array.from({ length: 3 }, (_, i) => ({ ...baseAction, id: `a${i}`, rank: i + 1 })),
@@ -40,6 +49,22 @@ describe('GET /api/admin/ai/nba-explain', () => {
     const res = await GET(makeReq());
     expect(res.status).toBe(401);
     expect(mockLoadNBA).not.toHaveBeenCalled();
+  });
+
+  it('no crida serveis IA si no hi ha opt-in explícit', async () => {
+    delete process.env.ADMIN_AI_ENABLED;
+
+    const res = await GET(makeReq());
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body).toEqual({
+      explanation: '',
+      actions: [],
+      generatedAt: expect.any(String),
+    });
+    expect(mockLoadNBA).not.toHaveBeenCalled();
+    expect(mockExplain).not.toHaveBeenCalled();
   });
 
   it('retorna explicació i top 3 accions', async () => {
@@ -67,5 +92,33 @@ describe('GET /api/admin/ai/nba-explain', () => {
     const body = await res.json();
     expect(body.explanation).toBe('');
     expect(res.status).toBe(200);
+  });
+
+  it('degrada a resposta buida si el motor NBA falla', async () => {
+    mockLoadNBA.mockRejectedValue(new Error('nba down'));
+
+    const res = await GET(makeReq());
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body).toEqual({
+      explanation: '',
+      actions: [],
+      generatedAt: expect.any(String),
+    });
+  });
+
+  it('degrada a resposta buida si el builder IA falla inesperadament', async () => {
+    mockExplain.mockRejectedValue(new Error('ai down'));
+
+    const res = await GET(makeReq());
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body).toEqual({
+      explanation: '',
+      actions: [],
+      generatedAt: expect.any(String),
+    });
   });
 });

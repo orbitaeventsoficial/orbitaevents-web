@@ -1,14 +1,17 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockSendPostEvent } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockSendPostEvent } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockSendPostEvent: vi.fn(),
 }));
 
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
 vi.mock('@/lib/services/postEventDispatchService', () => ({ sendPostEventEmailForBooking: mockSendPostEvent }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn() } }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { POST } from '@/app/api/admin/emails/send-post-event/route';
 
@@ -19,7 +22,7 @@ function makeReq(bookingId?: string) {
 }
 
 describe('POST /api/admin/emails/send-post-event', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockSendPostEvent.mockResolvedValue({ status: 'sent', email: 'a@b.cat', reference: 'ref-1' }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockSendPostEvent.mockResolvedValue({ status: 'sent', email: 'a@b.cat', reference: 'ref-1' }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));

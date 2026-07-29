@@ -1,12 +1,11 @@
 // app/admin/analytics/page.tsx
 import Link from 'next/link';
-import { DEFAULT_LOCALE, formatCurrency, formatNumber, getEventTypeDisplay, getLeadStatusAnalyticsDisplay, getSourceDisplay } from '@/lib/constants';
+import { formatNumber, getEventTypeDisplay, getLeadStatusAnalyticsDisplay, getSourceDisplay } from '@/lib/constants';
 import { getGa4ConfigStatus, getGa4Report } from '@/lib/analytics/ga4';
 import { getGoogleAdsConfigStatus, getGoogleAdsReport } from '@/lib/analytics/google-ads';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import InfoTooltip from '../components/InfoTooltip';
 import { ADMIN_ANALYTICS_HELP } from '../components/adminHelpContent';
 
@@ -167,7 +166,10 @@ export default async function AnalyticsPage() {
     pageViews: pctDelta(ga4.totals.pageViews, ga4.previousTotals.pageViews) ?? 0,
     events: pctDelta(ga4.totals.eventCount, ga4.previousTotals.eventCount) ?? 0,
   } : null;
-  const ga4SeriesMax = ga4 ? Math.max(1, ...ga4.timeseries.map((row) => Math.max(row.sessions, row.activeUsers))) : 1;
+  const ga4TrendActiveDays = ga4 ? ga4.timeseries.filter((row) => row.sessions > 0 || row.activeUsers > 0).length : 0;
+  const ga4TrendPeakSessions = ga4 ? Math.max(0, ...ga4.timeseries.map((row) => row.sessions)) : 0;
+  const ga4TrendPeakUsers = ga4 ? Math.max(0, ...ga4.timeseries.map((row) => row.activeUsers)) : 0;
+  const hasGa4TrendData = ga4TrendActiveDays > 0;
   const adsCost = (googleAds?.totals.costMicros || 0) / 1_000_000;
   const adsPrevCost = (googleAds?.previousTotals.costMicros || 0) / 1_000_000;
   const adsCurrency = googleAds?.currencyCode || 'EUR';
@@ -192,65 +194,6 @@ export default async function AnalyticsPage() {
         </div>
       }
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema al panell de rendiment',
-          tone: ga4Ready || googleAdsStatus.ready ? 'info' : 'warning',
-          items: [
-            `${data.leads.thisYear} entrades i ${data.bookings.thisYear} reserves aquest any.`,
-            `${formatNumber(data.revenue.thisYear)}€ facturats enguany amb tiquet mitjà de ${formatNumber(data.revenue.avgBooking, { maximumFractionDigits: 0 })}€.`,
-            ga4Ready
-              ? `GA4 està ${ga4 ? 'carregant dades reals' : 'configurat però sense lectura estable ara mateix'}.`
-              : 'GA4 encara no està configurat correctament.',
-          ],
-          emptyText: 'Sense fonts connectades no hi ha lectura automàtica del rendiment.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: !ga4Ready || !googleAdsStatus.ready || Boolean(ga4Error || googleAdsError) ? 'warning' : 'success',
-          items: [
-            ops.avgFirstContactHours > 24
-              ? `El primer contacte mitjà és de ${Math.max(0, Math.round(ops.avgFirstContactHours))}h i demana tensió comercial.`
-              : `El primer contacte mitjà està controlat a ${Math.max(0, Math.round(ops.avgFirstContactHours))}h.`,
-            ga4Error
-              ? `GA4 està fallant: ${ga4Error}`
-              : !ga4Ready
-                ? 'Cal regularitzar la configuració de GA4.'
-                : 'GA4 no mostra incidència crítica al primer nivell.',
-            googleAdsError
-              ? `Google Ads està fallant: ${googleAdsError}`
-              : !googleAdsStatus.ready
-                ? 'Google Ads encara té configuració pendent.'
-                : 'Google Ads no mostra incidència crítica al primer nivell.',
-          ],
-          emptyText: 'No hi ha coll manual evident al primer nivell.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          title: !ga4Ready
-            ? 'Connectar i estabilitzar GA4'
-            : !googleAdsStatus.ready
-              ? 'Regularitzar la capa de Google Ads'
-              : ops.conversionToQuotePct < 30
-                ? 'Atacar la conversió d’entrada a pressupost'
-                : 'Fer servir el panell per seguir el rendiment setmanal',
-          detail: !ga4Ready
-            ? 'Sense GA4 estable, el panell encara no pot donar lectura completa de trànsit i comportament.'
-            : !googleAdsStatus.ready
-              ? 'Amb GA4 operatiu, el següent buit clar és la capa de paid media.'
-              : ops.conversionToQuotePct < 30
-                ? 'Les mètriques apunten més retorn en millorar l’embut comercial que no pas en afegir més dashboards.'
-                : 'La base d’analítica ja permet governar creixement, qualitat i trànsit sense sortir del panell.',
-          href: !ga4Ready ? '#google-ads' : '/admin/analytics',
-          ctaLabel: !ga4Ready ? 'Veure integracions analytics' : 'Revisar rendiment',
-          secondaryAction: !ga4Ready || !googleAdsStatus.ready
-            ? { href: '/admin/settings/integrations', label: 'Obrir integracions' }
-            : undefined,
-        }}
-      />
-
       <section className="ap-card rounded-2xl p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -297,32 +240,55 @@ export default async function AnalyticsPage() {
           </div>
         )}
 
-        {ga4 && ga4.timeseries.length > 0 && (
+        {ga4 && (
           <div className="mt-4 ap-card rounded-2xl p-4">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-sm font-semibold">Tendència 30 dies</p>
-              <p className="text-xs admin-tone-text-neutral">Sessions · Usuaris</p>
+              <p className="text-xs admin-tone-text-neutral">30 dies · Activitat GA4</p>
             </div>
-            <div className="flex h-28 items-end gap-1">
-              {ga4.timeseries.map((row) => {
-                const sessionsH = Math.max(3, Math.round((row.sessions / ga4SeriesMax) * 100));
-                const usersH = Math.max(3, Math.round((row.activeUsers / ga4SeriesMax) * 100));
-                return (
-                  <div key={row.date} className="flex flex-1 items-end gap-[2px]">
-                    <div className="w-1.5 rounded-sm admin-tone-bg-info" style={{ height: `${sessionsH}%` }} />
-                    <div className="w-1.5 rounded-sm admin-tone-bg-warning" style={{ height: `${usersH}%` }} />
+            {hasGa4TrendData ? (
+              <>
+                <div className="mb-3 grid gap-2 sm:grid-cols-3">
+                  <div className="rounded-xl border px-3 py-2 admin-tone-border-neutral admin-tone-bg-neutral">
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide admin-tone-text-neutral">Dies actius</p>
+                    <p className="mt-1 text-lg font-semibold">{ga4TrendActiveDays}</p>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="rounded-xl border px-3 py-2 admin-tone-border-success admin-tone-bg-success">
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide admin-tone-text-neutral">Pic sessions</p>
+                    <p className="mt-1 text-lg font-semibold admin-tone-text-success">{ga4TrendPeakSessions}</p>
+                  </div>
+                  <div className="rounded-xl border px-3 py-2 admin-tone-border-warning admin-tone-bg-warning">
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide admin-tone-text-neutral">Pic usuaris</p>
+                    <p className="mt-1 text-lg font-semibold admin-tone-text-warning">{ga4TrendPeakUsers}</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex h-3 gap-1" aria-label="Dies amb activitat GA4">
+                  {ga4.timeseries.map((row) => {
+                    const active = row.sessions > 0 || row.activeUsers > 0;
+                    return (
+                      <span
+                        key={row.date}
+                        className={`min-w-[3px] flex-1 rounded-sm ${active ? 'admin-tone-bg-success' : 'admin-tone-bg-neutral'}`}
+                        aria-label={`${row.date}: ${row.sessions} sessions, ${row.activeUsers} usuaris`}
+                      />
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="flex min-h-20 flex-col items-center justify-center rounded-xl border border-dashed px-4 py-6 text-center admin-tone-border-neutral admin-tone-bg-neutral" role="status">
+                <p className="text-sm font-semibold">Sense tendència útil encara</p>
+                <p className="mt-1 max-w-md text-xs admin-tone-text-neutral">GA4 està connectat, però aquests 30 dies no tenen sessions ni usuaris suficients per dibuixar una evolució llegible.</p>
+              </div>
+            )}
           </div>
         )}
 
         {ga4 && (
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
-            <div className="ap-card rounded-2xl p-0"><div className="border-b px-4 py-3 text-sm font-semibold admin-tone-border-neutral">Pàgines principals</div><div className="space-y-2 p-4 text-sm">{ga4.pages.map((row) => <div key={row.dimension} className="flex items-center justify-between"><span className="truncate">{row.dimension}</span><span>{row.value}</span></div>)}</div></div>
-            <div className="ap-card rounded-2xl p-0"><div className="border-b px-4 py-3 text-sm font-semibold admin-tone-border-neutral">Fonts</div><div className="space-y-2 p-4 text-sm">{ga4.sources.map((row) => <div key={row.dimension} className="flex items-center justify-between"><span className="truncate">{row.dimension}</span><span>{row.value}</span></div>)}</div></div>
-            <div className="ap-card rounded-2xl p-0"><div className="border-b px-4 py-3 text-sm font-semibold admin-tone-border-neutral">Temps real (top)</div><div className="space-y-2 p-4 text-sm"><div className="flex items-center justify-between"><span>Actius ara</span><span>{ga4.realtime.activeUsers}</span></div>{ga4.realtime.pages.map((row) => <div key={row.dimension} className="flex items-center justify-between"><span className="truncate">{row.dimension}</span><span>{row.value}</span></div>)}{ga4.realtimeFallback && <p className="pt-2 text-xs admin-tone-text-neutral">Temps real parcial: només usuaris actius disponibles.</p>}</div></div>
+            <div className="ap-card rounded-2xl p-0"><div className="border-b px-4 py-3 text-sm font-semibold admin-tone-border-neutral">Pàgines principals</div><div className="space-y-2 p-4 text-sm">{ga4.pages.map((row, index) => <div key={`${row.dimension}-${index}`} className="flex items-center justify-between"><span className="truncate">{row.dimension}</span><span>{row.value}</span></div>)}</div></div>
+            <div className="ap-card rounded-2xl p-0"><div className="border-b px-4 py-3 text-sm font-semibold admin-tone-border-neutral">Fonts</div><div className="space-y-2 p-4 text-sm">{ga4.sources.map((row, index) => <div key={`${row.dimension}-${index}`} className="flex items-center justify-between"><span className="truncate">{row.dimension}</span><span>{row.value}</span></div>)}</div></div>
+            <div className="ap-card rounded-2xl p-0"><div className="border-b px-4 py-3 text-sm font-semibold admin-tone-border-neutral">Temps real (top)</div><div className="space-y-2 p-4 text-sm"><div className="flex items-center justify-between"><span>Actius ara</span><span>{ga4.realtime.activeUsers}</span></div>{ga4.realtime.pages.map((row, index) => <div key={`${row.dimension}-${index}`} className="flex items-center justify-between"><span className="truncate">{row.dimension}</span><span>{row.value}</span></div>)}{ga4.realtimeFallback && <p className="pt-2 text-xs admin-tone-text-neutral">Temps real parcial: només usuaris actius disponibles.</p>}</div></div>
           </div>
         )}
 

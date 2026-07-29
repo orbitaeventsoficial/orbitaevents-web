@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { getRequestId } from '@/lib/request-context';
@@ -15,6 +15,8 @@ const bulkPaymentSchema = z.object({
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
   const requestId = getRequestId(req);

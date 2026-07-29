@@ -68,6 +68,85 @@ describe('mapCustomerActivityToCanonicalEvent', () => {
     expect(event.timelineType).toBe('ACTIVITY');
     expect(event.title).toBe('UNKNOWN_XYZ');
   });
+
+  it('mapeja decisio post-event registrada amb lectura humana', () => {
+    const event = mapCustomerActivityToCanonicalEvent({
+      id: 'ca-post',
+      action: 'POST_EVENT_RECURRENCE_DECIDED',
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      details: {
+        actionKey: 'testimonial',
+        bookingRef: 'OE-2026-001',
+        safety: 'DECIDED_NOT_SENT',
+        draft: 'Hola Maria, em deixaries un testimoni curt?',
+      },
+    });
+
+    expect(event.title).toBe('Testimoni sol.licitat');
+    expect(event.body).toContain('Ref. OE-2026-001');
+    expect(event.body).toContain('Registrat, no enviat');
+    expect(event.timelineType).toBe('ACTIVITY');
+    expect(event.metadata).toMatchObject({ actionKey: 'testimonial' });
+  });
+
+  it('mapeja esborrany social post-event sense exposar codis interns', () => {
+    const event = mapCustomerActivityToCanonicalEvent({
+      id: 'ca-social',
+      action: 'POST_EVENT_RECURRENCE_DECIDED',
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      details: {
+        actionKey: 'social_post',
+        bookingRef: 'OE-2026-002',
+        safety: 'DRAFT_NOT_PUBLISHED',
+        socialPostId: 'social-1',
+        draft: 'Bolo pendent de revisar abans de publicar.',
+      },
+    });
+
+    expect(event.title).toBe('Social preparat');
+    expect(event.body).toContain('Esborrany social, no publicat');
+    expect(event.body).toContain('Esborrany social social-1');
+    expect(event.body).not.toContain('DRAFT_NOT_PUBLISHED');
+  });
+
+  it('mapeja accions comercials de referral i reactivacio amb titol llegible', () => {
+    const referral = mapCustomerActivityToCanonicalEvent({
+      id: 'ca-referral',
+      action: 'REFERRAL_ASK_PREPARED',
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      details: { note: 'Canal: clipboard\nMotiu: VIP sense referral\n\nMissatge referral' },
+    });
+    const reactivation = mapCustomerActivityToCanonicalEvent({
+      id: 'ca-reactivation',
+      action: 'REACTIVATION_PREPARED',
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      details: { note: 'Canal: inbox\nMotiu: VIP dormant\n\nMissatge reactivacio' },
+    });
+
+    expect(referral.title).toBe('Referral preparat');
+    expect(referral.body).toContain('VIP sense referral');
+    expect(reactivation.title).toBe('Reactivacio preparada');
+    expect(reactivation.body).toContain('VIP dormant');
+  });
+
+  it('mapeja moderacio de testimoni amb titol i resum llegibles', () => {
+    const event = mapCustomerActivityToCanonicalEvent({
+      id: 'ca-testimonial-approved',
+      action: 'TESTIMONIAL_APPROVED',
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      details: {
+        testimonialId: 'test-1',
+        rating: 5,
+        eventType: 'WEDDING',
+        textPreview: 'La festa va anar molt be.',
+      },
+    });
+
+    expect(event.title).toBe('Testimoni aprovat');
+    expect(event.body).toContain('5/5');
+    expect(event.body).toContain('WEDDING');
+    expect(event.body).toContain('La festa va anar molt be.');
+  });
 });
 
 describe('mapLeadActivityToCanonicalEvent', () => {
@@ -147,6 +226,159 @@ describe('mapAdminLogToCanonicalEvent', () => {
     });
     expect(event.timelineType).toBe('PROPOSAL_SENT');
     expect(event.title).toBe('Pressupost enviat');
+  });
+
+  it('mapeja traça documental de pressupost enviat amb body reconstruible', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-prop-doc',
+      action: 'DOCUMENT_PROPOSAL_SENT',
+      entity: 'proposal',
+      entityId: 'prop-1',
+      details: {
+        documentType: 'PROPOSAL',
+        source: 'admin_proposal_send',
+        reference: 'OE-Q-2026-001',
+        proposalReference: 'OE-Q-2026-001',
+        total: 1500,
+        to: 'maria@test.com',
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.title).toBe('Pressupost enviat');
+    expect(event.body).toBe('Ref. OE-Q-2026-001 · a maria@test.com · 1500.00 EUR · admin_proposal_send');
+    expect(event.timelineType).toBe('PROPOSAL_SENT');
+    expect(event.link?.label).toBe('Obrir pressupost');
+    expect(event.link?.href).toBe('/admin/presupuestos?proposalId=prop-1');
+  });
+
+  it('mapeja traça documental de contracte amb CTA especific', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-contract-doc',
+      action: 'DOCUMENT_CONTRACT_SENT',
+      entity: 'proposal',
+      entityId: 'prop-2',
+      details: {
+        documentType: 'CONTRACT',
+        source: 'admin_contract_send',
+        reference: 'CTR-2026-001',
+        contractReference: 'CTR-2026-001',
+        to: 'maria@test.com',
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.title).toBe('Contracte enviat');
+    expect(event.body).toBe('Ref. CTR-2026-001 · a maria@test.com · admin_contract_send');
+    expect(event.timelineType).toBe('ACTIVITY');
+    expect(event.link).toEqual({
+      label: 'Obrir contracte',
+      href: '/admin/presupuestos?proposalId=prop-2',
+    });
+  });
+
+  it('mapeja traça documental de dossier amb origen i CTA al preview guardat', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-dossier-doc',
+      action: 'DOCUMENT_DOSSIER_SENT',
+      entity: 'dossier',
+      entityId: 'dos-1',
+      details: {
+        documentType: 'DOSSIER',
+        source: 'dossier_email_send',
+        dossierId: 'dos-1',
+        leadId: 'lead-1',
+        customerId: 'cust-1',
+        to: 'joan@test.com',
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.title).toBe('Dossier enviat');
+    expect(event.body).toBe('a joan@test.com · dossier_email_send');
+    expect(event.link).toEqual({
+      label: 'Obrir dossier',
+      href: '/api/admin/dossiers/dos-1/preview',
+    });
+    expect(event.metadata).toMatchObject({
+      dossierId: 'dos-1',
+      leadId: 'lead-1',
+      customerId: 'cust-1',
+    });
+  });
+
+  it('manté fallback a la llista de dossiers si la traça no porta dossierId', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-dossier-doc-empty',
+      action: 'DOCUMENT_DOSSIER_SENT',
+      entity: 'dossier',
+      entityId: null,
+      details: {
+        documentType: 'DOSSIER',
+        source: 'dossier_email_send',
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.link).toEqual({
+      label: 'Obrir dossiers',
+      href: '/admin/dossiers',
+    });
+  });
+
+  it('mapeja factura PDF amb CTA directe al document', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-invoice-doc',
+      action: 'DOCUMENT_INVOICE_PDF_GENERATED',
+      entity: 'invoice',
+      entityId: 'inv-1',
+      details: {
+        documentType: 'INVOICE',
+        source: 'invoice_service_create',
+        reference: 'FAC-2026-001',
+        bookingId: 'b-1',
+        customerId: 'cust-1',
+        pdfUrl: 'https://cdn.test/factura.pdf',
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.title).toBe('PDF factura generat');
+    expect(event.body).toBe('Ref. FAC-2026-001 · invoice_service_create');
+    expect(event.link).toEqual({
+      label: 'Obrir factura',
+      href: 'https://cdn.test/factura.pdf',
+    });
+  });
+
+  it('mapeja albarà sense PDF cap a documents de reserva', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-delivery-doc',
+      action: 'DOCUMENT_DELIVERY_NOTE_CREATED',
+      entity: 'deliveryNote',
+      entityId: 'dn-1',
+      details: {
+        documentType: 'DELIVERY_NOTE',
+        source: 'admin_delivery_note_create',
+        reference: 'ALB-2026-001',
+        bookingId: 'b-1',
+        customerId: 'cust-1',
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.title).toBe('Albarà creat');
+    expect(event.body).toBe('Ref. ALB-2026-001 · admin_delivery_note_create');
+    expect(event.link).toEqual({
+      label: 'Veure documents',
+      href: '/admin/bookings/b-1#sec-documents',
+    });
   });
 
   it('mapeja PAYMENT_RECORDED de Stripe com a activitat de reserva llegible', () => {
@@ -296,7 +528,9 @@ describe('fetchCanonicalEventsForCustomer', () => {
     const adminLogCall = mockPrisma.adminLog.findMany.mock.calls[0][0];
     expect(adminLogCall.where.OR).toEqual([
       { entity: 'customer', entityId: 'cust-1' },
+      { entity: 'dossier', details: { path: ['customerId'], equals: 'cust-1' } },
       { entity: 'lead', entityId: { in: ['lead-1'] } },
+      { entity: 'dossier', details: { path: ['leadId'], equals: 'lead-1' } },
       { entity: 'booking', entityId: { in: ['booking-1'] } },
     ]);
   });
@@ -380,7 +614,14 @@ describe('fetchCanonicalEventsForLead', () => {
       expect.objectContaining({ where: { leadId: 'lead-1' } })
     );
     expect(mockPrisma.adminLog.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { entity: 'lead', entityId: 'lead-1' } })
+      expect.objectContaining({
+        where: {
+          OR: [
+            { entity: 'lead', entityId: 'lead-1' },
+            { entity: 'dossier', details: { path: ['leadId'], equals: 'lead-1' } },
+          ],
+        },
+      })
     );
   });
 
@@ -432,7 +673,7 @@ describe('fetchCanonicalEventsForLead', () => {
 });
 
 describe('fetchCanonicalEventsForBooking', () => {
-  it('consulta adminLog booking + inventory + leadActivity si booking té lead', async () => {
+  it('consulta adminLog booking + inventory + documents + leadActivity si booking té lead', async () => {
     mockPrisma.booking.findUnique.mockResolvedValue({ leadId: 'lead-1' });
 
     await fetchCanonicalEventsForBooking('b-1');
@@ -445,6 +686,17 @@ describe('fetchCanonicalEventsForBooking', () => {
     expect(mockPrisma.adminLog.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { entity: 'booking_inventory', details: { path: ['bookingId'], equals: 'b-1' } },
+      })
+    );
+    // document adminLogs
+    expect(mockPrisma.adminLog.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          OR: [
+            { entity: 'invoice', details: { path: ['bookingId'], equals: 'b-1' } },
+            { entity: 'deliveryNote', details: { path: ['bookingId'], equals: 'b-1' } },
+          ],
+        },
       })
     );
     // lead activities
@@ -480,6 +732,56 @@ describe('fetchCanonicalEventsForBooking', () => {
     expect(events[0].id).toBe('al:al-inv');
     expect(events[1].id).toBe('al:al-1');
     expect(events[2].id).toBe('la:la-1');
+  });
+
+  it('inclou traces documentals de factura i albarà filtrades per bookingId', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({ leadId: null });
+    mockPrisma.adminLog.findMany
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          id: 'al-invoice',
+          action: 'DOCUMENT_INVOICE_PDF_GENERATED',
+          entity: 'invoice',
+          entityId: 'inv-1',
+          details: {
+            documentType: 'INVOICE',
+            source: 'invoice_service_create',
+            reference: 'FAC-2026-001',
+            bookingId: 'b-1',
+            pdfUrl: 'https://cdn.test/factura.pdf',
+          },
+          createdAt: new Date('2026-01-03T10:00:00Z'),
+          userId: null,
+        },
+        {
+          id: 'al-delivery',
+          action: 'DOCUMENT_DELIVERY_NOTE_CREATED',
+          entity: 'deliveryNote',
+          entityId: 'dn-1',
+          details: {
+            documentType: 'DELIVERY_NOTE',
+            source: 'admin_delivery_note_create',
+            reference: 'ALB-2026-001',
+            bookingId: 'b-1',
+          },
+          createdAt: new Date('2026-01-02T10:00:00Z'),
+          userId: null,
+        },
+      ]);
+
+    const events = await fetchCanonicalEventsForBooking('b-1');
+
+    expect(events.map((event) => event.id)).toEqual(['al:al-invoice', 'al:al-delivery']);
+    expect(events[0]).toMatchObject({
+      title: 'PDF factura generat',
+      link: { label: 'Obrir factura', href: 'https://cdn.test/factura.pdf' },
+    });
+    expect(events[1]).toMatchObject({
+      title: 'Albarà creat',
+      link: { label: 'Veure documents', href: '/admin/bookings/b-1#sec-documents' },
+    });
   });
 
   it('retorna events canònics amb kind=booking i link correcte', async () => {
@@ -693,7 +995,19 @@ describe('fetchCanonicalAdminActivityPage', () => {
     expect(mockPrisma.adminLog.findMany).toHaveBeenCalledWith({
       where: {
         createdAt: { gte: new Date('2025-12-31T00:00:00Z') },
-        action: { in: ['COMM_SENT', 'COMM_RESPONDED', 'COMM_SEQUENCE_EXEC', 'COMM_SEQUENCE_BATCH', 'SEND_POST_EVENT_EMAIL', 'PAYMENT_REMINDER_SENT'] },
+        action: {
+          in: [
+            'COMM_SENT',
+            'COMM_RESPONDED',
+            'COMM_SEQUENCE_EXEC',
+            'COMM_SEQUENCE_BATCH',
+            'SEND_POST_EVENT_EMAIL',
+            'PAYMENT_REMINDER_SENT',
+            'DOCUMENT_PROPOSAL_SENT',
+            'DOCUMENT_DOSSIER_SENT',
+            'DOCUMENT_CONTRACT_SENT',
+          ],
+        },
       },
       orderBy: { createdAt: 'desc' },
       skip: 25,

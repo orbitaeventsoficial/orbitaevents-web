@@ -9,7 +9,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import { ADMIN_INVENTORY_HELP, helpAttrs } from '../components/adminHelpContent';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import {
   DEFAULT_EXPECTED_LIFE_HOURS,
   INVENTORY_CATEGORY_OPTIONS,
@@ -116,8 +115,10 @@ export default function InventoryListClient() {
   const loadBundles = useCallback(async () => {
     try {
       const res = await fetchWithCsrf('/api/admin/inventory/bundles');
-      if (!res.ok) return;
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as { bundles?: BundleApiItem[]; error?: string; message?: string };
+      if (!res.ok) {
+        throw new Error(data.error || data.message || 'No s\'han pogut carregar els lots.');
+      }
       const next = Array.isArray(data?.bundles)
         ? data.bundles.map((b: BundleApiItem) => ({
             id: String(b.id),
@@ -127,8 +128,10 @@ export default function InventoryListClient() {
         : [];
       setBundles(next);
       if (!selectedBundleId && next.length > 0) setSelectedBundleId(next[0].id);
-    } catch {
-      setBundleMessage('No s\'han pogut carregar els lots.');
+      setBundleMessage(null);
+    } catch (error) {
+      log.error('[Inventory] Error carregant lots', error);
+      setBundleMessage(error instanceof Error ? error.message : 'No s\'han pogut carregar els lots.');
     }
   }, [selectedBundleId]);
 
@@ -150,33 +153,6 @@ export default function InventoryListClient() {
           i.minStock != null &&
           i.stockQuantity <= i.minStock
       ),
-    [items]
-  );
-  const missingCostItems = useMemo(
-    () => items.filter((item) => item.purchasePrice == null || item.expectedLifeHours == null),
-    [items]
-  );
-  const unusedValuableItems = useMemo(
-    () => items.filter((item) => item.purchasePrice != null && item.purchasePrice > 0 && item.packItems.length === 0 && item._count.bookingItems === 0),
-    [items]
-  );
-  const endOfLifeItems = useMemo(
-    () => items.filter((item) => {
-      const life = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
-      return life > 0 && item.totalHoursUsed / life >= 0.95;
-    }),
-    [items]
-  );
-  const agingItems = useMemo(
-    () => items.filter((item) => {
-      const life = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
-      const ratio = life > 0 ? item.totalHoursUsed / life : 0;
-      return ratio >= 0.8 && ratio < 0.95;
-    }),
-    [items]
-  );
-  const packLinkedItems = useMemo(
-    () => items.filter((item) => item.packItems.length > 0),
     [items]
   );
 
@@ -252,74 +228,6 @@ export default function InventoryListClient() {
       .slice(0, 20);
   }, [items, selectedBundle, bundleItemSearch]);
 
-  const selectedBundleCoverage = selectedBundle?.itemIds.length || 0;
-  const hasActiveFilters = Boolean(search || filterCategory || filterStatus || healthFilter);
-  const nextStepTitle = fetchError
-    ? 'Recuperar la lectura d’inventari abans d’actuar'
-    : lowStockItems.length > 0
-      ? 'Atacar primer el stock crític'
-      : missingCostItems.length > 0
-        ? 'Completar cost i vida útil abans de llegir marge'
-        : unusedValuableItems.length > 0
-          ? 'Decidir què fer amb equip valuós sense ús'
-          : endOfLifeItems.length > 0 || agingItems.length > 0
-            ? 'Revisar equips tensats abans del pròxim bolo'
-      : healthFilter === 'missing-cost'
-        ? 'Omplir cost i vida útil dels equips incomplets'
-      : healthFilter === 'end-of-life' || healthFilter === 'aging'
-          ? 'Revisar els equips més tensats abans d’ampliar catàleg'
-          : selectedBundleCoverage === 0
-            ? 'Definir un lot útil abans de seguir afinant'
-            : 'Mantenir inventari, lots i salut sota control';
-  const nextStepDetail = fetchError
-    ? 'Sense lectura estable no toca canviar lots, estat ni decisions de manteniment.'
-    : lowStockItems.length > 0
-      ? 'Ja tens detectats els consumibles o ítems que han arribat al mínim i són el coll més immediat.'
-      : missingCostItems.length > 0
-        ? `${missingCostItems.length} equips no tenen cost o vida útil completa. Sense això packs i pressupostos arrosseguen marge parcial.`
-        : unusedValuableItems.length > 0
-          ? `${unusedValuableItems.length} equips tenen valor econòmic però no apareixen a packs ni reserves. Decideix si entren en un pack, lot o retirada.`
-          : endOfLifeItems.length > 0 || agingItems.length > 0
-            ? `${endOfLifeItems.length} equips estan al final de vida i ${agingItems.length} ja s'acosten al límit. Revisa estat abans de seguir venent-los.`
-      : healthFilter === 'missing-cost'
-        ? 'Aquest focus ja t’aïlla els equips que no permeten llegir bé amortització ni valor real.'
-        : healthFilter === 'end-of-life' || healthFilter === 'aging'
-          ? 'La lectura de salut ja t’està separant els equips que demanen revisió abans de seguir explotant-los.'
-          : selectedBundleCoverage === 0
-            ? 'Sense un lot mínim definit costa reutilitzar configuracions i veure cobertura real d’equip.'
-            : 'Amb stock i salut estables, el pas útil és polir lots, cerca i vista segons el bloc que governes.';
-  const nextStepHref = fetchError
-    ? '/admin/inventory'
-    : lowStockItems.length > 0
-      ? '/admin/inventory?health=low-stock'
-      : missingCostItems.length > 0
-        ? '/admin/inventory?health=missing-cost'
-        : unusedValuableItems.length > 0
-          ? '/admin/inventory?health=unused'
-          : endOfLifeItems.length > 0
-            ? '/admin/inventory?health=end-of-life'
-            : agingItems.length > 0
-              ? '/admin/inventory?health=aging'
-      : healthFilter === 'missing-cost'
-        ? '/admin/inventory?health=missing-cost'
-        : healthFilter === 'end-of-life' || healthFilter === 'aging'
-          ? `/admin/inventory?health=${healthFilter}`
-          : '/admin/inventory';
-  const nextStepLabel = fetchError
-    ? 'Recarregar inventari'
-    : lowStockItems.length > 0
-      ? 'Obrir stock crític'
-      : missingCostItems.length > 0
-        ? 'Obrir cost pendent'
-        : unusedValuableItems.length > 0
-          ? 'Obrir sense ús'
-          : endOfLifeItems.length > 0
-            ? 'Obrir final de vida'
-            : agingItems.length > 0
-              ? 'Obrir envelliment'
-      : healthFilter
-        ? 'Mantenir aquest focus'
-        : 'Revisar inventari';
 
   const handleStatusChange = useCallback(
     async (itemId: string, newStatus: string) => {
@@ -457,66 +365,6 @@ export default function InventoryListClient() {
         </div>
       }
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema a l’inventari',
-          tone: displayedItems.length > 0 ? 'info' : 'warning',
-          items: [
-            `${displayedItems.length} equips visibles i ${formatNumber(totalValue)}€ de valor dins la lectura actual.`,
-            lowStockItems.length > 0
-              ? `${lowStockItems.length} ítems marquen stock crític o al mínim.`
-              : 'No hi ha stock crític detectat al primer nivell.',
-            selectedBundleCoverage > 0
-              ? `El lot seleccionat cobreix ${selectedBundleCoverage} equips.`
-              : 'Cap lot seleccionat amb cobertura útil ara mateix.',
-            packLinkedItems.length > 0
-              ? `${packLinkedItems.length} equips ja estan connectats a almenys un pack.`
-              : 'Cap equip visible està connectat a packs ara mateix.',
-          ],
-          emptyText: 'Sense lectura d’inventari no hi ha resum automàtic del canal.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: hasActiveFilters || savingBundles || bundleMessage ? 'warning' : 'success',
-          items: [
-            activeHealthLabel
-              ? activeHealthLabel
-              : 'No hi ha focus de salut actiu en aquesta sessió.',
-            hasActiveFilters
-              ? 'Hi ha filtres o cerca actius sobre la lectura actual.'
-              : 'Sense filtres manuals: veus l’inventari complet.',
-            missingCostItems.length > 0
-              ? `${missingCostItems.length} equips sense cost o vida útil completa.`
-              : 'Cost i vida útil complets a primer nivell.',
-            unusedValuableItems.length > 0
-              ? `${unusedValuableItems.length} equips amb valor econòmic sense ús a packs ni reserves.`
-              : 'No hi ha equips valuosos completament desconnectats.',
-            endOfLifeItems.length > 0 || agingItems.length > 0
-              ? `${endOfLifeItems.length} equips al final de vida i ${agingItems.length} envellint.`
-              : 'Cap tensió de vida útil destacada.',
-            savingBundles
-              ? 'Hi ha canvis de lots desant-se ara mateix.'
-              : bundleMessage
-                ? bundleMessage
-                : 'Els lots no mostren incidències a primer nivell.',
-          ],
-          emptyText: 'No hi ha coll manual evident a primer nivell.',
-        }}
-        nextStep={{
-          title: nextStepTitle,
-          detail: nextStepDetail,
-          href: nextStepHref,
-          ctaLabel: nextStepLabel,
-          secondaryAction:
-            hasActiveFilters
-              ? { href: '/admin/inventory', label: 'Veure tot l’inventari' }
-              : selectedBundleCoverage > 0
-                ? { href: '/admin/inventory/new', label: 'Afegir equip nou' }
-                : undefined,
-        }}
-      />
       <InventorySummarySection displayedItems={displayedItems} totalValue={totalValue} />
       <InventoryBundlesSection
         bundles={bundles}

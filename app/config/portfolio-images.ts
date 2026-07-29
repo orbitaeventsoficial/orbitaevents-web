@@ -83,6 +83,14 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/bodas/bodas-04.avif",
       "alt": "Bodas – Bodas  04"
+    },
+    {
+      "src": "/img/portfolio/bodas/bodas-05.avif",
+      "alt": "Bodas – Bodas  05"
+    },
+    {
+      "src": "/img/portfolio/bodas/bodas-06.avif",
+      "alt": "Bodas – Bodas  06"
     }
   ],
   "discomovil": [
@@ -221,6 +229,22 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-05.avif",
       "alt": "Fiestas infantiles – Fiestas infantiles  05"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif",
+      "alt": "Fiestas infantiles – Fiestas infantiles  06"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-07.avif",
+      "alt": "Fiestas infantiles – Fiestas infantiles  07"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-08.avif",
+      "alt": "Fiestas infantiles – Fiestas infantiles  08"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-09.avif",
+      "alt": "Fiestas infantiles – Fiestas infantiles  09"
     }
   ],
   "fiestas-privadas": [
@@ -389,6 +413,14 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-29.avif",
       "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  29"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-30.avif",
+      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  30"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-31.avif",
+      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  31"
     }
   ],
   "fiestas-tematicas-mon-magic": [
@@ -485,6 +517,10 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/produccion-tecnica/produccion-tecnica-04.avif",
       "alt": "Produccion tecnica – Produccion tecnica  04"
+    },
+    {
+      "src": "/img/portfolio/produccion-tecnica/produccion-tecnica-05.avif",
+      "alt": "Produccion tecnica – Produccion tecnica  05"
     }
   ]
 };

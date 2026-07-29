@@ -405,7 +405,7 @@ export default function TemplateEditorClient({
                     e.dataTransfer.effectAllowed = 'copy';
                   }}
                   onDragEnd={() => {}}
-                  className="admin-tone-idle flex cursor-grab items-center gap-3 rounded-xl border p-3 transition-all hover:admin-tone-bg-neutral active:cursor-grabbing"
+                  className="admin-tone-idle flex cursor-grab items-center gap-3 ap-card p-3 transition-all hover:admin-tone-bg-neutral active:cursor-grabbing"
                 >
                   <span className="admin-tone-bg-neutral flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold">
                     {cat.icon}
@@ -468,7 +468,7 @@ export default function TemplateEditorClient({
                 <div
                   onClick={() => setSelectedBlockId(block.id)}
                   className={[
-                    'group flex cursor-grab items-center gap-2 rounded-xl border p-2.5 transition-all active:cursor-grabbing',
+                    'group flex cursor-grab items-center gap-2 ap-card p-2.5 transition-all active:cursor-grabbing',
                     isSelected ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-idle hover:admin-tone-bg-neutral',
                     isDragging ? 'opacity-40' : '',
                   ].join(' ')}

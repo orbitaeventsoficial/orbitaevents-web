@@ -67,6 +67,22 @@ describe('/api/admin/privacy/consents', () => {
     await expect(res.json()).resolves.toEqual({ ok: true, body: { rows: [], total: 0 } });
   });
 
+  it('saneja paginació bruta en lectura', async () => {
+    await GET(new NextRequest('http://localhost/api/admin/privacy/consents?limit=Infinity&offset=-8'));
+
+    expect(mockListConsents).toHaveBeenLastCalledWith(expect.objectContaining({
+      limit: 50,
+      offset: 0,
+    }));
+
+    await GET(new NextRequest('http://localhost/api/admin/privacy/consents?limit=250.2&offset=6.9'));
+
+    expect(mockListConsents).toHaveBeenLastCalledWith(expect.objectContaining({
+      limit: 200,
+      offset: 6,
+    }));
+  });
+
   it('rebutja auth abans de CSRF en DELETE', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response('{}', { status: 401 }));
 

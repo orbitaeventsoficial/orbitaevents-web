@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { createStripeCheckoutSession, constructStripeEvent, StripeNotConfiguredError, type StripePaymentType } from '@/lib/services/stripeService';
 import { normalizePortalLocale } from '@/lib/services/clientPortalAccess';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 
 function isUniqueConstraintError(error: unknown): boolean {
   return error instanceof Error && 'code' in error && (error as { code?: string }).code === 'P2002';
@@ -18,6 +19,10 @@ export type BookingStripeCheckoutResult =
   | { status: 200; body: { url: string } }
   | { status: 400 | 404 | 409 | 500; body: { error: string } };
 
+function amountsMatch(left: number, right: number): boolean {
+  return Math.round(left * 100) === Math.round(right * 100);
+}
+
 export async function createBookingStripeCheckoutLink(input: {
   bookingId: string;
   paymentType: StripePaymentType;
@@ -29,14 +34,24 @@ export async function createBookingStripeCheckoutLink(input: {
       id: true,
       reference: true,
       clientEmail: true,
+      total: true,
       depositAmount: true,
       depositPaid: true,
       remainingAmount: true,
       remainingPaid: true,
+      cashAmount: true,
     },
   });
 
   if (!booking) return { status: 404, body: { error: 'NOT_FOUND' } };
+  const outstanding = bookingOutstandingBreakdown({
+    total: booking.total,
+    depositAmount: booking.depositAmount,
+    remainingAmount: booking.remainingAmount,
+    depositPaid: booking.depositPaid,
+    remainingPaid: booking.remainingPaid,
+    cashAmount: booking.cashAmount,
+  });
 
   const baseUrl = input.baseUrl ?? process.env.NEXT_PUBLIC_BASE_URL ?? 'https://orbitaevents.com';
 
@@ -51,7 +66,10 @@ export async function createBookingStripeCheckoutLink(input: {
   const cancelUrl = `${baseUrl}${buildBookingHref(booking.id)}`;
 
   if (input.paymentType === 'deposit') {
-    if (booking.depositPaid) return { status: 409, body: { error: 'ALREADY_PAID' } };
+    if (outstanding.depositAmount <= 0) return { status: 409, body: { error: 'ALREADY_PAID' } };
+    if (!amountsMatch(outstanding.depositAmount, booking.depositAmount)) {
+      return { status: 409, body: { error: 'PARTIAL_CASH_REQUIRES_MANUAL' } };
+    }
 
     try {
       const stripeResult = await createStripeCheckoutSession({
@@ -78,8 +96,11 @@ export async function createBookingStripeCheckoutLink(input: {
     }
   }
 
-  if (!booking.depositPaid) return { status: 409, body: { error: 'DEPOSIT_NOT_PAID' } };
-  if (booking.remainingPaid) return { status: 409, body: { error: 'ALREADY_PAID' } };
+  if (outstanding.depositAmount > 0) return { status: 409, body: { error: 'DEPOSIT_NOT_PAID' } };
+  if (outstanding.remainingAmount <= 0) return { status: 409, body: { error: 'ALREADY_PAID' } };
+  if (!amountsMatch(outstanding.remainingAmount, booking.remainingAmount)) {
+    return { status: 409, body: { error: 'PARTIAL_CASH_REQUIRES_MANUAL' } };
+  }
 
   try {
     const stripeResult = await createStripeCheckoutSession({

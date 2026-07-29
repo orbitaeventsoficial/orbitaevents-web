@@ -127,7 +127,7 @@ export default function InfoTooltip({ text }: InfoTooltipProps) {
     <div
       ref={panelRef}
       role="tooltip"
-      className="fixed z-[99999] w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-white/10 bg-[var(--at-bg)] px-3 py-2 text-left text-xs leading-4 text-white shadow-2xl"
+      className="fixed z-[99999] w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-[var(--line)] bg-[var(--at-bg)] px-3 py-2 text-left text-xs leading-4 text-[var(--t)] shadow-2xl"
       style={{
         top: pos?.top ?? -9999,
         left: pos?.left ?? -9999,
@@ -151,7 +151,7 @@ export default function InfoTooltip({ text }: InfoTooltipProps) {
         onMouseLeave={closeTipDelayed}
         onFocus={openTip}
         onBlur={closeTipDelayed}
-        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-white/10 text-[length:var(--o-text-2xs)] font-bold leading-none text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--raised)] text-[length:var(--o-text-2xs)] font-bold leading-none text-[var(--t)] hover:bg-[var(--raised)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
         aria-label="Ajuda"
         aria-expanded={open}
       >

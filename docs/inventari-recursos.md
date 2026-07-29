@@ -88,7 +88,6 @@ Tot el que ja existeix per a leads i que el laboratori `/studio-lab/leads` pot i
 - `lib/constants/index.ts` — formatters + ServiceSlug + base (~1800L).
 - `lib/constants/admin.ts` — labels de nav, FAB, mòbil, `ADMIN_CHANGE_COUNTER`, paletes de chart/SVG, etc.
 - `lib/constants/leadLoss.ts` — motius de pèrdua canònics.
-- `lib/constants/pricingRules.ts` — regles de preu per data.
 - `lib/constants/automationThresholds.ts` — llindars d'automatització.
 - `lib/constants/notifications.ts`, `customer-crm.ts`, `privacy.ts`, `social.ts`, `googleCalendar.ts`, `services.ts`, `adminManual.ts`, `clientPortalNavigation.ts`.
 - `config/*` — `packs-config.ts`, `site-config.ts`, `portfolio-images.ts`, `client-logos.ts`, `equipment-config.ts`.
@@ -104,7 +103,7 @@ El que l'esquelet del nou admin (la "pàgina tipus que ho albergarà tot") ha de
 | `useConfirmDialog` + `ConfirmDialog` | `app/admin/components/ConfirmDialog.tsx` | **Mai** `alert()`/`confirm()`. Diàleg canònic. |
 | `useAsyncForm` | `app/admin/components/useAsyncForm.ts` | Submit async amb estat de càrrega/error. |
 | Hooks de domini | `lib/hooks/*` (`usePacks`, `useBookedDates`, `useAnalytics`, `useUtmParams`…) i `app/admin/bookings/use*` | Lògica reutilitzable. |
-| Tokens de tema admin | `app/admin/admin-theme.css`, `app/globals.css`, `app/admin/control-room.css` | Paleta `--at-*`, glass, gradients `.admin-gradient--*`, prefix `html.admin-mode`. |
+| Tokens de tema admin | `app/admin/admin-theme.css`, `app/globals.css`, `app/admin/admin-shell.css` | Paleta `--at-*`/`--at-cr-*`, glass, gradients `.admin-gradient--*`, prefix `html.admin-mode`. |
 | Kanban D&D + view toggle | Tasks/Leads/Bookings | Patró de pipeline arrossegable + `view=kanban|list`. |
 | Semàfor de pagament | (patró) | `depositPaid && remainingPaid` = verd / `depositPaid` = groc / cap = vermell. |
 | Smart GDPR delete | `customerRouteService` | Si té reserves → anonimitza; si no → elimina. |

@@ -18,7 +18,7 @@ export default function InventoryLoading() {
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="h-48 rounded-2xl border border-white/10" />
+          <div key={i} className="h-48 rounded-2xl border border-[var(--line)]" />
         ))}
       </div>
     </div>

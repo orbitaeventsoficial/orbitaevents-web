@@ -222,15 +222,44 @@ describe('buildSeasonCalendar', () => {
       id: 'l1',
       status: 'WON',
       eventDate: new Date('2026-06-20T00:00:00.000Z'),
-      booking: { id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', depositPaid: true, remainingPaid: false, distanceKm: 40 },
+      booking: { id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', total: 900, depositPaid: true, remainingPaid: false, cashAmount: null, distanceKm: 40 },
     });
     const plainLead = makeLead({ id: 'l2', eventDate: new Date('2026-06-19T00:00:00.000Z') });
     const result = buildSeasonCalendar(makeInput([wonWithBooking, plainLead]));
     const entries = result.weekends.flatMap((w) => w.entries);
     const won = entries.find((e) => e.id === 'l1');
     const plain = entries.find((e) => e.id === 'l2');
-    expect(won?.booking).toEqual({ id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', depositPaid: true, remainingPaid: false });
+    expect(won?.booking).toEqual({ id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', total: 900, depositPaid: true, remainingPaid: false, cashAmount: null, distanceKm: 40 });
     expect(plain?.booking).toBeNull();
+  });
+
+  it('propaga total i cashAmount de la reserva vinculada per pintar pagament cash-aware', () => {
+    const wonWithCashBooking = makeLead({
+      id: 'l1',
+      status: 'WON',
+      eventDate: new Date('2026-06-20T00:00:00.000Z'),
+      booking: {
+        id: 'b9',
+        reference: 'OE-2026-009',
+        status: 'CONFIRMED',
+        total: 1200,
+        depositPaid: false,
+        remainingPaid: false,
+        cashAmount: 1200,
+        distanceKm: 40,
+      },
+    });
+
+    const result = buildSeasonCalendar(makeInput([wonWithCashBooking]));
+    const won = result.weekends.flatMap((w) => w.entries).find((e) => e.id === 'l1');
+
+    expect(won?.booking).toMatchObject({
+      id: 'b9',
+      total: 1200,
+      depositPaid: false,
+      remainingPaid: false,
+      cashAmount: 1200,
+    });
   });
 
   it('els booking entries (lead-less) no porten enllaç de booking propi', () => {

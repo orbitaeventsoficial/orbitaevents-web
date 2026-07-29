@@ -21,6 +21,7 @@ import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { trackLead, trackCTAClick } from '@/lib/analytics';
+import { formatLocalDateInputValue } from '@/lib/date-input';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 import { useUtmParams } from '@/lib/hooks/useUtmParams';
 
@@ -51,6 +52,14 @@ interface FormData {
 interface FormErrors {
   [key: string]: string;
 }
+
+const REQUIRED_MARK_CLASS = 'text-[color-mix(in_oklab,var(--oe-orange)_82%,white)]';
+const ERROR_TEXT_CLASS = 'text-[color-mix(in_oklab,var(--oe-orange)_82%,white)]';
+const ERROR_BORDER_CLASS = 'border-[color-mix(in_oklab,var(--oe-orange)_74%,white)]';
+const ERROR_RING_CLASS = 'focus:ring-[color-mix(in_oklab,var(--oe-orange)_54%,transparent)]';
+const FOCUS_FIELD_CLASS = 'focus:border-[var(--oe-gold)] focus:ring-2 focus:ring-[color-mix(in_oklab,var(--oe-gold)_42%,transparent)]';
+const PUBLIC_LINK_CLASS = 'text-[var(--oe-gold)] hover:underline';
+const PUBLIC_PRIMARY_CTA_CLASS = 'bg-[var(--grad-gold)] text-[var(--bg-main)] hover:shadow-[var(--shadow-glow-gold)]';
 
 // ============================================================
 // VALIDACIO
@@ -144,7 +153,7 @@ export default function ContactFormComplete({
 
   // Set minDate on client to avoid hydration mismatch
   useEffect(() => {
-    setMinDate(new Date().toISOString().split('T')[0]);
+    setMinDate(formatLocalDateInputValue());
   }, []);
 
   // Update form
@@ -206,7 +215,10 @@ export default function ContactFormComplete({
     const controller = new AbortController();
     timeoutId = setTimeout(() => controller.abort(), 15000);
 
-  try {
+    try {
+      const pathSegments = window.location.pathname.split('/').filter(Boolean);
+      const pageLocale = ['ca', 'es', 'en'].includes(pathSegments[0]) ? pathSegments[0] : undefined;
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -221,6 +233,7 @@ export default function ContactFormComplete({
           eventStartTime: formData.eventStartTime || undefined,
           eventEndTime: formData.eventEndTime || undefined,
           location: formData.location,
+          locale: pageLocale,
           message: formData.message,
           timestamp: new Date().toISOString(),
           source: 'contact-form-complete',
@@ -262,7 +275,7 @@ export default function ContactFormComplete({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="p-8 rounded-2xl bg-green-500/10 border border-green-500/30 text-center"
+        className="p-8 rounded-2xl bg-[color-mix(in_oklab,var(--oe-green)_10%,transparent)] border border-[color-mix(in_oklab,var(--oe-green)_30%,transparent)] text-center"
       >
         <span className="text-6xl block mb-4">🎉</span>
         <h3 className="text-2xl font-bold text-white mb-2">{t('success.title')}</h3>
@@ -284,13 +297,13 @@ export default function ContactFormComplete({
       {/* Seccio: Dades personals */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span>👤</span> {t('sections.personalData')}
+          {t('sections.personalData')}
         </h3>
 
         {/* Nom complet */}
         <div className={errors.fullName && touched.fullName ? 'error-field' : ''}>
           <label htmlFor="fullName" className="block text-white/70 text-sm mb-2">
-            {t('labels.fullName')} <span className="text-red-400">*</span>
+            {t('labels.fullName')} <span className={REQUIRED_MARK_CLASS}>*</span>
           </label>
           <input
             type="text"
@@ -303,12 +316,12 @@ export default function ContactFormComplete({
             className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base
                      placeholder:text-white/50 outline-none transition-all
                      ${errors.fullName && touched.fullName
-                       ? 'border-red-500 focus:ring-red-500'
-                       : 'border-white/10 focus:border-amber-500 focus:ring-amber-500'
-                     } focus:ring-2`}
+                       ? `${ERROR_BORDER_CLASS} ${ERROR_RING_CLASS}`
+                       : `border-white/10 ${FOCUS_FIELD_CLASS}`
+                     }`}
           />
           {errors.fullName && touched.fullName && (
-            <p className="text-red-400 text-sm mt-1">{errors.fullName}</p>
+            <p className={`${ERROR_TEXT_CLASS} text-sm mt-1`}>{errors.fullName}</p>
           )}
         </div>
 
@@ -317,7 +330,7 @@ export default function ContactFormComplete({
           {/* Email */}
           <div className={errors.email && touched.email ? 'error-field' : ''}>
             <label htmlFor="email" className="block text-white/70 text-sm mb-2">
-              {t('labels.email')} <span className="text-red-400">*</span>
+              {t('labels.email')} <span className={REQUIRED_MARK_CLASS}>*</span>
             </label>
             <input
               type="email"
@@ -330,19 +343,19 @@ export default function ContactFormComplete({
               className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base
                        placeholder:text-white/50 outline-none transition-all
                        ${errors.email && touched.email
-                         ? 'border-red-500'
-                         : 'border-white/10 focus:border-amber-500'
-                       } focus:ring-2 focus:ring-amber-500`}
+                         ? ERROR_BORDER_CLASS
+                         : `border-white/10 ${FOCUS_FIELD_CLASS}`
+                       }`}
             />
             {errors.email && touched.email && (
-              <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+              <p className={`${ERROR_TEXT_CLASS} text-sm mt-1`}>{errors.email}</p>
             )}
           </div>
 
           {/* Telefon */}
           <div className={errors.phone && touched.phone ? 'error-field' : ''}>
             <label htmlFor="phone" className="block text-white/70 text-sm mb-2">
-              {t('labels.phone')} <span className="text-red-400">*</span>
+              {t('labels.phone')} <span className={REQUIRED_MARK_CLASS}>*</span>
             </label>
             <input
               type="tel"
@@ -355,30 +368,30 @@ export default function ContactFormComplete({
               className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base
                        placeholder:text-white/50 outline-none transition-all
                        ${errors.phone && touched.phone
-                         ? 'border-red-500'
-                         : 'border-white/10 focus:border-amber-500'
-                       } focus:ring-2 focus:ring-amber-500`}
+                         ? ERROR_BORDER_CLASS
+                         : `border-white/10 ${FOCUS_FIELD_CLASS}`
+                       }`}
             />
             {errors.phone && touched.phone && (
-              <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
+              <p className={`${ERROR_TEXT_CLASS} text-sm mt-1`}>{errors.phone}</p>
             )}
           </div>
         </div>
         {errors.contact && (
-          <p className="text-red-400 text-sm mt-1">{errors.contact}</p>
+          <p className={`${ERROR_TEXT_CLASS} text-sm mt-1`}>{errors.contact}</p>
         )}
       </div>
 
       {/* Seccio: Dades event */}
       <div className="space-y-4 pt-4 border-t border-white/10">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span>🎉</span> {t('sections.eventData')}
+          {t('sections.eventData')}
         </h3>
 
         {/* Tipus event */}
         <div className={errors.eventType && touched.eventType ? 'error-field' : ''}>
           <label htmlFor="eventType" className="block text-white/70 text-sm mb-2">
-            {t('labels.eventType')} <span className="text-red-400">*</span>
+            {t('labels.eventType')} <span className={REQUIRED_MARK_CLASS}>*</span>
           </label>
           <select
             id="eventType"
@@ -389,9 +402,9 @@ export default function ContactFormComplete({
             className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base
                      outline-none transition-all appearance-none cursor-pointer
                      ${errors.eventType && touched.eventType
-                       ? 'border-red-500'
-                       : 'border-white/10 focus:border-amber-500'
-                     } focus:ring-2 focus:ring-amber-500`}
+                       ? ERROR_BORDER_CLASS
+                       : `border-white/10 ${FOCUS_FIELD_CLASS}`
+                     }`}
           >
             <option value="" className="bg-black">{t('placeholders.selectEventType')}</option>
             <option value="boda" className="bg-black">{t('eventTypes.boda')}</option>
@@ -403,7 +416,7 @@ export default function ContactFormComplete({
             <option value="otro" className="bg-black">{t('eventTypes.otro')}</option>
           </select>
           {errors.eventType && touched.eventType && (
-            <p className="text-red-400 text-sm mt-1">{errors.eventType}</p>
+            <p className={`${ERROR_TEXT_CLASS} text-sm mt-1`}>{errors.eventType}</p>
           )}
         </div>
 
@@ -412,7 +425,7 @@ export default function ContactFormComplete({
           {/* Data */}
           <div className={errors.eventDate && touched.eventDate ? 'error-field' : ''}>
             <label htmlFor="eventDate" className="block text-white/70 text-sm mb-2">
-              {t('labels.eventDate')} <span className="text-red-400">*</span>
+              {t('labels.eventDate')} <span className={REQUIRED_MARK_CLASS}>*</span>
             </label>
             <input
               type="date"
@@ -423,18 +436,17 @@ export default function ContactFormComplete({
               onBlur={() => { touchField('eventDate'); validateField('eventDate'); }}
               min={minDate}
               className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base outline-none transition-all
-                       ${errors.eventDate && touched.eventDate ? 'border-red-500' : 'border-white/10 focus:border-amber-500'}
-                       focus:ring-2 focus:ring-amber-500`}
+                       ${errors.eventDate && touched.eventDate ? ERROR_BORDER_CLASS : `border-white/10 ${FOCUS_FIELD_CLASS}`}`}
             />
             {errors.eventDate && touched.eventDate && (
-              <p className="text-red-400 text-sm mt-1">{errors.eventDate}</p>
+              <p className={`${ERROR_TEXT_CLASS} text-sm mt-1`}>{errors.eventDate}</p>
             )}
           </div>
 
           {/* Ubicació */}
           <div>
             <label htmlFor="location" className="block text-white/70 text-sm mb-2">
-              {t('labels.location')} <span className="text-red-400">*</span>
+              {t('labels.location')} <span className={REQUIRED_MARK_CLASS}>*</span>
             </label>
             <input
               type="text"
@@ -445,11 +457,10 @@ export default function ContactFormComplete({
               onBlur={() => { touchField('location'); validateField('location'); }}
               placeholder={t('placeholders.location')}
               className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base placeholder:text-white/50 outline-none transition-all
-                       ${errors.location && touched.location ? 'border-red-500' : 'border-white/10 focus:border-amber-500'}
-                       focus:ring-2 focus:ring-amber-500`}
+                       ${errors.location && touched.location ? ERROR_BORDER_CLASS : `border-white/10 ${FOCUS_FIELD_CLASS}`}`}
             />
             {errors.location && touched.location && (
-              <p className="text-red-400 text-sm mt-1">{errors.location}</p>
+              <p className={`${ERROR_TEXT_CLASS} text-sm mt-1`}>{errors.location}</p>
             )}
           </div>
         </div>
@@ -466,7 +477,7 @@ export default function ContactFormComplete({
               name="eventStartTime"
               value={formData.eventStartTime}
               onChange={(e) => updateField('eventStartTime', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-base outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500"
+              className={`w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-base outline-none transition-all ${FOCUS_FIELD_CLASS}`}
             />
           </div>
           <div>
@@ -479,7 +490,7 @@ export default function ContactFormComplete({
               name="eventEndTime"
               value={formData.eventEndTime}
               onChange={(e) => updateField('eventEndTime', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-base outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500"
+              className={`w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-base outline-none transition-all ${FOCUS_FIELD_CLASS}`}
             />
           </div>
         </div>
@@ -488,7 +499,7 @@ export default function ContactFormComplete({
       {/* Seccio: Missatge */}
       <div className="space-y-4 pt-4 border-t border-white/10">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span>💬</span> {t('sections.tellUsMore')}
+          {t('sections.tellUsMore')}
         </h3>
 
         {/* Missatge */}
@@ -503,9 +514,9 @@ export default function ContactFormComplete({
             onChange={(e) => updateField('message', e.target.value)}
             placeholder={t('placeholders.message')}
             rows={4}
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
+            className={`w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
                      text-white text-base placeholder:text-white/50 outline-none resize-none
-                     focus:border-amber-500 focus:ring-2 focus:ring-amber-500 transition-all"
+                     ${FOCUS_FIELD_CLASS} transition-all`}
           />
         </div>
 
@@ -527,9 +538,9 @@ export default function ContactFormComplete({
                 className="peer absolute inset-0 z-10 h-5 w-5 cursor-pointer appearance-none opacity-0"
               />
               <div className={`w-5 h-5 rounded border-2 transition-all
-                           peer-checked:bg-amber-500 peer-checked:border-amber-500
+                           peer-checked:bg-[var(--oe-gold)] peer-checked:border-[var(--oe-gold)]
                            ${errors.acceptPrivacy && touched.acceptPrivacy
-                             ? 'border-red-500'
+                             ? ERROR_BORDER_CLASS
                              : 'border-white/30 group-hover:border-white/50'
                            }`}>
                 {formData.acceptPrivacy && (
@@ -541,18 +552,18 @@ export default function ContactFormComplete({
             </div>
             <span className="text-white/70 text-sm">
               {t('privacy.text')}{' '}
-              <Link href="/legal/privacidad" className="text-amber-400 hover:underline" target="_blank" rel="noopener noreferrer">
+              <Link href="/legal/privacidad" className={PUBLIC_LINK_CLASS} target="_blank" rel="noopener noreferrer">
                 {t('privacy.link')}
               </Link>{' '}
               {t('privacy.and')}{' '}
-              <Link href="/legal/terminos" className="text-amber-400 hover:underline" target="_blank" rel="noopener noreferrer">
+              <Link href="/legal/terminos" className={PUBLIC_LINK_CLASS} target="_blank" rel="noopener noreferrer">
                 {t('privacy.termsLink')}
               </Link>
-              . <span className="text-red-400">*</span>
+              . <span className={REQUIRED_MARK_CLASS}>*</span>
             </span>
           </label>
           {errors.acceptPrivacy && touched.acceptPrivacy && (
-            <p className="text-red-400 text-sm mt-1 ml-8">{errors.acceptPrivacy}</p>
+            <p className={`${ERROR_TEXT_CLASS} text-sm mt-1 ml-8`}>{errors.acceptPrivacy}</p>
           )}
         </div>
 
@@ -580,7 +591,7 @@ export default function ContactFormComplete({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm"
+            className={`p-4 rounded-xl bg-[color-mix(in_oklab,var(--oe-orange)_10%,transparent)] border ${ERROR_BORDER_CLASS} ${ERROR_TEXT_CLASS} text-sm`}
           >
             {t('error.message')}{' '}
             <a href={`tel:${SITE_CONFIG.business.phone}`} className="underline">{SITE_CONFIG.business.phoneDisplay}</a>.
@@ -602,7 +613,7 @@ export default function ContactFormComplete({
           theme="dark"
         />
         {errors.turnstile && touched.turnstile && (
-          <p className="text-red-400 text-sm mt-2 text-center">{errors.turnstile}</p>
+          <p className={`${ERROR_TEXT_CLASS} text-sm mt-2 text-center`}>{errors.turnstile}</p>
         )}
       </div>
 
@@ -615,7 +626,7 @@ export default function ContactFormComplete({
         className={`w-full py-4 rounded-xl font-bold text-lg transition-all
                  ${isSubmitting
                    ? 'bg-white/20 text-white/50 cursor-not-allowed'
-                   : 'bg-gradient-to-r from-amber-400 to-orange-500 text-black hover:shadow-lg hover:shadow-amber-500/30'
+                   : PUBLIC_PRIMARY_CTA_CLASS
                  }`}
       >
         {isSubmitting ? (
@@ -634,7 +645,7 @@ export default function ContactFormComplete({
       {/* Nota final */}
       <p className="text-center text-white/60 text-sm">
         {t('responseNote')}{' '}
-        <a href={`tel:${SITE_CONFIG.business.phone}`} className="text-amber-400 hover:underline">
+        <a href={`tel:${SITE_CONFIG.business.phone}`} className={PUBLIC_LINK_CLASS}>
           {SITE_CONFIG.business.phoneDisplay}
         </a>
       </p>

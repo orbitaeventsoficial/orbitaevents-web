@@ -9,7 +9,6 @@ import {
 } from '@/lib/services/timelineQueryService';
 import { AdminPage } from '../components/AdminPage';
 import InfoTooltip from '../components/InfoTooltip';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import LossBreakdownPanel from './LossBreakdownPanel';
 import RunCommercialSequencesButton from './RunCommercialSequencesButton';
 import SendExecutiveReportButton from './SendExecutiveReportButton';
@@ -133,43 +132,7 @@ export default async function SalesOpsPage() {
   const responseRateStatus: AuditStatus = responseRate30d >= 0.55 ? 'FORT' : responseRate30d >= 0.35 ? 'A_MILLORAR' : 'CRITIC';
   const pipelineStatus: AuditStatus = scored.length >= 10 ? 'FORT' : scored.length >= 5 ? 'A_MILLORAR' : 'CRITIC';
   const riskStatus: AuditStatus = riskLeads.length <= 5 ? 'FORT' : riskLeads.length <= 12 ? 'A_MILLORAR' : 'CRITIC';
-  const systemItems = [
-    `${scored.length} entrades obertes amb ${formatNumber(pipelineTotal)}€ a l'embut`,
-    `Previsió ponderada actual: ${formatNumber(forecastTotal)}€`,
-    `${sequenceExec30d.sequenceExec} seqüències automàtiques executades en 30 dies`,
-    `Taxa de resposta comercial del ${toPct(responseRate30d)}`,
-  ].filter(Boolean);
-  const manualItems = [
-    slaSnapshot > 0 ? `${slaSnapshot} entrades porten més de 24h sense resposta` : '',
-    riskLeads.length > 0 ? `${riskLeads.length} oportunitats ja presenten risc de pèrdua` : '',
-    responseRateStatus !== 'FORT' ? 'La taxa de resposta comercial encara demana optimitzar missatges i seguiment' : '',
-    'Cal mantenir net l\'embut i revisar duplicats o camps crítics',
-  ].filter(Boolean);
 
-  const nextStep =
-    slaSnapshot > 0
-      ? {
-          title: 'Desbloquejar el temps de resposta avui',
-          detail: `Hi ha ${slaSnapshot} entrades amb més de 24h sense tocar. La prioritat és atacar-les abans de mirar optimització fina.`,
-          href: '/admin/leads',
-          ctaLabel: 'Obrir entrades',
-          secondaryAction: { href: '/admin/tasks', label: 'Veure tasques crítiques' },
-        }
-      : riskLeads.length > 0
-        ? {
-            title: 'Recuperar oportunitats en risc abans que es refredin',
-            detail: `${riskLeads.length} leads ja acumulen senyals de pèrdua. El següent pas és executar seguiment amb context, no només mirar mètriques.`,
-            href: '/admin/tasks',
-            ctaLabel: 'Executar seguiment',
-            secondaryAction: { href: '/admin/leads', label: 'Obrir embut' },
-          }
-        : {
-            title: 'Optimitzar el pipeline, no apagar focs',
-            detail: `El sistema no detecta un coll d'ampolla crític ara mateix. El millor retorn és revisar conversió, missatges i origen per pujar qualitat i tancament.`,
-            href: '/admin/leads',
-            ctaLabel: 'Revisar embut',
-            secondaryAction: { href: '/admin/analytics', label: 'Mirar analítica' },
-          };
 
   const auditRows = [
     { area: 'Velocitat de resposta', status: responseBacklogStatus, avui: `${slaSnapshot} entrades amb +24h sense resposta`, en30: 'Deixar-ho a 0 cada dia amb tasques automàtiques.', en90: 'Predicció de colls d\'ampolla per franja horària.', href: '/admin/leads', cta: 'Atacar entrades pendents' },
@@ -181,7 +144,7 @@ export default async function SalesOpsPage() {
     { area: 'Operació d\'una sola persona', status: 'FORT' as AuditStatus, avui: 'Mode solo + checklist diari automatitzat.', en30: 'Macros per blocs de feina repetitiva.', en90: 'Pilot automàtic avançat per estalviar hores.', href: '/admin/tasks', cta: 'Obrir guia de tasques' },
     { area: 'Visibilitat financera', status: 'A_MILLORAR' as AuditStatus, avui: 'Previsió disponible, falta lectura setmanal fixa.', en30: 'Revisió setmanal d\'ingressos, marge i cobraments.', en90: 'Quadre executiu de marge per tipus d\'esdeveniment.', href: '/admin/economia', cta: 'Revisar finances' },
     { area: 'Analítica web i embut', status: 'A_MILLORAR' as AuditStatus, avui: 'Analítica disponible, cal ritual d\'anàlisi.', en30: 'Informe setmanal amb accions concretes.', en90: 'Model d\'atribució simple per decidir inversió.', href: '/admin/analytics', cta: 'Obrir analítica' },
-    { area: 'Post-esdeveniment i reputació', status: 'A_MILLORAR' as AuditStatus, avui: 'Flux actiu, marge de millora en ritme d\'execució.', en30: 'Automatitzar més recordatoris i seguiment.', en90: 'Bucle de feedback per millorar oferta comercial.', href: '/admin/post-event', cta: 'Tancar cicle post-esdeveniment' },
+    { area: 'Post-esdeveniment i reputació', status: 'A_MILLORAR' as AuditStatus, avui: 'Flux actiu, marge de millora en ritme d\'execució.', en30: 'Automatitzar més recordatoris i seguiment.', en90: 'Aprenentatge de valoracions i testimonis per millorar oferta comercial.', href: '/admin/post-event', cta: 'Tancar cicle post-esdeveniment' },
     {
       area: 'Contingut social (Instagram)',
       status: (socialPulse.isActive && socialPulse.consistencyScore >= 60 ? 'FORT' : socialPulse.consistencyScore >= 30 || (socialPulse.isActive && (socialPulse.daysSinceLastPost ?? 99) < 14) ? 'A_MILLORAR' : 'CRITIC') as AuditStatus,
@@ -209,27 +172,6 @@ export default async function SalesOpsPage() {
         <div className="ap-kpi"><p className="ap-kpi-label">Seqüències auto 30d <InfoTooltip text="Missatges automàtics enviats pel sistema (follow-ups, recordatoris, seqüències comercials)." /></p><p className="ap-kpi-value">{sequenceExec30d.sequenceExec}</p></div>
       </section>
 
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què vigila el sistema',
-          tone: responseBacklogStatus === 'CRITIC' || responseRateStatus === 'CRITIC' ? 'warning' : 'info',
-          items: systemItems,
-          emptyText: 'Sense senyals automàtiques rellevants ara mateix.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: slaSnapshot > 0 || riskLeads.length > 0 ? 'warning' : 'success',
-          items: manualItems,
-          emptyText: 'Sense bloquejos manuals greus. Pots treballar millora i optimització.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          ...nextStep,
-        }}
-      />
-
       <section className="ap-card p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -246,12 +188,12 @@ export default async function SalesOpsPage() {
             <p className="mt-1 text-xl font-bold">{socialPulse.postsLast30d}</p>
             <p className="mt-0.5 text-xs opacity-50">{socialPulse.publishedLast30d} publicats</p>
           </div>
-          <div className={`rounded-xl border p-3 ${socialPulse.scheduledUpcoming > 0 ? 'admin-tone-border-info admin-tone-bg-info' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+          <div className={`ap-card p-3 ${socialPulse.scheduledUpcoming > 0 ? 'admin-tone-border-info admin-tone-bg-info' : ''}`}>
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Programats</p>
             <p className={`mt-1 text-xl font-bold ${socialPulse.scheduledUpcoming > 0 ? 'admin-tone-text-info' : ''}`}>{socialPulse.scheduledUpcoming}</p>
             <p className="mt-0.5 text-xs opacity-50">{socialPulse.draftsPending} esborranys</p>
           </div>
-          <div className={`rounded-xl border p-3 ${socialPulse.consistencyScore >= 60 ? 'admin-tone-border-success admin-tone-bg-success' : socialPulse.consistencyScore >= 30 ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
+          <div className={`ap-card p-3 ${socialPulse.consistencyScore >= 60 ? 'admin-tone-border-success admin-tone-bg-success' : socialPulse.consistencyScore >= 30 ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Consistència</p>
             <p className={`mt-1 text-xl font-bold ${socialPulse.consistencyScore >= 60 ? 'admin-tone-text-success' : socialPulse.consistencyScore >= 30 ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>{socialPulse.consistencyScore}%</p>
             <p className="mt-0.5 text-xs opacity-50">{socialPulse.daysSinceLastPost !== null ? `Fa ${socialPulse.daysSinceLastPost}d` : 'Mai publicat'}</p>
@@ -326,7 +268,7 @@ export default async function SalesOpsPage() {
 
       <section className="grid gap-4 xl:grid-cols-2">
         <article className="ap-card rounded-2xl p-5"><h2 className="ap-h2">Pla d'execució a 30 dies</h2><ol className="mt-3 space-y-2 text-sm admin-tone-text-neutral"><li>1. Temps de resposta: deixar cada dia a 0 les entrades de +24h.</li><li>2. Tasques guia: treballar sempre des de la checklist diària.</li><li>3. Pipeline: neteja setmanal de fases i estats sense activitat.</li><li>4. Missatges: optimitzar plantilles per pujar la taxa de resposta.</li><li>5. Dades: control diari de duplicats i camps crítics.</li><li>6. Reserva a calendari: verificar traçabilitat a tots els casos.</li></ol></article>
-        <article className="ap-card rounded-2xl p-5"><h2 className="ap-h2">Pla d'escalat a 90 dies</h2><ol className="mt-3 space-y-2 text-sm admin-tone-text-neutral"><li>1. Predicció: alertes abans que una entrada entri en risc.</li><li>2. Automatització: seqüències per segment i tipus d'esdeveniment.</li><li>3. Quadre executiu: marge i previsió per canal en una sola vista.</li><li>4. Qualitat de dades: regles intel·ligents a la captura inicial.</li><li>5. Post-event: feedback incorporat per millorar proposta comercial.</li><li>6. Operativa solo: més accions en 1 clic i menys canvi de pantalla.</li></ol></article>
+        <article className="ap-card rounded-2xl p-5"><h2 className="ap-h2">Pla d'escalat a 90 dies</h2><ol className="mt-3 space-y-2 text-sm admin-tone-text-neutral"><li>1. Predicció: alertes abans que una entrada entri en risc.</li><li>2. Automatització: seqüències per segment i tipus d'esdeveniment.</li><li>3. Quadre executiu: marge i previsió per canal en una sola vista.</li><li>4. Qualitat de dades: regles intel·ligents a la captura inicial.</li><li>5. Post-event: aprenentatge de valoracions i testimonis per millorar proposta comercial.</li><li>6. Operativa solo: més accions en 1 clic i menys canvi de pantalla.</li></ol></article>
       </section>
 
       <div className="grid gap-6 xl:grid-cols-2">

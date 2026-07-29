@@ -1,8 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { AdminPage } from '../../components/AdminPage';
+import { AdminPage, AdminEmptyState } from '../../components/AdminPage';
 import { MarkdownView } from '../MarkdownView';
-import '../docs-view.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,13 +24,16 @@ export default async function EsquemaPage() {
       subtitle="Radiografia de cables i funcions: cada òrgan amb alçada, prioritat, temps i les seves connexions reals."
     >
       {markdown ? (
-        <article className="dmd__doc">
-          <MarkdownView markdown={markdown} />
+        <article className="ap-card mx-auto max-w-[64rem]">
+          <div className="ap-card-body">
+            <MarkdownView markdown={markdown} />
+          </div>
         </article>
       ) : (
-        <div className="dmd__empty">
-          <p>No s&apos;ha trobat <code>docs/admin-esquema-absolut.md</code>.</p>
-        </div>
+        <AdminEmptyState
+          title="Esquema no disponible"
+          description="No s'ha trobat el fitxer docs/admin-esquema-absolut.md."
+        />
       )}
     </AdminPage>
   );

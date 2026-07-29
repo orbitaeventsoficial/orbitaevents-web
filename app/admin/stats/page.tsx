@@ -1,6 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import {
+  CalendarDays,
+  PartyPopper,
+  Sparkles,
+  Star,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 import { log } from '@/lib/logger';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
@@ -17,6 +25,27 @@ interface Stat {
   fallback: number;
   calculated: number;
   isManual: boolean;
+}
+
+const STAT_ICON_MAP: Record<string, LucideIcon> = {
+  party: PartyPopper,
+  people: Users,
+  calendar: CalendarDays,
+  star: Star,
+  sparkle: Sparkles,
+};
+
+function StatIcon({ icon }: { icon: string }) {
+  const Icon = STAT_ICON_MAP[icon] ?? Sparkles;
+  return (
+    <span
+      aria-hidden="true"
+      data-stat-icon={icon}
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--raised)]"
+    >
+      <Icon className="h-5 w-5" strokeWidth={1.8} />
+    </span>
+  );
 }
 
 export default function StatsPage() {
@@ -210,12 +239,12 @@ export default function StatsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Valors automàtics</div>
           <div className="mt-1 text-3xl font-bold">{automaticStats}</div>
           <div className="mt-1 text-xs">Calculats des de la BD</div>
         </div>
-        <div className="rounded-xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Valors manuals</div>
           <div className="mt-1 text-3xl font-bold">{manualStats}</div>
           <div className="mt-1 text-xs">Configurats manualment</div>
@@ -230,12 +259,12 @@ export default function StatsPage() {
             className={`border rounded-xl p-6 ${
               stat.isManual
                 ? 'admin-tone-bg-warning admin-tone-border-warning'
-                : 'bg-black/60 border-white/10'
+                : 'bg-black/60 border-[var(--line)]'
             }`}
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-start gap-3">
-                <span className="text-3xl">{stat.icon}</span>
+                <StatIcon icon={stat.icon} />
                 <div>
                   <h3 className="font-semibold">{stat.label}</h3>
                   <p className="text-sm mt-0.5">{stat.description}</p>
@@ -249,15 +278,15 @@ export default function StatsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="bg-white/5 rounded-xl p-3">
+              <div className="bg-[var(--raised)] rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Actual</div>
                 <div className="text-2xl font-bold">{stat.value}</div>
               </div>
-              <div className="bg-white/5 rounded-xl p-3">
+              <div className="bg-[var(--raised)] rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Calculat</div>
                 <div className="text-2xl font-bold">{stat.calculated}</div>
               </div>
-              <div className="bg-white/5 rounded-xl p-3">
+              <div className="bg-[var(--raised)] rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Manual</div>
                 <div className="text-2xl font-bold">
                   {stat.isManual ? stat.fallback : '—'}
@@ -272,7 +301,7 @@ export default function StatsPage() {
                   min={0}
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="flex-1 px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+                  className="flex-1 px-4 py-2 border border-[var(--line)] rounded-xl focus:ring-2"
                   step="0.1"
                 />
                 <button
@@ -287,7 +316,7 @@ export default function StatsPage() {
                 <button
                   onClick={() => setEditingStat(null)}
                   type="button"
-                  className="px-4 py-2 bg-white/5 rounded-xl font-medium hover:bg-white/10"
+                  className="px-4 py-2 bg-[var(--raised)] rounded-xl font-medium hover:bg-[var(--raised)]"
                 >
                   Cancel·lar
                 </button>
@@ -297,7 +326,7 @@ export default function StatsPage() {
                 <button
                   onClick={() => startEdit(stat)}
                   type="button"
-                  className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl font-medium hover:bg-white/10"
+                  className="flex-1 px-4 py-2 bg-[var(--raised)] border border-[var(--line)] rounded-xl font-medium hover:bg-[var(--raised)]"
                 >
                   ✏️ Editar Valor Manual
                 </button>
@@ -319,7 +348,7 @@ export default function StatsPage() {
       </div>
 
       {/* Info */}
-      <div id="stats-help" className="rounded-xl border admin-card-glass p-4">
+      <div id="stats-help" className="ap-card p-4">
         <h3 className="mb-2 text-sm font-semibold">ℹ️ Com funciona</h3>
         <ul className="space-y-1 text-sm">
           <li>• Els <strong>valors automàtics</strong> es calculen des de les reserves completades</li>
@@ -332,6 +361,5 @@ export default function StatsPage() {
     </AdminPage>
   );
 }
-
 
 

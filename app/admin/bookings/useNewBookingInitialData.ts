@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
-import type { BookingExtra, BookingFormData, BookingLeadData, BookingPack, BookingPartnerOption, RawExtraConfig } from './booking-form.types';
+import type { BookingExtra, BookingFormData, BookingLeadData, BookingPack, BookingPartnerOption, BookingServiceLineFormInput, RawExtraConfig } from './booking-form.types';
 import { INITIAL_BOOKING_FORM, bookingAutosaveKey } from './booking-form.types';
+import { mapLeadServiceLinesToBookingFormLines } from './bookingLeadServiceLineMapper';
 import { hasFormAutosaveDraft } from '@/lib/hooks/useFormAutosave';
 import { log } from '@/lib/logger';
 
@@ -29,21 +30,27 @@ function humaniseExtraLabel(name?: string | null, slug?: string | null, id?: str
 
 interface UseNewBookingInitialDataOptions {
   leadId: string | null;
+  customerId?: string | null;
   dateParam: string | null;
+  forceLeadPrefill?: boolean;
 }
 
-export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingInitialDataOptions) {
+export function useNewBookingInitialData({ leadId, customerId = null, dateParam, forceLeadPrefill = false }: UseNewBookingInitialDataOptions) {
   const [form, setForm] = useState<BookingFormData>(INITIAL_BOOKING_FORM);
   const [packs, setPacks] = useState<BookingPack[]>([]);
   const [extras, setExtras] = useState<BookingExtra[]>([]);
   const [loading, setLoading] = useState(true);
   const [leadData, setLeadData] = useState<BookingLeadData | null>(null);
+  const [leadServiceLines, setLeadServiceLines] = useState<BookingServiceLineFormInput[]>([]);
+  const [leadRouteCostLines, setLeadRouteCostLines] = useState<BookingServiceLineFormInput[]>([]);
   const [partners, setPartners] = useState<BookingPartnerOption[]>([]);
   const [fuelReferenceInfo, setFuelReferenceInfo] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
       try {
+        setLeadServiceLines([]);
+        setLeadRouteCostLines([]);
         const [packsRes, extrasRes, partnersRes] = await Promise.all([
           fetchWithCsrf('/api/admin/packs'),
           fetchWithCsrf('/api/admin/extras'),
@@ -103,7 +110,23 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
         // prefill del lead: l'esborrany ja conté el que l'usuari estava omplint
         // (incloent el que va venir del lead la primera vegada). Evita la cursa
         // prefill↔restore. Igualment carreguem leadData per a la resta de la UI.
-        const hasDraft = hasFormAutosaveDraft(bookingAutosaveKey(leadId, null));
+        const hasDraft = !forceLeadPrefill && hasFormAutosaveDraft(bookingAutosaveKey(leadId, customerId));
+        if (customerId && !leadId && !hasDraft) {
+          const customerRes = await fetchWithCsrf(`/api/admin/customers/${customerId}`);
+          if (customerRes.ok) {
+            const customerData = await customerRes.json();
+            const customer = customerData.customer || customerData.data;
+            if (customer) {
+              setForm((prev) => ({
+                ...prev,
+                clientName: customer.name || prev.clientName,
+                clientEmail: customer.email || prev.clientEmail,
+                clientPhone: customer.phone || prev.clientPhone,
+              }));
+            }
+          }
+        }
+
         if (leadId) {
           const leadRes = await fetchWithCsrf(`/api/admin/leads/${leadId}`);
           if (leadRes.ok) {
@@ -122,9 +145,23 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
                 eventEndTime: lead.eventEndTime || prev.eventEndTime,
                 eventLocation: lead.eventLocation || prev.eventLocation,
                 eventVenue: lead.eventAddress || prev.eventVenue,
+                // Hereta la distància i els peatges JA calculats al lead (#1394): la reserva
+                // no els recalcula (un sol cervell) — si el lead va resoldre 422 km, la reserva
+                // parteix de 422, no de 0 esperant re-geocodificar el municipi.
+                distanceKm: lead.distanceKm != null ? String(lead.distanceKm) : prev.distanceKm,
+                tollsEur: lead.tollsEur != null ? String(lead.tollsEur) : prev.tollsEur,
                 guestCount: lead.guestCount ? String(lead.guestCount) : prev.guestCount,
                 packId: lead.interestedPackId || prev.packId,
               }));
+            }
+          }
+
+          if (!hasDraft) {
+            const leadLinesRes = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`);
+            if (leadLinesRes.ok) {
+              const leadLinesData = await leadLinesRes.json();
+              setLeadServiceLines(mapLeadServiceLinesToBookingFormLines(leadLinesData?.lines));
+              setLeadRouteCostLines(mapLeadServiceLinesToBookingFormLines(leadLinesData?.routeCostLines));
             }
           }
         }
@@ -140,7 +177,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
     }
 
     load();
-  }, [dateParam, leadId]);
+  }, [customerId, dateParam, forceLeadPrefill, leadId]);
 
   return {
     form,
@@ -149,6 +186,8 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
     extras,
     loading,
     leadData,
+    leadServiceLines,
+    leadRouteCostLines,
     partners,
     fuelReferenceInfo,
   };

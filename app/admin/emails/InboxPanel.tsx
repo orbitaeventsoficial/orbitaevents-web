@@ -162,7 +162,7 @@ export default function InboxPanel() {
   const unreadCount = emails.filter((email) => !email.isRead).length;
 
   return (
-    <section className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Safata d'entrada IMAP" data-help-desc="Llista els emails rebuts a info@orbitaevents.com via IMAP. Pots llegir, eliminar i refrescar.">
+    <section className="ap-card overflow-hidden" data-help-title="Safata d'entrada IMAP" data-help-desc="Llista els emails rebuts a info@orbitaevents.com via IMAP. Pots llegir, eliminar i refrescar.">
       <div className="flex items-center justify-between border-b px-6 py-4">
         <div>
           <h2 className="flex items-center gap-2 font-semibold">
@@ -202,7 +202,7 @@ export default function InboxPanel() {
 
       {!loading && !error && (
         <div className="flex">
-          <div className={`${selectedEmail ? 'w-1/3 border-r border-white/10' : 'w-full'} max-h-[500px] overflow-y-auto divide-y admin-tone-border-subtle`}>
+          <div className={`${selectedEmail ? 'w-1/3 border-r border-[var(--line)]' : 'w-full'} max-h-[500px] overflow-y-auto divide-y admin-tone-border-subtle`}>
             {emails.length === 0 ? (
               <div className="p-8 text-center">
                 <span className="text-4xl">📭</span>
@@ -221,10 +221,10 @@ export default function InboxPanel() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <p className={`truncate text-sm ${!email.isRead ? 'font-semibold text-white/90' : 'text-white/60'}`}>
+                      <p className={`truncate text-sm ${!email.isRead ? 'font-semibold text-[var(--t)]' : 'text-[var(--t2)]'}`}>
                         {email.from.name || email.from.address}
                       </p>
-                      <p className={`truncate text-sm ${!email.isRead ? 'font-medium text-white/80' : 'text-white/40'}`}>
+                      <p className={`truncate text-sm ${!email.isRead ? 'font-medium text-[var(--t2)]' : 'text-[var(--t3)]'}`}>
                         {email.subject}
                       </p>
                       <p className="mt-1 truncate text-xs">{email.preview}</p>

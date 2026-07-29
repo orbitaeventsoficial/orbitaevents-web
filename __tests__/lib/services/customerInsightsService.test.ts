@@ -101,6 +101,42 @@ describe('computeCustomerInsights', () => {
     expect(result.pendingPaymentTotal).toBe(0);
   });
 
+  it('pagament pendent = 0 si el total consta cobert en efectiu', () => {
+    const hub = makeHub({
+      bookings: [
+        {
+          id: 'b1', status: 'CONFIRMED', reference: 'ORB-CASH',
+          totalAmount: 3000, depositAmount: 1000, remainingAmount: 2000,
+          depositPaid: false, remainingPaid: false, cashAmount: 3000,
+        },
+      ] as CustomerHubDTO['bookings'],
+    });
+
+    const result = computeCustomerInsights(hub, NOW);
+    expect(result.pendingPaymentTotal).toBe(0);
+    expect(result.nextAction.type).not.toBe('COLLECT_PAYMENT');
+  });
+
+  it('pagament pendent resta efectiu parcial abans de proposar cobrament', () => {
+    const hub = makeHub({
+      bookings: [
+        {
+          id: 'b1', status: 'CONFIRMED', reference: 'ORB-CASH-PART',
+          totalAmount: 3000, depositAmount: 1000, remainingAmount: 2000,
+          depositPaid: false, remainingPaid: false, cashAmount: 1000,
+        },
+      ] as CustomerHubDTO['bookings'],
+    });
+
+    const result = computeCustomerInsights(hub, NOW);
+    expect(result.pendingPaymentTotal).toBe(2000);
+    expect(result.nextAction).toMatchObject({
+      type: 'COLLECT_PAYMENT',
+      context: 'ORB-CASH-PART',
+    });
+    expect(result.nextAction.label).toContain('2.000');
+  });
+
   // ─── Days calculations ────────────────────────────────────────────
 
   it('calcula dies des del darrer contacte', () => {

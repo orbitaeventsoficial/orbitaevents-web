@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildSocialWorkspaceHref } from '@/lib/admin/socialWorkspaceHref';
 import { useRouter } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
@@ -11,7 +12,7 @@ import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
+import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel, getCalendarTone, getCalendarToneClasses, getCalendarEconomicRiskClasses, summarizeCalendarEconomicRisk, selectCalendarEconomicRiskBooking, formatCalendarEconomicRiskActionReason, resolveCalendarEconomicRiskActionHash, formatCalendarEconomicRiskSummary, resolveWorkTimeLabel } from './calendar-utils';
 
 type CalendarLayer = 'bookings' | 'blocks' | 'leads' | 'tasks' | 'social' | 'followUps';
 
@@ -115,6 +116,11 @@ export default function CalendarWeekClient() {
     let tasks = 0;
     let social = 0;
     let followUps = 0;
+    const economicRisk = { total: 0, critical: 0, warning: 0 };
+    let economicRiskBookingId: string | null = null;
+    let economicRiskBookingLevel: 'critical' | 'warning' | null = null;
+    let economicRiskActionReason: string | null = null;
+    let economicRiskActionHash: 'sec-finances' | 'sec-marge' | null = null;
     for (const day of weekDays) {
       const key = formatKey(day);
       const dayData = data?.days?.[key];
@@ -125,15 +131,29 @@ export default function CalendarWeekClient() {
         tasks += dayData.tasks.length;
         social += dayData.socialPosts.length;
         followUps += dayData.followUps.length;
+        const dayEconomicRisk = summarizeCalendarEconomicRisk(dayData);
+        economicRisk.total += dayEconomicRisk.total;
+        economicRisk.critical += dayEconomicRisk.critical;
+        economicRisk.warning += dayEconomicRisk.warning;
+        const actionBooking = selectCalendarEconomicRiskBooking(dayData);
+        if (
+          actionBooking?.economicRisk &&
+          (!economicRiskBookingId || (economicRiskBookingLevel !== 'critical' && actionBooking.economicRisk.level === 'critical'))
+        ) {
+          economicRiskBookingId = actionBooking.id;
+          economicRiskBookingLevel = actionBooking.economicRisk.level;
+          economicRiskActionReason = formatCalendarEconomicRiskActionReason(actionBooking);
+          economicRiskActionHash = resolveCalendarEconomicRiskActionHash(actionBooking);
+        }
       }
     }
-    return { reservas, bloqueos, leads, tasks, social, followUps };
+    return { reservas, bloqueos, leads, tasks, social, followUps, economicRisk, economicRiskBookingId, economicRiskActionReason, economicRiskActionHash };
   }, [weekDays, data]);
 
   return (
     <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i feina planificada per executar el negoci.">
       {/* Barra superior */}
-      <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-3 sm:p-4 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.weekNavigation)}>
+      <div className="ap-card flex flex-col gap-3 p-3 sm:p-4 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.weekNavigation)}>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -172,7 +192,7 @@ export default function CalendarWeekClient() {
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=day')}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium transition-all hover:bg-white/10"
+              className="inline-flex items-center px-3 py-2 text-sm font-medium transition-all hover:bg-[var(--raised)]"
             >
               Dia
             </button>
@@ -185,6 +205,18 @@ export default function CalendarWeekClient() {
           </div>
           <div className="text-sm">
             {stats.reservas} reserves · {stats.leads} entrades · {stats.bloqueos} bloquejos · {stats.tasks + stats.social + stats.followUps} feines
+          </div>
+          <div className={`text-xs font-semibold ${stats.economicRisk.critical > 0 ? 'admin-tone-text-danger' : stats.economicRisk.total > 0 ? 'admin-tone-text-warning' : ''}`}>
+            Risc econòmic: {formatCalendarEconomicRiskSummary(stats.economicRisk)}
+            {stats.economicRiskActionReason ? ` · Motiu: ${stats.economicRiskActionReason}` : ''}
+            {stats.economicRiskBookingId && (
+              <>
+                {' · '}
+                <Link href={buildBookingHref(stats.economicRiskBookingId, stats.economicRiskActionHash)} className="text-[var(--gold)] no-underline hover:text-[var(--gold-bright)]">
+                  Obrir reserva amb risc
+                </Link>
+              </>
+            )}
           </div>
           {loading && (
             <div className="flex items-center gap-2 text-sm" role="status" aria-live="polite">
@@ -201,7 +233,7 @@ export default function CalendarWeekClient() {
       </div>
 
 
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
+      <div className="ap-card flex flex-wrap items-center gap-2 px-3 py-2 text-xs">
         <span className="font-semibold opacity-60">Capes:</span>
         {[
           ['bookings', 'Reserves'],
@@ -215,7 +247,7 @@ export default function CalendarWeekClient() {
             key={key}
             type="button"
             onClick={() => toggleLayer(key as CalendarLayer)}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] opacity-45'}`}
           >
             {label}
           </button>
@@ -239,7 +271,7 @@ export default function CalendarWeekClient() {
             <div
               key={key}
               className={[
-                'flex min-h-[280px] flex-col rounded-2xl border p-3 transition-all',
+                'flex min-h-[280px] flex-col ap-card p-3 transition-all',
                 toneClasses.card,
                 todayClass ? 'ring-2 ring-cyan-400/50' : '',
               ].join(' ')}
@@ -282,7 +314,7 @@ export default function CalendarWeekClient() {
 
               {/* Formulari bloqueig inline */}
               {blockingDate === key && (
-                <div className="mb-2 flex flex-col gap-1.5 rounded-xl border p-2">
+                <div className="mb-2 flex flex-col gap-1.5 ap-card p-2">
                   <input
                     type="text"
                     value={blockNote}
@@ -328,7 +360,7 @@ export default function CalendarWeekClient() {
                   <Link
                     key={task.id}
                     href="/admin/tasks"
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info"
+                    className="ap-card block px-2.5 py-2 transition-all admin-tone-soft-info"
                   >
                     <div className="truncate text-xs font-semibold">✓ {task.title}</div>
                     <div className="mt-0.5 text-xs opacity-70">{resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
@@ -337,8 +369,8 @@ export default function CalendarWeekClient() {
                 {visibleLayers.social && dayData.socialPosts.map((post) => (
                   <Link
                     key={post.id}
-                    href="/admin/social"
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-warning"
+                    href={buildSocialWorkspaceHref(post.id)}
+                    className="ap-card block px-2.5 py-2 transition-all admin-tone-soft-warning"
                   >
                     <div className="truncate text-xs font-semibold">📣 {post.title}</div>
                     <div className="mt-0.5 text-xs opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
@@ -358,27 +390,32 @@ export default function CalendarWeekClient() {
                     <div className="mt-0.5 text-xs opacity-70">{item.urgency}</div>
                   </Link>
                 ))}
-                {visibleLayers.leads && dayLeads.map((lead) => (
+                {visibleLayers.leads && dayLeads.map((lead) => {
+                  const isLost = lead.status === 'LOST';
+                  return (
                   <Link
                     key={lead.id}
                     href={buildLeadCustomerHref({
                       leadId: lead.id,
                       customerId: lead.customerId,
                     })}
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info"
+                    className={isLost
+                      ? 'block rounded-lg border px-2 py-1 text-xs opacity-60 transition-all'
+                      : 'block rounded-xl border px-2.5 py-2 transition-all admin-tone-soft-info'}
                   >
-                    <div className="truncate text-xs font-semibold">Nova entrada · {lead.name}</div>
+                    <div className="truncate text-xs font-semibold">{isLost ? 'Perdut' : 'Nova entrada'} · {lead.name}</div>
                     <div className="mt-0.5 text-xs opacity-70">
                       {lead.eventStartTime || '--:--'}{lead.eventEndTime ? ` - ${lead.eventEndTime}` : ''}
-                      {lead.eventType ? ` · ${lead.eventType}` : ''}
+                      {!isLost && lead.eventType ? ` · ${lead.eventType}` : ''}
                     </div>
                   </Link>
-                ))}
+                  );
+                })}
                 {visibleLayers.bookings && dayData.reservas.map((r) => (
                   <Link
                     key={r.id}
                     href={buildBookingHref(r.id)}
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass"
+                    className="ap-card block px-2.5 py-2 transition-all"
                   >
                     <div className="flex items-center justify-between gap-1">
                       <span className="text-xs font-semibold truncate">
@@ -399,6 +436,11 @@ export default function CalendarWeekClient() {
                       {resolveServiceLabel(r)}
                       {r.ubicacion ? ` · ${r.ubicacion}` : ''}
                     </div>
+                    {r.economicRisk && (
+                      <div className={`mt-1 truncate rounded border px-1.5 py-0.5 text-xs font-semibold ${getCalendarEconomicRiskClasses(r.economicRisk)}`}>
+                        {r.economicRisk.label}
+                      </div>
+                    )}
                   </Link>
                 ))}
                 {(!visibleLayers.bookings || !hasReservas) && (!visibleLayers.blocks || !hasBloqueos) && (!visibleLayers.leads || !hasLeads) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (
@@ -409,7 +451,7 @@ export default function CalendarWeekClient() {
               </div>
 
               {/* Accions ràpides */}
-              <div className="mt-2 pt-2 border-t border-white/5 flex gap-1">
+              <div className="mt-2 pt-2 border-t border-[var(--line)] flex gap-1">
                 <Link
                   href={`/admin/bookings/new?date=${key}`}
                   className="flex-1 rounded-lg border py-1 text-center text-xs font-medium transition-colors admin-tone-idle"

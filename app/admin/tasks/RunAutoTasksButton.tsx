@@ -35,16 +35,16 @@ export default function RunAutoTasksButton() {
   };
 
   return (
-    <div className="tk__auto-btn">
+    <div className="flex flex-col items-end gap-1">
       <button
         type="button"
         onClick={handleRun}
         disabled={loading}
-        className="tk__btn"
+        className="ap-btn ap-btn--xs"
       >
         {loading ? 'Executant...' : '⚡ Auto-tasques'}
       </button>
-      {message && <p className="tk__auto-msg">{message}</p>}
+      {message && <p className="max-w-[14rem] text-right text-xs text-[var(--t3)]">{message}</p>}
     </div>
   );
 }

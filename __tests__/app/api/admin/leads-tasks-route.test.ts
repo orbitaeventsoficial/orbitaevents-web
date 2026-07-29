@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockListTasks, mockCreateTask } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockListTasks, mockCreateTask } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockListTasks: vi.fn(),
   mockCreateTask: vi.fn(),
 }));
@@ -17,6 +18,8 @@ vi.mock('@/lib/services/leadScopedTaskRouteService', () => ({
 vi.mock('@/lib/logger', () => ({
   log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { GET, POST } from '@/app/api/admin/leads/[id]/tasks/route';
 
@@ -41,7 +44,7 @@ function makePostReq(id: string, body: Record<string, unknown>) {
 describe('GET /api/admin/leads/[id]/tasks', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockListTasks.mockResolvedValue([{ id: 'task-1', title: 'Trucar client' }]);
   });
 
@@ -80,7 +83,7 @@ describe('GET /api/admin/leads/[id]/tasks', () => {
 describe('POST /api/admin/leads/[id]/tasks', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockCreateTask.mockResolvedValue({ id: 'task-2', title: 'Enviar pressupost' });
   });
 

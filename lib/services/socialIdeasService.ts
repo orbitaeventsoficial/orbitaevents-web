@@ -11,6 +11,7 @@ import {
   SOCIAL_PLATFORMS,
   SOCIAL_CONTENT_TYPES,
   SOCIAL_CATEGORIES,
+  SOCIAL_POST_ORIGIN_TYPES,
   type SocialPlatform,
   type SocialContentType,
   type SocialCategory,
@@ -62,12 +63,14 @@ export type SocialIdeasInput = {
     categorySlug: string;
     coverImage: string;
     createdAt: Date;
+    hasSocialPost: boolean;
   }>;
   upcomingEvents: Array<{
     id: string;
     eventDate: Date;
     eventType: string | null;
     venue: string | null;
+    hasSocialPost: boolean;
   }>;
   now: Date;
 };
@@ -141,6 +144,7 @@ export function generateSocialIdeas(input: SocialIdeasInput): SocialIdea[] {
 
   // ── New portfolio items ────────────────────────────────────────────────
   for (const p of input.portfolioEvents) {
+    if (p.hasSocialPost) continue;
     const daysSince = daysBetween(input.now, p.createdAt);
     if (daysSince > 45) continue;
 
@@ -162,6 +166,7 @@ export function generateSocialIdeas(input: SocialIdeasInput): SocialIdea[] {
 
   // ── Upcoming events (teaser countdown) ─────────────────────────────────
   for (const e of input.upcomingEvents) {
+    if (e.hasSocialPost) continue;
     const daysUntil = daysBetween(e.eventDate, input.now);
     if (daysUntil < 2 || daysUntil > 14) continue;
 
@@ -259,13 +264,38 @@ export async function loadSocialIdeas(now: Date = new Date()): Promise<SocialIde
       take: 10,
     }),
     prisma.socialPost.findMany({
-      where: { bookingId: { not: null } },
-      select: { bookingId: true },
+      where: {
+        OR: [
+          { bookingId: { not: null } },
+          { originId: { not: null } },
+        ],
+      },
+      select: { bookingId: true, originType: true, originId: true },
     }),
   ]);
 
   const bookingsWithPost = new Set(
-    existingPostKeys.map((p) => p.bookingId).filter((id): id is string => Boolean(id))
+    existingPostKeys
+      .flatMap((p) => [
+        p.bookingId,
+        p.originType === SOCIAL_POST_ORIGIN_TYPES.BOOKING ? p.originId : null,
+      ])
+      .filter((id): id is string => Boolean(id))
+  );
+  const testimonialsWithPost = new Set(
+    existingPostKeys
+      .filter((p) => p.originType === SOCIAL_POST_ORIGIN_TYPES.TESTIMONIAL && p.originId)
+      .map((p) => p.originId as string)
+  );
+  const portfolioWithPost = new Set(
+    existingPostKeys
+      .filter((p) => p.originType === SOCIAL_POST_ORIGIN_TYPES.PORTFOLIO && p.originId)
+      .map((p) => p.originId as string)
+  );
+  const upcomingEventsWithPost = new Set(
+    existingPostKeys
+      .filter((p) => p.originType === SOCIAL_POST_ORIGIN_TYPES.UPCOMING_EVENT && p.originId)
+      .map((p) => p.originId as string)
   );
 
   const input: SocialIdeasInput = {
@@ -284,7 +314,7 @@ export async function loadSocialIdeas(now: Date = new Date()): Promise<SocialIde
       rating: t.rating,
       eventType: t.eventType as string | null,
       photoUrl: t.photoUrl,
-      hasSocialPost: false,
+      hasSocialPost: testimonialsWithPost.has(t.id),
     })),
     portfolioEvents: portfolioRows.map((p) => ({
       id: p.id,
@@ -293,12 +323,14 @@ export async function loadSocialIdeas(now: Date = new Date()): Promise<SocialIde
       categorySlug: p.categorySlug,
       coverImage: p.coverImage,
       createdAt: p.createdAt,
+      hasSocialPost: portfolioWithPost.has(p.id),
     })),
     upcomingEvents: upcomingRows.map((e) => ({
       id: e.id,
       eventDate: e.eventDate,
       eventType: e.eventType as string | null,
       venue: e.eventLocation,
+      hasSocialPost: upcomingEventsWithPost.has(e.id),
     })),
     now,
   };

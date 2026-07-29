@@ -219,10 +219,10 @@ export default function TextManagerPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--o-admin-canvas)]">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--o-admin-canvas)]" role="status" aria-live="polite">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white/70 animate-spin" />
-          <p className="text-sm text-white/40">Carregant textos...</p>
+          <div className="w-6 h-6 rounded-full border-2 border-[var(--line)] border-t-white/70 animate-spin" />
+          <p className="text-sm text-[var(--t3)]">Carregant textos...</p>
         </div>
       </div>
     );
@@ -230,9 +230,9 @@ export default function TextManagerPage() {
 
   if (error && !Object.keys(esTexts).length) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[var(--o-admin-canvas)]">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[var(--o-admin-canvas)]" role="alert" aria-live="assertive">
         <p className="admin-tone-text-warning text-sm">{error}</p>
-        <button type="button" onClick={loadTexts} className="text-sm px-4 py-2 rounded-lg border border-white/10 text-white/60 hover:text-white/80">Reintentar</button>
+        <button type="button" onClick={loadTexts} className="ap-btn ap-btn--xs">Reintentar</button>
       </div>
     );
   }
@@ -241,18 +241,18 @@ export default function TextManagerPage() {
     <div className="h-screen flex flex-col bg-[var(--o-admin-canvas)]">
 
       {/* HEADER */}
-      <header className="shrink-0 border-b border-white/[0.06] bg-[var(--o-admin-canvas)]">
+      <header className="shrink-0 border-b border-[var(--line)] bg-[var(--o-admin-canvas)]">
         <div className="flex items-center gap-3 px-5 h-14">
-          <span className="text-xs font-bold text-white/30 uppercase tracking-[0.18em] shrink-0">Gestor de textos</span>
+          <span className="text-xs font-bold text-[var(--t3)] uppercase tracking-[0.18em] shrink-0">Gestor de textos</span>
           <div className="w-px h-4 bg-[var(--o-admin-fill-4)] shrink-0" />
 
-          <div className="flex items-center rounded-lg border border-white/[0.08] overflow-hidden shrink-0 bg-[var(--o-admin-fill-1)]">
+          <div className="flex items-center rounded-lg border border-[var(--line)] overflow-hidden shrink-0 bg-[var(--o-admin-fill-1)]">
             {(['ca', 'es', 'en'] as const).map((lang) => (
               <button
                 key={lang}
                 onClick={() => setActiveLanguage(lang)}
-                className={`px-4 h-8 text-xs font-semibold transition-all border-r border-white/[0.06] last:border-r-0 ${
-                  activeLanguage === lang ? 'bg-white/12 text-white' : 'text-white/35 hover:text-white/60 adm-row-hover'
+                className={`px-4 h-8 text-xs font-semibold transition-all border-r border-[var(--line)] last:border-r-0 ${
+                  activeLanguage === lang ? 'bg-[var(--raised)] text-[var(--t)]' : 'text-[var(--t3)] hover:text-[var(--t2)] adm-row-hover'
                 }`}
               >
                 {LANGUAGE_META[lang].label}
@@ -266,7 +266,7 @@ export default function TextManagerPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Cerca per clau o text..."
-              className="w-full h-8 px-3 rounded-lg text-xs text-white/70 placeholder-white/20 outline-none border border-white/[0.06] transition-colors focus:border-[var(--line)] bg-[var(--panel)]"
+              className="w-full h-8 px-3 rounded-lg text-xs text-[var(--t2)] placeholder-white/20 outline-none border border-[var(--line)] transition-colors focus:border-[var(--line)] bg-[var(--panel)]"
             />
           </div>
 
@@ -275,10 +275,10 @@ export default function TextManagerPage() {
             className={`flex items-center gap-2 px-3 h-8 rounded-lg text-xs font-medium border transition-all shrink-0 ${
               showOnlyModified
                 ? 'admin-tone-bg-warning admin-tone-border-warning admin-tone-text-warning'
-                : 'bg-[var(--o-admin-fill-1)] border-white/[0.08] text-white/35 hover:text-white/55 hover:border-white/15'
+                : 'bg-[var(--o-admin-fill-1)] border-[var(--line)] text-[var(--t3)] hover:text-[var(--t3)] hover:border-[var(--line)]'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${showOnlyModified ? 'bg-[var(--o-warning)]' : 'bg-white/25'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${showOnlyModified ? 'bg-[var(--o-warning)]' : 'bg-[var(--t3)]'}`} />
             Modificats
             {modifiedCount > 0 && <span className="opacity-60">({modifiedCount})</span>}
           </button>
@@ -288,10 +288,10 @@ export default function TextManagerPage() {
           <button
             onClick={handleSave}
             disabled={saving || modifiedCount === 0}
-            className={`px-5 h-9 rounded-lg text-sm font-bold border transition-all shrink-0 ${
+            className={`ap-btn shrink-0 ${
               modifiedCount > 0
-                ? 'bg-[var(--o-success)] border-[var(--o-success)] text-white hover:brightness-110'
-                : 'bg-transparent border-white/10 text-white/20 cursor-not-allowed'
+                ? 'ap-btn--primary admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
+                : ''
             }`}
           >
             {saving ? 'Desant...' : 'Desar'}
@@ -303,13 +303,13 @@ export default function TextManagerPage() {
       {(error || success) && (
         <div className="px-4 pt-3">
           {error && (
-            <div className="flex items-center justify-between px-4 py-2.5 rounded-lg border admin-tone-border-danger admin-tone-bg-danger text-sm admin-tone-text-danger">
+            <div role="alert" aria-live="assertive" className="flex items-center justify-between px-4 py-2.5 rounded-lg border admin-tone-border-danger admin-tone-bg-danger text-sm admin-tone-text-danger">
               <span>{error}</span>
               <button onClick={() => setError(null)} className="admin-tone-text-danger opacity-60 hover:opacity-100 ml-4">✕</button>
             </div>
           )}
           {success && (
-            <div className="flex items-center justify-between px-4 py-2.5 rounded-lg border admin-tone-border-success admin-tone-bg-success text-sm admin-tone-text-success">
+            <div role="status" aria-live="polite" className="flex items-center justify-between px-4 py-2.5 rounded-lg border admin-tone-border-success admin-tone-bg-success text-sm admin-tone-text-success">
               <span>{success}</span>
               <button onClick={() => setSuccess(null)} className="admin-tone-text-success opacity-60 hover:opacity-100 ml-4">✕</button>
             </div>
@@ -321,13 +321,13 @@ export default function TextManagerPage() {
       <div className="flex flex-1 min-h-0">
 
         {/* SIDEBAR */}
-        <aside className="w-64 shrink-0 border-r border-white/[0.06] overflow-y-scroll">
+        <aside className="w-64 shrink-0 border-r border-[var(--line)] overflow-y-scroll">
           <div className="p-2 space-y-0.5">
             <button
               onClick={() => setActiveSection(null)}
               type="button"
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all flex items-center justify-between ${
-                !activeSection ? 'bg-white/10 text-white' : 'text-white/45 hover:text-white/70 adm-row-hover'
+                !activeSection ? 'bg-[var(--raised)] text-[var(--t)]' : 'text-[var(--t3)] hover:text-[var(--t2)] adm-row-hover'
               }`}
             >
               <span>Totes</span>
@@ -343,7 +343,7 @@ export default function TextManagerPage() {
                   onClick={() => setActiveSection(section.id)}
                   type="button"
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all flex items-center justify-between gap-2 ${
-                    isActive ? 'bg-white/10 text-white' : 'text-white/45 hover:text-white/70 adm-row-hover'
+                    isActive ? 'bg-[var(--raised)] text-[var(--t)]' : 'text-[var(--t3)] hover:text-[var(--t2)] adm-row-hover'
                   }`}
                 >
                   <span className="leading-snug"><span className="mr-1.5 opacity-70">{section.icon}</span>{section.name}</span>
@@ -362,22 +362,22 @@ export default function TextManagerPage() {
           <div className="max-w-3xl mx-auto px-6 py-6 space-y-4">
             {activeSectionMeta && (
               <div className="mb-2">
-                <h2 className="text-sm font-semibold text-white/70">{activeSectionMeta.name}</h2>
-                <p className="text-xs text-white/30 mt-0.5">{activeSectionMeta.description} · {sectionCounts[activeSection!]?.total || 0} textos</p>
+                <h2 className="text-sm font-semibold text-[var(--t2)]">{activeSectionMeta.name}</h2>
+                <p className="text-xs text-[var(--t3)] mt-0.5">{activeSectionMeta.description} · {sectionCounts[activeSection!]?.total || 0} textos</p>
               </div>
             )}
             {filteredTexts.length === 0 ? (
-              <div className="py-16 text-center text-white/25 text-sm">Cap text trobat</div>
+              <div className="py-16 text-center text-[var(--t3)] text-sm">Cap text trobat</div>
             ) : groupedTexts.map(({ key, label, entries }) => {
               const groupModified = entries.some(([p, v]) => v !== originalTexts[p]);
               return (
                 <div
                   key={key}
-                  className={`rounded-xl border transition-all ${groupModified ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-white/[0.06] bg-white/[0.015]'}`}
+                  className={`rounded-xl border transition-all ${groupModified ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-[var(--line)] bg-[var(--raised)]'}`}
                 >
-                  <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/[0.05]">
-                    <span className="text-sm font-semibold text-white/70">{label}</span>
-                    <span className="text-xs text-white/20">{entries.length} camps</span>
+                  <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--line)]">
+                    <span className="text-sm font-semibold text-[var(--t2)]">{label}</span>
+                    <span className="text-xs text-[var(--t3)]">{entries.length} camps</span>
                   </div>
                   <div className="divide-y divide-white/[0.04]">
                     {entries.map(([path, value]) => {
@@ -386,26 +386,26 @@ export default function TextManagerPage() {
                         <div key={path} className="px-4 py-3">
                           <div className="flex items-center justify-between gap-3 mb-1.5">
                             <div className="min-w-0 flex-1">
-                              <span className={`text-xs font-medium ${isModified ? 'admin-tone-text-warning' : 'text-white/45'}`}>{formatPathLabel(path)}</span>
-                              <span className="text-xs text-white/15 font-mono ml-2">{path}</span>
+                              <span className={`text-xs font-medium ${isModified ? 'admin-tone-text-warning' : 'text-[var(--t3)]'}`}>{formatPathLabel(path)}</span>
+                              <span className="text-xs text-[var(--t3)] font-mono ml-2">{path}</span>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
                               {isModified && (
-                                <button onClick={() => handleRevert(path)} className="text-xs text-white/30 hover:text-white/60 transition-colors">
+                                <button onClick={() => handleRevert(path)} className="text-xs text-[var(--t3)] hover:text-[var(--t2)] transition-colors">
                                   Revertir
                                 </button>
                               )}
-                              <span className="text-xs text-white/20">{value.length}</span>
+                              <span className="text-xs text-[var(--t3)]">{value.length}</span>
                             </div>
                           </div>
                           <textarea
                             value={value}
                             onChange={(e) => handleTextChange(path, e.target.value)}
                             rows={Math.min(20, Math.max(2, Math.ceil(value.length / 65), value.split('\n').length + 1))}
-                            className={`w-full px-3 py-2 rounded-lg text-sm text-white/85 placeholder-white/20 resize-y outline-none transition-all border ${
+                            className={`w-full px-3 py-2 rounded-lg text-sm text-[var(--t2)] placeholder-white/20 resize-y outline-none transition-all border ${
                               isModified
                                 ? 'admin-tone-bg-warning admin-tone-border-warning'
-                                : 'bg-[var(--o-admin-fill-1)] border-white/[0.05] focus:border-white/12'
+                                : 'bg-[var(--o-admin-fill-1)] border-[var(--line)] focus:border-[var(--line)]'
                             }`}
                             placeholder="Buit..."
                           />

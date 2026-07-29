@@ -8,6 +8,8 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { TASK_SOURCE, TASK_DEDUPE_KEY } from '@/lib/constants';
+import { isSmtpConfigured } from '@/lib/env';
+import { sendLeadWelcomeEmail } from '@/lib/services/leadWelcomeEmailService';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -18,7 +20,7 @@ interface TriggerContext {
 
 type TriggerResult = { triggered: boolean; action: string; detail?: string };
 
-// ─── Proposal accepted → auto-generate contract ─────────────────────────────
+// ─── Proposal accepted → queue contract generation ──────────────────────────
 
 export async function onProposalAccepted(
   proposalId: string,
@@ -34,12 +36,12 @@ export async function onProposalAccepted(
       return { triggered: false, action: 'generate-contract', detail: 'No booking linked' };
     }
 
-    // Only auto-generate if contract doesn't exist yet
+    // Only queue the contract workflow if it doesn't exist yet.
     if (proposal.contractStatus && proposal.contractStatus !== 'DRAFT') {
       return { triggered: false, action: 'generate-contract', detail: 'Contract already exists' };
     }
 
-    // Mark contract as pending generation
+    // Mark contract as pending generation; the PDF is still created by the Studio.
     await prisma.proposal.update({
       where: { id: proposalId },
       data: {
@@ -48,10 +50,10 @@ export async function onProposalAccepted(
       },
     });
 
-    log.info(`[AutoTrigger] Contracte auto-generat per proposta ${proposalId}`);
-    return { triggered: true, action: 'generate-contract', detail: `Contract DRAFT for proposal ${proposalId}` };
+    log.info(`[AutoTrigger] Contracte pendent de generar per proposta ${proposalId}`);
+    return { triggered: true, action: 'generate-contract', detail: `Contract pending generation for proposal ${proposalId}` };
   } catch (error) {
-    log.error('[AutoTrigger] Error generant contracte:', error);
+    log.error('[AutoTrigger] Error marcant contracte pendent:', error);
     return { triggered: false, action: 'generate-contract', detail: String(error) };
   }
 }
@@ -72,7 +74,9 @@ export async function onLeadCreated(
       return { triggered: false, action: 'welcome-email', detail: 'No valid email' };
     }
 
-    // Canonical dedup via dedupeKey — evita duplicats en retry del dispatcher o double-click de l'API
+    // Lock idempotent + audit: la tasca (dedupeKey ÚNIC) evita duplicats en retry o
+    // double-click i queda com a registre. Un cop enviat l'email, es marca DONE.
+    const dedupeKey = TASK_DEDUPE_KEY.welcomeEmail(lead.id);
     const result = await prisma.task.createMany({
       data: [
         {
@@ -83,18 +87,41 @@ export async function onLeadCreated(
           dueDate: new Date(),
           leadId: lead.id,
           source: TASK_SOURCE.AUTOMATION,
-          dedupeKey: TASK_DEDUPE_KEY.welcomeEmail(lead.id),
+          dedupeKey,
         },
       ],
       skipDuplicates: true,
     });
 
     if (result.count === 0) {
-      return { triggered: false, action: 'welcome-email', detail: 'Welcome email already queued' };
+      return { triggered: false, action: 'welcome-email', detail: 'Welcome email already handled' };
     }
 
-    log.info(`[AutoTrigger] Welcome email task creada per lead ${leadId}`);
-    return { triggered: true, action: 'welcome-email', detail: `Task created for ${lead.email}` };
+    // Enviament AUTOMÀTIC (decisió del propietari 2026-07-05): si hi ha SMTP, s'envia
+    // sol amb la plantilla `welcome` en el preferredLocale del lead i es marca la tasca
+    // com a feta. Si NO hi ha SMTP o l'enviament falla, la tasca queda OBERTA com a
+    // fallback manual — mai es perd, i el dedupeKey garanteix que no es dupliqui.
+    if (!isSmtpConfigured()) {
+      log.info(`[AutoTrigger] Welcome email encuat (SMTP off) per lead ${leadId}`);
+      return { triggered: true, action: 'welcome-email', detail: 'Queued for manual send (SMTP off)' };
+    }
+
+    const sent = await sendLeadWelcomeEmail({
+      to: lead.email,
+      clientName: lead.name,
+      locale: lead.preferredLocale,
+      leadId: lead.id,
+    });
+    if (sent.ok) {
+      await prisma.task
+        .update({ where: { dedupeKey }, data: { status: 'DONE', description: `Email de benvinguda enviat automàticament a ${lead.email}.` } })
+        .catch((e) => log.error('[AutoTrigger] No s\'ha pogut marcar la tasca de welcome com a feta', e));
+      log.info(`[AutoTrigger] Welcome email ENVIAT automàticament a lead ${leadId}`);
+      return { triggered: true, action: 'welcome-email', detail: `Welcome email sent to ${lead.email}` };
+    }
+
+    log.error(`[AutoTrigger] Welcome email auto-send fallit per ${leadId}: ${sent.error}`);
+    return { triggered: true, action: 'welcome-email', detail: `Queued for manual send (send failed)` };
   } catch (error) {
     log.error('[AutoTrigger] Error creant welcome email task:', error);
     return { triggered: false, action: 'welcome-email', detail: String(error) };

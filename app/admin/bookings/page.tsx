@@ -1,27 +1,22 @@
 // app/admin/bookings/page.tsx
-import './[id]/booking-detail.css';
 import { log } from '@/lib/logger';
 // Pàgina de gestió de reserves
 import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
-import { Prisma } from '@prisma/client';
-import { AdminPage } from '../components/AdminPage';
-import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import BookingActions from './BookingActions';
 import BookingFilters from './BookingFilters';
 import { BOOKING_OVERVIEW_STATUS_CARDS, formatDate, formatDateShort, formatCurrency, getBookingStatusDisplay, getEventLabel } from '@/lib/constants';
 import { getMarginTone } from '@/lib/margin-utils';
+import { getPaymentLabel, getPaymentTextClass, getPaymentDotClass } from '@/lib/payment-status';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
-import { computeSimpleMarginPct } from '@/lib/services/costEngine';
+import { aggregateServiceLines, computeSimpleMarginPct } from '@/lib/services/costEngine';
 import { getTranslatedPackName } from '@/lib/pack-name';
 import ExportCsvButton from '../components/ExportCsvButton';
 import dynamicImport from 'next/dynamic';
-import { ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS } from '@/lib/constants/admin';
 import { buildCustomerBookingListHref, buildCustomerWorkspaceTabHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
+import { buildBookingsWhere, getPaymentFilterLabel, type BookingSearchParams } from '@/lib/services/bookingPaymentFilter';
 
 const BookingPipelineViewWrapper = dynamicImport(
   () => import('./BookingPipelineView'),
@@ -33,126 +28,6 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Reserves | Òrbita Admin',
 };
-
-type BookingPaymentFilter = 'deposit-pending' | 'overdue' | 'due-soon';
-
-interface BookingSearchParams {
-  page?: string;
-  status?: string;
-  eventType?: string;
-  fromDate?: string;
-  toDate?: string;
-  search?: string;
-  view?: string;
-  payment?: string;
-  customerId?: string;
-}
-
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-}
-
-function resolvePaymentFilter(value?: string): BookingPaymentFilter | null {
-  switch (value) {
-    case 'deposit-pending':
-    case 'overdue':
-    case 'due-soon':
-      return value;
-    default:
-      return null;
-  }
-}
-
-function getPaymentFilterLabel(value: BookingPaymentFilter | null) {
-  if (!value) return null;
-  const match = ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS.find((option) => option.id === value);
-  return match?.label ?? null;
-}
-
-function buildBookingsWhere(params: BookingSearchParams) {
-  const now = new Date();
-  const paymentFilter = resolvePaymentFilter(params.payment);
-  const overdueEventDateLimit = addDays(now, 30);
-  const overdueRemainingDateLimit = addDays(now, 7);
-  const dueSoonDepositFrom = addDays(now, 30);
-  const dueSoonDepositTo = addDays(now, 37);
-  const dueSoonRemainingFrom = addDays(now, 7);
-  const dueSoonRemainingTo = addDays(now, 14);
-
-  const andClauses: Prisma.BookingWhereInput[] = [];
-  if (params.status) {
-    andClauses.push({
-      status: params.status as Prisma.BookingWhereInput['status'],
-    });
-  }
-  if (params.eventType) {
-    andClauses.push({
-      eventType: params.eventType as Prisma.BookingWhereInput['eventType'],
-    });
-  }
-  if (params.fromDate || params.toDate) {
-    const eventDate: Prisma.DateTimeFilter = {};
-    if (params.fromDate) {
-      eventDate.gte = new Date(params.fromDate);
-    }
-    if (params.toDate) {
-      eventDate.lte = new Date(params.toDate + 'T23:59:59');
-    }
-    andClauses.push({ eventDate });
-  }
-  if (params.search) {
-    const q = params.search;
-    andClauses.push({
-      OR: [
-        { clientName: { contains: q, mode: 'insensitive' } },
-        { reference: { contains: q, mode: 'insensitive' } },
-        { eventLocation: { contains: q, mode: 'insensitive' } },
-        { clientEmail: { contains: q, mode: 'insensitive' } },
-      ],
-    });
-  }
-  if (params.customerId) {
-    andClauses.push({ customerId: params.customerId });
-  }
-  if (paymentFilter === 'deposit-pending') {
-    andClauses.push({ depositPaid: false });
-  }
-  if (paymentFilter === 'overdue') {
-    andClauses.push({
-      OR: [
-        { depositPaid: false, eventDate: { lt: overdueEventDateLimit } },
-        { remainingPaid: false, eventDate: { lt: overdueRemainingDateLimit } },
-      ],
-    });
-  }
-  if (paymentFilter === 'due-soon') {
-    andClauses.push({
-      OR: [
-        {
-          depositPaid: false,
-          eventDate: {
-            gte: dueSoonDepositFrom,
-            lte: dueSoonDepositTo,
-          },
-        },
-        {
-          remainingPaid: false,
-          eventDate: {
-            gte: dueSoonRemainingFrom,
-            lte: dueSoonRemainingTo,
-          },
-        },
-      ],
-    });
-  }
-
-  return {
-    paymentFilter,
-    where: andClauses.length > 0 ? { AND: andClauses } : {},
-  } satisfies { paymentFilter: BookingPaymentFilter | null; where: Prisma.BookingWhereInput };
-}
 
 async function getBookings(params: BookingSearchParams) {
   try {
@@ -175,6 +50,7 @@ async function getBookings(params: BookingSearchParams) {
             pack: { include: { translations: true } },
             lead: { select: { id: true, name: true, source: true, preferredLocale: true } },
             extras: { select: { price: true, quantity: true } },
+            serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true } },
             _count: { select: { extras: true } },
           },
         }),
@@ -246,68 +122,19 @@ export default async function BookingsPage({
   const totalRevenue = stats.reduce((sum, s) => sum + (s._sum.total || 0), 0);
   const paymentFilterLabel = getPaymentFilterLabel(paymentFilter);
   const now = new Date();
-  const nextWeek = addDays(now, 7);
-  const pendingPaymentCount = bookings.filter((booking) => !booking.depositPaid || !booking.remainingPaid).length;
-  const overduePaymentCount = bookings.filter((booking) => {
-    if (booking.status === 'CANCELLED' || booking.status === 'COMPLETED') return false;
-    const eventDate = new Date(booking.eventDate);
-    return (!booking.depositPaid && eventDate < addDays(now, 30)) || (!booking.remainingPaid && eventDate < addDays(now, 7));
-  }).length;
-  const upcomingExecutionCount = bookings.filter((booking) => {
-    if (booking.status === 'CANCELLED' || booking.status === 'COMPLETED') return false;
-    const eventDate = new Date(booking.eventDate);
-    return eventDate >= now && eventDate <= nextWeek;
-  }).length;
-  const preparingCount = statsMap.PREPARING?.count || 0;
-  const automaticSignals = [
-    customerId ? 'Llista contextual del client activa' : null,
-    paymentFilterLabel ? `Focus automàtic: ${paymentFilterLabel}` : null,
-    upcomingExecutionCount > 0 ? `${upcomingExecutionCount} reserva${upcomingExecutionCount > 1 ? 'es' : ''} dins dels pròxims 7 dies` : null,
-    preparingCount > 0 ? `${preparingCount} reserva${preparingCount > 1 ? 'es' : ''} en preparació` : null,
-  ].filter(Boolean) as string[];
-  const manualSignals = [
-    overduePaymentCount > 0 ? `${overduePaymentCount} cobrament${overduePaymentCount > 1 ? 's' : ''} en risc o vençut${overduePaymentCount > 1 ? 's' : ''}` : null,
-    pendingPaymentCount > 0 ? `${pendingPaymentCount} reserva${pendingPaymentCount > 1 ? 'es' : ''} amb cobrament pendent` : null,
-    statsMap.PENDING?.count ? `${statsMap.PENDING.count} reserva${statsMap.PENDING.count > 1 ? 'es' : ''} pendents de confirmar` : null,
-  ].filter(Boolean) as string[];
-  const nextStepHref = overduePaymentCount > 0
-    ? customerId
-      ? buildCustomerBookingListHref(customerId, { payment: 'overdue' })
-      : '/admin/bookings?payment=overdue'
-    : upcomingExecutionCount > 0
-      ? customerId
-        ? buildCustomerBookingListHref(customerId, { status: 'PREPARING' })
-        : '/admin/bookings?status=PREPARING'
-      : customerId
-        ? buildCustomerWorkspaceTabHref(customerId, 'bookings')
-        : '/admin/bookings/new';
-  const nextStepLabel = overduePaymentCount > 0
-    ? 'Revisar cobraments en risc'
-    : upcomingExecutionCount > 0
-      ? 'Preparar reserves imminents'
-      : customerId
-        ? 'Obrir workspace del client'
-        : 'Crear reserva nova';
-  const nextStepDetail = overduePaymentCount > 0
-    ? 'La prioritat és tancar imports que poden afectar execució o caixa.'
-    : upcomingExecutionCount > 0
-      ? 'Hi ha execució pròxima i convé revisar checklist, timings i estat.'
-      : customerId
-        ? 'No hi ha tensió clara ara mateix, però el context del client continua actiu.'
-        : 'No hi ha senyal calent a la llista actual.';
 
   return (
-    <div className="bd__root">
+    <div className="min-h-screen bg-[var(--ax-canvas)] text-[var(--t2)]">
 
       {/* ── Header sticky — mateix patró que la fitxa de reserva ── */}
       <div className="ap-sticky-header">
-        <div className="ap-detail-bar bk-detail-bar-row">
+        <div className="ap-detail-bar">
           {customerId ? (
             <Link href={buildCustomerWorkspaceTabHref(customerId, 'bookings')} className="ap-detail-bar-btn">← Client</Link>
           ) : (
             <span className="ap-detail-kicker">Agenda</span>
           )}
-          <div className="bk-detail-bar-actions">
+          <div className="ap-detail-bar-actions">
             <ExportCsvButton
               filename="reserves"
               headers={['Referència', 'Client', 'Data', 'Tipus', 'Estat', 'Total (€)']}
@@ -330,16 +157,16 @@ export default async function BookingsPage({
       </div>
 
       {paymentFilterLabel && (
-        <div className="bk-payment-filter-banner ap-detail-stats-cell ap-detail-stats-cell--warn">
+        <div className="ap-inline-alert ap-inline-alert--warning flex items-center gap-2.5">
           <span className="ap-detail-stats-label">Focus</span>
           <span className="ap-detail-stats-val text-sm">{paymentFilterLabel}</span>
           <Link href="/admin/bookings" className="text-xs opacity-60 hover:opacity-100 ml-auto">Veure totes →</Link>
         </div>
       )}
 
-      <div className="bk-list-shell bk-list-shell--top">
+      <div className="mx-auto flex w-full max-w-[76.25rem] flex-col gap-2 px-5 py-2">
 
-        <div className="bk-stats-bar ap-detail-stats">
+        <div className="ap-detail-stats">
           <div className="ap-detail-stats-cell ap-detail-stats-cell--gold">
             <span className="ap-detail-stats-label">Total</span>
             <span className="ap-detail-stats-val">{pagination.total} · {formatCurrency(totalRevenue)}</span>
@@ -360,10 +187,10 @@ export default async function BookingsPage({
         <BookingPipelineViewWrapper />
       )}
 
-      {!isKanban && <div className="bk-list-shell"><>
+      {!isKanban && <div className="mx-auto flex w-full max-w-[76.25rem] flex-col gap-2 px-5"><>
       <section className="lg:hidden space-y-3">
         {bookings.length === 0 ? (
-          <div className="ap-card bk-empty-state">
+          <div className="ap-card ap-empty">
             <span className="text-4xl">📅</span>
             <p className="mt-2">Encara no hi ha reserves</p>
             <p className="text-xs mt-1 admin-tone-text-slate">Quan un lead es confirma, es genera una reserva automàticament. També pots crear-ne una manualment.</p>
@@ -380,10 +207,10 @@ export default async function BookingsPage({
             return (
               <article
                 key={booking.id}
-                className={`ap-card bk-mobile-card ${
+                className={`ap-card block p-4 ${
                   isPast && booking.status !== 'COMPLETED'
-                    ? 'bk-mobile-card--past'
-                    : 'bk-mobile-card--normal'
+                    ? 'admin-tone-border-warning'
+                    : ''
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -410,21 +237,24 @@ export default async function BookingsPage({
                   </div>
                   <div className="text-right shrink-0">
                     <p className="font-bold">{formatCurrency(booking.total)}</p>
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
-                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
-                      {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
+                    <span className={`inline-flex items-center gap-1 text-xs font-medium mt-0.5 ${getPaymentTextClass(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}`}>
+                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${getPaymentDotClass(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}`} />
+                      {getPaymentLabel(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}
                     </span>
                     {(() => {
                       const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+                      const serviceLines = aggregateServiceLines(booking.serviceLines);
                       const marginPct = computeSimpleMarginPct(
                         {
                           total: booking.total,
                           packPrice: booking.pack.price,
                           extrasTotal,
-                          extraHours: 0,
-                          extraHourPrice: 0,
+                          extraHours: booking.extraHours ?? 0,
+                          extraHourPrice: booking.pack.extraHourPrice ?? 0,
                           distanceKm: 0,
                           travelCost: booking.travelCost ?? 0,
+                          serviceLinesRevenue: serviceLines.revenue,
+                          serviceLinesCost: serviceLines.cost,
                         },
                         profitConfig,
                       );
@@ -472,22 +302,22 @@ export default async function BookingsPage({
         )}
       </section>
 
-      <section className="bk-table-section hidden lg:block overflow-hidden">
-          <table className="w-full" aria-label="Llistat de reserves">
-            <thead className="bk-table-head">
+      <section className="ap-table-wrap hidden lg:block">
+          <table className="ap-table" aria-label="Llistat de reserves">
+            <thead className="ap-table-head">
               <tr>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[9%]">Ref.</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label">Client</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[11%]">Tipus</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[11%]">Data</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[9%]">Pack</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[10%]">Total</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[7%]">Marge</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[9%]">Estat</th>
-                <th scope="col" className="px-3 py-2 text-right bk-th-label w-[18%]">Accions</th>
+                <th scope="col" className="ap-table-th w-[9%]">Ref.</th>
+                <th scope="col" className="ap-table-th">Client</th>
+                <th scope="col" className="ap-table-th w-[11%]">Tipus</th>
+                <th scope="col" className="ap-table-th w-[11%]">Data</th>
+                <th scope="col" className="ap-table-th w-[9%]">Pack</th>
+                <th scope="col" className="ap-table-th w-[10%]">Total</th>
+                <th scope="col" className="ap-table-th w-[7%]">Marge</th>
+                <th scope="col" className="ap-table-th w-[9%]">Estat</th>
+                <th scope="col" className="ap-table-th w-[18%] text-right">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y admin-tone-border-subtle">
+            <tbody className="ap-table-body">
               {bookings.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center">
@@ -505,16 +335,16 @@ export default async function BookingsPage({
                   return (
                     <tr
                       key={booking.id}
-                      className={`bk-table-row adm-row-hover${isPast && booking.status !== 'COMPLETED' ? ' bk-table-row--past' : ''}`}
+                      className={isPast && booking.status !== 'COMPLETED' ? 'admin-tone-bg-warning' : undefined}
                     >
                       <td className="px-3 py-2.5">
-                        <Link href={buildBookingHref(booking.id)} className="bk-booking-ref-link block max-w-[7rem] truncate font-mono text-xs hover:opacity-80 whitespace-nowrap">
+                        <Link href={buildBookingHref(booking.id)} className="block max-w-[7rem] truncate font-mono text-xs text-[var(--gold)] hover:opacity-80 whitespace-nowrap">
                           {booking.reference}
                         </Link>
                       </td>
                       <td className="px-3 py-2.5">
                         {booking.customerId ? (
-                          <Link href={buildCustomerHubHref(booking.customerId!)} className="font-semibold text-sm hover:text-white truncate block max-w-[160px]">
+                          <Link href={buildCustomerHubHref(booking.customerId!)} className="font-semibold text-sm hover:text-[var(--t)] truncate block max-w-[160px]">
                             {booking.clientName}
                           </Link>
                         ) : (
@@ -543,23 +373,26 @@ export default async function BookingsPage({
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="max-w-[7rem] truncate text-sm font-bold tabular-nums whitespace-nowrap">{formatCurrency(booking.total)}</div>
-                        <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
-                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
-                          {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
+                        <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${getPaymentTextClass(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}`}>
+                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${getPaymentDotClass(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}`} />
+                          {getPaymentLabel(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}
                         </span>
                       </td>
                       <td className="px-3 py-2.5 text-center">
                         {(() => {
                           const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+                          const serviceLines = aggregateServiceLines(booking.serviceLines);
                           const marginPct = computeSimpleMarginPct(
                             {
                               total: booking.total,
                               packPrice: booking.pack.price,
                               extrasTotal,
-                              extraHours: 0,
-                              extraHourPrice: 0,
+                              extraHours: booking.extraHours ?? 0,
+                              extraHourPrice: booking.pack.extraHourPrice ?? 0,
                               distanceKm: 0,
                               travelCost: booking.travelCost ?? 0,
+                              serviceLinesRevenue: serviceLines.revenue,
+                              serviceLinesCost: serviceLines.cost,
                             },
                             profitConfig,
                           );
@@ -595,7 +428,7 @@ export default async function BookingsPage({
       </></div>}
 
       {!isKanban && pagination.totalPages > 1 && (
-        <section className="flex flex-col items-center justify-center gap-2 rounded-2xl border p-3 text-xs sm:flex-row sm:justify-between">
+        <section className="flex flex-col items-center justify-center gap-2 ap-card p-3 text-xs sm:flex-row sm:justify-between">
           <span>
             Pàgina {pagination.page} de {pagination.totalPages}
           </span>

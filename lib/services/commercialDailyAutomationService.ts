@@ -5,7 +5,7 @@ import { runCommercialSequences } from '@/lib/services/commercialSequenceService
 import { enforceLeadSla } from '@/lib/services/slaAutomationService';
 import { sendPaymentReminders } from '@/lib/services/paymentReminderService';
 import { scoreLead } from '@/lib/services/commercialScoring';
-import { sendEmail } from '@/lib/email';
+import { sendTrackedStandaloneEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
@@ -145,6 +145,11 @@ export async function runCommercialDailyAutomation() {
         message: w.alertMessage,
       })),
     },
+    notifications: {
+      emailSent: false,
+      whatsappSent: false,
+      errors: 0,
+    },
   };
 
   const subject = `Resum diari comercial · ${new Date().toLocaleDateString('ca-ES')}`;
@@ -210,7 +215,19 @@ export async function runCommercialDailyAutomation() {
   `;
 
   const recipient = (await getRecipientsAsString('reports')) || SITE_CONFIG.business.email;
-  await sendEmail({ to: recipient, subject, html });
+  try {
+    await sendTrackedStandaloneEmail({
+      templateKey: 'commercial-daily-summary',
+      to: recipient,
+      subject,
+      html,
+      orbita: { kind: 'admin', origin: 'commercial-daily-summary' },
+    });
+    summary.notifications.emailSent = true;
+  } catch (err) {
+    summary.notifications.errors += 1;
+    log.error('Commercial daily email summary failed', err);
+  }
 
   const waTo = (process.env.ADMIN_WHATSAPP || SITE_CONFIG.business.phone).replace(/[^\d]/g, '');
   if (waTo) {
@@ -243,7 +260,16 @@ export async function runCommercialDailyAutomation() {
       }
     }
     const waText = waLines.join('\n');
-    await sendWhatsAppText({ to: waTo, text: waText });
+    try {
+      const result = await sendWhatsAppText({ to: waTo, text: waText });
+      summary.notifications.whatsappSent = result.ok;
+      if (!result.ok) {
+        summary.notifications.errors += 1;
+      }
+    } catch (err) {
+      summary.notifications.errors += 1;
+      log.error('Commercial daily WhatsApp summary failed', err);
+    }
   }
 
   await prisma.adminLog.create({

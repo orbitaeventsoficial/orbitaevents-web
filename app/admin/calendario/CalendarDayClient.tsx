@@ -4,20 +4,19 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
-import { useRouter } from 'next/navigation';
+import { buildSocialWorkspaceHref } from '@/lib/admin/socialWorkspaceHref';
 import { formatDateFull, formatWeekdayLong, getBookingStatusBadgeDisplay } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { formatKey, isToday, resolveServiceLabel, HOURS, parseHour, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
+import { formatKey, isToday, resolveServiceLabel, HOURS, parseHour, getCalendarTone, getCalendarToneClasses, getCalendarEconomicRiskClasses, summarizeCalendarEconomicRisk, selectCalendarEconomicRiskBooking, formatCalendarEconomicRiskActionReason, resolveCalendarEconomicRiskActionHash, formatCalendarEconomicRiskSummary, resolveWorkTimeLabel } from './calendar-utils';
 
 type CalendarLayer = 'bookings' | 'blocks' | 'leads' | 'tasks' | 'social' | 'followUps';
 
 export default function CalendarDayClient() {
   const toast = useToast();
-  const router = useRouter();
   const todayDate = useMemo(() => new Date(), []);
 
   const [currentDate, setCurrentDate] = useState<Date>(todayDate);
@@ -44,6 +43,10 @@ export default function CalendarDayClient() {
     return data.days[dateKey];
   }, [data, dateKey]);
   const dayLeads = dayData.leads ?? [];
+  const dayEconomicRisk = summarizeCalendarEconomicRisk(dayData);
+  const dayEconomicRiskBooking = selectCalendarEconomicRiskBooking(dayData);
+  const dayEconomicRiskReason = formatCalendarEconomicRiskActionReason(dayEconomicRiskBooking);
+  const dayEconomicRiskHash = resolveCalendarEconomicRiskActionHash(dayEconomicRiskBooking);
 
   const isBlocked = dayData.bloqueos.length > 0;
   const isTodayDate = isToday(currentDate);
@@ -178,7 +181,7 @@ export default function CalendarDayClient() {
       </div>
 
 
-      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
+      <div className="ap-card mb-4 flex flex-wrap items-center gap-2 px-3 py-2 text-xs">
         <span className="font-semibold opacity-60">Capes:</span>
         {[
           ['bookings', 'Reserves'],
@@ -192,7 +195,7 @@ export default function CalendarDayClient() {
             key={key}
             type="button"
             onClick={() => toggleLayer(key as CalendarLayer)}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] opacity-45'}`}
           >
             {label}
           </button>
@@ -205,7 +208,7 @@ export default function CalendarDayClient() {
       )}
 
       {error && (
-        <div className="rounded-xl border p-4 text-sm mb-6">
+        <div className="ap-card p-4 text-sm mb-6">
           {error}
         </div>
       )}
@@ -214,8 +217,8 @@ export default function CalendarDayClient() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Timeline column */}
           <div className="lg:col-span-2">
-            <div className="overflow-hidden rounded-2xl border admin-card-glass" {...helpAttrs(ADMIN_CALENDAR_HELP.dayTimeline)}>
-              <div className={`flex items-center justify-between border-b px-5 py-3 ${isTodayDate ? 'admin-card-glass' : ''} ${dayToneClasses.card}`}>
+            <div className="ap-card overflow-hidden" {...helpAttrs(ADMIN_CALENDAR_HELP.dayTimeline)}>
+              <div className={`flex items-center justify-between border-b px-5 py-3 ${isTodayDate ? 'ap-card' : ''} ${dayToneClasses.card}`}>
                 <div className="flex items-center gap-2">
                   {isBlocked && <span className="w-2.5 h-2.5 rounded-full" />}
                   {!isBlocked && dayData.reservas.length > 0 && <span className="w-2.5 h-2.5 rounded-full" />}
@@ -226,7 +229,7 @@ export default function CalendarDayClient() {
                 </div>
                 <div className="flex items-center gap-2">
                   {isBlocked ? (
-                    <button onClick={unblockDay} type="button" className="text-xs px-3 py-1 rounded-xl border transition-colors">
+                    <button onClick={unblockDay} type="button" className="ap-btn ap-btn--xs">
                       Desbloquejar
                     </button>
                   ) : (
@@ -248,7 +251,7 @@ export default function CalendarDayClient() {
               </div>
 
               {showBlockForm && (
-                <div className="flex items-center gap-2 border-b px-5 py-3 admin-card-glass">
+                <div className="ap-card flex items-center gap-2 border-b px-5 py-3">
                   <input
                     type="text"
                     value={blockNote}
@@ -283,8 +286,8 @@ export default function CalendarDayClient() {
                   });
 
                   return (
-                    <div key={hour} className="flex border-b border-white/5 min-h-[48px]">
-                      <div className="w-16 flex-shrink-0 border-r border-white/5 px-3 py-2 text-right text-xs">
+                    <div key={hour} className="flex border-b border-[var(--line)] min-h-[48px]">
+                      <div className="w-16 flex-shrink-0 border-r border-[var(--line)] px-3 py-2 text-right text-xs">
                         {String(hour).padStart(2, '0')}:00
                       </div>
                       <div className="flex-1 flex items-stretch gap-1 px-2 py-1">
@@ -302,6 +305,11 @@ export default function CalendarDayClient() {
                                 <>
                                   <span className="font-medium">{resolveServiceLabel(b)}</span>
                                   {b.clientName && <span className=" ml-2">{b.clientName}</span>}
+                                  {b.economicRisk && (
+                                    <span className={`ml-2 rounded border px-1.5 py-0.5 font-semibold ${getCalendarEconomicRiskClasses(b.economicRisk)}`}>
+                                      {b.economicRisk.label}
+                                    </span>
+                                  )}
                                 </>
                               )}
                             </Link>
@@ -314,7 +322,7 @@ export default function CalendarDayClient() {
 
                 {/* Bookings without time */}
                 {visibleTimelineBookings.filter((b) => b.startH === null).length > 0 && (
-                  <div className="border-t px-5 py-3 admin-card-glass">
+                  <div className="ap-card border-t px-5 py-3">
                     <p className="mb-2 text-xs">Sense hora definida:</p>
                     {visibleTimelineBookings.filter((b) => b.startH === null).map((b) => (
                       <Link
@@ -324,6 +332,11 @@ export default function CalendarDayClient() {
                       >
                         <span className="text-sm font-medium">{resolveServiceLabel(b)}</span>
                         {b.clientName && <span className="text-xs  ml-2">{b.clientName}</span>}
+                        {b.economicRisk && (
+                          <div className={`mt-1 rounded border px-2 py-1 text-xs font-semibold ${getCalendarEconomicRiskClasses(b.economicRisk)}`}>
+                            Risc econòmic · {b.economicRisk.label}
+                          </div>
+                        )}
                       </Link>
                     ))}
                   </div>
@@ -335,7 +348,7 @@ export default function CalendarDayClient() {
           {/* Detail sidebar */}
           <div className="space-y-4" {...helpAttrs(ADMIN_CALENDAR_HELP.daySidebar)}>
             {/* Summary card */}
-            <div className="rounded-2xl border p-5 admin-card-glass">
+            <div className="ap-card p-5">
               <h3 className="mb-3 text-sm font-semibold">Resum del dia</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -354,6 +367,20 @@ export default function CalendarDayClient() {
                   <span className="">Feina pendent</span>
                   <span className="font-medium">{(visibleLayers.tasks ? dayData.tasks.length : 0) + (visibleLayers.social ? dayData.socialPosts.length : 0) + (visibleLayers.followUps ? dayData.followUps.length : 0)}</span>
                 </div>
+                <div className="flex justify-between gap-3">
+                  <span className="">Risc econòmic</span>
+                  <div className={`text-right font-medium ${dayEconomicRisk.critical > 0 ? 'admin-tone-text-danger' : dayEconomicRisk.total > 0 ? 'admin-tone-text-warning' : ''}`}>
+                    <span>{visibleLayers.bookings ? formatCalendarEconomicRiskSummary(dayEconomicRisk) : 'Cap'}</span>
+                    {visibleLayers.bookings && dayEconomicRiskReason && (
+                      <span className="mt-0.5 block text-xs opacity-80">Motiu: {dayEconomicRiskReason}</span>
+                    )}
+                    {visibleLayers.bookings && dayEconomicRiskBooking && (
+                      <Link href={buildBookingHref(dayEconomicRiskBooking.id, dayEconomicRiskHash)} className="mt-0.5 block text-xs text-[var(--gold)] no-underline hover:text-[var(--gold-bright)]">
+                        Obrir reserva amb risc →
+                      </Link>
+                    )}
+                  </div>
+                </div>
                 <div className="flex justify-between">
                   <span className="">Estat</span>
                   <span className={`font-medium ${dayToneClasses.text}`}>
@@ -364,34 +391,41 @@ export default function CalendarDayClient() {
             </div>
 
             {visibleLayers.leads && dayLeads.length > 0 && (
-              <div className="rounded-2xl border p-5 admin-card-glass">
+              <div className="ap-card p-5">
                 <h3 className="mb-3 text-sm font-semibold">Entrades del web</h3>
                 <div className="space-y-2">
-                  {dayLeads.map((lead) => (
+                  {dayLeads.map((lead) => {
+                    const isLost = lead.status === 'LOST';
+                    return (
                     <Link
                       key={lead.id}
                       href={buildLeadCustomerHref({
                         leadId: lead.id,
                         customerId: lead.customerId,
                       })}
-                      className="block rounded-xl border px-3 py-2 admin-tone-soft-info"
+                      className={isLost
+                        ? 'block rounded-lg border px-2 py-1.5 text-xs opacity-60'
+                        : 'block rounded-xl border px-3 py-2 admin-tone-soft-info'}
                     >
-                      <div className="truncate text-sm font-medium">Nova entrada · {lead.name}</div>
-                      <div className="mt-1 text-xs opacity-70">
-                        {lead.eventStartTime || '--:--'}{lead.eventEndTime ? ` - ${lead.eventEndTime}` : ''}
-                        {lead.eventType ? ` · ${lead.eventType}` : ''}
+                      <div className={isLost ? 'truncate font-medium' : 'truncate text-sm font-medium'}>
+                        {isLost ? 'Perdut' : 'Nova entrada'} · {lead.name}
                       </div>
-                      {lead.eventLocation && (
+                      <div className={isLost ? 'mt-0.5 opacity-70' : 'mt-1 text-xs opacity-70'}>
+                        {lead.eventStartTime || '--:--'}{lead.eventEndTime ? ` - ${lead.eventEndTime}` : ''}
+                        {!isLost && lead.eventType ? ` · ${lead.eventType}` : ''}
+                      </div>
+                      {!isLost && lead.eventLocation && (
                         <div className="mt-1 truncate text-xs opacity-70">{lead.eventLocation}</div>
                       )}
                     </Link>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {((visibleLayers.tasks && dayData.tasks.length > 0) || (visibleLayers.social && dayData.socialPosts.length > 0) || (visibleLayers.followUps && dayData.followUps.length > 0)) && (
-              <div className="rounded-2xl border p-5 admin-card-glass">
+              <div className="ap-card p-5">
                 <h3 className="mb-3 text-sm font-semibold">Feina planificada</h3>
                 <div className="space-y-2">
                   {visibleLayers.tasks && dayData.tasks.map((task) => (
@@ -401,7 +435,7 @@ export default function CalendarDayClient() {
                     </Link>
                   ))}
                   {visibleLayers.social && dayData.socialPosts.map((post) => (
-                    <Link key={post.id} href="/admin/social" className="block rounded-xl border px-3 py-2 admin-tone-soft-warning">
+                    <Link key={post.id} href={buildSocialWorkspaceHref(post.id)} className="block rounded-xl border px-3 py-2 admin-tone-soft-warning">
                       <div className="truncate text-sm font-medium">📣 {post.title}</div>
                       <div className="mt-1 text-xs opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
                     </Link>
@@ -425,7 +459,7 @@ export default function CalendarDayClient() {
             )}
             {/* Blockage details */}
             {visibleLayers.blocks && dayData.bloqueos.length > 0 && (
-              <div className="rounded-2xl border p-5">
+              <div className="ap-card p-5">
                 <h3 className="text-sm font-semibold mb-2">Bloquejos</h3>
                 {dayData.bloqueos.map((b) => (
                   <div key={b.id} className="text-sm">
@@ -442,7 +476,7 @@ export default function CalendarDayClient() {
                 <Link
                   key={b.id}
                   href={buildBookingHref(b.id)}
-                  className="block rounded-2xl border p-5 transition-colors admin-card-glass"
+                  className="block ap-card p-5 transition-colors"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold">{resolveServiceLabel(b)}</span>
@@ -459,12 +493,17 @@ export default function CalendarDayClient() {
                       {b.eventStartTime}{b.eventEndTime ? ` – ${b.eventEndTime}` : ''}
                     </p>
                   )}
+                  {b.economicRisk && (
+                    <div className={`mt-3 rounded-lg border px-2 py-1 text-xs font-semibold ${getCalendarEconomicRiskClasses(b.economicRisk)}`}>
+                      Risc econòmic · {b.economicRisk.label}
+                    </div>
+                  )}
                 </Link>
               );
             })}
 
             {(visibleLayers.bookings ? dayData.reservas.length === 0 : true) && (!visibleLayers.blocks || !isBlocked) && (!visibleLayers.leads || dayLeads.length === 0) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (
-              <div className="rounded-2xl border p-5 text-center admin-card-glass">
+              <div className="ap-card p-5 text-center">
                 <p className="text-sm">Dia lliure</p>
                 <Link
                   href={`/admin/bookings/new?date=${dateKey}`}

@@ -6,17 +6,17 @@ import {
   OPERATOR_EXTRA_MIN_PRICE, OPERATOR_EXTRA_FACTOR,
 } from '@/lib/constants/pricing';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
+import { getMarginBand } from '@/lib/margin-utils';
 import { aggregateServiceLines, computeDirectCostBreakdown } from '@/lib/services/costEngine';
 import {
   calculateBillableTravelKm,
   calculateTravelBlocks,
-  calculateTravelCharge,
   calculateTravelCost,
   DEFAULT_VEHICLE_COST_PER_KM,
   INCLUDED_TRAVEL_KM,
-  TRAVEL_BLOCK_EUR,
   TRAVEL_BLOCK_KM,
 } from '@/lib/services/travelCost';
+import { calculateClientTravelCharge, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
 import type { BookingExtra, BookingFormData, BookingPack, BookingSelectedExtras, BookingServiceLineFormInput } from './booking-form.types';
 import { OPERATOR_EXTRA_ID } from './booking-form.types';
 
@@ -32,7 +32,7 @@ function calculateEventDuration(startTime: string | null | undefined, endTime: s
 }
 
 interface UseBookingPricingOptions {
-  form: Pick<BookingFormData, 'packId' | 'extraHours' | 'eventStartTime' | 'eventEndTime' | 'distanceKm' | 'fuelCostPerKm' | 'discount'>;
+  form: Pick<BookingFormData, 'packId' | 'extraHours' | 'eventStartTime' | 'eventEndTime' | 'distanceKm' | 'tollsEur' | 'fuelCostPerKm' | 'discount'>;
   packs: BookingPack[];
   extras: BookingExtra[];
   selectedExtras: BookingSelectedExtras;
@@ -40,29 +40,32 @@ interface UseBookingPricingOptions {
   manualTotalPrice?: number;
   invoiceRequired?: boolean;
   serviceLines?: BookingServiceLineFormInput[];
+  internalTravelCostOverride?: number;
 }
 
-export function useBookingPricing({ form, packs, extras, selectedExtras, customPackPrice, manualTotalPrice, invoiceRequired = false, serviceLines = [] }: UseBookingPricingOptions) {
+export function useBookingPricing({ form, packs, extras, selectedExtras, customPackPrice, manualTotalPrice, invoiceRequired = false, serviceLines = [], internalTravelCostOverride }: UseBookingPricingOptions) {
   const internalTravelCost = useMemo(() => {
+    if (typeof internalTravelCostOverride === 'number' && internalTravelCostOverride > 0) {
+      return internalTravelCostOverride;
+    }
     const km = parseFloat(form.distanceKm) || 0;
     const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM;
     return calculateTravelCost(km, rate, INCLUDED_TRAVEL_KM);
-  }, [form.distanceKm, form.fuelCostPerKm]);
+  }, [form.distanceKm, form.fuelCostPerKm, internalTravelCostOverride]);
 
+  // Càrrec de transport al client (#1363): cost real amb dues potes (cotxe/km + gent/hores).
+  // El headcount surt de les línies del bolo.
   const travelCharge = useMemo(() => {
     const km = parseFloat(form.distanceKm) || 0;
-    return calculateTravelCharge(km, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
-  }, [form.distanceKm]);
+    const tolls = parseFloat(form.tollsEur) || 0;
+    const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM;
+    return calculateClientTravelCharge(km, deriveTravelHeadcount(serviceLines, Boolean(form.packId)), rate, tolls);
+  }, [form.distanceKm, form.fuelCostPerKm, form.packId, form.tollsEur, serviceLines]);
 
-  const billableKm = useMemo(() => {
-    const km = parseFloat(form.distanceKm) || 0;
-    return calculateBillableTravelKm(km, INCLUDED_TRAVEL_KM);
-  }, [form.distanceKm]);
-
-  const travelBlocks = useMemo(() => {
-    const km = parseFloat(form.distanceKm) || 0;
-    return calculateTravelBlocks(km, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
-  }, [form.distanceKm]);
+  // Valors informatius de km (llegat de la visualització per trams #1363): el CÀRREC ja
+  // és el real de dues potes; aquests només descriuen la part de cotxe a la UI antiga.
+  const billableKm = useMemo(() => calculateBillableTravelKm(parseFloat(form.distanceKm) || 0, INCLUDED_TRAVEL_KM), [form.distanceKm]);
+  const travelBlocks = useMemo(() => calculateTravelBlocks(parseFloat(form.distanceKm) || 0, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM), [form.distanceKm]);
 
   const selectedPack = useMemo(() => packs.find((pack) => pack.id === form.packId) || null, [packs, form.packId]);
 
@@ -112,7 +115,7 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     const { revenue: serviceLinesRevenue, cost: serviceLinesCost } = aggregateServiceLines(serviceLines);
     const subtotal = packPrice + extraHoursPrice + extrasPrice + travelCharge + serviceLinesRevenue;
     const discount = parseFloat(form.discount) || 0;
-    const baseAfterDiscount = subtotal - discount;
+    const baseAfterDiscount = Math.max(0, subtotal - discount);
     const vatRate = calcVatRate(invoiceRequired);
     const manualTotal = manualTotalPrice && manualTotalPrice > 0 ? manualTotalPrice : null;
     const total = manualTotal ?? baseAfterDiscount + baseAfterDiscount * (vatRate / 100);
@@ -129,7 +132,7 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     // Cost directe via la font única (computeDirectCostBreakdown), no reimplementat.
     // extraHours=1 + extraHourPrice=extraHoursPrice perquè el preu d'hores extra ja ve
     // agregat (count×preu). travelCost explícit; si és 0, el helper el recalcula a 0.
-    const { directCost } = computeDirectCostBreakdown({
+    const { directCost, ownServiceMargin, subcontractedMarkup, transportMargin, orbitaTechIncome } = computeDirectCostBreakdown({
       total: pricing.total,
       packPrice: pricing.packPrice,
       extrasTotal: pricing.extrasPrice,
@@ -137,14 +140,19 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
       extraHourPrice: pricing.extraHoursPrice,
       distanceKm: 0,
       travelCost: internalTravelCost,
+      travelRevenue: pricing.travelCharge,
       serviceLinesRevenue: pricing.serviceLinesRevenue,
       serviceLinesCost: pricing.serviceLinesCost || 0,
+      serviceLines,
     }, PROFITABILITY_MODEL_DEFAULTS);
     const netMargin = pricing.total - directCost; // marge en viu: sense CAC (per disseny)
     const marginPct = pricing.total > 0 ? (netMargin / pricing.total) * 100 : 0;
-    const tone: 'emerald' | 'amber' | 'rose' = marginPct >= 50 ? 'emerald' : marginPct >= 30 ? 'amber' : 'rose';
-    return { directCost, netMargin, marginPct, tone };
-  }, [internalTravelCost, pricing]);
+    // Semàfor de marge canònic (4 bandes, font única getMarginBand): Excel·lent/Acceptable/Vigilar/Crític.
+    const band = getMarginBand(marginPct);
+    const tone: 'emerald' | 'amber' | 'orange' | 'rose' =
+      band === 'excellent' ? 'emerald' : band === 'acceptable' ? 'amber' : band === 'watch' ? 'orange' : 'rose';
+    return { directCost, netMargin, marginPct, tone, ownServiceMargin, subcontractedMarkup, transportMargin, orbitaTechIncome };
+  }, [internalTravelCost, pricing, serviceLines]);
 
   return {
     internalTravelCost,

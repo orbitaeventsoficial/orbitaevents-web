@@ -6,4 +6,9 @@ describe('buildBookingHref', () => {
     expect(buildBookingHref('booking-1')).toBe('/admin/bookings/booking-1');
     expect(buildBookingHref('abc123')).toBe('/admin/bookings/abc123');
   });
+
+  it('pot apuntar a una seccio concreta de la reserva', () => {
+    expect(buildBookingHref('booking-1', 'sec-finances')).toBe('/admin/bookings/booking-1#sec-finances');
+    expect(buildBookingHref('booking-1', '#sec-marge')).toBe('/admin/bookings/booking-1#sec-marge');
+  });
 });

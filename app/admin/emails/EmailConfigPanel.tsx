@@ -52,7 +52,7 @@ export default function EmailConfigPanel() {
   };
 
   return (
-    <section className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Configuració d'emails" data-help-desc="Ajusta la configuració base del sistema: Google Reviews, retard post-event, automatismes actius i percentatges de descompte.">
+    <section className="ap-card overflow-hidden" data-help-title="Configuració d'emails" data-help-desc="Ajusta la configuració base del sistema: Google Reviews, retard post-event, automatismes actius i percentatges de descompte.">
       <div className="border-b px-6 py-4">
         <h2 className="font-semibold">⚙️ Configuració</h2>
       </div>
@@ -142,7 +142,7 @@ export default function EmailConfigPanel() {
         </div>
 
         {error && (
-          <div className="rounded-xl border p-3 admin-tone-soft-danger admin-tone-border-danger" role="alert">
+          <div className="ap-card p-3 admin-tone-soft-danger admin-tone-border-danger" role="alert">
             <p className="text-sm admin-tone-text-danger">❌ {error}</p>
           </div>
         )}
@@ -156,7 +156,7 @@ export default function EmailConfigPanel() {
             saved
               ? 'border admin-tone-soft-success admin-tone-border-success admin-tone-text-success'
               : saving
-                ? 'border border-white/10 bg-white/5 text-white/30'
+                ? 'border border-[var(--line)] bg-[var(--raised)] text-[var(--t3)]'
                 : 'ap-btn ap-btn--primary justify-center'
           }`}
         >

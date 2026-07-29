@@ -1,19 +1,21 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { AdminHelpLegend } from '@/app/admin/components/AdminHelpLegend';
-import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
-import { pluralize } from '@/lib/utils/pluralize';
+import { AdminPage } from '@/app/admin/components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { PORTFOLIO_CATEGORIES, PORTFOLIO_IMAGES } from '@/app/config/portfolio-images';
 import {
   PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE,
   PORTFOLIO_MEDIA_IMAGE_MAX_SIZE,
+  PORTFOLIO_EVENT_ORIGIN_LABELS,
+  PORTFOLIO_EVENT_ORIGIN_TYPES,
   PORTFOLIO_MEDIA_UPLOAD_ACCEPT,
   PORTFOLIO_MEDIA_VIDEO_MAX_SIZE,
+  type PortfolioEventOriginType,
 } from '@/lib/constants/portfolio-media';
 
 type PortfolioEvent = {
@@ -30,6 +32,11 @@ type PortfolioEvent = {
   services: string[];
   coverImage: string;
   published: boolean;
+  originType: string;
+  sourceBookingId: string | null;
+  sourceGalleryPhotoId: string | null;
+  sourceTestimonialId: string | null;
+  originLabel: string | null;
   _count?: { media: number };
 };
 
@@ -119,6 +126,24 @@ function buildEventPayload(form: EventFormState) {
   };
 }
 
+function formatPortfolioEventOrigin(eventItem: PortfolioEvent): string | null {
+  const originType = eventItem.originType as PortfolioEventOriginType;
+  if (!originType || originType === PORTFOLIO_EVENT_ORIGIN_TYPES.MANUAL) return null;
+  const label = PORTFOLIO_EVENT_ORIGIN_LABELS[originType] || originType;
+  const value = eventItem.originLabel || eventItem.sourceBookingId || eventItem.sourceGalleryPhotoId || eventItem.sourceTestimonialId;
+  return value ? `${label}: ${value}` : label;
+}
+
+async function readPortfolioMutationError(response: Response, fallback: string) {
+  const data = await response.json().catch(() => null);
+  if (data && typeof data === 'object') {
+    const record = data as { error?: unknown; message?: unknown };
+    if (typeof record.error === 'string' && record.error.trim()) return record.error;
+    if (typeof record.message === 'string' && record.message.trim()) return record.message;
+  }
+  return fallback;
+}
+
 function FullscreenPreview({ preview, onClose }: { preview: PreviewState | null; onClose: () => void }) {
   useEffect(() => {
     if (!preview) return;
@@ -140,7 +165,7 @@ function FullscreenPreview({ preview, onClose }: { preview: PreviewState | null;
       <button
         type="button"
         onClick={onClose}
-        className="absolute right-4 top-4 rounded-full border border-white/15 bg-black/60 px-3 py-2 text-sm text-white/90"
+        className="ap-btn absolute right-4 top-4"
       >
         Tancar
       </button>
@@ -170,12 +195,14 @@ function CategorySection({
   onOpenPreview: (preview: PreviewState) => void;
 }) {
   const [media, setMedia] = useState<MediaItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dropActive, setDropActive] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const replaceFileRef = useRef<HTMLInputElement>(null);
   const replaceTargetRef = useRef<MediaItem | null>(null);
@@ -205,9 +232,11 @@ function CategorySection({
       const data = await response.json();
       const items = Array.isArray(data.data) ? data.data : [];
       setMedia(items.length > 0 ? items : fallbackItems);
+      setLoaded(true);
     } catch (err) {
       log.error(`Error carregant ${slug}`, err);
       setMedia(fallbackItems);
+      setLoaded(true);
       setError(
         fallbackItems.length > 0
           ? "No s'ha pogut llegir el portfolio editable; es mostra el catàleg públic actual en mode lectura."
@@ -225,11 +254,14 @@ function CategorySection({
   }, [expanded, loadMedia]);
   const persistSortOrder = useCallback(async (items: MediaItem[]) => {
     for (let index = 0; index < items.length; index += 1) {
-      await fetchWithCsrf('/api/admin/portfolio/media', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/media', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mediaId: items[index].id, sortOrder: index }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut guardar el nou ordre"));
+      }
     }
   }, []);
 
@@ -241,6 +273,10 @@ function CategorySection({
     setError(null);
     try {
       for (const file of entries) {
+        const isVideoType = file.type.startsWith('video/');
+        if (!isImageType(file.type) && !isVideoType) {
+          throw new Error(`${file.name} no és una imatge o vídeo compatible`);
+        }
         const maxSize = isImageType(file.type) ? PORTFOLIO_MEDIA_IMAGE_MAX_SIZE : PORTFOLIO_MEDIA_VIDEO_MAX_SIZE;
         if (file.size > maxSize) {
           throw new Error(`${file.name} supera el límit permès`);
@@ -255,16 +291,13 @@ function CategorySection({
           method: 'POST',
           body: formData,
         });
-        if (!uploadResponse.ok) {
-          const data = await uploadResponse.json().catch(() => ({}));
-          throw new Error(data?.error || 'Error pujant fitxer');
-        }
+        if (!uploadResponse.ok) throw new Error(await readPortfolioMutationError(uploadResponse, 'Error pujant fitxer'));
 
         const uploadData = await uploadResponse.json();
         const created = uploadData.data as MediaItem;
 
         if (replacement) {
-          await fetchWithCsrf('/api/admin/portfolio/media', {
+          const updateResponse = await fetchWithCsrf('/api/admin/portfolio/media', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -274,17 +307,26 @@ function CategorySection({
               eventId: replacement.event?.id ?? null,
             }),
           });
+          if (!updateResponse.ok) {
+            throw new Error(await readPortfolioMutationError(updateResponse, "No s'ha pogut conservar les dades de la media substituida"));
+          }
 
           const coverRefs = coverMap.get(replacement.mediaUrl) || [];
           for (const eventItem of coverRefs) {
-            await fetchWithCsrf('/api/admin/portfolio/events', {
+            const coverResponse = await fetchWithCsrf('/api/admin/portfolio/events', {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ id: eventItem.id, coverImage: created.mediaUrl }),
             });
+            if (!coverResponse.ok) {
+              throw new Error(await readPortfolioMutationError(coverResponse, "No s'ha pogut actualitzar la portada vinculada"));
+            }
           }
 
-          await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${replacement.id}`, { method: 'DELETE' });
+          const deleteResponse = await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${replacement.id}`, { method: 'DELETE' });
+          if (!deleteResponse.ok) {
+            throw new Error(await readPortfolioMutationError(deleteResponse, "No s'ha pogut eliminar la media substituida"));
+          }
           await onEventsRefresh();
         }
       }
@@ -301,6 +343,21 @@ function CategorySection({
     }
   }, [coverMap, loadMedia, onEventsRefresh, slug]);
 
+  const handleDropZoneDrag = useCallback((event: DragEvent<HTMLButtonElement>, active: boolean) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDropActive(active);
+  }, []);
+
+  const handleDropZoneUpload = useCallback((event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDropActive(false);
+    if (event.dataTransfer.files.length > 0) {
+      void handleUpload(event.dataTransfer.files);
+    }
+  }, [handleUpload]);
+
   const handleReplaceSelection = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || !replaceTargetRef.current) return;
     void handleUpload(event.target.files, replaceTargetRef.current);
@@ -310,11 +367,14 @@ function CategorySection({
     setSavingId(item.id);
     setError(null);
     try {
-      await fetchWithCsrf('/api/admin/portfolio/media', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/media', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mediaId: item.id, caption }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut guardar el caption"));
+      }
       setMedia((current) => current.map((entry) => (entry.id === item.id ? { ...entry, caption } : entry)));
     } catch (err) {
       log.error('Error guardant caption', err);
@@ -328,11 +388,14 @@ function CategorySection({
     setSavingId(item.id);
     setError(null);
     try {
-      await fetchWithCsrf('/api/admin/portfolio/media', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/media', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mediaId: item.id, eventId: eventId || null }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut assignar l'event"));
+      }
       await loadMedia();
     } catch (err) {
       log.error('Error assignant event', err);
@@ -346,11 +409,14 @@ function CategorySection({
     setSavingId(eventId);
     setError(null);
     try {
-      await fetchWithCsrf('/api/admin/portfolio/events', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/events', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: eventId, coverImage: mediaUrl }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut actualitzar la portada"));
+      }
       await onEventsRefresh();
     } catch (err) {
       log.error('Error actualitzant portada', err);
@@ -375,7 +441,10 @@ function CategorySection({
       if (coverRefs.length > 0) {
         throw new Error('Aquesta imatge és portada d\'un event. Substitueix-la o assigna una altra portada abans d\'eliminar-la.');
       }
-      await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${item.id}`, { method: 'DELETE' });
+      const response = await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${item.id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut eliminar la media"));
+      }
       await loadMedia();
     } catch (err) {
       log.error('Error eliminant media', err);
@@ -402,108 +471,119 @@ function CategorySection({
       await persistSortOrder(normalized);
     } catch (err) {
       log.error('Error reordenant media', err);
-      setError('No s\'ha pogut guardar el nou ordre');
+      setError(err instanceof Error ? err.message : "No s'ha pogut guardar el nou ordre");
       await loadMedia();
     }
   }, [draggingId, loadMedia, media, persistSortOrder]);
 
-  const imageCount = media.filter((item) => item.mediaType === 'image').length;
-  const videoCount = media.filter((item) => item.mediaType === 'video').length;
+  const visibleCountItems = loaded ? media : buildStaticMediaItems(slug);
+  const imageCount = visibleCountItems.filter((item) => item.mediaType === 'image').length;
+  const videoCount = visibleCountItems.filter((item) => item.mediaType === 'video').length;
 
   return (
     <div className="ap-card overflow-hidden rounded-2xl">
       <input ref={fileRef} type="file" accept={PORTFOLIO_MEDIA_UPLOAD_ACCEPT} multiple className="hidden" onChange={(event) => event.target.files && void handleUpload(event.target.files)} />
       <input ref={replaceFileRef} type="file" accept={PORTFOLIO_MEDIA_UPLOAD_ACCEPT} className="hidden" onChange={handleReplaceSelection} />
 
-      <button type="button" onClick={() => setExpanded((current) => !current)} className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-white/5">
+      <button type="button" onClick={() => setExpanded((current) => !current)} className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-[var(--raised)]">
         <div className="flex items-center gap-3">
-          <span className="text-lg">🖼️</span>
           <div>
-            <p className="font-semibold text-white/90">{name}</p>
-            <p className="text-xs text-white/40">{slug}</p>
+            <p className="font-semibold text-[var(--t)]">{name}</p>
+            <p className="text-xs text-[var(--t3)]">{slug} · carpeta de portfolio</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-white/60">
-          <span className="rounded-full border border-white/10 px-2 py-1">{imageCount} fotos</span>
-          <span className="rounded-full border border-white/10 px-2 py-1">{videoCount} vídeos</span>
+        <div className="flex items-center gap-2 text-xs text-[var(--t2)]">
+          <span className="ap-badge">{imageCount} fotos</span>
+          <span className="ap-badge">{videoCount} vídeos</span>
           <span className={`text-base transition-transform ${expanded ? 'rotate-180' : ''}`}>â–¾</span>
         </div>
       </button>
 
       {expanded && (
-        <div className="space-y-4 border-t border-white/10 p-5">
+        <div className="space-y-4 border-t border-[var(--line)] p-5">
           {error && <p className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
           <div className="grid gap-3 lg:grid-cols-3">
-            <AdminHelpLegend title="Portada" body="És la imatge principal de cada event. La pots marcar des de qualsevol miniatura." />
+            <AdminHelpLegend title="Drop-in" body="Arrossega fitxers dins la categoria correcta. El backend els deixa a la carpeta del slug i normalitza el nom." />
             <AdminHelpLegend title="Assignació" body="Vincula una peça a un event concret perquè sàpigues on surt i la puguis reutilitzar amb criteri." />
             <AdminHelpLegend title="Ordre" body="L'ordre controla la galeria pública. Arrossega targetes per canviar-lo sense tocar codi." />
           </div>
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-            <button type="button" onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-white/15 p-8 text-left transition-colors hover:border-white/30 adm-row-hover">
-              <span className="mb-3 block text-3xl">ï¼‹</span>
-              <p className="text-sm font-medium text-white/90">Afegir media a {name}</p>
-              <p className="mt-1 text-xs text-white/50">Puja des de l'admin. El backend converteix imatges a AVIF, conserva l'ordre i deixa traça a la BBDD.</p>
-              <p className="mt-2 text-xs text-white/35">{uploading ? 'Pujant...' : `Límit imatge: ${PORTFOLIO_MEDIA_IMAGE_MAX_SIZE / (1024 * 1024)}MB · vídeo: ${PORTFOLIO_MEDIA_VIDEO_MAX_SIZE / (1024 * 1024)}MB`}</p>
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              onDragEnter={(event) => handleDropZoneDrag(event, true)}
+              onDragOver={(event) => handleDropZoneDrag(event, true)}
+              onDragLeave={(event) => handleDropZoneDrag(event, false)}
+              onDrop={handleDropZoneUpload}
+              className={`rounded-2xl border-2 border-dashed p-8 text-left transition-colors adm-row-hover ${dropActive ? 'border-[var(--hair-gold)] bg-[var(--raised)]' : 'border-[var(--line)] hover:border-[var(--hair-gold)]'}`}
+            >
+              <p className="text-sm font-medium text-[var(--t)]">Drop-in d'imatges · {name}</p>
+              <p className="mt-1 text-xs text-[var(--t3)]">Destí: `/api/uploads/portfolio/{slug}/...avif` · nom segur · AVIF optimitzat · registre a BBDD.</p>
+              <p className="mt-2 text-xs text-[var(--t3)]">{uploading ? 'Processant...' : `Arrossega aquí o fes clic · imatge ${PORTFOLIO_MEDIA_IMAGE_MAX_SIZE / (1024 * 1024)}MB · vídeo ${PORTFOLIO_MEDIA_VIDEO_MAX_SIZE / (1024 * 1024)}MB`}</p>
             </button>
             <div className="ap-card p-4">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/40">Events d'aquesta categoria</p>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--t3)]">Events d'aquesta categoria</p>
               <div className="mt-3 space-y-2">
-                {categoryEvents.length === 0 ? <p className="text-sm text-white/45">Encara no hi ha events creats per aquesta categoria.</p> : categoryEvents.map((eventItem) => <div key={eventItem.id} className="rounded-xl border border-white/10 px-3 py-2"><p className="text-sm font-medium text-white/90">{eventItem.title}</p><p className="text-xs text-white/45">Portada actual: {eventItem.coverImage ? 'assignada' : 'pendent'}</p></div>)}
+                {categoryEvents.length === 0 ? <p className="text-sm text-[var(--t3)]">Encara no hi ha events creats per aquesta categoria.</p> : categoryEvents.map((eventItem) => <div key={eventItem.id} className="rounded-xl border border-[var(--line)] px-3 py-2"><p className="text-sm font-medium text-[var(--t)]">{eventItem.title}</p><p className="text-xs text-[var(--t3)]">Portada actual: {eventItem.coverImage ? 'assignada' : 'pendent'}</p></div>)}
               </div>
             </div>
           </div>
           {loading ? (
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[1,2,3,4].map((item) => <div key={item} className="aspect-[0.9] animate-pulse rounded-2xl bg-white/5" />)}</div>
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[1,2,3,4].map((item) => <div key={item} className="aspect-[0.9] animate-pulse rounded-2xl bg-[var(--raised)]" />)}</div>
           ) : media.length === 0 ? (
-            <p className="py-6 text-center text-sm text-white/45">{PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE}</p>
+            <p className="py-6 text-center text-sm text-[var(--t3)]">{PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE}</p>
           ) : (
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
               {media.map((item) => {
                 const coverRefs = coverMap.get(item.mediaUrl) || [];
                 return (
-                  <div key={item.id} draggable={!item.isStatic} onDragStart={() => !item.isStatic && setDraggingId(item.id)} onDragOver={(event) => !item.isStatic && event.preventDefault()} onDrop={() => !item.isStatic && void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-[var(--o-admin-fill-1)] transition-colors ${draggingId === item.id ? 'border-[var(--hair-gold)]' : 'border-white/10 hover:border-white/20'}`}>
+                  <div key={item.id} draggable={!item.isStatic} onDragStart={() => !item.isStatic && setDraggingId(item.id)} onDragOver={(event) => !item.isStatic && event.preventDefault()} onDrop={() => !item.isStatic && void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-[var(--o-admin-fill-1)] transition-colors ${draggingId === item.id ? 'border-[var(--hair-gold)]' : 'border-[var(--line)] hover:border-[var(--hair-gold)]'}`}>
                     <div className="grid gap-0 md:grid-cols-[18rem_minmax(0,1fr)]">
                       <button type="button" onClick={() => onOpenPreview({ url: item.mediaUrl, type: item.mediaType, alt: item.caption || `${name} media` })} className="relative aspect-[4/3] bg-black">
                         {item.mediaType === 'image' ? <Image src={item.mediaUrl} alt={item.caption || `${name} media`} fill sizes="(max-width: 768px) 100vw, 288px" className="object-cover" /> : <video src={item.mediaUrl} className="h-full w-full object-cover" muted playsInline preload="metadata" />}
-                        <div className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white/90">{item.mediaType === 'image' ? 'Imatge' : 'Vídeo'} · #{item.sortOrder + 1}</div>
-                        <div className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white/90">Clic per ampliar</div>
+                        <div className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-xs text-[var(--t)]">{item.mediaType === 'image' ? 'Imatge' : 'Vídeo'} · #{item.sortOrder + 1}</div>
+                        <div className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2 py-1 text-xs text-[var(--t)]">Clic per ampliar</div>
                       </button>
                       <div className="space-y-4 p-4">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <p className="text-sm font-semibold text-white/90">{item.caption || 'Sense caption'}</p>
-                            <p className="text-xs text-white/40">ID {item.id.slice(0, 8)} · destí /portfolio/{slug}</p>
+                            <p className="text-sm font-semibold text-[var(--t)]">{item.caption || 'Sense caption'}</p>
+                            <p className="text-xs text-[var(--t3)]">ID {item.id.slice(0, 8)} · destí /portfolio/{slug}</p>
                           </div>
-                          <div className="flex items-center gap-2 text-xs text-white/45">
-                            <span className="rounded-full border border-white/10 px-2 py-1">{item.isStatic ? 'Catàleg públic actual' : 'Drag & drop'}</span>
-                            {item.event ? <span className="rounded-full border admin-tone-border-info px-2 py-1 admin-tone-text-info">Vinculat a {item.event.title}</span> : <span className="rounded-full border border-white/10 px-2 py-1">Sense event</span>}
+                          <div className="flex items-center gap-2 text-xs text-[var(--t3)]">
+                            <span className="ap-badge">{item.isStatic ? 'Catàleg públic actual' : 'Drag & drop'}</span>
+                            {item.event ? <span className="ap-badge ap-badge--info">Vinculat a {item.event.title}</span> : <span className="ap-badge">Sense event</span>}
                           </div>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs text-white/40">Llegenda / codi intern</label>
-                          <input defaultValue={item.caption || ''} disabled={item.isStatic} onBlur={(event) => { if ((item.caption || '') !== event.target.value) { void handleCaptionSave(item, event.target.value); } }} className="w-full ap-card px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60" placeholder="Ex: entrada-cerimonia" />
-                          <p className="mt-1 text-xs text-white/35">{item.isStatic ? 'Aquesta peça ve del catàleg públic actual. Per editar-la o reordenar-la, primer cal migrar-la al portfolio de BBDD.' : "Aquesta etiqueta t'ajuda a saber què és la peça sense obrir-la."}</p>
+                          <label className="mb-1 block text-xs text-[var(--t3)]">Llegenda / codi intern</label>
+                          <input defaultValue={item.caption || ''} disabled={item.isStatic} onBlur={(event) => { if ((item.caption || '') !== event.target.value) { void handleCaptionSave(item, event.target.value); } }} className="w-full ap-card px-3 py-2 text-sm text-[var(--t2)] disabled:cursor-not-allowed disabled:opacity-60" placeholder="Ex: entrada-cerimonia" />
+                          <p className="mt-1 text-xs text-[var(--t3)]">{item.isStatic ? 'Aquesta peça ve del catàleg públic actual. Per editar-la o reordenar-la, primer cal migrar-la al portfolio de BBDD.' : "Aquesta etiqueta t'ajuda a saber què és la peça sense obrir-la."}</p>
                         </div>
                         <div className="grid gap-3 md:grid-cols-2">
                           <div>
-                            <label className="mb-1 block text-xs text-white/40">Assignar a event</label>
-                            <select value={item.event?.id || ''} disabled={item.isStatic} onChange={(event) => void handleAssignEvent(item, event.target.value)} className="w-full ap-card px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60">
+                            <label className="mb-1 block text-xs text-[var(--t3)]">Assignar a event</label>
+                            <select value={item.event?.id || ''} disabled={item.isStatic} onChange={(event) => void handleAssignEvent(item, event.target.value)} className="w-full ap-card px-3 py-2 text-sm text-[var(--t2)] disabled:cursor-not-allowed disabled:opacity-60">
                               <option value="">Sense assignació</option>
                               {categoryEvents.map((eventItem) => <option key={eventItem.id} value={eventItem.id}>{eventItem.title}</option>)}
                             </select>
                           </div>
                           <div>
-                            <label className="mb-1 block text-xs text-white/40">Fer portada de</label>
-                            <div className="flex flex-wrap gap-2">
-                              {categoryEvents.length === 0 ? <p className="text-xs text-white/45">Crea primer un event.</p> : categoryEvents.map((eventItem) => {
-                                const active = coverRefs.some((coverEvent) => coverEvent.id === eventItem.id);
-                                return <button key={eventItem.id} type="button" disabled={item.isStatic} onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-white/10 text-white/70 hover:bg-white/5'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
-                              })}
-                            </div>
+                            <label className="mb-1 block text-xs text-[var(--t3)]">Fer portada de</label>
+                            {item.mediaType !== 'image' ? (
+                              <p className="text-xs text-[var(--t3)]">Els vídeos poden anar a galeria, però la portada pública ha de ser una imatge.</p>
+                            ) : (
+                              <div className="flex flex-wrap gap-2">
+                                {categoryEvents.length === 0 ? <p className="text-xs text-[var(--t3)]">Crea primer un event.</p> : categoryEvents.map((eventItem) => {
+                                  const active = coverRefs.some((coverEvent) => coverEvent.id === eventItem.id);
+                                  return <button key={eventItem.id} type="button" disabled={item.isStatic} onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-[var(--line)] text-[var(--t2)] hover:bg-[var(--raised)]'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
+                                })}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          <button type="button" disabled={item.isStatic} onClick={() => { replaceTargetRef.current = item; replaceFileRef.current?.click(); }} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60">Substituir fitxer</button>
+                          <button type="button" disabled={item.isStatic} onClick={() => { replaceTargetRef.current = item; replaceFileRef.current?.click(); }} className="rounded-xl border border-[var(--line)] px-3 py-2 text-sm text-[var(--t2)] hover:bg-[var(--raised)] disabled:cursor-not-allowed disabled:opacity-60">Substituir fitxer</button>
                           <button type="button" onClick={() => void handleDelete(item)} disabled={savingId === item.id || item.isStatic} className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger hover:admin-tone-bg-danger disabled:opacity-50">Eliminar</button>
                         </div>
                       </div>
@@ -526,6 +606,45 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
   const [error, setError] = useState<string | null>(null);
   const { confirm, dialogProps } = useConfirmDialog();
   const [form, setForm] = useState<EventFormState>(EMPTY_EVENT_FORM);
+  const [coverOptions, setCoverOptions] = useState<MediaItem[]>([]);
+  const [coverOptionsLoading, setCoverOptionsLoading] = useState(false);
+
+  const selectedCategoryName = useMemo(
+    () => PORTFOLIO_CATEGORIES.find((category) => category.slug === form.categorySlug)?.name || form.categorySlug,
+    [form.categorySlug],
+  );
+  const coverImageOptions = useMemo(
+    () => coverOptions.filter((item) => item.mediaType === 'image'),
+    [coverOptions],
+  );
+
+  const loadCoverOptions = useCallback(async (categorySlug: string) => {
+    setCoverOptionsLoading(true);
+    const fallbackItems = buildStaticMediaItems(categorySlug).filter((item) => item.mediaType === 'image');
+    try {
+      const response = await fetchWithCsrf(`/api/admin/portfolio/media?slug=${categorySlug}`, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'han pogut carregar les portades"));
+      }
+      const data = await response.json();
+      const items = Array.isArray(data.data) ? data.data as MediaItem[] : [];
+      const imageItems = items.filter((item) => item.mediaType === 'image');
+      setCoverOptions(imageItems.length > 0 ? imageItems : fallbackItems);
+    } catch (err) {
+      log.error('Error carregant portades de portfolio', err);
+      setCoverOptions(fallbackItems);
+      if (fallbackItems.length === 0) {
+        setError(err instanceof Error ? err.message : "No s'han pogut carregar les portades");
+      }
+    } finally {
+      setCoverOptionsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showForm) return;
+    void loadCoverOptions(form.categorySlug);
+  }, [form.categorySlug, loadCoverOptions, showForm]);
 
   const handleSubmit = useCallback(async () => {
     if (!form.slug || !form.title || !form.coverImage) {
@@ -542,8 +661,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
         body: JSON.stringify(buildEventPayload(form)),
       });
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data?.error || 'Error creant event');
+        throw new Error(await readPortfolioMutationError(response, 'Error creant event'));
       }
       setForm(EMPTY_EVENT_FORM);
       setShowForm(false);
@@ -558,11 +676,14 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
 
   const togglePublished = useCallback(async (eventItem: PortfolioEvent) => {
     try {
-      await fetchWithCsrf('/api/admin/portfolio/events', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/events', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: eventItem.id, published: !eventItem.published }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut actualitzar l'event"));
+      }
       await onEventsRefresh();
     } catch (err) {
       log.error('Error actualitzant event', err);
@@ -579,7 +700,10 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
     });
     if (!confirmed) return;
     try {
-      await fetchWithCsrf(`/api/admin/portfolio/events?id=${id}`, { method: 'DELETE' });
+      const response = await fetchWithCsrf(`/api/admin/portfolio/events?id=${id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut eliminar l'event"));
+      }
       await onEventsRefresh();
     } catch (err) {
       log.error('Error eliminant event', err);
@@ -591,10 +715,10 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="ap-h2 text-white/90">Events del portfolio</h2>
-          <p className="text-xs text-white/45">Cada event és una mini-pàgina pública amb portada, metadades i galeria vinculada.</p>
+          <h2 className="ap-h2 text-[var(--t)]">Events del portfolio</h2>
+          <p className="text-xs text-[var(--t3)]">Cada event és una mini-pàgina pública amb portada, metadades i galeria vinculada.</p>
         </div>
-        <button type="button" onClick={() => setShowForm((current) => !current)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/85 hover:bg-white/5">{showForm ? 'Tancar formulari' : '+ Nou event'}</button>
+        <button type="button" onClick={() => setShowForm((current) => !current)} className="rounded-xl border border-[var(--line)] px-4 py-2 text-sm text-[var(--t2)] hover:bg-[var(--raised)]">{showForm ? 'Tancar formulari' : '+ Nou event'}</button>
       </div>
       {error && <p className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
       <div className="grid gap-3 lg:grid-cols-3">
@@ -605,20 +729,43 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
       {showForm ? (
         <div className="ap-card p-5">
           <div className="grid gap-4 md:grid-cols-2">
-            <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value, slug: event.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/g, '') }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Títol de l'event" />
-            <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Slug URL" />
-            <select value={form.categorySlug} onChange={(event) => setForm((current) => ({ ...current, categorySlug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85">{PORTFOLIO_CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>
-            <input value={form.coverImage} onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="URL de portada" />
-            <input value={form.subtitle} onChange={(event) => setForm((current) => ({ ...current, subtitle: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Subtítol" />
-            <input value={form.venue} onChange={(event) => setForm((current) => ({ ...current, venue: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Venue" />
-            <input value={form.location} onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Ubicació" />
-            <input type="date" value={form.eventDate} onChange={(event) => setForm((current) => ({ ...current, eventDate: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" />
-            <input type="number" min={0} value={form.guestCount} onChange={(event) => setForm((current) => ({ ...current, guestCount: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Convidats" />
-            <input value={form.services} onChange={(event) => setForm((current) => ({ ...current, services: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Serveis separats per coma" />
-            <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows={4} className="ap-card px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Descripció" />
+            <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value, slug: event.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/g, '') }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Títol de l'event" />
+            <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Slug URL" />
+            <select value={form.categorySlug} onChange={(event) => setForm((current) => ({ ...current, categorySlug: event.target.value, coverImage: '' }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]">{PORTFOLIO_CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>
+            <div>
+              <select
+                value={form.coverImage}
+                onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))}
+                disabled={coverOptionsLoading || coverImageOptions.length === 0}
+                className="w-full ap-card px-3 py-2.5 text-sm text-[var(--t2)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <option value="">
+                  {coverOptionsLoading
+                    ? 'Carregant portades...'
+                    : coverImageOptions.length === 0
+                      ? `Cap imatge disponible a ${selectedCategoryName}`
+                      : 'Tria una imatge existent'}
+                </option>
+                {coverImageOptions.map((item) => (
+                  <option key={item.id} value={item.mediaUrl}>
+                    {item.caption || item.mediaUrl} · {item.isStatic ? 'catàleg públic' : 'media editable'}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 truncate text-xs text-[var(--t3)]">
+                {form.coverImage || 'Portada del portfolio, no URL manual de producte.'}
+              </p>
+            </div>
+            <input value={form.subtitle} onChange={(event) => setForm((current) => ({ ...current, subtitle: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Subtítol" />
+            <input value={form.venue} onChange={(event) => setForm((current) => ({ ...current, venue: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Venue" />
+            <input value={form.location} onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Ubicació" />
+            <input type="date" value={form.eventDate} onChange={(event) => setForm((current) => ({ ...current, eventDate: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" />
+            <input type="number" min={0} value={form.guestCount} onChange={(event) => setForm((current) => ({ ...current, guestCount: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Convidats" />
+            <input value={form.services} onChange={(event) => setForm((current) => ({ ...current, services: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)] md:col-span-2" placeholder="Serveis separats per coma" />
+            <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows={4} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)] md:col-span-2" placeholder="Descripció" />
           </div>
           <div className="mt-4 flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm text-white/80"><input type="checkbox" checked={form.published} onChange={(event) => setForm((current) => ({ ...current, published: event.target.checked }))} />Publicat</label>
+            <label className="flex items-center gap-2 text-sm text-[var(--t2)]"><input type="checkbox" checked={form.published} onChange={(event) => setForm((current) => ({ ...current, published: event.target.checked }))} />Publicat</label>
             <button type="button" onClick={() => void handleSubmit()} disabled={saving} className="ap-btn ap-btn--primary">{saving ? 'Guardant...' : 'Crear event'}</button>
           </div>
         </div>
@@ -627,14 +774,18 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
         {events.map((eventItem) => (
           <div key={eventItem.id} className="ap-card rounded-2xl p-4">
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
-              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black">{eventItem.coverImage ? <Image src={eventItem.coverImage} alt={eventItem.title} fill className="object-cover" sizes="96px" /> : null}</div>
+              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-[var(--line)] bg-black">{eventItem.coverImage ? <Image src={eventItem.coverImage} alt={eventItem.title} fill className="object-cover" sizes="96px" /> : null}</div>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-white/90">{eventItem.title}</p><span className={`rounded-full px-2 py-1 text-xs ${eventItem.published ? 'admin-tone-bg-success admin-tone-text-success' : 'bg-white/10 text-white/60'}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
-                <p className="mt-1 text-xs text-white/45">/{eventItem.categorySlug}/{eventItem.slug} · {eventItem._count?.media || 0} elements vinculats</p>
-                <p className="mt-1 text-xs text-white/35">Portada: {eventItem.coverImage || 'pendent'}</p>
+                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-[var(--t)]">{eventItem.title}</p><span className={`ap-badge ${eventItem.published ? 'ap-badge--success' : ''}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
+                <p className="mt-1 text-xs text-[var(--t3)]">/{eventItem.categorySlug}/{eventItem.slug} · {eventItem._count?.media || 0} elements vinculats</p>
+                <p className="mt-1 text-xs text-[var(--t3)]">Portada: {eventItem.coverImage || 'pendent'}</p>
+                {(() => {
+                  const origin = formatPortfolioEventOrigin(eventItem);
+                  return origin ? <p className="mt-1 text-xs text-[var(--t3)]">Origen: {origin}</p> : null;
+                })()}
               </div>
               <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => void togglePublished(eventItem)} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5">{eventItem.published ? 'Despublicar' : 'Publicar'}</button>
+                <button type="button" onClick={() => void togglePublished(eventItem)} className="rounded-xl border border-[var(--line)] px-3 py-2 text-sm text-[var(--t2)] hover:bg-[var(--raised)]">{eventItem.published ? 'Despublicar' : 'Publicar'}</button>
                 <button type="button" onClick={() => void deleteEvent(eventItem.id)} className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger hover:admin-tone-bg-danger">Eliminar</button>
               </div>
             </div>
@@ -683,140 +834,34 @@ export default function AdminPortfolioPage() {
     return () => window.removeEventListener('hashchange', applyHash);
   }, []);
 
-  const strip = useMemo(() => {
-    const total = events.length;
-    const publishedCount = events.filter((event) => event.published).length;
-    const draftCount = total - publishedCount;
-    const withoutCover = events.filter((event) => !event.coverImage).length;
-    const withoutMedia = events.filter((event) => (event._count?.media ?? 0) === 0).length;
-    const totalMediaLinked = events.reduce((sum, event) => sum + (event._count?.media ?? 0), 0);
-    const emptyCategories = PORTFOLIO_CATEGORIES.filter(
-      (category) => !events.some((event) => event.categorySlug === category.slug),
-    );
-    const systemItems = [
-      `Events totals: ${total} (${publishedCount} publicats · ${draftCount} esborranys)`,
-      `Peces vinculades: ${totalMediaLinked}`,
-      `Categories actives: ${PORTFOLIO_CATEGORIES.length - emptyCategories.length}/${PORTFOLIO_CATEGORIES.length}`,
-    ];
-    const manualItems: string[] = [];
-    if (withoutCover > 0) manualItems.push(`${withoutCover} ${pluralize(withoutCover, 'event', 'events')} sense portada`);
-    if (withoutMedia > 0) manualItems.push(`${withoutMedia} ${pluralize(withoutMedia, 'event', 'events')} sense media vinculat`);
-    if (draftCount > 0) manualItems.push(`${draftCount} ${pluralize(draftCount, 'esborrany pendent', 'esborranys pendents')} de publicar`);
-    if (emptyCategories.length > 0) manualItems.push(`Categories buides: ${emptyCategories.map((category) => category.name).join(', ')}`);
-    let nextStep: {
-      title: string;
-      detail: string;
-      href: string;
-      ctaLabel: string;
-      secondary?: { href: string; label: string };
-    };
-    if (total === 0) {
-      nextStep = {
-        title: 'Crea el primer event del portfolio',
-        detail: 'Sense events no hi ha pàgina pública. Obre Events i crea el primer cas per tenir presència.',
-        href: '#events',
-        ctaLabel: 'Crear primer event',
-      };
-    } else if (withoutCover > 0) {
-      nextStep = {
-        title: `Assigna portada a ${withoutCover} ${pluralize(withoutCover, 'event', 'events')}`,
-        detail: 'Els events sense portada es veuen buits a la web. Des de Media tria una peça i marca-la com a portada.',
-        href: '#media',
-        ctaLabel: 'Obrir Media',
-        secondary: { href: '#events', label: 'Revisar events' },
-      };
-    } else if (withoutMedia > 0) {
-      nextStep = {
-        title: `Vincula media a ${withoutMedia} ${pluralize(withoutMedia, 'event', 'events')}`,
-        detail: 'Events sense media no tenen galeria pública. Des de Media selecciona peces i vincula-les a l\'event.',
-        href: '#media',
-        ctaLabel: 'Obrir Media',
-      };
-    } else if (draftCount > 0) {
-      nextStep = {
-        title: `Publica ${draftCount} ${pluralize(draftCount, 'esborrany', 'esborranys')}`,
-        detail: 'Els esborranys existeixen a l\'admin però no es veuen públicament. Revisa-los i publica els que estiguin a punt.',
-        href: '#events',
-        ctaLabel: 'Obrir Events',
-      };
-    } else if (emptyCategories.length > 0) {
-      nextStep = {
-        title: `Afegeix events a ${emptyCategories.length} ${pluralize(emptyCategories.length, 'categoria buida', 'categories buides')}`,
-        detail: `Sense events, les categories es veuen desertes. Pendents: ${emptyCategories.map((category) => category.name).join(', ')}.`,
-        href: '#events',
-        ctaLabel: 'Obrir Events',
-      };
-    } else {
-      nextStep = {
-        title: 'Portfolio al dia',
-        detail: 'Tots els events tenen portada i media vinculat. Continua mantenint la cadència de publicació.',
-        href: '#events',
-        ctaLabel: 'Obrir Events',
-      };
-    }
-    const manualTone: 'info' | 'warning' | 'success' =
-      withoutCover > 0 || withoutMedia > 0 ? 'warning' : draftCount > 0 ? 'info' : 'success';
-    return {
-      system: {
-        eyebrow: 'BBDD',
-        title: 'Inventari actual',
-        tone: total === 0 ? 'warning' : 'info',
-        items: systemItems,
-        emptyText: 'Sense events encara.',
-      } as const,
-      manual: {
-        eyebrow: 'Pendents manuals',
-        title: 'Què requereix la teva mà',
-        tone: manualTone,
-        items: manualItems,
-        emptyText: 'Cap acció manual pendent.',
-      } as const,
-      nextStep: {
-        title: nextStep.title,
-        detail: nextStep.detail,
-        href: nextStep.href,
-        ctaLabel: nextStep.ctaLabel,
-        secondaryAction: nextStep.secondary,
-      },
-    };
-  }, [events]);
 
   return (
-    <div className="space-y-6">
+    <AdminPage
+      title="Portfolio"
+      subtitle="Gestor visual únic del portfolio: miniatures, destinació real, portada, ordre, substitució i assignació d'events."
+    >
       <FullscreenPreview preview={preview} onClose={() => setPreview(null)} />
-      <div>
-        <h1 className="text-2xl font-bold text-white/95">Portfolio</h1>
-        <p className="mt-1 text-sm text-white/50">Gestor visual únic del portfolio: miniatures, destinació real, portada, ordre, substitució i assignació d'events.</p>
-      </div>
-      <OwnerControlStrip system={strip.system} manual={strip.manual} nextStep={strip.nextStep} className="mb-2" />
       <div className="grid gap-3 lg:grid-cols-3">
-        <AdminHelpLegend title="Què estàs veient" body="Media gestiona fitxers i ordre. Events gestiona la pàgina pública i les seves metadades." />
-        <AdminHelpLegend title="Com treballar" body="Primer crea o revisa l'event. Després vincula les imatges, tria portada i ordena la galeria des de Media." />
+        <AdminHelpLegend title="Què estàs veient" body="Imatges gestiona fitxers, categoria, ordre i portada. Events gestiona la pàgina pública i les seves metadades." />
+        <AdminHelpLegend title="Com treballar" body="Primer deixa cada imatge dins la seva categoria. Després vincula-la a l'event, tria portada i ordena la galeria." />
         <AdminHelpLegend title="Protecció" body="Les peces marcades com a portada no es deixen eliminar a cegues. Així s'evita trencar la web sense voler." />
       </div>
       <div id="media" />
       <div id="events" />
       <div className="flex gap-2">
-        <button type="button" onClick={() => setTab('media')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'media' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Media</button>
+        <button type="button" onClick={() => setTab('media')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'media' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Imatges</button>
         <button type="button" onClick={() => setTab('events')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'events' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Events</button>
       </div>
       {tab === 'media' ? (
         <div className="space-y-3">
-          {eventsLoading ? <div className="ap-card p-6 text-sm text-white/50">Carregant events i assignacions...</div> : PORTFOLIO_CATEGORIES.map((category) => <CategorySection key={category.slug} slug={category.slug} name={category.name} events={events} onEventsRefresh={loadEvents} onOpenPreview={setPreview} />)}
+          {eventsLoading ? <div className="ap-card p-6 text-sm text-[var(--t3)]">Carregant events i assignacions...</div> : PORTFOLIO_CATEGORIES.map((category) => <CategorySection key={category.slug} slug={category.slug} name={category.name} events={events} onEventsRefresh={loadEvents} onOpenPreview={setPreview} />)}
         </div>
       ) : (
         <EventsManager events={events} onEventsRefresh={loadEvents} />
       )}
-    </div>
+    </AdminPage>
   );
 }
-
-
-
-
-
-
-
 
 
 

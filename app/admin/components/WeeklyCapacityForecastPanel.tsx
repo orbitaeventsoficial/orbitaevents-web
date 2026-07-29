@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { WeeklyCapacityForecast, WeekAlertLevel } from '@/lib/services/operationalForecastService';
 
 const ALERT_STYLE: Record<WeekAlertLevel, { border: string; bg: string; tone: string; label: string }> = {
-  NONE: { border: '', bg: '', tone: 'admin-cr-meta', label: 'Sense reserves' },
+  NONE: { border: '', bg: '', tone: 'text-[var(--t3)]', label: 'Sense reserves' },
   INFO: { border: 'admin-tone-border-info', bg: 'admin-tone-bg-info', tone: 'admin-tone-text-info', label: 'Normal' },
   WARNING: { border: 'admin-tone-border-warning', bg: 'admin-tone-bg-warning', tone: 'admin-tone-text-warning', label: 'Intensa' },
   CRITICAL: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', tone: 'admin-tone-text-danger', label: 'Al límit' },
@@ -16,7 +16,7 @@ export default function WeeklyCapacityForecastPanel({ forecast }: { forecast: We
   const headerBorder = hasCritical ? 'admin-tone-border-danger' : 'admin-tone-border-warning';
 
   return (
-    <section className={`admin-cr-panel admin-cr-forecast-panel ${headerBorder}`}>
+    <section className={`ap-card grid gap-4 p-4 ${headerBorder}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-semibold flex items-center gap-2">
@@ -28,7 +28,7 @@ export default function WeeklyCapacityForecastPanel({ forecast }: { forecast: We
         </div>
         <Link
           href="/admin/calendario/capacity"
-          className="admin-cr-action-link"
+          className="ap-btn ap-btn--secondary ap-btn--xs"
         >
           Capacitat →
         </Link>
@@ -39,7 +39,7 @@ export default function WeeklyCapacityForecastPanel({ forecast }: { forecast: We
           return (
             <div
               key={week.weekStart}
-              className={`admin-stagger-item rounded-xl border p-3 ${style.border} ${style.bg}`}
+              className={`admin-stagger-item ap-card p-3 ${style.border} ${style.bg}`}
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-semibold opacity-80">

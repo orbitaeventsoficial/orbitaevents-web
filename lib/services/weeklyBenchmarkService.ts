@@ -6,7 +6,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { prisma } from '@/lib/prisma';
-import { sendEmail } from '@/lib/email';
+import { sendTrackedStandaloneEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { log } from '@/lib/logger';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
@@ -155,10 +155,12 @@ export async function runWeeklyBenchmark(now: Date = new Date()): Promise<Weekly
   const recipient = (await getRecipientsAsString('reports')) || SITE_CONFIG.business.email;
   const html = buildEmailHtml(report);
   try {
-    await sendEmail({
+    await sendTrackedStandaloneEmail({
+      templateKey: 'weekly-benchmark',
       to: recipient,
       subject: `📊 Benchmark setmanal · ${report.weekLabel}`,
       html,
+      orbita: { kind: 'admin', origin: 'weekly-benchmark' },
     });
   } catch (err) {
     log.error('Weekly benchmark email failed', err);

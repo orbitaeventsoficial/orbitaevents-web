@@ -1,17 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockTryPortal, mockCalcDuration } = vi.hoisted(() => ({
+const { mockPrisma, mockTryPortal, mockCalcDuration, mockOnBookingConfirmed } = vi.hoisted(() => ({
   mockPrisma: {
     $transaction: vi.fn(),
     booking: { findUnique: vi.fn() },
-    bookingInventory: { count: vi.fn(), create: vi.fn(), createMany: vi.fn(), findMany: vi.fn(), groupBy: vi.fn() },
+    bookingInventory: { count: vi.fn(), create: vi.fn(), createMany: vi.fn(), findMany: vi.fn(), groupBy: vi.fn(), updateMany: vi.fn() },
     inventoryItem: { update: vi.fn(), updateMany: vi.fn() },
-    inventoryUsage: { create: vi.fn(), createMany: vi.fn() },
+    inventoryUsage: { create: vi.fn(), createMany: vi.fn(), findMany: vi.fn(), updateMany: vi.fn() },
     availability: { updateMany: vi.fn() },
-    liveNotification: { create: vi.fn() },
+    liveNotification: { create: vi.fn(), findFirst: vi.fn() },
   },
   mockTryPortal: vi.fn(),
   mockCalcDuration: vi.fn(),
+  mockOnBookingConfirmed: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -20,6 +21,9 @@ vi.mock('@/lib/services/bookingPortalCompletionService', () => ({
 }));
 vi.mock('@/lib/inventory-utils', () => ({
   calculateEventDuration: mockCalcDuration,
+}));
+vi.mock('@/lib/services/automationTriggers', () => ({
+  onBookingConfirmed: mockOnBookingConfirmed,
 }));
 
 import { applyBookingStatusSideEffects, type BookingStatusTransitionInput } from '@/lib/services/bookingStatusTransitionService';
@@ -32,6 +36,7 @@ function makeInput(overrides: Partial<BookingStatusTransitionInput> = {}): Booki
     existing: {
       guestCount: 120,
       eventType: 'Boda' as never,
+      eventDate: new Date('2026-08-18T20:00:00.000Z'),
       eventLocation: 'Masia Can Roda',
       eventStartTime: '20:00',
       eventEndTime: '03:00',
@@ -54,11 +59,16 @@ describe('applyBookingStatusSideEffects', () => {
     mockPrisma.bookingInventory.createMany.mockResolvedValue({ count: 0 });
     mockPrisma.bookingInventory.findMany.mockResolvedValue([]);
     mockPrisma.bookingInventory.groupBy.mockResolvedValue([]);
+    mockPrisma.bookingInventory.updateMany.mockResolvedValue({ count: 0 });
     mockPrisma.inventoryItem.update.mockResolvedValue({});
     mockPrisma.inventoryItem.updateMany.mockResolvedValue({ count: 0 });
     mockPrisma.inventoryUsage.create.mockResolvedValue({});
     mockPrisma.inventoryUsage.createMany.mockResolvedValue({ count: 0 });
+    mockPrisma.inventoryUsage.findMany.mockResolvedValue([]);
+    mockPrisma.inventoryUsage.updateMany.mockResolvedValue({ count: 0 });
     mockPrisma.availability.updateMany.mockResolvedValue({});
+    mockPrisma.liveNotification.findFirst.mockResolvedValue(null);
+    mockPrisma.liveNotification.create.mockResolvedValue({});
     mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => Promise<void>) => {
       await fn({
         ...mockPrisma,
@@ -67,6 +77,7 @@ describe('applyBookingStatusSideEffects', () => {
     });
     mockTryPortal.mockResolvedValue(undefined);
     mockCalcDuration.mockReturnValue(7);
+    mockOnBookingConfirmed.mockResolvedValue({ triggered: true, action: 'pre-event-checklist' });
   });
 
   // ─── CONFIRMED ──────────────────────────────────────────
@@ -82,6 +93,7 @@ describe('applyBookingStatusSideEffects', () => {
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'CONFIRMED' }));
 
+    expect(mockOnBookingConfirmed).toHaveBeenCalledWith('booking-1', { source: 'booking-status-transition' });
     expect(mockPrisma.bookingInventory.createMany).toHaveBeenCalledWith({
       data: [expect.objectContaining({
         bookingId: 'booking-1',
@@ -93,6 +105,20 @@ describe('applyBookingStatusSideEffects', () => {
     expect(mockPrisma.inventoryItem.updateMany).toHaveBeenCalledWith({
       where: { id: { in: ['item-1'] } },
       data: { status: 'IN_USE' },
+    });
+    expect(mockPrisma.bookingInventory.groupBy).toHaveBeenCalledWith({
+      by: ['itemId'],
+      where: expect.objectContaining({
+        itemId: { in: ['item-1'] },
+        booking: expect.objectContaining({
+          id: { not: 'booking-1' },
+          status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] },
+          eventDate: {
+            gte: new Date('2026-08-18T00:00:00.000Z'),
+            lt: new Date('2026-08-19T00:00:00.000Z'),
+          },
+        }),
+      }),
     });
   });
 
@@ -108,6 +134,10 @@ describe('applyBookingStatusSideEffects', () => {
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'CONFIRMED' }));
 
     expect(mockPrisma.bookingInventory.createMany).not.toHaveBeenCalled();
+    expect(mockPrisma.inventoryItem.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['item-1'] } },
+      data: { status: 'IN_USE' },
+    });
   });
 
   it('no assigna inventari si en ús per altra reserva activa', async () => {
@@ -132,38 +162,41 @@ describe('applyBookingStatusSideEffects', () => {
     }));
 
     expect(mockPrisma.booking.findUnique).not.toHaveBeenCalled();
+    expect(mockOnBookingConfirmed).not.toHaveBeenCalled();
   });
 
   // ─── COMPLETED ──────────────────────────────────────────
 
-  it('actualitza stats (total_events, total_people) al completar', async () => {
-    const txMock = { $executeRaw: vi.fn(), liveNotification: { create: vi.fn().mockResolvedValue({}) } };
-    mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof txMock) => Promise<void>) => {
-      await fn(txMock);
-    });
-
+  it('marca stats actualitzades i crea notificació pública al completar', async () => {
     const result = await applyBookingStatusSideEffects(makeInput({
       newStatus: 'COMPLETED',
     }));
 
     expect(result.statsUpdated).toBe(true);
-    expect(txMock.$executeRaw).toHaveBeenCalledTimes(2); // total_events + total_people
-    expect(txMock.liveNotification.create).toHaveBeenCalledOnce();
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+    expect(mockPrisma.liveNotification.findFirst).toHaveBeenCalledWith({
+      where: { bookingId: 'booking-1', isReal: true },
+      select: { id: true },
+    });
+    expect(mockPrisma.liveNotification.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        bookingId: 'booking-1',
+        type: 'Boda',
+        location: 'Masia Can Roda',
+        isReal: true,
+      }),
+    });
   });
 
-  it('no compta guests si guestCount és 0', async () => {
-    const txMock = { $executeRaw: vi.fn(), liveNotification: { create: vi.fn().mockResolvedValue({}) } };
-    mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof txMock) => Promise<void>) => {
-      await fn(txMock);
-    });
+  it('no duplica notificació pública si la reserva ja en tenia una', async () => {
+    mockPrisma.liveNotification.findFirst.mockResolvedValue({ id: 'live-1' });
 
-    await applyBookingStatusSideEffects(makeInput({
+    const result = await applyBookingStatusSideEffects(makeInput({
       newStatus: 'COMPLETED',
-      existing: { ...makeInput().existing, guestCount: 0 },
     }));
 
-    // Only total_events, not total_people
-    expect(txMock.$executeRaw).toHaveBeenCalledTimes(1);
+    expect(result.statsUpdated).toBe(false);
+    expect(mockPrisma.liveNotification.create).not.toHaveBeenCalled();
   });
 
   it('crea inventoryUsage per cada item al completar', async () => {
@@ -187,6 +220,47 @@ describe('applyBookingStatusSideEffects', () => {
           bookingId: 'booking-1',
         }),
       ]),
+    });
+  });
+
+  it('marca inventari com sortit i retornat al completar', async () => {
+    mockPrisma.bookingInventory.findMany.mockResolvedValue([
+      { itemId: 'item-1', item: { id: 'item-1' } },
+    ]);
+
+    await applyBookingStatusSideEffects(makeInput({ newStatus: 'COMPLETED' }));
+
+    expect(mockPrisma.bookingInventory.updateMany).toHaveBeenCalledWith({
+      where: { bookingId: 'booking-1' },
+      data: { checkedOut: true, checkedIn: true },
+    });
+  });
+
+  it('actualitza inventoryUsage existent i només crea els items que falten', async () => {
+    mockPrisma.bookingInventory.findMany.mockResolvedValue([
+      { itemId: 'item-1', item: { id: 'item-1' } },
+      { itemId: 'item-2', item: { id: 'item-2' } },
+    ]);
+    mockPrisma.inventoryUsage.findMany.mockResolvedValue([{ itemId: 'item-1' }]);
+
+    await applyBookingStatusSideEffects(makeInput({ newStatus: 'COMPLETED' }));
+
+    expect(mockPrisma.inventoryUsage.updateMany).toHaveBeenCalledWith({
+      where: {
+        bookingId: 'booking-1',
+        itemId: { in: ['item-1'] },
+      },
+      data: {
+        hoursUsed: 7,
+        notes: 'Bolo OE-2026-001',
+      },
+    });
+    expect(mockPrisma.inventoryUsage.createMany).toHaveBeenCalledWith({
+      data: [expect.objectContaining({
+        itemId: 'item-2',
+        bookingId: 'booking-1',
+        hoursUsed: 7,
+      })],
     });
   });
 

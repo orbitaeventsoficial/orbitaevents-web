@@ -1,17 +1,19 @@
 import Link from 'next/link';
 import dynamicImport from 'next/dynamic';
 import { prisma } from '@/lib/prisma';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { formatCurrency } from '@/lib/constants';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
+import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import ProposalsList from './ProposalsList';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
-import './presupuestos.css';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { AdminPage } from '../components/AdminPage';
+import { inferStudioServiceFromLead } from './studio-utils';
 
 const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'), {
   ssr: false,
   loading: () => (
-    <section className="pr__loading">
+    <section className="ap-card ap-card-body text-[var(--o-text-sm)] text-[var(--t2)]">
       Carregant editor de pressupostos...
     </section>
   ),
@@ -42,30 +44,43 @@ export default async function PresupuestosPage({
   const leadId = searchParams?.leadId || '';
   const proposalId = searchParams?.proposalId || '';
   const statusFilter = searchParams?.statusFilter || '';
+  const explicitProposalId = proposalId;
 
   // If we have customerId or proposalId, show the editor
   const showEditor = Boolean(customerId || proposalId || leadId);
 
-  const customer = customerId
+  const proposalForEditor = proposalId
+    ? await prisma.proposal.findUnique({
+        where: { id: proposalId },
+        select: { customerId: true, leadId: true, status: true },
+      })
+    : null;
+  const resolvedCustomerId = customerId || proposalForEditor?.customerId || '';
+  const resolvedLeadId = leadId || proposalForEditor?.leadId || '';
+
+  const customer = resolvedCustomerId
     ? await prisma.customer.findUnique({
-        where: { id: customerId },
+        where: { id: resolvedCustomerId },
         select: { id: true, name: true, email: true, phone: true, preferredLocale: true },
       })
     : null;
 
-  const leadForEditor = leadId
+  const leadForEditor = resolvedLeadId
     ? await prisma.lead.findUnique({
-        where: { id: leadId },
+        where: { id: resolvedLeadId },
         select: {
           id: true,
           name: true,
           email: true,
           phone: true,
           eventDate: true,
+          eventType: true,
           eventStartTime: true,
           eventEndTime: true,
           eventLocation: true,
           eventAddress: true,
+          distanceKm: true,
+          tollsEur: true,
           guestCount: true,
           preferredLocale: true,
           customer: {
@@ -77,9 +92,94 @@ export default async function PresupuestosPage({
               preferredLocale: true,
             },
           },
+          booking: {
+            select: {
+              id: true,
+              reference: true,
+            },
+          },
+          serviceLines: {
+            orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+            select: {
+              id: true,
+              collaboratorId: true,
+              kind: true,
+              label: true,
+              revenueAmount: true,
+              costAmount: true,
+              quantity: true,
+              hours: true,
+              notes: true,
+            },
+          },
         },
       })
     : null;
+  const implicitLeadDraft = !explicitProposalId && resolvedLeadId
+    ? await prisma.proposal.findFirst({
+        where: { leadId: resolvedLeadId, status: 'DRAFT' },
+        orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }],
+        select: { id: true },
+      })
+    : null;
+  const editorProposalId = explicitProposalId || implicitLeadDraft?.id || '';
+  const editorProposalStatus = proposalForEditor?.status || (implicitLeadDraft ? 'DRAFT' : '');
+  const preferLeadPrefill = Boolean(resolvedLeadId && (!explicitProposalId || proposalForEditor?.status === 'DRAFT'));
+
+  // Always load canonical proposals for the list. Legacy LeadDocument quotes are
+  // historical audit traces and must not appear as live budgets here.
+  const proposals = await prisma.proposal.findMany({
+    where: resolvedLeadId ? { leadId: resolvedLeadId } : {},
+    orderBy: { createdAt: 'desc' },
+    take: 100,
+    select: {
+      id: true,
+      reference: true,
+      status: true,
+      total: true,
+      createdAt: true,
+      sentAt: true,
+      pdfUrl: true,
+      pdfKey: true,
+      customerId: true,
+      leadId: true,
+      bookingId: true,
+      customer: {
+        select: { name: true, email: true },
+      },
+    },
+  });
+
+  // Serialize dates for client component
+  const serializedProposals = proposals.map((p) => ({
+    ...p,
+    createdAt: p.createdAt.toISOString(),
+    sentAt: p.sentAt?.toISOString() || null,
+  }));
+
+  if (leadForEditor?.booking && !explicitProposalId) {
+    return (
+      <AdminPage
+        back={{ href: '/admin/presupuestos', label: 'Pressupostos' }}
+        eyebrow="Comercial · Pressupostos"
+        title="Lead formalitzat com a reserva"
+        subtitle={`Aquest lead ja és la reserva ${leadForEditor.booking.reference}. Els pressupostos del lead són històric comercial; els canvis operatius es fan a la reserva.`}
+        actions={
+          <Link
+            href={buildBookingHref(leadForEditor.booking.id)}
+            className="ap-btn ap-btn--primary"
+          >
+            Obrir reserva {leadForEditor.booking.reference}
+          </Link>
+        }
+      >
+        <ProposalsList
+          proposals={serializedProposals}
+          initialStatusFilter={statusFilter}
+        />
+      </AdminPage>
+    );
+  }
 
   const brandSettingsRows = await prisma.setting.findMany({
     where: {
@@ -97,59 +197,15 @@ export default async function PresupuestosPage({
     select: { key: true, value: true },
   });
   const brandSettings = Object.fromEntries(brandSettingsRows.map((row) => [row.key, row.value]));
-
-  // Always load proposals for the list
-  const [proposals, quotes] = await Promise.all([
-    prisma.proposal.findMany({
-      where: leadId ? { leadId } : {},
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-      select: {
-        id: true,
-        reference: true,
-        status: true,
-        total: true,
-        createdAt: true,
-        sentAt: true,
-        customerId: true,
-        leadId: true,
-        bookingId: true,
-        customer: {
-          select: { name: true, email: true },
-        },
-      },
-    }),
-    prisma.leadDocument.findMany({
-      where: {
-        type: 'QUOTE',
-        ...(leadId ? { leadId } : {}),
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 20,
-      select: {
-        id: true,
-        title: true,
-        fileUrl: true,
-        createdAt: true,
-        leadId: true,
-        lead: {
-          select: { name: true, email: true },
-        },
-      },
-    }),
-  ]);
-
-  // Serialize dates for client component
-  const serializedProposals = proposals.map((p) => ({
-    ...p,
-    createdAt: p.createdAt.toISOString(),
-    sentAt: p.sentAt?.toISOString() || null,
-  }));
-
-  const serializedQuotes = quotes.map((q) => ({
-    ...q,
-    createdAt: q.createdAt.toISOString(),
-  }));
+  const editorCustomer = customer || leadForEditor?.customer || null;
+  const initialEventType = inferStudioServiceFromLead({
+    eventType: leadForEditor?.eventType,
+    serviceLines: leadForEditor?.serviceLines || [],
+  });
+  const vehicleCostReference = await getEffectiveVehicleCostPerKm().catch(() => null);
+  const initialVehicleCostPerKm = vehicleCostReference && vehicleCostReference.costPerKm > 0
+    ? vehicleCostReference.costPerKm
+    : undefined;
 
   if (!showEditor) {
     // LIST VIEW — show all proposals with filters and actions
@@ -212,10 +268,6 @@ export default async function PresupuestosPage({
     if (counts.draft > 0) {
       systemItems.push(`${counts.draft} esborranys vius`);
     }
-    if (quotes.length > 0) {
-      systemItems.push(`${quotes.length} pressupostos antics (LeadDocument) encara vinculats`);
-    }
-
     const manualItems: string[] = [];
     if (sentStale > 0) {
       manualItems.push(`${sentStale} propostes enviades sense resposta fa ${SENT_STALE_DAYS}+ dies`);
@@ -233,143 +285,75 @@ export default async function PresupuestosPage({
       manualItems.push(`${counts.rejected} rebutjades recents (lliçó per l'ofertes)`);
     }
 
-    const nextStep = acceptedWithoutBooking > 0
-      ? {
-          eyebrow: 'Següent pas · Conversió',
-          title: 'Convertir acceptades en reserves',
-          detail: `${acceptedWithoutBooking} ${acceptedWithoutBooking === 1 ? 'proposta acceptada no té reserva' : 'propostes acceptades no tenen reserva'} vinculada. Tanca el cercle creant la reserva des de la fitxa.`,
-          href: '/admin/presupuestos?statusFilter=ACCEPTED',
-          ctaLabel: 'Veure acceptades',
-          secondaryAction: { href: '/admin/bookings', label: 'Obrir reserves' },
-        }
-      : sentStale > 0
-      ? {
-          eyebrow: 'Següent pas · Follow-up',
-          title: 'Recuperar propostes enviades fredes',
-          detail: `${sentStale} ${sentStale === 1 ? 'proposta enviada ha passat' : 'propostes enviades han passat'} ${SENT_STALE_DAYS}+ dies sense resposta. Reactiva-les amb un seguiment o tanca-les.`,
-          href: '/admin/presupuestos?statusFilter=SENT',
-          ctaLabel: 'Revisar enviades',
-          secondaryAction: { href: '/admin/inbox/compose', label: 'Redactar seguiment' },
-        }
-      : draftStale > 0
-      ? {
-          eyebrow: 'Següent pas · Netejar',
-          title: 'Tancar esborranys oberts',
-          detail: `${draftStale} ${draftStale === 1 ? 'esborrany porta' : 'esborranys porten'} ${DRAFT_STALE_DAYS}+ dies sense enviar. Completa'ls, envia'ls o esborra'ls per no deixar cua fantasma.`,
-          href: '/admin/presupuestos?statusFilter=DRAFT',
-          ctaLabel: 'Revisar esborranys',
-        }
-      : counts.total === 0
-      ? {
-          eyebrow: 'Següent pas',
-          title: 'Crear el primer pressupost',
-          detail: 'Encara no hi ha propostes al catàleg comercial recent. Obre un pressupost nou per començar la traça.',
-          href: '/admin/presupuestos?customerId=new',
-          ctaLabel: 'Nou pressupost',
-        }
-      : {
-          eyebrow: 'Següent pas',
-          title: 'Catàleg comercial al dia',
-          detail: 'Sense bloquejos visibles a les propostes recents. Aprofita per preparar noves ofertes o revisar plantilles del PDF.',
-          href: '/admin/presupuestos?customerId=new',
-          ctaLabel: 'Nou pressupost',
-          secondaryAction: { href: '/admin/settings/quotes', label: 'Plantilles PDF' },
-        };
 
     return (
-      <main className="pr__page">
-        <header className="pr__hero">
-          <div>
-            <p className="pr__eyebrow">Comercial · Pressupostos</p>
-            <h1 className="pr__title">Pressupostos</h1>
-            <p className="pr__subtitle">
-              Controla què s'ha ofert, què està pendent de seguiment i què ja hauria de convertir-se en reserva.
-            </p>
-          </div>
-          <div className="pr__heroActions">
+      <AdminPage
+        eyebrow="Comercial · Pressupostos"
+        title="Pressupostos"
+        subtitle="Controla què s'ha ofert, què està pendent de seguiment i què ja hauria de convertir-se en reserva."
+        actions={
           <Link
             href="/admin/presupuestos?customerId=new"
             className="ap-btn ap-btn--primary"
           >
             + Nou pressupost
           </Link>
-          </div>
-        </header>
-        <OwnerControlStrip
-          className="pr__signal"
-          system={{
-            eyebrow: 'Automàtic · Catàleg comercial',
-            title: counts.total === 0
-              ? 'Sense propostes recents'
-              : `${counts.total} propostes recents`,
-            tone: counts.accepted > 0 ? 'success' : counts.total > 0 ? 'info' : 'info',
-            items: systemItems,
-            emptyText: 'El catàleg encara no té propostes registrades.',
-          }}
-          manual={{
-            eyebrow: 'Manual · Intervenció',
-            title: manualItems.length === 0
-              ? 'Cap coll visible'
-              : `${manualItems.length} senyals per revisar`,
-            tone: (acceptedWithoutBooking > 0 || sentStale > 0 || counts.expired > 0)
-              ? 'warning'
-              : manualItems.length > 0
-              ? 'info'
-              : 'success',
-            items: manualItems,
-            emptyText: 'Cap proposta requereix intervenció manual ara mateix.',
-          }}
-          nextStep={nextStep}
-        />
+        }
+      >
         <ProposalsList
           proposals={serializedProposals}
-          quotes={serializedQuotes}
           initialStatusFilter={statusFilter}
         />
-      </main>
+      </AdminPage>
     );
   }
 
   // EDITOR VIEW — show the PDF studio
   return (
-    <main className="pr__page">
-      <header className="pr__hero">
-        <div>
-          <Link href="/admin/presupuestos" className="ap-back">
-            ← Pressupostos
+    <AdminPage
+      back={{ href: '/admin/presupuestos', label: 'Pressupostos' }}
+      eyebrow="Comercial · Editor PDF"
+      title={editorProposalId ? 'Editar pressupost' : 'Nou pressupost'}
+      subtitle={
+        editorCustomer ? (
+          <span>
+            Client: <Link href={buildCustomerHubHref(editorCustomer.id)} className="hover:underline"><strong>{editorCustomer.name}</strong></Link> ({editorCustomer.email})
+          </span>
+        ) : leadForEditor ? (
+          <span>
+            Lead: <strong>{leadForEditor.name}</strong> ({leadForEditor.email})
+          </span>
+        ) : (
+          'Selecciona un client per començar'
+        )
+      }
+      actions={
+        editorCustomer ? (
+          <Link href={buildCustomerHubHref(editorCustomer.id)} className="ap-btn ap-btn--secondary">
+            Fitxa client
           </Link>
-          <p className="pr__eyebrow">Comercial · Editor PDF</p>
-          <h1 className="pr__title">{proposalId ? 'Editar pressupost' : 'Nou pressupost'}</h1>
-          <p className="pr__subtitle">
-          {customer ? (
-            <span>
-              Client: <Link href={buildCustomerHubHref(customer.id)} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
-            </span>
-          ) : (
-            'Selecciona un client per començar'
-          )}
-          </p>
-        </div>
-        <div className="pr__heroActions">
-          {customer && (
-            <Link href={buildCustomerHubHref(customer.id)} className="ap-btn ap-btn--secondary">
-              Fitxa client
-            </Link>
-          )}
-        </div>
-      </header>
+        ) : undefined
+      }
+    >
       <PresupuestoPdfStudio
-        initialCustomerId={customer?.id || leadForEditor?.customer?.id || ''}
-        initialCustomerName={customer?.name || leadForEditor?.customer?.name || leadForEditor?.name || ''}
-        initialCustomerEmail={customer?.email || leadForEditor?.customer?.email || leadForEditor?.email || ''}
-        initialCustomerPhone={customer?.phone || leadForEditor?.customer?.phone || leadForEditor?.phone || ''}
+        initialCustomerId={editorCustomer?.id || ''}
+        initialCustomerName={editorCustomer?.name || leadForEditor?.name || ''}
+        initialCustomerEmail={editorCustomer?.email || leadForEditor?.email || ''}
+        initialCustomerPhone={editorCustomer?.phone || leadForEditor?.phone || ''}
+        initialEventType={initialEventType}
         initialEventDate={toDateInputValue(leadForEditor?.eventDate)}
         initialEventSchedule={buildSchedule(leadForEditor?.eventStartTime, leadForEditor?.eventEndTime)}
         initialEventLocation={leadForEditor?.eventAddress || leadForEditor?.eventLocation || ''}
+        initialDistanceKm={leadForEditor?.distanceKm ?? undefined}
+        initialTollsEur={leadForEditor?.tollsEur ?? undefined}
+        initialVehicleCostPerKm={initialVehicleCostPerKm}
         initialGuests={leadForEditor?.guestCount || 80}
-        initialLeadId={leadId}
-        initialProposalId={proposalId}
-        initialPreferredLocale={customer?.preferredLocale || leadForEditor?.customer?.preferredLocale || leadForEditor?.preferredLocale || 'ca'}
+        initialLeadId={resolvedLeadId}
+        initialLeadServiceLines={leadForEditor?.serviceLines || []}
+        initialProposalId={editorProposalId}
+        initialProposalStatus={editorProposalStatus}
+        initialPreferLeadPrefill={preferLeadPrefill}
+        initialPreferredLocale={editorCustomer?.preferredLocale || leadForEditor?.preferredLocale || 'ca'}
         initialBrandName={String(brandSettings['quotes.brandName'] || ADMIN_PDF_STUDIO_DEFAULTS.brandName)}
         initialBrandWebsite={String(brandSettings['quotes.brandWebsite'] || ADMIN_PDF_STUDIO_DEFAULTS.brandWebsite)}
         initialBrandEmail={String(brandSettings['quotes.brandEmail'] || '')}
@@ -377,6 +361,6 @@ export default async function PresupuestosPage({
         initialBrandTagline={String(brandSettings['quotes.brandTagline'] || 'El teu esdeveniment. El teu estil. La teva nit perfecta.')}
         initialBrandLogoDataUrl={String(brandSettings['quotes.logoDataUrl'] || '')}
       />
-    </main>
+    </AdminPage>
   );
 }

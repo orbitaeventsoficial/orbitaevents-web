@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const { mockPrisma, mockCreateLead, mockCreateProposal, mockCreateBooking } = vi.hoisted(() => ({
   mockPrisma: {
+    pack: { findUnique: vi.fn() },
     proposal: { update: vi.fn() },
   },
   mockCreateLead: vi.fn(),
@@ -18,6 +19,7 @@ import { quickCreate } from '@/lib/services/leads/quickCreateFlow';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockPrisma.pack.findUnique.mockResolvedValue(null);
   mockPrisma.proposal.update.mockResolvedValue({});
 });
 
@@ -70,6 +72,44 @@ describe('quickCreate — outcome=lead+proposal', () => {
     expect(args.vatRate).toBe(21);
     expect(args.vatAmount).toBeCloseTo(210, 5);
     expect(args.total).toBeCloseTo(1210, 5);
+  });
+
+  it('usa el preu server-side del pack si hi ha interestedPackId', async () => {
+    mockCreateLead.mockResolvedValue({ ok: true, lead: { id: 'lead-pack' } });
+    mockCreateProposal.mockResolvedValue({ ok: true, proposal: { id: 'prop-pack' } });
+    mockPrisma.pack.findUnique.mockResolvedValue({ price: 875 });
+
+    await quickCreate({
+      ...baseInput,
+      outcome: 'lead+proposal',
+      event: { ...baseInput.event, interestedPackId: 'pack-live' },
+      proposalSubtotal: 100,
+    });
+
+    expect(mockPrisma.pack.findUnique).toHaveBeenCalledWith({
+      where: { id: 'pack-live' },
+      select: { price: true },
+    });
+    const args = mockCreateProposal.mock.calls[0][0];
+    expect(args.subtotal).toBe(875);
+    expect(args.vatAmount).toBeCloseTo(183.75, 5);
+    expect(args.total).toBeCloseTo(1058.75, 5);
+  });
+
+  it('no confia en proposalSubtotal si el packId no existeix', async () => {
+    mockCreateLead.mockResolvedValue({ ok: true, lead: { id: 'lead-missing-pack' } });
+    mockCreateProposal.mockResolvedValue({ ok: true, proposal: { id: 'prop-missing-pack' } });
+
+    await quickCreate({
+      ...baseInput,
+      outcome: 'lead+proposal',
+      event: { ...baseInput.event, interestedPackId: 'pack-missing' },
+      proposalSubtotal: 999,
+    });
+
+    const args = mockCreateProposal.mock.calls[0][0];
+    expect(args.subtotal).toBe(0);
+    expect(args.total).toBe(0);
   });
 
   it('proposalSubtotal=0 per defecte (proposta plantilla)', async () => {

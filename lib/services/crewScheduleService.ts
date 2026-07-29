@@ -10,12 +10,14 @@
  *   SOLAPAMENTS (mateixa persona, franges que xoquen) i disponibilitat.
  * - Repartiment: qui cobra què per període (cash a col·laboradors + part del propietari).
  *
- * Diners: el repartiment és FLUX DE CAIXA (costAmount real per línia de col·laborador),
- * no marge — el marge/net segueix vivint a costEngine. No es reimplementa cap regla.
+ * Diners: el repartiment separa caixa client, saldo de tercers, cost intern d'Òrbita
+ * i benefici net conegut. El marge financer complet (CAC, operatiu general...) segueix
+ * vivint a costEngine. No es reimplementa cap regla.
  */
 
 import { prisma } from '@/lib/prisma';
 import type { BookingServiceLineKind } from '@prisma/client';
+import { computeBoloRepartiment, REPARTIMENT_OWNER_KEY, type BoloRepartiment } from '@/lib/services/repartimentService';
 
 export const OWNER_KEY = 'OWNER';
 export const OWNER_NAME = 'Òrbita (jo)';
@@ -169,6 +171,53 @@ function personKeyOf(line: CrewLineInput): string {
   return line.collaboratorId ?? OWNER_KEY;
 }
 
+/** Minuts de muntatge i desmuntatge estàndard (decisió del propietari #1364). */
+export const SETUP_MINUTES = 45;
+export const TEARDOWN_MINUTES = 45;
+/** Velocitat mitjana per estimar el temps de ruta (mateixa que travelLaborCost). */
+const JORNADA_AVG_SPEED_KMH = 65;
+
+export interface Jornada {
+  departureTime: string | null; // sortida de casa
+  arrivalTime: string | null;   // arribada al lloc (per començar a muntar)
+  teardownEndTime: string | null; // fi de desmuntatge al lloc
+  returnTime: string | null;    // tornada a casa
+  workHours: number | null;     // jornada total (sortida → tornada), en hores
+}
+
+/**
+ * Jornada d'un bolo (#1364): sortida de casa, arribada al lloc, tornada. Compta 45'
+ * de muntatge abans de l'event i 45' de desmuntatge després, més el temps de ruta
+ * (anada = meitat del round-trip). Retorna null si no hi ha hora d'inici de l'event.
+ */
+export function computeJornada(input: {
+  eventStartTime: string | null;
+  eventEndTime: string | null;
+  roundTripKm: number | null;
+}): Jornada {
+  const startMin = parseHhmmToMin(input.eventStartTime);
+  if (startMin === null) {
+    return { departureTime: null, arrivalTime: null, teardownEndTime: null, returnTime: null, workHours: null };
+  }
+  const km = typeof input.roundTripKm === 'number' && input.roundTripKm > 0 ? input.roundTripKm : 0;
+  const oneWayMin = Math.round((km / JORNADA_AVG_SPEED_KMH / 2) * 60);
+  const endMin = parseHhmmToMin(input.eventEndTime) ?? startMin + DEFAULT_ASSIGNMENT_HOURS * 60;
+  const safeEndMin = endMin > startMin ? endMin : startMin + DEFAULT_ASSIGNMENT_HOURS * 60;
+
+  const arrivalMin = startMin - SETUP_MINUTES;
+  const departureMin = arrivalMin - oneWayMin;
+  const teardownEndMin = safeEndMin + TEARDOWN_MINUTES;
+  const returnMin = teardownEndMin + oneWayMin;
+
+  return {
+    departureTime: minToHhmm(departureMin),
+    arrivalTime: minToHhmm(arrivalMin),
+    teardownEndTime: minToHhmm(teardownEndMin),
+    returnTime: minToHhmm(returnMin),
+    workHours: Math.round(((returnMin - departureMin) / 60) * 100) / 100,
+  };
+}
+
 /** Dos intervals (en minuts) s'encavalquen? */
 export function intervalsOverlap(
   aStart: number,
@@ -289,6 +338,19 @@ export function buildCrewSchedule(
   return { people, overlaps };
 }
 
+/**
+ * Quan un lead ja té reserva vinculada, la font de veritat deixa de ser
+ * LeadServiceLine i passa a BookingServiceLine. Cuadrant i repartiment no poden
+ * comptar les dues fotos del mateix bolo.
+ */
+export function filterSupersededLeadLines(
+  lines: CrewLineInput[],
+  bookedLeadIds: ReadonlySet<string>,
+): CrewLineInput[] {
+  if (bookedLeadIds.size === 0) return lines;
+  return lines.filter((line) => !(line.origin === 'lead' && bookedLeadIds.has(line.parentId)));
+}
+
 // ─── Repartiment (pur) ─────────────────────────────────────────────────────────
 
 export interface PayoutEvent {
@@ -304,84 +366,120 @@ export interface PayoutByPerson {
   amount: number; // cash total (col·laborador: el que cobra; propietari: la seva part)
   events: PayoutEvent[];
 }
+/** Detall d'un bolo per al drill-down (qui cobra què dins d'aquell event). */
+export interface PayoutBolo {
+  parentId: string;
+  parentRef: string;
+  dateKey: string | null;
+  repartiment: BoloRepartiment;
+}
 export interface PayoutPeriodResult {
   people: PayoutByPerson[];
-  totals: { revenue: number; collaboratorCost: number; ownerNet: number };
+  totals: {
+    revenue: number;
+    collaboratorCost: number;
+    collaboratorPayments: number;
+    collaboratorSettlements: number;
+    ownerGross: number;
+    internalCost: number;
+    ownerNet: number;
+  };
+  bolos: PayoutBolo[];
 }
 
 /**
- * Repartiment de caixa: per col·laborador, el que cobra (Σ costAmount×qty de les
- * seves línies); per al propietari, la seva part = ingrés total − pagat a col·laboradors.
+ * Repartiment de caixa i cost: per col·laborador, el saldo net que cobra; per al
+ * propietari, benefici net conegut = brut d'Òrbita − costos interns.
  */
 export function buildPayoutSummary(
   lines: CrewLineInput[],
   names: Map<string, string>,
 ): PayoutPeriodResult {
+  // Agrupa les línies per BOLO i reparteix cada bolo amb el motor canònic
+  // (`computeBoloRepartiment`) → solidari amb la fitxa de lead/reserva (una sola
+  // veritat). L'agregat del període és la suma dels repartiments per bolo.
+  const byBolo = new Map<string, { parentRef: string; dateKey: string | null; lines: CrewLineInput[] }>();
+  for (const line of lines) {
+    const bucket = byBolo.get(line.parentId)
+      ?? { parentRef: line.parentRef, dateKey: line.eventDate ? toDateKey(line.eventDate) : null, lines: [] };
+    bucket.lines.push(line);
+    byBolo.set(line.parentId, bucket);
+  }
+
+  const bolos: PayoutBolo[] = [];
+  const person = new Map<string, { name: string; amount: number; count: number; events: PayoutEvent[] }>();
   let totalRevenue = 0;
   let totalCollaboratorCost = 0;
-  const collab = new Map<string, { name: string; amount: number; count: number; events: PayoutEvent[] }>();
-  const ownerEvents: PayoutEvent[] = [];
+  let totalCollaboratorPayments = 0;
+  let totalCollaboratorSettlements = 0;
+  let totalOwnerGross = 0;
+  let totalInternalCost = 0;
+  let totalOwnerNet = 0;
+  const roundMoney = (value: number) => Math.round(value * 100) / 100;
 
-  for (const line of lines) {
-    const qty = line.quantity || 1;
-    const revenue = (line.revenueAmount || 0) * qty;
-    totalRevenue += revenue;
-    const dateKey = line.eventDate ? toDateKey(line.eventDate) : null;
+  for (const [parentId, bolo] of byBolo.entries()) {
+    const repartiment = computeBoloRepartiment(bolo.lines);
+    bolos.push({ parentId, parentRef: bolo.parentRef, dateKey: bolo.dateKey, repartiment });
+    totalRevenue = roundMoney(totalRevenue + repartiment.totals.clientTotal);
+    totalCollaboratorCost = roundMoney(totalCollaboratorCost + repartiment.totals.aCollaboradors);
+    totalCollaboratorPayments = roundMoney(totalCollaboratorPayments + repartiment.totals.pagamentsCollaboradors);
+    totalCollaboratorSettlements = roundMoney(totalCollaboratorSettlements + repartiment.totals.liquidacionsCapAOrbita);
+    totalOwnerGross = roundMoney(totalOwnerGross + repartiment.totals.brutOrbita);
+    totalInternalCost = roundMoney(totalInternalCost + repartiment.totals.costInternOrbita);
+    totalOwnerNet = roundMoney(totalOwnerNet + repartiment.totals.partOrbita);
 
-    if (line.collaboratorId) {
-      const cost = (line.costAmount || 0) * qty;
-      totalCollaboratorCost += cost;
-      const name = names.get(line.collaboratorId) ?? 'Col·laborador';
-      const bucket = collab.get(line.collaboratorId) ?? { name, amount: 0, count: 0, events: [] };
-      bucket.amount += cost;
+    for (const pp of repartiment.perPersona) {
+      if (pp.rep === 0) continue;
+      const key = pp.esOrbita ? OWNER_KEY : pp.personId;
+      const name = pp.esOrbita ? OWNER_NAME : (names.get(pp.personId) ?? 'Col·laborador');
+      const bucket = person.get(key) ?? { name, amount: 0, count: 0, events: [] };
+      bucket.amount = roundMoney(bucket.amount + pp.rep);
       bucket.count += 1;
-      bucket.events.push({ parentRef: line.parentRef, dateKey, amount: cost });
-      collab.set(line.collaboratorId, bucket);
-    } else {
-      ownerEvents.push({ parentRef: line.parentRef, dateKey, amount: revenue });
+      bucket.events.push({ parentRef: bolo.parentRef, dateKey: bolo.dateKey, amount: pp.rep });
+      person.set(key, bucket);
     }
   }
 
-  const ownerNet = totalRevenue - totalCollaboratorCost;
-
-  // La part del propietari = ingrés de les seves línies + marge revenent serveis de
-  // tercers. Es fa explícit aquest marge perquè la llista quadri amb el total.
-  const ownerAssignmentCount = ownerEvents.length;
-  const ownEventsSum = ownerEvents.reduce((s, e) => s + e.amount, 0);
-  const resaleMargin = ownerNet - ownEventsSum;
-  if (Math.abs(resaleMargin) >= 0.5) {
-    ownerEvents.push({ parentRef: 'Marge de revenda (serveis de tercers)', dateKey: null, amount: resaleMargin });
-  }
-
+  const ownerBucket = person.get(OWNER_KEY);
   const people: PayoutByPerson[] = [
     {
       personKey: OWNER_KEY,
       personName: OWNER_NAME,
       isOwner: true,
-      assignments: ownerAssignmentCount,
-      amount: ownerNet,
-      events: ownerEvents,
+      assignments: ownerBucket?.count ?? 0,
+      amount: ownerBucket?.amount ?? 0,
+      events: ownerBucket?.events ?? [],
     },
-    ...[...collab.entries()].map(([personKey, b]) => ({
-      personKey,
-      personName: b.name,
-      isOwner: false,
-      assignments: b.count,
-      amount: b.amount,
-      events: b.events,
-    })).sort((x, y) => y.amount - x.amount),
+    ...[...person.entries()]
+      .filter(([key]) => key !== OWNER_KEY)
+      .map(([personKey, b]) => ({
+        personKey, personName: b.name, isOwner: false,
+        assignments: b.count, amount: b.amount, events: b.events,
+      }))
+      .sort((x, y) => y.amount - x.amount),
   ];
+
+  bolos.sort((a, b) => (b.dateKey ?? '').localeCompare(a.dateKey ?? ''));
 
   return {
     people,
-    totals: { revenue: totalRevenue, collaboratorCost: totalCollaboratorCost, ownerNet },
+    totals: {
+      revenue: roundMoney(totalRevenue),
+      collaboratorCost: roundMoney(totalCollaboratorCost),
+      collaboratorPayments: roundMoney(totalCollaboratorPayments),
+      collaboratorSettlements: roundMoney(totalCollaboratorSettlements),
+      ownerGross: roundMoney(totalOwnerGross),
+      internalCost: roundMoney(totalInternalCost),
+      ownerNet: roundMoney(totalOwnerNet),
+    },
+    bolos,
   };
 }
 
 // ─── Loaders (async) ───────────────────────────────────────────────────────────
 
-const LEAD_STATUSES_ACTIVE = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'] as const;
-const BOOKING_STATUSES_ACTIVE = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED'] as const;
+export const LEAD_STATUSES_ACTIVE = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'] as const;
+export const BOOKING_STATUSES_ACTIVE = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED'] as const;
 
 /** Carrega totes les línies (lead + booking) amb event dins [from, to]. */
 async function loadCrewLines(from: Date, to: Date): Promise<{ lines: CrewLineInput[]; names: Map<string, string> }> {
@@ -396,19 +494,18 @@ async function loadCrewLines(from: Date, to: Date): Promise<{ lines: CrewLineInp
     prisma.booking.findMany({
       where: { status: { in: [...BOOKING_STATUSES_ACTIVE] }, eventDate: { gte: from, lte: to } },
       select: {
-        id: true, reference: true, clientName: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true,
+        id: true, reference: true, leadId: true, clientName: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true,
         serviceLines: { select: { id: true, collaboratorId: true, kind: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true } },
       },
     }),
   ]);
 
-  const lines: CrewLineInput[] = [];
-  const collaboratorIds = new Set<string>();
+  const rawLines: CrewLineInput[] = [];
+  const bookedLeadIds = new Set<string>();
 
   for (const lead of leads) {
     for (const l of lead.serviceLines) {
-      if (l.collaboratorId) collaboratorIds.add(l.collaboratorId);
-      lines.push({
+      rawLines.push({
         lineId: l.id, origin: 'lead', parentId: lead.id, parentRef: lead.name,
         collaboratorId: l.collaboratorId, kind: l.kind, label: l.label,
         revenueAmount: l.revenueAmount, costAmount: l.costAmount, quantity: l.quantity, hours: l.hours,
@@ -417,15 +514,21 @@ async function loadCrewLines(from: Date, to: Date): Promise<{ lines: CrewLineInp
     }
   }
   for (const bk of bookings) {
+    if (bk.leadId) bookedLeadIds.add(bk.leadId);
     for (const l of bk.serviceLines) {
-      if (l.collaboratorId) collaboratorIds.add(l.collaboratorId);
-      lines.push({
+      rawLines.push({
         lineId: l.id, origin: 'booking', parentId: bk.id, parentRef: bk.clientName || bk.reference,
         collaboratorId: l.collaboratorId, kind: l.kind, label: l.label,
         revenueAmount: l.revenueAmount, costAmount: l.costAmount, quantity: l.quantity, hours: l.hours,
         eventDate: bk.eventDate, eventStartTime: bk.eventStartTime, eventEndTime: bk.eventEndTime, eventLocation: bk.eventLocation,
       });
     }
+  }
+
+  const lines = filterSupersededLeadLines(rawLines, bookedLeadIds);
+  const collaboratorIds = new Set<string>();
+  for (const line of lines) {
+    if (line.collaboratorId) collaboratorIds.add(line.collaboratorId);
   }
 
   const names = new Map<string, string>();

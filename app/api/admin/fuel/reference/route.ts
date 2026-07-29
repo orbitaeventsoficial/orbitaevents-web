@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
-import { getFuelCostPerKmReference, refreshFuelReferenceNow } from '@/lib/services/fuelReferenceService';
+import { getEffectiveVehicleCostPerKm, refreshFuelReferenceNow } from '@/lib/services/fuelReferenceService';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   if (permissionError) return permissionError;
 
   try {
-    const data = await getFuelCostPerKmReference();
+    const data = await getEffectiveVehicleCostPerKm();
     return NextResponse.json({ ok: true, ...data });
   } catch (error) {
     log.error('Error obtenint referència preu combustible', error, { context: { endpoint: 'GET /api/admin/fuel/reference' } });
@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
   if (csrfError) return csrfError;
 
   try {
-    const data = await refreshFuelReferenceNow();
+    await refreshFuelReferenceNow();
+    const data = await getEffectiveVehicleCostPerKm();
     return NextResponse.json({ ok: true, ...data });
   } catch (error) {
     log.error('Error actualitzant referència preu combustible', error, { context: { endpoint: 'POST /api/admin/fuel/reference' } });

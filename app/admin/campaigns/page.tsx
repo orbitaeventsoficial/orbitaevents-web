@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { loadCampaigns, type Campaign } from '@/lib/services/campaignService';
 
 export const dynamic = 'force-dynamic';
@@ -12,7 +11,7 @@ export const metadata = {
 const URGENCY_TONE: Record<string, string> = {
   HIGH: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
   MEDIUM: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-  LOW: 'border-[var(--line)] bg-[var(--panel)] text-white/60',
+  LOW: 'border-[var(--line)] bg-[var(--panel)] text-[var(--t2)]',
 };
 
 const URGENCY_LABEL: Record<string, string> = {
@@ -25,7 +24,7 @@ const TYPE_ICON: Record<string, string> = {
   REACTIVATION: '🔄',
   UPSELL: '📈',
   SEASONAL: '🌸',
-  FEEDBACK_REQUEST: '⭐',
+  REVIEW_REQUEST: '⭐',
   REFERRAL: '🤝',
   LOYALTY: '💜',
 };
@@ -68,7 +67,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
           <span className="group-open:hidden">▶ Veure plantilla del missatge</span>
           <span className="hidden group-open:inline">▼ Amagar plantilla</span>
         </summary>
-        <div className="mt-2 rounded-lg border border-white/10 bg-[var(--sunk)] p-3">
+        <div className="mt-2 rounded-lg border border-[var(--line)] bg-[var(--sunk)] p-3">
           <p className="text-xs font-semibold opacity-70">Assumpte</p>
           <p className="mt-0.5 text-xs">{campaign.subject}</p>
           <p className="mt-2 text-xs font-semibold opacity-70">Cos del missatge</p>
@@ -83,22 +82,7 @@ export default async function CampaignsPage() {
   const campaigns = await loadCampaigns();
 
   const highCount = campaigns.filter((c) => c.urgency === 'HIGH').length;
-  const mediumCount = campaigns.filter((c) => c.urgency === 'MEDIUM').length;
   const totalAudience = campaigns.reduce((sum, c) => sum + c.audienceSize, 0);
-  const whatsappCount = campaigns.filter((c) => c.channel === 'whatsapp').length;
-  const emailCount = campaigns.filter((c) => c.channel === 'email').length;
-  const nextStepTitle = campaigns.length === 0
-    ? 'Esperar nous segments amb prou massa crítica'
-    : highCount > 0
-      ? 'Atacar primer les campanyes d’urgència alta'
-      : whatsappCount > emailCount
-        ? 'Executar la següent onada pel canal més ràpid'
-        : 'Revisar la següent campanya i convertir-la en acció';
-  const nextStepDetail = campaigns.length === 0
-    ? 'Les campanyes apareixen quan els segments CRM tenen volum i senyal suficients per justificar una acció massiva.'
-    : highCount > 0
-      ? `${highCount} campanyes demanen intervenció alta i concentren el millor retorn immediat.`
-      : `Ara mateix el catàleg es reparteix entre ${whatsappCount} campanyes per WhatsApp i ${emailCount} per email.`;
 
   return (
     <AdminPage
@@ -107,56 +91,13 @@ export default async function CampaignsPage() {
       actions={
         <Link
           href="/admin/clientes/reactivation"
-          className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+          className="rounded-lg border border-[var(--line)] bg-[var(--raised)] px-3 py-1.5 text-xs hover:bg-[var(--raised)]"
         >
           Reactivació individual →
         </Link>
       }
     >
       <div className="space-y-6 p-6">
-        <OwnerControlStrip
-          system={{
-            eyebrow: 'Automàtic',
-            title: 'Què veu el sistema a les campanyes',
-            tone: campaigns.length > 0 ? 'info' : 'warning',
-            items: [
-              `${campaigns.length} campanyes suggerides sobre una audiència total de ${totalAudience} contactes.`,
-              `${whatsappCount} campanyes per WhatsApp i ${emailCount} per email al catàleg actual.`,
-              campaigns.length > 0
-                ? `${mediumCount} campanyes queden en urgència mitjana i ${highCount} en urgència alta.`
-                : 'Encara no hi ha segments amb prou massa crítica per generar campanyes.',
-            ],
-            emptyText: 'Sense campanyes suggerides no hi ha lectura automàtica del canal.',
-          }}
-          manual={{
-            eyebrow: 'Manual',
-            title: 'On et cal intervenir',
-            tone: highCount > 0 ? 'warning' : campaigns.length > 0 ? 'success' : 'warning',
-            items: [
-              highCount > 0
-                ? `${highCount} campanyes marquen urgència alta i convé revisar-les abans de la resta.`
-                : 'No hi ha campanyes amb urgència alta al primer nivell.',
-              campaigns.length > 0
-                ? 'L’execució continua sent manual: cal copiar plantilla i disparar-la pel canal correcte.'
-                : 'Sense campanyes actives no hi ha cap execució manual pendent.',
-              campaigns.some((campaign) => campaign.type === 'REACTIVATION')
-                ? 'Hi ha reactivacions massives suggerides convivint amb la reactivació individual.'
-                : 'No hi ha reactivacions massives suggerides al primer nivell.',
-            ],
-            emptyText: 'No hi ha coll manual evident al primer nivell.',
-          }}
-          nextStep={{
-            eyebrow: 'Següent pas',
-            title: nextStepTitle,
-            detail: nextStepDetail,
-            href: campaigns.length > 0 ? '/admin/campaigns' : '/admin/clientes/reactivation',
-            ctaLabel: campaigns.length > 0 ? 'Revisar campanyes' : 'Reactivació individual',
-            secondaryAction: campaigns.length > 0
-              ? { href: '/admin/clientes/reactivation', label: 'Reactivació individual' }
-              : undefined,
-          }}
-        />
-
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="ap-card p-3">

@@ -86,19 +86,19 @@ export default async function FAQPage() {
       />
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Total Preguntes</p>
           <p className="mt-2 text-3xl font-bold">{faqs.length}</p>
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Actives</p>
           <p className="mt-2 text-3xl font-bold">{faqs.filter((f) => f.isActive).length}</p>
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Categories</p>
           <p className="mt-2 text-3xl font-bold">{Object.keys(faqsByCategory).length}</p>
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Idiomes</p>
           <p className="mt-2 text-3xl font-bold">{locales.size}</p>
         </div>
@@ -126,7 +126,7 @@ export default async function FAQPage() {
         const config = getFaqCategoryDisplay(category);
 
         return (
-          <section key={category} className="overflow-hidden rounded-2xl border admin-card-glass">
+          <section key={category} className="ap-card overflow-hidden">
             <div className="border-b p-4">
               <h2 className="flex items-center gap-2 font-semibold">
                 <span>{config.icon}</span>

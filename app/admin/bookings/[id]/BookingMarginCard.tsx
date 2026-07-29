@@ -4,22 +4,26 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
 import {
-  calculateBillableTravelKm,
-  calculateTravelBlocks,
-  calculateTravelCharge,
   calculateTravelCost,
   DEFAULT_VEHICLE_COST_PER_KM,
-  getIncludedTravelOneWayKm,
   INCLUDED_TRAVEL_KM,
-  TRAVEL_BLOCK_EUR,
-  TRAVEL_BLOCK_KM,
 } from '@/lib/services/travelCost';
-import { formatCurrency } from '@/lib/constants';
+import {
+  computeBoloTransport,
+  TRAVEL_AVG_SPEED_KMH,
+  TRAVEL_DRIVER_HOURLY_RATE,
+  TRAVEL_INCLUDED_HOURS,
+  TRAVEL_LONG_ROUTE_HOURS,
+  TRAVEL_MEAL_ALLOWANCE_PER_PERSON,
+} from '@/lib/services/travelLaborCost';
+import { formatCurrency, formatCurrencyExact, formatNumber } from '@/lib/constants';
 import { computeDirectCostBreakdown } from '@/lib/services/costEngine';
+import type { ServiceLineLike } from '@/lib/services/costEngine';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { getMarginTone, getTravelMarginTone } from '@/lib/margin-utils';
 import Tooltip from '@/app/admin/components/Tooltip';
+import BoloTripCard, { CROWDED_TRIP_THRESHOLD } from '@/app/admin/components/BoloTripCard';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface BookingMarginProps {
@@ -31,6 +35,8 @@ interface BookingMarginProps {
   extraHourPrice: number;
   distanceKm: number | null;
   vehicleCostPerKm?: number | null;
+  storedTravelCost?: number | null;
+  tollsEur?: number | null;
   eventLocation?: string | null;
   eventVenue?: string | null;
   inventoryCostReal?: number | null;
@@ -44,6 +50,10 @@ interface BookingMarginProps {
   targetMarginPct: number;
   /** Cost de subcontractació de les línies de servei (animació, pintacares...). */
   serviceLinesCost?: number;
+  /** Línies reals per alimentar el cervell econòmic (subcontractat +20%, tècnic Òrbita, cost per línia). */
+  serviceLines?: ServiceLineLike[];
+  /** Persones que viatgen al bolo (#1363): alimenta el càrrec de transport de dues potes. */
+  travelHeadcount?: number;
 }
 
 export default function BookingMarginCard({
@@ -55,6 +65,8 @@ export default function BookingMarginCard({
   extraHourPrice,
   distanceKm: initialDistanceKm,
   vehicleCostPerKm: initialVehicleCostPerKm,
+  storedTravelCost,
+  tollsEur: initialTollsEur,
   eventLocation,
   eventVenue,
   inventoryCostReal,
@@ -67,30 +79,68 @@ export default function BookingMarginCard({
   fixedOperationalCost,
   targetMarginPct,
   serviceLinesCost = 0,
+  serviceLines = [],
+  travelHeadcount = 0,
 }: BookingMarginProps) {
   const router = useRouter();
   const toast = useToast();
 
   const [distanceKm, setDistanceKm] = useState(initialDistanceKm ?? 0);
+  const [tollsEur, setTollsEur] = useState(
+    typeof initialTollsEur === 'number' && Number.isFinite(initialTollsEur)
+      ? Math.max(0, initialTollsEur)
+      : 0,
+  );
   const resolvedCostPerKm = initialVehicleCostPerKm ?? DEFAULT_VEHICLE_COST_PER_KM;
   const [vehicleCostPerKm] = useState(resolvedCostPerKm);
   const [saving, setSaving] = useState(false);
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
+  const [travelSaveError, setTravelSaveError] = useState<string | null>(null);
   const lastDistanceDestinationRef = useRef('');
 
-  const billableKm = calculateBillableTravelKm(distanceKm, INCLUDED_TRAVEL_KM);
-  const travelBlocks = calculateTravelBlocks(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
-  const calculatedTravelCost = calculateTravelCost(distanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM);
-  const calculatedTravelCharge = calculateTravelCharge(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
-  const includedOneWayKm = getIncludedTravelOneWayKm(INCLUDED_TRAVEL_KM);
+  const hasChanged = distanceKm !== (initialDistanceKm ?? 0);
+
+  // Transport (#1369): una sola font per cost/càrrec/headcount. Si la reserva ja té
+  // `travelCost` guardat, és la veritat fins que l'operador canvia la distància.
+  const transport = computeBoloTransport({
+    roundTripKm: distanceKm,
+    vehicleCostPerKm,
+    headcountOverride: travelHeadcount,
+    tollsEur,
+  });
+  const travelBreakdown = transport.breakdown;
+  const vehicleOnlyTravelCost = calculateTravelCost(distanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM);
+  const calculatedTravelCost = !hasChanged && typeof storedTravelCost === 'number' && storedTravelCost > 0
+    ? storedTravelCost
+    : transport.cost;
+  const calculatedTravelCharge = transport.clientCharge;
+  const effectiveTravelHeadcount = transport.headcount;
   const travelNetMargin = calculatedTravelCharge - calculatedTravelCost;
   const travelMarginPct = calculatedTravelCharge > 0 ? (travelNetMargin / calculatedTravelCharge) * 100 : 0;
+  const travelCalculationNotes = distanceKm > 0
+    ? [
+        `Hores ruta: ${formatNumber(distanceKm, { maximumFractionDigits: 1 })} km / ${TRAVEL_AVG_SPEED_KMH} km/h = ${formatNumber(travelBreakdown.routeHours, { maximumFractionDigits: 2 })} h.`,
+        ...(travelBreakdown.chargeableHours > 0 ? [
+          `Temps cobrable: ${formatNumber(travelBreakdown.routeHours, { maximumFractionDigits: 2 })} h - ${formatNumber(TRAVEL_INCLUDED_HOURS, { maximumFractionDigits: 1 })} h inclosa = ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h.`,
+          `Hores de cotxe: ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h x ${formatCurrencyExact(TRAVEL_DRIVER_HOURLY_RATE)}/h = ${formatCurrencyExact(travelBreakdown.chargeableHours * TRAVEL_DRIVER_HOURLY_RATE)} per persona; ${effectiveTravelHeadcount} ${effectiveTravelHeadcount === 1 ? 'persona' : 'persones'} = ${formatCurrencyExact(travelBreakdown.peopleCost)}.`,
+        ] : []),
+        ...(transport.mealAllowance > 0 ? [
+          `Dietes: ruta > ${TRAVEL_LONG_ROUTE_HOURS} h; ${formatCurrencyExact(TRAVEL_MEAL_ALLOWANCE_PER_PERSON)} x ${effectiveTravelHeadcount} ${effectiveTravelHeadcount === 1 ? 'persona' : 'persones'} = ${formatCurrencyExact(transport.mealAllowance)}.`,
+        ] : []),
+      ]
+    : [];
 
   // Cost directe via la font única (computeDirectCostBreakdown), no reimplementat.
   // El helper gestiona pack real-vs-estimat (inventoryCostReal) i usa el travelCost
   // explícit que ja hem calculat. Els ratios vénen dels props (config de la reserva).
-  const { packCost: packCostUsed, extrasCost, extraHoursCost, directCost } = computeDirectCostBreakdown(
+  const {
+    packCost: packCostUsed,
+    extrasCost,
+    extraHoursCost,
+    transportMargin,
+    directCost,
+  } = computeDirectCostBreakdown(
     {
       total,
       packPrice,
@@ -100,8 +150,10 @@ export default function BookingMarginCard({
       distanceKm,
       vehicleCostPerKm,
       travelCost: calculatedTravelCost,
+      travelRevenue: calculatedTravelCharge,
       inventoryCostReal,
       serviceLinesCost,
+      serviceLines,
     },
     { ...PROFITABILITY_MODEL_DEFAULTS, packCostRatio, extraCostRatio, extraHourCostRatio, fixedOperationalCost },
   );
@@ -113,7 +165,6 @@ export default function BookingMarginCard({
 
   const marginTone = getMarginTone(marginPct);
   const marginColor = marginTone.color;
-  const marginBg = `border-${marginTone.tone}-400/30 bg-${marginTone.tone}-950/30`;
 
   const travelTone = getTravelMarginTone(travelMarginPct);
   const travelMarginColor = travelTone.color;
@@ -122,6 +173,7 @@ export default function BookingMarginCard({
 
   const handleSave = useCallback(async () => {
     setSaving(true);
+    setTravelSaveError(null);
     try {
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
@@ -129,7 +181,8 @@ export default function BookingMarginCard({
         body: JSON.stringify({
           distanceKm,
           fuelCostPerKm: vehicleCostPerKm,
-          travelCost: calculatedTravelCost,
+          tollsEur,
+          travelCost: transport.cost,
         }),
       });
 
@@ -141,22 +194,31 @@ export default function BookingMarginCard({
       toast.success('Costos de viatge desats');
       router.refresh();
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error desant costos';
       log.error('Error saving travel cost', error);
-      toast.error(error instanceof Error ? error.message : 'Error desant costos');
+      setTravelSaveError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
-  }, [bookingId, distanceKm, vehicleCostPerKm, calculatedTravelCost, router, toast]);
+  }, [bookingId, distanceKm, vehicleCostPerKm, tollsEur, transport.cost, router, toast]);
 
-  const persistDistance = useCallback(async (nextDistanceKm: number) => {
+  const persistDistance = useCallback(async (nextDistanceKm: number, nextTollsEur = tollsEur) => {
     try {
+      const nextTransport = computeBoloTransport({
+        roundTripKm: nextDistanceKm,
+        vehicleCostPerKm,
+        headcountOverride: travelHeadcount,
+        tollsEur: nextTollsEur,
+      });
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           distanceKm: nextDistanceKm,
           fuelCostPerKm: vehicleCostPerKm,
-          travelCost: calculateTravelCost(nextDistanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM),
+          tollsEur: nextTollsEur,
+          travelCost: nextTransport.cost,
         }),
       });
       if (!res.ok) {
@@ -167,7 +229,7 @@ export default function BookingMarginCard({
       log.error('[BookingMarginCard] Error desant distancia', err);
       toast.error('Error desant la distància');
     }
-  }, [bookingId, vehicleCostPerKm, toast]);
+  }, [bookingId, tollsEur, travelHeadcount, vehicleCostPerKm, toast]);
 
   const calculateDistanceForDestination = useCallback(async (destination: string) => {
     setCalculatingDistance(true);
@@ -185,9 +247,13 @@ export default function BookingMarginCard({
       }
 
       const nextDistanceKm = Number(data.roundTripKm || 0);
+      const nextTollsEur = typeof data.tollsEur === 'number' && data.tollsEur > 0
+        ? data.tollsEur
+        : tollsEur;
       setDistanceKm(nextDistanceKm);
+      setTollsEur(nextTollsEur);
       lastDistanceDestinationRef.current = destination;
-      void persistDistance(nextDistanceKm);
+      void persistDistance(nextDistanceKm, nextTollsEur);
       setDistanceMessage(`Ruta: ${data.oneWayKm || 0} km anada · ${data.roundTripKm || 0} km anada i tornada`);
     } catch (error) {
       setDistanceMessage(error instanceof Error ? error.message : 'Error calculant ruta');
@@ -199,6 +265,7 @@ export default function BookingMarginCard({
   useEffect(() => {
     const destination = [eventVenue || '', eventLocation || ''].filter(Boolean).join(', ').trim();
     if (!destination) return;
+    if ((initialDistanceKm ?? 0) > 0) return;
     if (destination === lastDistanceDestinationRef.current) return;
 
     const timer = setTimeout(() => {
@@ -206,17 +273,15 @@ export default function BookingMarginCard({
     }, 450);
 
     return () => clearTimeout(timer);
-  }, [eventLocation, eventVenue, calculateDistanceForDestination]);
-
-  const hasChanged = distanceKm !== (initialDistanceKm ?? 0);
+  }, [eventLocation, eventVenue, initialDistanceKm, calculateDistanceForDestination]);
 
   return (
     <section
-      className={`admin-booking-margin rounded-xl border shadow-sm p-6 ${marginBg}`}
+      className="ap-card p-6"
       data-help-title="Marge i costos"
       data-help-desc="Explica què costa realment aquest esdeveniment, quin marge deixa i com impacta el transport en la rendibilitat."
     >
-      <div className="admin-booking-margin-hero mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Cabina econòmica</p>
           <h2 className="mt-2 ap-h2">Marge i costos</h2>
@@ -224,34 +289,34 @@ export default function BookingMarginCard({
             Llegeix en un cop d'ull què deixa la reserva, on marxa cada euro i si el desplaçament està ben cobert.
           </p>
         </div>
-        <div className="admin-booking-margin-badge">
-          <span className={`admin-booking-margin-badge-value ${marginColor}`}>{marginPct.toFixed(1)}%</span>
+        <div className="ap-card flex flex-col gap-1 p-4 sm:items-end">
+          <span className={`text-xl font-bold leading-none ${marginColor}`}>{marginPct.toFixed(1)}%</span>
           <span className="text-xs uppercase tracking-wide opacity-70">Marge actual</span>
         </div>
       </div>
 
       <div
-        className="admin-booking-margin-kpis mb-6 grid gap-4 sm:grid-cols-4"
+        className="mb-6 grid gap-4 sm:grid-cols-4"
         data-help-title="KPI de marge"
         data-help-desc="Resumeixen ingrés total, cost directe, marge net i percentatge de marge d'aquesta reserva."
       >
-        <div className="admin-booking-margin-kpi">
+        <div className="ap-kpi">
           <p className="text-xs font-medium uppercase">Ingrés total</p>
           <p className="text-lg font-bold">{formatCurrency(total)}</p>
         </div>
-        <div className="admin-booking-margin-kpi">
+        <div className="ap-kpi">
           <p className="text-xs font-medium uppercase">Cost directe</p>
           <p className="text-lg font-bold">{formatCurrency(directCost)}</p>
         </div>
-        <div className="admin-booking-margin-kpi">
+        <div className="ap-kpi">
           <p className="text-xs font-medium uppercase">Marge net</p>
           <p className={`text-lg font-bold ${marginColor}`}>{formatCurrency(netMargin)}</p>
         </div>
-        <div className="admin-booking-margin-kpi">
+        <div className="ap-kpi">
           <Tooltip text="Calculat pel motor de cost: pack, extres, transport i cost operacional.">
             <p className="text-xs font-medium uppercase">% marge</p>
           </Tooltip>
-          <p className={`admin-booking-margin-kpi-value ${marginColor}`}>{marginPct.toFixed(1)}%</p>
+          <p className={`text-lg font-bold ${marginColor}`}>{marginPct.toFixed(1)}%</p>
           <p className={`text-xs mt-0.5 ${marginColor}`}>
             {marginPct >= 50 ? 'Excel·lent. Marge sa.' :
              marginPct >= 30 ? 'Acceptable. Encara hi ha marge per optimitzar.' :
@@ -261,7 +326,7 @@ export default function BookingMarginCard({
         </div>
       </div>
 
-      <div className="mb-6 admin-booking-margin-panel ap-card rounded-xl p-4" data-help-title="Sumatori de costos i marge" data-help-desc="Desglossa d'on surt el cost directe i com es compara el marge real amb el marge objectiu.">
+      <div id="booking-margin-costs" className="mb-6 scroll-mt-40 ap-card p-4" data-help-title="Sumatori de costos i marge" data-help-desc="Desglossa d'on surt el cost directe i com es compara el marge real amb el marge objectiu.">
         <h3 className="text-sm font-semibold mb-3">Sumatori de costos i marge</h3>
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between"><span>Cost pack (real o estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
@@ -300,8 +365,8 @@ export default function BookingMarginCard({
       </div>
 
       {total > 0 && (
-        <div className="mb-6 admin-booking-margin-panel rounded-xl border p-4">
-          <h3 className="admin-booking-margin-panel-title">{"On va cada euro d'aquest bolo"}</h3>
+        <div className="mb-6 ap-card p-4">
+          <h3 className="mb-1 text-sm font-semibold">{"On va cada euro d'aquest bolo"}</h3>
           <p className="text-sm mb-4 opacity-70">Desglossament practic de costos i benefici real.</p>
           <div className="space-y-3 text-sm">
             <div className="flex items-start justify-between gap-3">
@@ -357,10 +422,10 @@ export default function BookingMarginCard({
             <div className="border-t admin-tone-border-neutral pt-3 mt-1">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <span className="admin-booking-margin-benefit-label">Benefici net</span>
+                  <span className="font-bold">Benefici net</span>
                   <p className="text-xs opacity-60 mt-0.5">Compte principal — sou, estalvi i reinversio</p>
                 </div>
-                <span className={`admin-booking-margin-benefit-value ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                <span className={`shrink-0 font-bold tabular-nums ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                   {formatCurrency(netMargin)}
                 </span>
               </div>
@@ -374,7 +439,11 @@ export default function BookingMarginCard({
         </div>
       )}
 
-      <div className="admin-booking-margin-breakdown text-sm space-y-1 mb-6 border-t admin-tone-border-neutral pt-4" data-help-title="Desglossament de costos" data-help-desc="Mostra el detall tècnic del cost del pack, extres, hores extra i desplaçament usat per calcular el marge.">
+      <details className="ap-rep-detail mb-6" data-help-title="Desglossament de costos" data-help-desc="Mostra el detall tècnic del cost del pack, extres, hores extra i desplaçament usat per calcular el marge.">
+        <summary className="ap-rep-detail-summary">
+          <span>Desglossament de costos</span>
+        </summary>
+        <div className="ap-rep-detail-body text-sm">
         <div className="flex justify-between">
           <span>
             {typeof inventoryCostReal === 'number' && inventoryCostReal > 0
@@ -400,67 +469,71 @@ export default function BookingMarginCard({
           <span>{formatCurrency(fixedOperationalCost)}</span>
         </div>
         <div className="flex justify-between">
-          <span>Desplaçament ({travelBlocks} trams de {TRAVEL_BLOCK_KM} km)</span>
+          <span>Cost transport intern ({distanceKm.toFixed(0)} km)</span>
           <span>{formatCurrency(calculatedTravelCost)}</span>
         </div>
+        {tollsEur > 0 && (
+          <div className="flex justify-between">
+            <span>Peatges inclosos</span>
+            <span>{formatCurrency(tollsEur)}</span>
+          </div>
+        )}
+        {travelBreakdown.peopleCost > 0 && (
+          <div className="flex justify-between">
+            <span>Temps tripulació transport</span>
+            <span>{formatCurrency(travelBreakdown.peopleCost)}</span>
+          </div>
+        )}
+        {transport.mealAllowance > 0 && (
+          <div className="flex justify-between">
+            <span>Dieta transport</span>
+            <span>{formatCurrency(transport.mealAllowance)}</span>
+          </div>
+        )}
         <div className="flex justify-between">
-          <span>Suplement client ({travelBlocks} trams)</span>
+          <span>Transport al client (vehicle + {travelBreakdown.chargeableHours} h × {effectiveTravelHeadcount} pers.)</span>
           <span>{formatCurrency(calculatedTravelCharge)}</span>
         </div>
         <div className="flex justify-between">
           <span>Marge transport</span>
           <span className={travelMarginColor}>
-            {formatCurrency(travelNetMargin)} {calculatedTravelCharge > 0 ? `(${travelMarginPct.toFixed(1)}%)` : ''}
+            {formatCurrency(transportMargin.marginAmount)} {calculatedTravelCharge > 0 ? `(${transportMargin.marginPct.toFixed(1)}%)` : ''}
           </span>
         </div>
-      </div>
+        </div>
+      </details>
 
-      <div className="admin-booking-travel-editor border-t admin-tone-border-neutral pt-4" data-help-title="Desplaçament editable" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
-        <h3 className="text-sm font-semibold mb-3">Desplaçament editable</h3>
-        <p className="mb-3 text-xs">
-          Inclòs: {INCLUDED_TRAVEL_KM} km totals ({includedOneWayKm} anada + {includedOneWayKm} tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div>
-            <label htmlFor="bmc-distance" className="block text-xs font-medium mb-1">Distància (km)</label>
-            <input
-              id="bmc-distance"
-              type="number"
-              min="0"
-              step="1"
-              value={distanceKm}
-              onChange={(e) => setDistanceKm(Number(e.target.value) || 0)}
-              className="ap-input w-full px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium mb-1">Km extra</label>
-            <div className="ap-card px-3 py-2 text-sm">
-              {billableKm} km
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-medium mb-1">Cost viatge</label>
-            <div className="ap-card px-3 py-2 text-sm font-bold">
-              {formatCurrency(calculatedTravelCost)}
-            </div>
-            <p className="mt-1 text-xs">
-              {travelBlocks} trams · {TRAVEL_BLOCK_EUR} €
+      <div className="ap-card p-4" data-help-title="Desplaçament" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
+        {/* ── DESPLAÇAMENT: MATEIXA targeta compartida que el lead (#1380). La reserva hereta
+        el disseny; integrants en lectura (es decideix al lead). Els números, del cervell. ── */}
+        <BoloTripCard
+          km={distanceKm}
+          distanceKm={String(distanceKm)}
+          onDistanceChange={(v) => {
+            setDistanceKm(Number(v) || 0);
+            setTravelSaveError(null);
+          }}
+          calculatingDistance={calculatingDistance}
+          derivedHeadcount={effectiveTravelHeadcount}
+          headcount={effectiveTravelHeadcount}
+          chargeableHours={travelBreakdown.chargeableHours}
+          tripCrowded={effectiveTravelHeadcount > CROWDED_TRIP_THRESHOLD}
+          calculationNotes={travelCalculationNotes}
+        />
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="ap-card p-3">
+            <p className="text-xs uppercase tracking-wide" title="Inclou vehicle, tripulació de ruta, dieta i peatges quan apliquen.">Cost transport intern</p>
+            <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
+            <p className="text-xs">
+              vehicle {formatCurrency(vehicleOnlyTravelCost)} · {distanceKm.toFixed(1)} km · {vehicleCostPerKm.toFixed(2)} €/km{tollsEur > 0 ? ` · peatges ${formatCurrency(tollsEur)}` : ''}
             </p>
           </div>
-        </div>
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <div className="admin-booking-travel-card ap-card rounded-xl p-3">
-            <p className="text-xs uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>
-            <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
-            <p className="text-xs">{distanceKm.toFixed(1)} km · {vehicleCostPerKm.toFixed(2)} €/km</p>
-          </div>
-          <div className="admin-booking-travel-card ap-card rounded-xl p-3">
+          <div className="ap-card p-3">
             <p className="text-xs uppercase tracking-wide">Ingressos transport</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
-            <p className="text-xs">{travelBlocks} trams · {TRAVEL_BLOCK_EUR} €</p>
+            <p className="text-xs">vehicle + {travelBreakdown.chargeableHours} h × {effectiveTravelHeadcount} pers.</p>
           </div>
-          <div className={`admin-booking-travel-card rounded-xl border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
+          <div className={`ap-card p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
             <p className="text-xs uppercase tracking-wide">Marge real transport</p>
             <p className={`text-sm font-semibold ${travelMarginColor}`}>
               {formatCurrency(travelNetMargin)}
@@ -478,10 +551,16 @@ export default function BookingMarginCard({
           <button
             onClick={handleSave}
             disabled={saving}
+            aria-invalid={travelSaveError ? true : undefined}
             className="mt-3 ap-btn ap-btn--primary text-sm disabled:opacity-50"
           >
             {saving ? 'Desant...' : 'Desar canvis'}
           </button>
+        )}
+        {travelSaveError && (
+          <p role="alert" className="mt-2 rounded-[var(--o-r-md)] border border-[var(--ax-danger-border)] px-3 py-2 text-xs font-semibold text-[var(--o-danger)]">
+            {travelSaveError}
+          </p>
         )}
       </div>
     </section>

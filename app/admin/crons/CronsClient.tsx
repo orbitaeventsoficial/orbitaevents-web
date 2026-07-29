@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useToast } from '../components/ToastProvider';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { formatDateTimeFull } from '@/lib/constants';
 import { ADMIN_CRON_HEALTH_CONFIG } from '@/lib/constants/admin';
 
@@ -39,21 +38,35 @@ function formatSummary(summary: Record<string, unknown> | null): string[] {
   });
 }
 
+function readCronLoadError(payload: unknown, fallback: string): string {
+  if (payload && typeof payload === 'object') {
+    const record = payload as Record<string, unknown>;
+    if (typeof record.error === 'string' && record.error.trim()) return record.error;
+    if (typeof record.message === 'string' && record.message.trim()) return record.message;
+  }
+
+  return fallback;
+}
+
 export default function CronsClient() {
   const toast = useToast();
   const [crons, setCrons] = useState<CronInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const fetchCrons = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch('/api/admin/crons');
-      if (!res.ok) throw new Error('Error carregant crons');
       const data = await res.json();
-      setCrons(data.crons || []);
+      if (!res.ok || !data?.ok) throw new Error(readCronLoadError(data, 'Error carregant crons'));
+      setCrons(Array.isArray(data.crons) ? data.crons : []);
     } catch (err) {
       console.error('Error carregant llista de crons', err);
-      toast.error(err instanceof Error ? err.message : 'Error');
+      const message = err instanceof Error ? err.message : 'Error carregant crons';
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -72,104 +85,49 @@ export default function CronsClient() {
     );
   }
 
+  if (error) {
+    return (
+      <div role="alert" className="ap-card admin-tone-border-danger admin-tone-bg-danger p-4">
+        <div className="font-semibold">No s'ha pogut carregar l'estat dels crons.</div>
+        <p className="mt-1 text-sm text-[var(--t2)]">{error}</p>
+        <button
+          type="button"
+          onClick={() => { setLoading(true); fetchCrons(); }}
+          className="ap-btn ap-btn--secondary mt-3"
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+
   const healthCounts = {
     ok: crons.filter((c) => c.health === 'ok').length,
     warning: crons.filter((c) => c.health === 'warning').length,
     error: crons.filter((c) => c.health === 'error').length,
     unknown: crons.filter((c) => c.health === 'unknown').length,
   };
-  const delayedCrons = crons.filter((c) => c.health === 'warning');
-  const failedCrons = crons.filter((c) => c.health === 'error');
-  const neverRunCrons = crons.filter((c) => c.health === 'unknown');
-  const systemItems = [
-    `${healthCounts.ok} crons estan correctes ara mateix`,
-    delayedCrons.length > 0 ? `${delayedCrons.length} crons van amb retard o fora de finestra` : '',
-    failedCrons.length > 0 ? `${failedCrons.length} crons han fallat i poden estar bloquejant automatismes` : '',
-    neverRunCrons.length > 0 ? `${neverRunCrons.length} crons encara no s'han executat mai` : '',
-  ].filter(Boolean);
-  const manualItems = [
-    failedCrons[0] ? `Cal revisar ${failedCrons[0].label} perquè està en error` : '',
-    delayedCrons[0] ? `Convé validar ${delayedCrons[0].label} perquè ja va tard` : '',
-    neverRunCrons.length > 0 ? 'Hi ha processos sense primera execució registrada i això erosiona confiança operativa' : '',
-    failedCrons.length === 0 && delayedCrons.length === 0 && neverRunCrons.length === 0
-      ? 'Sense incidències manuals crítiques. El focus pot passar a observació i consistència.'
-      : '',
-  ].filter(Boolean);
-  const nextStep =
-    failedCrons[0]
-      ? {
-          title: `Atacar l'error de ${failedCrons[0].label}`,
-          detail: failedCrons[0].lastMessage
-            ? `L'últim error registrat diu: ${failedCrons[0].lastMessage}. El primer pas és obrir el cron i llegir el detall abans que altres automatismes quedin cecs.`
-            : `Aquest cron està en error. El primer pas és obrir-lo i revisar el darrer estat abans que la incidència s'arrossegui.`,
-          href: '/admin/crons',
-          ctaLabel: 'Revisar cron en aquesta llista',
-          secondaryAction: { href: '/admin/salut', label: 'Obrir Salut' },
-        }
-      : delayedCrons[0]
-        ? {
-            title: `Regularitzar el retard de ${delayedCrons[0].label}`,
-            detail: `No hi ha error dur, però ${delayedCrons[0].label} ja surt fora de temps. El següent pas és confirmar si és retard puntual o símptoma sistèmic.`,
-            href: '/admin/crons',
-            ctaLabel: 'Revisar cron en aquesta llista',
-            secondaryAction: { href: '/admin/salut', label: 'Obrir Salut' },
-          }
-        : neverRunCrons[0]
-          ? {
-              title: `Verificar la primera execució de ${neverRunCrons[0].label}`,
-              detail: `Hi ha crons que encara no tenen rastre d'execució. Abans de donar-los per bons, cal confirmar que realment s'han desplegat i corren.`,
-              href: '/admin/crons',
-              ctaLabel: 'Revisar cron en aquesta llista',
-              secondaryAction: { href: '/admin' , label: 'Tornar al dashboard' },
-            }
-          : {
-              title: 'Mantenir observabilitat, no apagar focs',
-              detail: 'No hi ha errors ni retards crítics. El millor següent pas és revisar periòdicament salut i assegurar que els automatismes continuen visibles.',
-              href: '/admin/salut',
-              ctaLabel: 'Obrir Salut',
-              secondaryAction: { href: '/admin', label: 'Tornar al dashboard' },
-            };
 
   return (
     <div className="space-y-4">
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què vigila el sistema',
-          tone: failedCrons.length > 0 ? 'warning' : 'info',
-          items: systemItems,
-          emptyText: 'Sense senyals de cron rellevants ara mateix.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: failedCrons.length > 0 || delayedCrons.length > 0 || neverRunCrons.length > 0 ? 'warning' : 'success',
-          items: manualItems,
-          emptyText: 'Cap cron et reclama intervenció manual ara mateix.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          ...nextStep,
-        }}
-      />
 
       {/* Resum */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Correctes</div>
+        <div className="ap-card p-3 sm:p-4">
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Correctes</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.ok}</div>
         </div>
-        <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Retardats</div>
+        <div className="ap-card p-3 sm:p-4">
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Retardats</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.warning}</div>
         </div>
-        <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Errors</div>
+        <div className="ap-card p-3 sm:p-4">
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Errors</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.error}</div>
         </div>
-        <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Mai executat</div>
-          <div className="text-2xl sm:text-3xl font-bold text-white/30">{healthCounts.unknown}</div>
+        <div className="ap-card p-3 sm:p-4">
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Mai executat</div>
+          <div className="text-2xl sm:text-3xl font-bold text-[var(--t3)]">{healthCounts.unknown}</div>
         </div>
       </div>
 
@@ -185,7 +143,7 @@ export default function CronsClient() {
               key={cron.id}
               type="button"
               onClick={() => setExpandedId(isExpanded ? null : cron.id)}
-              className={`w-full text-left rounded-2xl border p-4 transition-all ${config.bg}`}
+              className={`w-full text-left ap-card p-4 transition-all ${config.bg}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
@@ -194,7 +152,7 @@ export default function CronsClient() {
                     <div className="font-semibold text-sm sm:text-base truncate">
                       {cron.label}
                     </div>
-                    <div className="text-xs text-white/50">
+                    <div className="text-xs text-[var(--t3)]">
                       {cron.frequency}
                     </div>
                   </div>
@@ -204,27 +162,27 @@ export default function CronsClient() {
                     <div className="text-xs font-medium">
                       {config.label}
                     </div>
-                    <div className="text-xs text-white/40">
+                    <div className="text-xs text-[var(--t3)]">
                       {cron.lastRun ? formatTimeAgo(cron.lastRun) : 'Mai'}
                     </div>
                   </div>
-                  <span className={`text-white/30 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                  <span className={`text-[var(--t3)] transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
                     ▼
                   </span>
                 </div>
               </div>
 
               {isExpanded && (
-                <div className="mt-3 pt-3 border-t border-white/10 text-sm space-y-2" onClick={(e) => e.stopPropagation()}>
+                <div className="mt-3 pt-3 border-t border-[var(--line)] text-sm space-y-2" onClick={(e) => e.stopPropagation()}>
                   {cron.lastRun && (
                     <div className="flex gap-2">
-                      <span className="text-white/40 w-24 flex-shrink-0">Últim run:</span>
+                      <span className="text-[var(--t3)] w-24 flex-shrink-0">Últim run:</span>
                       <span>{formatDateTimeFull(cron.lastRun)}</span>
                     </div>
                   )}
                   {cron.lastStatus && (
                     <div className="flex gap-2">
-                      <span className="text-white/40 w-24 flex-shrink-0">Estat:</span>
+                      <span className="text-[var(--t3)] w-24 flex-shrink-0">Estat:</span>
                       <span className={cron.lastStatus === 'ok' ? 'admin-tone-text-success' : 'admin-tone-text-danger'}>
                         {cron.lastStatus.toUpperCase()}
                       </span>
@@ -232,16 +190,16 @@ export default function CronsClient() {
                   )}
                   {cron.lastMessage && (
                     <div className="flex gap-2">
-                      <span className="text-white/40 w-24 flex-shrink-0">Missatge:</span>
+                      <span className="text-[var(--t3)] w-24 flex-shrink-0">Missatge:</span>
                       <span className="">{cron.lastMessage}</span>
                     </div>
                   )}
                   {summaryLines.length > 0 && (
                     <div>
-                      <span className="text-white/40 text-xs">Resum:</span>
+                      <span className="text-[var(--t3)] text-xs">Resum:</span>
                       <div className="mt-1 grid gap-1 sm:grid-cols-2">
                         {summaryLines.map((line) => (
-                          <div key={line} className="rounded-xl bg-white/5 px-2.5 py-1.5 text-xs">
+                          <div key={line} className="rounded-xl bg-[var(--raised)] px-2.5 py-1.5 text-xs">
                             {line}
                           </div>
                         ))}
@@ -260,7 +218,7 @@ export default function CronsClient() {
         <button
           type="button"
           onClick={() => { setLoading(true); fetchCrons(); }}
-          className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+          className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all hover:bg-[var(--raised)] active:scale-[0.98]"
         >
           Actualitzar
         </button>

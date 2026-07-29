@@ -36,6 +36,19 @@ async function hmacHex(secret: string, data: string): Promise<string> {
     .join('');
 }
 
+function secureCompare(left: string, right: string): boolean {
+  const encoder = new TextEncoder();
+  const leftBytes = encoder.encode(left);
+  const rightBytes = encoder.encode(right);
+  if (leftBytes.length !== rightBytes.length) return false;
+
+  let diff = 0;
+  for (let i = 0; i < leftBytes.length; i += 1) {
+    diff |= leftBytes[i] ^ rightBytes[i];
+  }
+  return diff === 0;
+}
+
 async function makeSessionToken(secret: string): Promise<string> {
   const expiry = Math.floor(Date.now() / 1000) + SESSION_TTL_S;
   const sig = await hmacHex(secret, String(expiry));
@@ -48,7 +61,7 @@ async function verifySessionToken(secret: string, token: string): Promise<boolea
   const expiry = Number(token.slice(0, dot));
   if (!Number.isFinite(expiry) || Math.floor(Date.now() / 1000) > expiry) return false;
   const expected = await hmacHex(secret, String(expiry));
-  return token.slice(dot + 1) === expected;
+  return secureCompare(token.slice(dot + 1), expected);
 }
 
 function setSessionCookie(res: NextResponse, token: string, isSecure: boolean) {
@@ -59,6 +72,24 @@ function setSessionCookie(res: NextResponse, token: string, isSecure: boolean) {
     maxAge: SESSION_TTL_S,
     path: '/',
   });
+}
+
+function isAdminMutation(req: NextRequest, pathname: string): boolean {
+  if (!pathname.startsWith('/api/admin')) return false;
+  const method = req.method.toUpperCase();
+  return !['GET', 'HEAD', 'OPTIONS'].includes(method);
+}
+
+function requireAdminMutationCsrf(req: NextRequest, pathname: string): NextResponse | null {
+  if (!isAdminMutation(req, pathname)) return null;
+
+  const csrfHeader = req.headers.get('x-csrf-token');
+  const csrfCookie = req.cookies.get('csrf-token')?.value;
+  if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
+    return NextResponse.json({ error: 'CSRF token missing or invalid' }, { status: 403 });
+  }
+
+  return null;
 }
 
 /**
@@ -78,18 +109,8 @@ export async function handleAdminAuth(req: NextRequest): Promise<NextResponse | 
   // ── 1. Cookie de sessió persistent (evita demanar clau cada cop) ──────────
   const sessionCookie = req.cookies.get(SESSION_COOKIE)?.value;
   if (sessionCookie && (await verifySessionToken(ADMIN_PASS, sessionCookie))) {
-    // CSRF check for mutations (cookie path)
-    if (pathname.startsWith('/api/admin')) {
-      const method = req.method.toUpperCase();
-      const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
-      if (isMutation) {
-        const csrfHeader = req.headers.get('x-csrf-token');
-        const csrfCookie = req.cookies.get('csrf-token')?.value;
-        if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
-          return NextResponse.json({ error: 'CSRF token missing or invalid' }, { status: 403 });
-        }
-      }
-    }
+    const csrfError = requireAdminMutationCsrf(req, pathname);
+    if (csrfError) return csrfError;
     return null; // sessió vàlida, continua
   }
 
@@ -99,7 +120,7 @@ export async function handleAdminAuth(req: NextRequest): Promise<NextResponse | 
   const isBearerAuth =
     Boolean(adminKey) &&
     Boolean(authHeader?.startsWith('Bearer ')) &&
-    authHeader?.slice(7).trim() === adminKey;
+    secureCompare(authHeader?.slice(7).trim() ?? '', adminKey ?? '');
 
   if (isBearerAuth) return null;
 
@@ -117,7 +138,7 @@ export async function handleAdminAuth(req: NextRequest): Promise<NextResponse | 
         : Buffer.from(base64Credentials, 'base64').toString('utf8');
     const [user, ...passParts] = decoded.split(':');
     const pass = passParts.join(':');
-    authValid = user === ADMIN_USER && pass === ADMIN_PASS;
+    authValid = secureCompare(user, ADMIN_USER) && secureCompare(pass, ADMIN_PASS);
   } catch {
     authValid = false;
   }
@@ -129,18 +150,8 @@ export async function handleAdminAuth(req: NextRequest): Promise<NextResponse | 
     return unauthorized();
   }
 
-  // CSRF check for API mutations (Basic auth path)
-  if (pathname.startsWith('/api/admin')) {
-    const method = req.method.toUpperCase();
-    const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
-    if (isMutation) {
-      const csrfHeader = req.headers.get('x-csrf-token');
-      const csrfCookie = req.cookies.get('csrf-token')?.value;
-      if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
-        return NextResponse.json({ error: 'CSRF token missing or invalid' }, { status: 403 });
-      }
-    }
-  }
+  const csrfError = requireAdminMutationCsrf(req, pathname);
+  if (csrfError) return csrfError;
 
   // Credencials correctes → emet cookie de sessió de 30 dies
   const token = await makeSessionToken(ADMIN_PASS);

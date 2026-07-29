@@ -1,8 +1,11 @@
 import { notFound } from 'next/navigation';
 import { AdminPage } from '../../components/AdminPage';
 import { fetchPartnerHub } from '@/lib/services/partnerHubService';
+import { loadCollaboratorPayout } from '@/lib/services/collaboratorPayoutService';
+import { loadCollaboratorAccount } from '@/lib/services/collaboratorAccountService';
 import { COLLABORATOR_ROLE_OPTIONS } from '@/lib/constants/admin';
 import PartnerHubClient from './PartnerHubClient';
+import CollaboratorAccountPanel from './CollaboratorAccountPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +21,11 @@ export async function generateMetadata({ params }: Props) {
 export default async function PartnerDetailPage({ params }: Props) {
   const hub = await fetchPartnerHub(params.id);
   if (!hub) notFound();
+
+  const [payout, account] = await Promise.all([
+    loadCollaboratorPayout(params.id),
+    loadCollaboratorAccount(params.id),
+  ]);
 
   const roleLabels = hub.partner.roles
     .map((role) => COLLABORATOR_ROLE_OPTIONS.find((option) => option.value === role)?.label || role)
@@ -64,17 +72,6 @@ export default async function PartnerDetailPage({ params }: Props) {
       total: booking.total,
       eventDate: booking.eventDate ? booking.eventDate.toISOString() : null,
     })),
-    contractedBookings: hub.contractedBookings.map((item) => ({
-      id: item.id,
-      commissionAmount: item.commissionAmount,
-      collaboratorPrice: item.collaboratorPrice,
-      isPaid: item.isPaid,
-      reference: item.booking.reference,
-      clientName: item.booking.clientName,
-      status: item.booking.status,
-      total: item.booking.total,
-      eventDate: item.booking.eventDate ? item.booking.eventDate.toISOString() : null,
-    })),
     products: hub.products.map((product) => ({
       id: product.id,
       name: product.name,
@@ -91,7 +88,8 @@ export default async function PartnerDetailPage({ params }: Props) {
       subtitle={roleLabels || 'Partner sense rols assignats'}
       back={{ href: '/admin/collaborators', label: 'Partners' }}
     >
-      <PartnerHubClient data={data} />
+      <CollaboratorAccountPanel account={account} />
+      <PartnerHubClient data={data} payout={payout} />
     </AdminPage>
   );
 }

@@ -13,6 +13,7 @@ import {
   SOCIAL_POST_STATUSES,
   SOCIAL_CONTENT_TYPES,
   SOCIAL_CATEGORIES,
+  SOCIAL_POST_ORIGIN_TYPES,
 } from '@/lib/constants';
 
 interface Params {
@@ -31,6 +32,9 @@ const contentTypeEnum = z.enum(
 const categoryEnum = z.enum(
   Object.values(SOCIAL_CATEGORIES) as [string, ...string[]]
 );
+const originTypeEnum = z.enum(
+  Object.values(SOCIAL_POST_ORIGIN_TYPES) as [string, ...string[]]
+);
 
 const updateSchema = z.object({
   title: z.string().min(1).max(200).optional(),
@@ -44,6 +48,9 @@ const updateSchema = z.object({
   publishedAt: z.string().nullable().optional(),
   mediaUrls: z.array(z.string()).optional(),
   bookingId: z.string().nullable().optional(),
+  originType: originTypeEnum.nullable().optional(),
+  originId: z.string().nullable().optional(),
+  originLabel: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
 });
 

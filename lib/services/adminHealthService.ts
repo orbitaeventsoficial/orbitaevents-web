@@ -1,9 +1,15 @@
 import { prisma } from '@/lib/prisma';
-import { ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES, ADMIN_HEALTH_ACTIVE_LEAD_STATUSES } from '@/lib/constants/admin';
+import {
+  ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES,
+  ADMIN_HEALTH_ACTIVE_LEAD_STATUSES,
+  getAdminPostEventCronSettingKeys,
+  readAdminPostEventCronSetting,
+} from '@/lib/constants/admin';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getFinanceAlertsSummary } from '@/lib/services/financeAlertsService';
 import { computePackPricingHealth, getPackPricingModelConfigEditable } from '@/lib/services/packPricingHealth';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 
 export type AdminHealthScope = 'system' | 'finances' | 'operations' | 'catalog' | 'data';
 export type AdminHealthStatus = 'critical' | 'warning' | 'ok';
@@ -134,6 +140,11 @@ function parseIsoDate(value?: string | null): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function sanitizeAlertCount(value?: string | null): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 0;
+}
+
 function addDays(date: Date, days: number): Date {
   const next = new Date(date);
   next.setDate(next.getDate() + days);
@@ -175,7 +186,6 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     extrasZeroPriceCount,
     extraHealthRows,
     hotStaleLeadsCount,
-    unpaidUpcomingBookingsCount,
     overdueTasksCount,
     customersWithoutEmailCount,
     bookingsTotalZeroCount,
@@ -189,7 +199,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       where: {
         key: {
           in: [
-            'emails.cron.lastRun',
+            ...getAdminPostEventCronSettingKeys(),
             'automation.commercial.lastRun',
             'alerts.finance.autofixFailureCount',
             'alerts.system.autofixFailureCount',
@@ -279,13 +289,6 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
         createdAt: { lt: twoDaysAgo },
       },
     }),
-    prisma.booking.count({
-      where: {
-        status: { in: [...ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES] },
-        eventDate: { gte: now, lte: upcomingDateLimit },
-        depositPaid: false,
-      },
-    }),
     prisma.task.count({
       where: {
         status: { in: ['OPEN', 'IN_PROGRESS'] },
@@ -307,8 +310,12 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       select: {
         id: true,
         eventDate: true,
+        total: true,
+        depositAmount: true,
+        remainingAmount: true,
         depositPaid: true,
         remainingPaid: true,
+        cashAmount: true,
       },
     }),
     getPackPricingModelConfigEditable().catch(() => null),
@@ -374,12 +381,18 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
   let overdueRemainingCount = 0;
   let dueSoonDepositCount = 0;
   let dueSoonRemainingCount = 0;
+  let unpaidUpcomingBookingsCount = 0;
 
   for (const booking of activeBookings) {
+    const paymentBreakdown = bookingOutstandingBreakdown(booking);
     const depositDueAt = addDays(new Date(booking.eventDate), -30);
     const remainingDueAt = addDays(new Date(booking.eventDate), -7);
 
-    if (!booking.depositPaid) {
+    if (new Date(booking.eventDate) <= upcomingDateLimit && paymentBreakdown.depositAmount > 0) {
+      unpaidUpcomingBookingsCount += 1;
+    }
+
+    if (paymentBreakdown.depositAmount > 0) {
       if (depositDueAt < now) {
         overdueDepositCount += 1;
       } else if (depositDueAt <= paymentDueSoonLimit) {
@@ -387,7 +400,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       }
     }
 
-    if (!booking.remainingPaid) {
+    if (paymentBreakdown.remainingAmount > 0) {
       if (remainingDueAt < now) {
         overdueRemainingCount += 1;
       } else if (remainingDueAt <= paymentDueSoonLimit) {
@@ -402,7 +415,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
   const catalogItems: AdminHealthItem[] = [];
   const dataItems: AdminHealthItem[] = [];
 
-  const emailCronLastRun = parseIsoDate(settings['emails.cron.lastRun']);
+  const emailCronLastRun = parseIsoDate(readAdminPostEventCronSetting(settings, 'lastRun'));
   if (!emailCronLastRun || emailCronLastRun.getTime() < twoDaysAgo.getTime()) {
     systemItems.push({
       id: 'system-email-cron-stale',
@@ -456,7 +469,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     });
   }
 
-  const systemAutofixFailures = Number(settings['alerts.system.autofixFailureCount'] || '0') || 0;
+  const systemAutofixFailures = sanitizeAlertCount(settings['alerts.system.autofixFailureCount']);
   if (systemAutofixFailures > 0) {
     systemItems.push({
       id: 'system-autofix-open',
@@ -471,7 +484,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     });
   }
 
-  const financeAutofixFailures = Number(settings['alerts.finance.autofixFailureCount'] || '0') || 0;
+  const financeAutofixFailures = sanitizeAlertCount(settings['alerts.finance.autofixFailureCount']);
   if (financeAutofixFailures > 0) {
     financeItems.push({
       id: 'finance-autofix-open',
@@ -914,9 +927,6 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     generatedAt: new Date().toISOString(),
   };
 }
-
-
-
 
 
 

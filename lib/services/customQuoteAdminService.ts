@@ -1,4 +1,3 @@
-import { CustomQuoteStatus, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 type CustomQuoteInput = {
@@ -15,39 +14,16 @@ type CustomQuoteInput = {
   notes?: string | null;
 };
 
-function normalizeComponents(components?: unknown[]): Prisma.InputJsonValue {
-  return JSON.parse(JSON.stringify(components || [])) as Prisma.InputJsonValue;
-}
-
-function normalizeCustomQuoteStatus(status?: string | null): CustomQuoteStatus {
-  return status === 'SENT' ? 'SENT' : status === 'ACCEPTED' ? 'ACCEPTED' : status === 'REJECTED' ? 'REJECTED' : 'DRAFT';
-}
+export const CUSTOM_QUOTE_RETIRED_ERROR =
+  'La calculadora de costos ja no desa pressupostos paral·lels. Crea el document client-facing a Pressupostos, com a Proposal canònica.';
 
 export async function listAdminCustomQuotes() {
   return prisma.customQuote.findMany({ orderBy: { createdAt: 'desc' } });
 }
 
 export async function createAdminCustomQuote(input: CustomQuoteInput) {
-  if (!input.name?.trim()) {
-    return { status: 400, body: { error: 'El nom és obligatori' } };
-  }
-
-  const quote = await prisma.customQuote.create({
-    data: {
-      name: input.name.trim(),
-      clientName: input.clientName?.trim() || null,
-      clientEmail: input.clientEmail?.trim() || null,
-      components: normalizeComponents(input.components),
-      totalCost: Number(input.totalCost) || 0,
-      suggestedPrice: Number(input.suggestedPrice) || 0,
-      marginPct: Number(input.marginPct) || 30,
-      finalPrice: input.finalPrice ? Number(input.finalPrice) : null,
-      status: normalizeCustomQuoteStatus(input.status),
-      notes: input.notes?.trim() || null,
-    },
-  });
-
-  return { status: 201, body: quote };
+  void input;
+  return { status: 410, body: { error: CUSTOM_QUOTE_RETIRED_ERROR, canonicalRoute: '/admin/presupuestos' } };
 }
 
 export async function getAdminCustomQuote(id: string) {
@@ -59,27 +35,12 @@ export async function getAdminCustomQuote(id: string) {
 }
 
 export async function updateAdminCustomQuote(id: string, input: CustomQuoteInput) {
-  const quote = await prisma.customQuote.update({
-    where: { id },
-    data: {
-      ...(input.name !== undefined && { name: input.name.trim() }),
-      ...(input.clientName !== undefined && { clientName: input.clientName?.trim() || null }),
-      ...(input.clientEmail !== undefined && { clientEmail: input.clientEmail?.trim() || null }),
-      ...(input.components !== undefined && { components: normalizeComponents(input.components) }),
-      ...(input.totalCost !== undefined && { totalCost: Number(input.totalCost) }),
-      ...(input.suggestedPrice !== undefined && { suggestedPrice: Number(input.suggestedPrice) }),
-      ...(input.marginPct !== undefined && { marginPct: Number(input.marginPct) }),
-      ...(input.finalPrice !== undefined && { finalPrice: input.finalPrice ? Number(input.finalPrice) : null }),
-      ...(input.status !== undefined && { status: normalizeCustomQuoteStatus(input.status) }),
-      ...(input.sentAt !== undefined && { sentAt: input.sentAt ? new Date(input.sentAt) : null }),
-      ...(input.notes !== undefined && { notes: input.notes?.trim() || null }),
-    },
-  });
-
-  return { status: 200, body: quote };
+  void id;
+  void input;
+  return { status: 410, body: { error: CUSTOM_QUOTE_RETIRED_ERROR, canonicalRoute: '/admin/presupuestos' } };
 }
 
 export async function deleteAdminCustomQuote(id: string) {
-  await prisma.customQuote.delete({ where: { id } });
-  return { status: 200, body: { ok: true } };
+  void id;
+  return { status: 410, body: { error: CUSTOM_QUOTE_RETIRED_ERROR, canonicalRoute: '/admin/presupuestos' } };
 }

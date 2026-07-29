@@ -24,6 +24,8 @@ import { ORBITA_LOGO_LOCKUP_LIGHT_BASE64 } from '@/lib/logo-lockup-light-base64'
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { computeDossierTransportBudget } from '@/lib/services/dossierMarginGuardService';
+import { orderDossierProductsForDossier } from '@/lib/services/dossierProductMappingService';
 
 /** Carrega una imatge de /public com a data URL per a jsPDF. Retorna null si no existeix. */
 async function loadImageDataUrl(imageUrl?: string | null): Promise<string | null> {
@@ -40,6 +42,11 @@ async function loadImageDataUrl(imageUrl?: string | null): Promise<string | null
 }
 
 export type DossierExtra = { nom: string; preu: number };
+export type DossierCompositeTransport = {
+  travelKm?: number;
+  travelTollsEur?: number;
+  travelLocation?: string;
+};
 
 export type GenerateDossierCompositePdfInput = {
   client: DossierClientInfo;
@@ -47,6 +54,7 @@ export type GenerateDossierCompositePdfInput = {
   productIds: string[];
   collaboratorProducts?: DossierCollaboratorProduct[];
   extras?: DossierExtra[];
+  transport?: DossierCompositeTransport;
   locale?: SupportedLocale;
   logoDataUri?: string;
 };
@@ -104,6 +112,7 @@ function drawIntro(doc: jsPDFType, client: DossierClientInfo, productCount: numb
   doc.addPage();
   doc.setFillColor(...COLORS.paperBg);
   doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
+  const optionLabel = productCount === 1 ? 'una opció' : productCount > 1 ? `${productCount} opcions` : 'algunes opcions';
 
   let y = 42;
   doc.setTextColor(...COLORS.gold);
@@ -114,19 +123,19 @@ function drawIntro(doc: jsPDFType, client: DossierClientInfo, productCount: numb
 
   doc.setTextColor(...COLORS.paperText);
   doc.setFontSize(22);
-  doc.text(doc.splitTextToSize('Mireu què podem portar a la vostra festa.', 150), PDF_DESIGN.left, y);
+  doc.text(doc.splitTextToSize('Ritme, joc i moments que la gent recorda.', 150), PDF_DESIGN.left, y);
   y += 30;
 
   setStyleBody(doc);
   const greeting = client.salutacio ||
-    `Hola ${client.nom}, gràcies per pensar en nosaltres! En aquestes pàgines hi trobareu les nostres animacions i espectacles, explicats amb calma. Mireu-los amb tranquil·litat i quedeu-vos amb els que us facin il·lusió per al vostre dia.`;
+    `Hola ${client.nom}, gràcies per pensar en nosaltres! Aquest dossier ordena ${optionLabel} perquè pugueu imaginar el ritme del dia: què anima, què acompanya i què pot quedar com a moment especial. Mireu-ho amb calma; després acabem d'ajustar-ho a espai, horaris i convidats.`;
   doc.text(doc.splitTextToSize(greeting, 150), PDF_DESIGN.left, y);
   y += 42;
 
   y = drawCanonicalSectionTitle(doc, y, 'Com està ordenat');
   const paragraphs = [
     'Ho hem separat per moments: animació per a adults, animació per als més petits i el suport musical. Així és fàcil veure què va bé per a cada estona de la festa.',
-    'Cada proposta porta el seu preu de referència. Els extres i els detalls els acabem de tancar junts quan sapiguem quanta gent vindrà, els horaris i l\'espai.',
+    'Cada proposta porta el seu preu de referència. Els extres i els detalls els tanquem junts quan sapiguem quanta gent vindrà, els horaris i l\'espai.',
   ];
   paragraphs.forEach((paragraph) => {
     setStyleBody(doc);
@@ -156,34 +165,33 @@ function drawProductChapter(doc: jsPDFType, product: AnimacioProduct, index: num
   doc.setFillColor(...COLORS.paperBg);
   doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
 
-  // Imatge del producte a la cantonada superior dreta sense retallar; el text flueix a l'esquerra.
+  // Imatge del producte com a peça visual completa: mai es retalla, el text comença a sota.
   let textWidth = 150;
   let imageBottom = 0;
+  let y = 40;
   if (imageDataUrl) {
     try {
-      const imgBoxW = 62;
-      const imgBoxH = product.id.includes('secret-pirates') ? 74 : 56;
+      const imgBoxW = PDF_DESIGN.right - PDF_DESIGN.left;
+      const imgBoxH = 104;
       const props = doc.getImageProperties(imageDataUrl);
       const fitted = fitWithin(props.width, props.height, imgBoxW, imgBoxH);
-      const imgX = PDF_DESIGN.right - fitted.width;
-      const imgY = 32;
+      const imgX = PDF_DESIGN.left + (imgBoxW - fitted.width) / 2;
+      const imgY = 28;
       const format = getImageFormatFromDataUrl(imageDataUrl);
       doc.addImage(imageDataUrl, format, imgX, imgY, fitted.width, fitted.height);
-      textWidth = imgX - PDF_DESIGN.left - 6;
       imageBottom = imgY + fitted.height;
-      // Durada sota la imatge (no solapada amb el header)
       if (product.durada) {
         setStyleCaption(doc);
         doc.setTextColor(...COLORS.gold);
-        doc.text(product.durada, imgX + fitted.width, imageBottom + 5, { align: 'right' });
+        doc.text(product.durada, PDF_DESIGN.right, imageBottom + 5, { align: 'right' });
         imageBottom += 7;
       }
+      y = imageBottom + 14;
     } catch {
       // Si la imatge falla, el capítol continua sense ella.
     }
   }
 
-  let y = 40;
   // Capçalera de categoria (eyebrow) quan comença una secció nova; si no, número de capítol.
   doc.setTextColor(...COLORS.gold);
   doc.setFont('helvetica', 'bold');
@@ -301,6 +309,62 @@ function drawExtras(doc: jsPDFType, extras: DossierExtra[], locale: SupportedLoc
   });
 }
 
+function drawTravelSummary(doc: jsPDFType, transport: DossierCompositeTransport | undefined, locale: SupportedLocale): void {
+  const km = typeof transport?.travelKm === 'number' && transport.travelKm > 0 ? transport.travelKm : 0;
+  if (km <= 0) return;
+  const tolls = typeof transport?.travelTollsEur === 'number' && transport.travelTollsEur > 0 ? transport.travelTollsEur : 0;
+  const budget = computeDossierTransportBudget(km, tolls);
+  const moneyLocale = locale === 'ca' ? 'ca-ES' : locale;
+
+  doc.addPage();
+  doc.setFillColor(...COLORS.paperBg);
+  doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
+
+  let y = 42;
+  doc.setTextColor(...COLORS.gold);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.text('DESPLAÇAMENT', PDF_DESIGN.left, y, { charSpace: 0.8 });
+  y += 14;
+
+  doc.setTextColor(...COLORS.paperText);
+  doc.setFontSize(24);
+  doc.text('Cost del desplaçament', PDF_DESIGN.left, y);
+  y += 15;
+
+  setStyleMuted(doc);
+  const routeLabel = transport?.travelLocation
+    ? `${transport.travelLocation} · ${Math.round(km)} km anada i tornada`
+    : `${Math.round(km)} km anada i tornada`;
+  doc.text(doc.splitTextToSize(routeLabel, 150), PDF_DESIGN.left, y);
+  y += 18;
+
+  doc.setTextColor(...COLORS.gold);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(26);
+  doc.text(formatCurrency(budget.clientCharge, moneyLocale), PDF_DESIGN.left, y);
+  y += 18;
+
+  const rows: Array<[string, number]> = [
+    ['Vehicle i combustible', budget.clientVehicleCost],
+    [`${budget.headcount} operaris en ruta`, budget.peopleCost],
+  ];
+  if (budget.tollsCost > 0) rows.push(['Peatges de ruta', budget.tollsCost]);
+  if (budget.mealAllowance > 0) rows.push(['Dietes de ruta llarga', budget.mealAllowance]);
+
+  rows.forEach(([label, amount]) => {
+    doc.setDrawColor(...COLORS.grayLight);
+    doc.roundedRect(PDF_DESIGN.left, y, PDF_DESIGN.width, 12, 1.5, 1.5);
+    setStyleBody(doc);
+    doc.setTextColor(...COLORS.paperText);
+    doc.text(label, PDF_DESIGN.left + 5, y + 7.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...COLORS.gold);
+    doc.text(formatCurrency(amount, moneyLocale), PDF_DESIGN.right - 4, y + 7.5, { align: 'right' });
+    y += 16;
+  });
+}
+
 function drawFootersExceptCover(doc: jsPDFType): void {
   const totalPages = doc.internal.pages.length - 1;
   const website = normalizeWebsite(SITE_CONFIG.web.url);
@@ -319,24 +383,10 @@ export async function generateDossierCompositePDF(input: GenerateDossierComposit
   const collaboratorChapters = (input.collaboratorProducts ?? []).map(collaboratorProductToAnimacioProduct);
   const merged = [...input.products, ...collaboratorChapters];
 
-  // Agrupa per categoria preservant l'ordre de primera aparició. Els productes sense
-  // categoria queden a "Els nostres serveis".
+  // Ordena editorialment igual que l'HTML: experiències principals primer i
+  // extres/equipament al final. Els productes sense categoria queden a suport.
   const fallbackCategory = 'Els nostres serveis';
-  // Ordre canònic: animació primer; el suport musical (DJ/so) va al final (opcional).
-  const CATEGORY_PRIORITY = ['Animació adulta', 'Animació infantil', 'DJ', 'DJ i so per a casaments'];
-  const categoryOrder: string[] = [];
-  for (const product of merged) {
-    const cat = product.categoria || fallbackCategory;
-    if (!categoryOrder.includes(cat)) categoryOrder.push(cat);
-  }
-  categoryOrder.sort((a, b) => {
-    const ia = CATEGORY_PRIORITY.indexOf(a);
-    const ib = CATEGORY_PRIORITY.indexOf(b);
-    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
-  });
-  const allChapters = categoryOrder.flatMap((cat) =>
-    merged.filter((product) => (product.categoria || fallbackCategory) === cat),
-  );
+  const allChapters = orderDossierProductsForDossier(merged);
   const chapterImages = await Promise.all(allChapters.map((product) => loadImageDataUrl(product.image)));
 
   drawCover(doc, input.client, input.logoDataUri);
@@ -350,6 +400,7 @@ export async function generateDossierCompositePDF(input: GenerateDossierComposit
     lastCategory = category;
   });
 
+  drawTravelSummary(doc, input.transport, locale);
   drawExtras(doc, input.extras ?? [], locale);
 
   drawFootersExceptCover(doc);

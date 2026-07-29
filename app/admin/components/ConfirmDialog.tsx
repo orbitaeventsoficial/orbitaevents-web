@@ -21,7 +21,7 @@ interface ConfirmDialogProps {
 // UX destructiva (vermell/ambre) però des de --o-*; info = or de sèrie (mai blau).
 const VARIANT_STYLES: Record<ConfirmVariant, { button: string; icon: string }> = {
   danger: {
-    button: 'bg-[var(--o-danger)] text-white hover:brightness-110 focus:ring-[var(--o-danger)]/50',
+    button: 'bg-[var(--o-danger)] text-[var(--t)] hover:brightness-110 focus:ring-[var(--o-danger)]/50',
     icon: '⚠️',
   },
   warning: {
@@ -181,10 +181,10 @@ export default function ConfirmDialog({
             <div className="flex items-start gap-3">
               <span className="mt-0.5 text-xl">{styles.icon}</span>
               <div className="flex-1 min-w-0">
-                <h3 id="confirm-dialog-title" className="text-base font-semibold text-white">
+                <h3 id="confirm-dialog-title" className="text-base font-semibold text-[var(--t)]">
                   {title}
                 </h3>
-                <p className="mt-1.5 text-sm text-white/60 leading-relaxed whitespace-pre-line">
+                <p className="mt-1.5 text-sm text-[var(--t2)] leading-relaxed whitespace-pre-line">
                   {message}
                 </p>
               </div>
@@ -195,7 +195,7 @@ export default function ConfirmDialog({
                 type="button"
                 onClick={onCancel}
                 disabled={busy}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
+                className="ap-btn disabled:opacity-50"
                 {...helpAttrs(ADMIN_SHARED_HELP.confirmCancel)}
               >
                 Cancel·lar
@@ -205,12 +205,12 @@ export default function ConfirmDialog({
                 type="button"
                 onClick={handleConfirm}
                 disabled={busy}
-                className={`rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors focus:outline-none focus:ring-2 disabled:opacity-50 ${styles.button}`}
+                className={`rounded-xl px-4 py-2 text-sm font-semibold text-[var(--t)] transition-colors focus:outline-none focus:ring-2 disabled:opacity-50 ${styles.button}`}
                 {...helpAttrs(ADMIN_SHARED_HELP.confirmAccept)}
               >
                 {busy ? (
                   <span className="flex items-center gap-1.5">
-                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[var(--line)] border-t-white" />
                     Processant...
                   </span>
                 ) : (

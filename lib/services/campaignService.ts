@@ -17,7 +17,7 @@ export type CampaignType =
   | 'REACTIVATION'
   | 'UPSELL'
   | 'SEASONAL'
-  | 'FEEDBACK_REQUEST'
+  | 'REVIEW_REQUEST'
   | 'REFERRAL'
   | 'LOYALTY';
 
@@ -164,11 +164,11 @@ export function generateCampaigns(input: CampaignInput): Campaign[] {
     });
   }
 
-  // ── 6. FEEDBACK_REQUEST — recent clients ─────────────────────────────
+  // ── 6. REVIEW_REQUEST — recent clients ───────────────────────────────
   if (input.segments.recentMonth > 0) {
     campaigns.push({
-      id: 'campaign:feedback-recent',
-      type: 'FEEDBACK_REQUEST',
+      id: 'campaign:review-recent',
+      type: 'REVIEW_REQUEST',
       name: `Recol·lecció de ressenyes (${monthName})`,
       description: `${input.segments.recentMonth} clients nous aquest mes. Demana opinió per alimentar la prova social.`,
       segment: 'Nous darrer mes',

@@ -1,6 +1,9 @@
 /** Km inclosos al preu (anada+tornada). 50 a/t = 25 km per sentit des de Granollers. */
 export const INCLUDED_TRAVEL_KM = 50;
-export const DEFAULT_VEHICLE_COST_PER_KM = 0.19;
+// Fallback de cost del cotxe SI el MITECO cau (el càlcul normal usa el preu de benzina
+// viu via getEffectiveVehicleCostPerKm). Valor = barem oficial d'IRPF per quilometratge
+// (Orden HFP/792/2023, vigent des del 17-07-2023). Actualitzar quan Hisenda el revisi.
+export const DEFAULT_VEHICLE_COST_PER_KM = 0.26;
 /**
  * Km totals (anar a buscar + tornar) per recollir material de lloguer extern
  * (p.ex. Tino a Granollers ↔ base a Sentmenat, 2 anades-i-tornades). El transport
@@ -50,15 +53,9 @@ export function calculateTravelCost(
   return round2(safeTotalKm * rate);
 }
 
-export function calculateTravelCharge(
-  totalKm: number,
-  includedKm = INCLUDED_TRAVEL_KM,
-  blockKm = TRAVEL_BLOCK_KM,
-  blockPrice = TRAVEL_BLOCK_EUR
-): number {
-  const blocks = calculateTravelBlocks(totalKm, includedKm, blockKm);
-  return round2(blocks * sanitizeNonNegative(blockPrice, TRAVEL_BLOCK_EUR));
-}
+// El càrrec de transport al client és font única a `computeBoloTransport`
+// (travelLaborCost.ts). Els trams es mantenen com a mínim comercial quan hi ha
+// km facturables però el cost real del vehicle seria microscòpic.
 
 /**
  * Calcula el cost efectiu per km del vehicle a partir de:
@@ -79,4 +76,3 @@ export function calculateEffectiveVehicleCostPerKm(
   const fuelComponent = (safeFuel * safeConsumption) / 100;
   return round2(fuelComponent + safeMaintenance);
 }
-

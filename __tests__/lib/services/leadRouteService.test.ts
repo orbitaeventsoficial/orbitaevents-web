@@ -84,9 +84,58 @@ describe('updateLeadFromInput', () => {
 
     expect(mockPrisma.lead.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ eventDate: expect.any(Date) }),
+        data: expect.objectContaining({ eventDate: new Date('2026-06-15T12:00:00.000Z') }),
       })
     );
+  });
+
+  it('retorna la veritat operativa del lead despres del PATCH', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEW', contactedAt: null });
+    const updatedLead = {
+      id: 'l1',
+      customerId: 'c1',
+      name: 'Albert Aujas',
+      email: 'casals@controlplay.cat',
+      phone: '+34673048368',
+      eventDate: new Date('2026-07-17T12:00:00.000Z'),
+      eventStartTime: '20:30',
+      eventEndTime: '21:30',
+      eventLocation: 'Cornella',
+      eventPhone: null,
+      eventAddress: 'Pati escola',
+      distanceKm: null,
+      tollsEur: null,
+      guestCount: 100,
+      budget: null,
+      sourceCollaboratorId: null,
+      assignedTo: null,
+      status: 'CONTACTED',
+      priority: 'MEDIUM',
+      updatedAt: new Date('2026-07-07T19:30:00.000Z'),
+    };
+    mockPrisma.lead.update.mockResolvedValueOnce(updatedLead);
+
+    const result = await updateLeadFromInput('l1', { eventDate: '2026-07-17' });
+
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          eventDate: true,
+          eventStartTime: true,
+          eventEndTime: true,
+          eventLocation: true,
+          eventAddress: true,
+          eventPhone: true,
+          guestCount: true,
+          budget: true,
+          distanceKm: true,
+          tollsEur: true,
+          sourceCollaboratorId: true,
+          assignedTo: true,
+        }),
+      })
+    );
+    expect(result.body.lead).toEqual(updatedLead);
   });
 
   it('retorna 400 amb data invàlida', async () => {
@@ -97,14 +146,50 @@ describe('updateLeadFromInput', () => {
     expect(result.status).toBe(400);
   });
 
+  it('retorna 400 amb data ambigua encara que JS la pogués interpretar', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEW', contactedAt: null });
+
+    const result = await updateLeadFromInput('l1', { eventDate: '26 Setiembre' });
+
+    expect(result.status).toBe(400);
+    expect(mockPrisma.lead.update).not.toHaveBeenCalled();
+  });
+
   it('estableix convertedAt quan WON', async () => {
-    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEGOTIATING', contactedAt: new Date() });
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEGOTIATING', contactedAt: new Date(), booking: { id: 'b1' } });
 
     await updateLeadFromInput('l1', { status: 'WON' });
 
     expect(mockPrisma.lead.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ convertedAt: expect.any(Date) }),
+      })
+    );
+  });
+
+  it('rebutja passar a WON si encara no hi ha reserva vinculada', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEGOTIATING', contactedAt: new Date(), booking: null });
+
+    const result = await updateLeadFromInput('l1', { status: 'WON' });
+
+    expect(result.status).toBe(409);
+    expect(result.body).toMatchObject({
+      error: expect.stringContaining('sense reserva vinculada'),
+      nextAction: '/admin/bookings/new?leadId=l1&prefill=lead',
+    });
+    expect(mockPrisma.lead.update).not.toHaveBeenCalled();
+    expect(mockPrisma.adminLog.create).not.toHaveBeenCalled();
+  });
+
+  it('permet editar un històric que ja era WON encara que encara no tingui reserva', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'WON', contactedAt: new Date(), booking: null });
+
+    const result = await updateLeadFromInput('l1', { status: 'WON', priority: 'HIGH' });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: 'WON', priority: 'HIGH' }),
       })
     );
   });

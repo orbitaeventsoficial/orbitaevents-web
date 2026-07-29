@@ -16,10 +16,6 @@
  * 2. computeSimpleMarginPct(input, config?)
  *    Retorna el % de marge simplificat (sense CAC) per a llistats i dashboards.
  *
- * 3. computeCollaboratorNetMargin(summary, collaborator)
- *    Calcula el marge net després de la comissió del col·laborador.
- *    Dos models: DISCOUNT (col·lab rep total - comissió) i NET_PLUS_COMMISSION.
- *
  * FÓRMULES CLAU:
  *   packCost = inventoryCostReal (si > 0) || packPrice × packCostRatio
  *   extrasCost = extrasTotal × extraCostRatio
@@ -34,10 +30,10 @@ import {
   computeBookingFinancialSummary,
   computeDirectCostBreakdown,
   computeSimpleMarginPct,
-  computeCollaboratorNetMargin,
   aggregateServiceLines,
+  computeServiceLineEconomics,
   classifyBoloLines,
-  computeSupportableTravelKm,
+  SUBCONTRACTED_MARKUP_TARGET_PCT,
 } from '@/lib/services/costEngine';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
@@ -69,7 +65,10 @@ function baseInput(overrides: Record<string, unknown> = {}) {
     extraHours: 1,
     extraHourPrice: 75,
     distanceKm: 80,
-    vehicleCostPerKm: null as number | null,
+    // Fixat a 0.19 explícit (#1364): abans era null i depenia del DEFAULT global, que
+    // ha passat de 0.19 a 0.26 (barem IRPF vigent). Fixar-lo aquí manté els valors
+    // esperats d'aquests tests estables i independents del fallback global.
+    vehicleCostPerKm: 0.19 as number | null,
     travelCost: null as number | null,
     source: null as string | null,
     inventoryCostReal: null as number | null,
@@ -388,6 +387,86 @@ describe('costEngine', () => {
       expect(result.total).toBe(340);
     });
 
+    it('calcula subcontractat +20% i tècnic Òrbita dins el resum financer', () => {
+      const serviceLines = [
+        { kind: 'PROVIDER_SERVICE', collaboratorId: 'masquerade', revenueAmount: 240, costAmount: 200, quantity: 1 },
+        { kind: 'SOUND_TECH', collaboratorId: 'masquerade', label: 'Tècnic de so inclòs · 1h 30', revenueAmount: 0, costAmount: -40, quantity: 1 },
+      ];
+      const result = computeBookingFinancialSummary(baseInput({
+        total: 498,
+        packPrice: 0,
+        extrasTotal: 0,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: 0,
+        travelCost: 271,
+        serviceLines,
+      }), defaultConfig);
+
+      expect(result.serviceLinesRevenue).toBe(240);
+      expect(result.serviceLinesCost).toBe(160);
+      expect(result.subcontractedMarkup.targetPct).toBe(SUBCONTRACTED_MARKUP_TARGET_PCT);
+      expect(result.subcontractedMarkup.cost).toBe(200);
+      expect(result.subcontractedMarkup.revenue).toBe(240);
+      expect(result.subcontractedMarkup.markupAmount).toBe(40);
+      expect(result.subcontractedMarkup.markupPct).toBe(20);
+      expect(result.subcontractedMarkup.ok).toBe(true);
+      expect(result.orbitaTechIncome).toBe(40);
+      expect(result.directCost).toBe(result.fixedOperationalCost + 271 + 160);
+    });
+
+    it('no duplica cost de ruta quan booking.travelCost ja porta el transport i hi ha línies [travel-cost]', () => {
+      const serviceLines = [
+        { kind: 'PROVIDER_SERVICE', collaboratorId: 'masquerade', revenueAmount: 240, costAmount: 200, quantity: 1 },
+        { kind: 'OTHER', label: 'Vehicle ruta · Òrbita', revenueAmount: 0, costAmount: 75, quantity: 1, notes: '[travel-cost] vehicle · 422.0 km' },
+        { kind: 'OTHER', label: 'Temps ruta conductor · Òrbita', revenueAmount: 0, costAmount: 83, quantity: 1, notes: '[travel-cost] DRIVER · 5.50 h' },
+      ];
+      const result = computeBookingFinancialSummary(baseInput({
+        total: 555,
+        packPrice: 0,
+        extrasTotal: 0,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: 0,
+        travelCost: 158,
+        serviceLines,
+      }), defaultConfig);
+
+      expect(result.travelCost).toBe(158);
+      expect(result.serviceLinesRevenue).toBe(240);
+      expect(result.serviceLinesCost).toBe(200);
+      expect(result.directCost).toBe(result.fixedOperationalCost + 158 + 200);
+    });
+
+    it('separa producte propi, subcontractat i transport en buckets economics', () => {
+      const serviceLines = [
+        { kind: 'DJ', revenueAmount: 150, costAmount: 0, quantity: 1 },
+        { kind: 'PROVIDER_SERVICE', collaboratorId: 'masquerade', revenueAmount: 240, costAmount: 200, quantity: 1 },
+      ];
+      const result = computeBookingFinancialSummary(baseInput({
+        total: 648,
+        packPrice: 0,
+        extrasTotal: 0,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: 0,
+        travelCost: 271,
+        travelRevenue: 258,
+        serviceLines,
+        serviceLinesOwnCostRatio: 0,
+      }), defaultConfig);
+
+      expect(result.ownServiceMargin.revenue).toBe(150);
+      expect(result.ownServiceMargin.cost).toBe(0);
+      expect(result.ownServiceMargin.marginAmount).toBe(150);
+      expect(result.subcontractedMarkup.cost).toBe(200);
+      expect(result.subcontractedMarkup.markupAmount).toBe(40);
+      expect(result.transportMargin.revenue).toBe(258);
+      expect(result.transportMargin.cost).toBe(271);
+      expect(result.transportMargin.marginAmount).toBe(-13);
+      expect(result.directCost).toBe(result.fixedOperationalCost + 271 + 200);
+    });
+
     // --- Config personalitzada ---
 
     it('config personalitzada: canvia els ratis i el cost fix', () => {
@@ -548,215 +627,24 @@ describe('costEngine', () => {
       const cacPct = (summary.acquisitionCost / input.total) * 100;
       expect(simplePct - summary.marginPct).toBeCloseTo(cacPct, 2);
     });
-  });
 
-  // ─── computeCollaboratorNetMargin ──────────────────────────────────────────
-  // Quan un col·laborador porta una reserva, la seva comissió es dedueix del marge.
-  // Dos models: DISCOUNT i NET_PLUS_COMMISSION.
-
-  describe('computeCollaboratorNetMargin', () => {
-    /** Helper: crea un summary base per als tests de col·laborador */
-    function baseSummary(overrides: Partial<{
-      total: number;
-      netMargin: number;
-      marginPct: number;
-      packCost: number;
-      packCostIsReal: boolean;
-      extrasCost: number;
-      extraHoursCost: number;
-      fixedOperationalCost: number;
-      travelCost: number;
-      directCost: number;
-      acquisitionCost: number;
-      marginTone: { color: string; bg: string; label: string; tone: 'emerald' | 'amber' | 'orange' | 'rose' };
-    }> = {}) {
-      const input = baseInput();
-      const summary = computeBookingFinancialSummary(input, defaultConfig);
-      return { ...summary, ...overrides };
-    }
-
-    // --- Model DISCOUNT ---
-
-    it('model DISCOUNT 15%: comissió es dedueix del total, col·lab rep la diferència', () => {
-      const summary = baseSummary();
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 15,
-        pricingModel: 'DISCOUNT',
+    it('inclou cost de línies de servei en el marge simple de llistes i dashboards', () => {
+      const input = baseInput({
+        total: 1000,
+        packPrice: 0,
+        extrasTotal: 0,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: 0,
+        travelCost: 0,
+        serviceLinesRevenue: 300,
+        serviceLinesCost: 120,
       });
 
-      const expectedCommission = Math.round(summary.total * 0.15);
-      expect(result.commissionAmount).toBe(expectedCommission);
-      expect(result.collaboratorPrice).toBe(summary.total - expectedCommission);
-      expect(result.netMarginAfterCommission).toBe(summary.netMargin - expectedCommission);
-    });
+      const simplePct = computeSimpleMarginPct(input, defaultConfig);
 
-    it('model DISCOUNT amb comissió 0%: sense impacte al marge', () => {
-      const summary = baseSummary();
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 0,
-        pricingModel: 'DISCOUNT',
-      });
-
-      expect(result.commissionAmount).toBe(0);
-      expect(result.collaboratorPrice).toBe(summary.total);
-      expect(result.netMarginAfterCommission).toBe(summary.netMargin);
-    });
-
-    it('model DISCOUNT amb comissió alta (30%): marge pot quedar negatiu', () => {
-      // Reserva amb marge just
-      const summary = baseSummary({ total: 800, netMargin: 150 });
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 30,
-        pricingModel: 'DISCOUNT',
-      });
-
-      // Comissió = 800 × 0.30 = 240 → marge = 150 - 240 = -90
-      expect(result.commissionAmount).toBe(240);
-      expect(result.netMarginAfterCommission).toBe(-90);
-      expect(result.marginPctAfterCommission).toBeLessThan(0);
-    });
-
-    // --- Model NET_PLUS_COMMISSION ---
-
-    it('model NET_PLUS_COMMISSION: col·lab rep el total sencer', () => {
-      const summary = baseSummary();
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 10,
-        pricingModel: 'NET_PLUS_COMMISSION',
-      });
-
-      expect(result.collaboratorPrice).toBe(summary.total);
-    });
-
-    it('model NET_PLUS_COMMISSION: comissió es calcula igual que DISCOUNT', () => {
-      const summary = baseSummary();
-      const resultDiscount = computeCollaboratorNetMargin(summary, {
-        commissionPct: 20,
-        pricingModel: 'DISCOUNT',
-      });
-      const resultNet = computeCollaboratorNetMargin(summary, {
-        commissionPct: 20,
-        pricingModel: 'NET_PLUS_COMMISSION',
-      });
-
-      // La comissió és la mateixa en ambdós models
-      expect(resultNet.commissionAmount).toBe(resultDiscount.commissionAmount);
-      // El marge net després de comissió també és igual
-      expect(resultNet.netMarginAfterCommission).toBe(resultDiscount.netMarginAfterCommission);
-    });
-
-    it('model NET_PLUS_COMMISSION vs DISCOUNT: diferència és el preu col·laborador', () => {
-      const summary = baseSummary();
-      const commissionPct = 15;
-
-      const resultDiscount = computeCollaboratorNetMargin(summary, {
-        commissionPct,
-        pricingModel: 'DISCOUNT',
-      });
-      const resultNet = computeCollaboratorNetMargin(summary, {
-        commissionPct,
-        pricingModel: 'NET_PLUS_COMMISSION',
-      });
-
-      // En DISCOUNT: col·lab rep total - comissió
-      // En NET: col·lab rep total
-      expect(resultDiscount.collaboratorPrice).toBeLessThan(resultNet.collaboratorPrice);
-      expect(resultNet.collaboratorPrice).toBe(summary.total);
-    });
-
-    // --- Edge cases ---
-
-    it('total 0 al summary: marginPctAfterCommission = 0', () => {
-      const summary = baseSummary({ total: 0, netMargin: -65 });
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 15,
-        pricingModel: 'DISCOUNT',
-      });
-
-      expect(result.marginPctAfterCommission).toBe(0);
-    });
-
-    it('comissió 100%: tot el total va com a comissió', () => {
-      const summary = baseSummary();
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 100,
-        pricingModel: 'DISCOUNT',
-      });
-
-      expect(result.commissionAmount).toBe(summary.total);
-      expect(result.collaboratorPrice).toBe(0);
-    });
-
-    it('la comissió s\'arrodoneix a enter (Math.round)', () => {
-      const summary = baseSummary({ total: 1000 });
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 33, // 1000 × 0.33 = 330 exacte
-        pricingModel: 'DISCOUNT',
-      });
-
-      expect(result.commissionAmount).toBe(330);
-      expect(Number.isInteger(result.commissionAmount)).toBe(true);
-    });
-
-    it('comissió amb arrodoniment no trivial: total × pct dona decimals', () => {
-      // 1234 × 0.17 = 209.78 → Math.round → 210
-      const summary = baseSummary({ total: 1234 });
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 17,
-        pricingModel: 'DISCOUNT',
-      });
-
-      expect(result.commissionAmount).toBe(Math.round(1234 * 0.17));
-      expect(result.commissionAmount).toBe(210);
-    });
-
-    it('comissió petita (1%): arrodoniment a l\'enter més proper', () => {
-      // 1500 × 0.01 = 15 exacte
-      const summary = baseSummary({ total: 1500 });
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 1,
-        pricingModel: 'DISCOUNT',
-      });
-
-      expect(result.commissionAmount).toBe(15);
-    });
-
-    // --- Invariants / Consistència ---
-
-    it('consistència: netMarginAfterCommission = netMargin - commissionAmount', () => {
-      const summary = baseSummary();
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 12,
-        pricingModel: 'DISCOUNT',
-      });
-
-      expect(result.netMarginAfterCommission).toBe(
-        summary.netMargin - result.commissionAmount,
-      );
-    });
-
-    it('consistència: marginPctAfterCommission = (netMarginAfterCommission / total) × 100', () => {
-      const summary = baseSummary();
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 15,
-        pricingModel: 'DISCOUNT',
-      });
-
-      const expectedPct = (result.netMarginAfterCommission / summary.total) * 100;
-      expect(result.marginPctAfterCommission).toBeCloseTo(expectedPct, 2);
-    });
-
-    it('consistència: retorna els 4 camps esperats', () => {
-      const summary = baseSummary();
-      const result = computeCollaboratorNetMargin(summary, {
-        commissionPct: 10,
-        pricingModel: 'DISCOUNT',
-      });
-
-      expect(result).toHaveProperty('netMarginAfterCommission');
-      expect(result).toHaveProperty('commissionAmount');
-      expect(result).toHaveProperty('collaboratorPrice');
-      expect(result).toHaveProperty('marginPctAfterCommission');
+      // directCost = fixedOperationalCost 45 + serviceLinesCost 120 = 165
+      expect(simplePct).toBeCloseTo(83.5, 2);
     });
   });
 });
@@ -790,6 +678,15 @@ describe('aggregateServiceLines', () => {
     const r = aggregateServiceLines([{ revenueAmount: 100, costAmount: 40, quantity: 3 }]);
     expect(r.revenue).toBe(300);
     expect(r.cost).toBe(120);
+  });
+
+  it('ignora línies [travel-cost] perquè el transport viu a booking.travelCost', () => {
+    const r = aggregateServiceLines([
+      { revenueAmount: 240, costAmount: 200, collaboratorId: 'masquerade', quantity: 1 },
+      { revenueAmount: 0, costAmount: 75, quantity: 1, notes: '[travel-cost] vehicle · 422.0 km' },
+    ]);
+    expect(r.revenue).toBe(240);
+    expect(r.cost).toBe(200);
   });
 
   it('barreja de línies (pròpia imputada + partner + explícita)', () => {
@@ -842,25 +739,6 @@ describe('classifyBoloLines', () => {
     ]);
     expect(r.hasOwnEquipment).toBe(true);
     expect(r.hasEquipmentRental).toBe(true);
-  });
-});
-
-describe('computeSupportableTravelKm', () => {
-  it('net positiu → km que aguanta el marge fins a net = 0', () => {
-    expect(computeSupportableTravelKm(28, 0.19)).toBe(Math.floor(28 / 0.19)); // 147
-  });
-
-  it('net ≤ 0 → 0 km (ja no guanya)', () => {
-    expect(computeSupportableTravelKm(0, 0.19)).toBe(0);
-    expect(computeSupportableTravelKm(-17, 0.19)).toBe(0);
-  });
-
-  it('cost/km no vàlid → fallback al cost per km per defecte', () => {
-    expect(computeSupportableTravelKm(38, 0)).toBe(Math.floor(38 / 0.19));
-  });
-
-  it('cost/km més alt (benzina cara) → menys km assumibles', () => {
-    expect(computeSupportableTravelKm(28, 0.23)).toBe(Math.floor(28 / 0.23)); // 121
   });
 });
 

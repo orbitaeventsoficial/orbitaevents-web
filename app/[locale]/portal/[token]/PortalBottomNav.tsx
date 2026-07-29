@@ -6,17 +6,20 @@ import {
   CLIENT_PORTAL_NAV_ITEMS,
   type ClientPortalNavKey,
 } from '@/lib/constants/clientPortalNavigation';
+import type { ClientPortalHiddenNavItems } from '@/lib/clientPortalVisibility';
 
 interface Props {
   basePath: string;
   accentHex: string;
   labels: {
+    ariaLabel: string;
     hub: string;
     payments: string;
     timeline: string;
     contract: string;
     gallery: string;
   };
+  hiddenItems?: ClientPortalHiddenNavItems;
 }
 
 function renderIcon(key: ClientPortalNavKey) {
@@ -64,7 +67,7 @@ function renderIcon(key: ClientPortalNavKey) {
   }
 }
 
-export default function PortalBottomNav({ basePath, accentHex, labels }: Props) {
+export default function PortalBottomNav({ basePath, accentHex, labels, hiddenItems }: Props) {
   const pathname = usePathname() ?? '';
 
   function isActive(path: string) {
@@ -74,16 +77,16 @@ export default function PortalBottomNav({ basePath, accentHex, labels }: Props) 
 
   return (
     <nav
-      aria-label="Navegació del portal"
-      className="fixed bottom-0 inset-x-0 z-40"
+      aria-label={labels.ariaLabel}
+      className="fixed bottom-0 inset-x-0 z-40 md:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div
-        className="border-t border-white/[0.08] bg-black/80"
+        className="min-h-[var(--o-portal-bottom-nav-h)] border-t border-white/[0.08] bg-black/80"
         style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
       >
         <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-2">
-          {CLIENT_PORTAL_NAV_ITEMS.map((item) => {
+          {CLIENT_PORTAL_NAV_ITEMS.filter((item) => !hiddenItems?.[item.key]).map((item) => {
             const active = isActive(item.path);
             const labelKey = item.key as keyof typeof labels;
             return (

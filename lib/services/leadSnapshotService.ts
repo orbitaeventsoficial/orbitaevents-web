@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { sendEmail } from '@/lib/email';
+import { sendTrackedStandaloneEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { formatDateTimeFull } from '@/lib/constants';
@@ -51,7 +51,6 @@ interface LeadSnapshotInput {
     reviewSubmittedAt?: Date | string | null;
     postEventReport?: unknown;
     clientSurvey?: unknown;
-    clientFeedback?: unknown;
   } | null;
 }
 
@@ -100,7 +99,6 @@ export function buildLeadTechnicalSnapshot(input: LeadSnapshotInput) {
             reviewSubmittedAt: booking.reviewSubmittedAt ?? null,
             hasPostEventReport: !!booking.postEventReport,
             hasClientSurvey: !!booking.clientSurvey,
-            hasClientFeedback: !!booking.clientFeedback,
           }
         : null,
     },
@@ -143,7 +141,6 @@ export async function processLeadTechnicalSnapshot(input: {
           reviewSubmittedAt: true,
           postEventReport: { select: { id: true } },
           clientSurvey: { select: { id: true } },
-          clientFeedback: { select: { id: true } },
         },
       },
     },
@@ -218,7 +215,8 @@ export async function processLeadTechnicalSnapshot(input: {
   const recipient = input.recipient || (await getRecipientsAsString('leads')) || SITE_CONFIG.business.email;
   const subject = `Instantània tècnica lead ${lead.name} (${lead.id})`;
 
-  await sendEmail({
+  await sendTrackedStandaloneEmail({
+    templateKey: 'lead-technical-snapshot',
     to: recipient,
     subject,
     html: renderLeadTechnicalSnapshotEmail({
@@ -227,6 +225,9 @@ export async function processLeadTechnicalSnapshot(input: {
       snapshotJson,
       escapeHtml,
     }),
+    leadId: lead.id,
+    customerId: lead.customerId ?? null,
+    orbita: { kind: 'lead', id: lead.id, origin: 'lead-technical-snapshot' },
   });
 
   await recordLeadTechnicalSnapshotSent({

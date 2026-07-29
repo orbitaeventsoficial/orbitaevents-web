@@ -3,20 +3,13 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { getAppBaseUrl } from '@/lib/site';
 import { SUPPORTED_LOCALES as SHARED_SUPPORTED_LOCALES } from '@/lib/constants';
+import { CLIENT_PORTAL_ACCESS_EXPIRY_LIMITS } from '@/lib/constants/clientPortalPersonalization';
+import type { PortalPersonalization } from '@/lib/constants/clientPortalPersonalization';
+import type { ClientPortalLocale } from '@/lib/clientPortalMessages';
 
-
-const DEFAULT_EXPIRY_DAYS = 30;
 const portalAccessRepo = prisma.clientPortalAccess;
 
-export type PortalPersonalization = {
-  headline?: string;
-  introMessage?: string;
-  accentColor?: string;
-  showTimeline?: boolean;
-  showPayments?: boolean;
-  showDocuments?: boolean;
-  showPostEvent?: boolean;
-};
+export type { PortalPersonalization };
 
 function hashPortalToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
@@ -26,9 +19,11 @@ function generatePortalToken(): string {
   return randomBytes(32).toString('base64url');
 }
 
-export function normalizePortalLocale(locale: string | null | undefined): string {
-  const normalized = String(locale || 'ca').toLowerCase();
-  return (SHARED_SUPPORTED_LOCALES as readonly string[]).includes(normalized) ? normalized : 'ca';
+export function normalizePortalLocale(locale: string | null | undefined): ClientPortalLocale {
+  const normalized = String(locale || 'ca').trim().toLowerCase();
+  return (SHARED_SUPPORTED_LOCALES as readonly string[]).includes(normalized)
+    ? normalized as ClientPortalLocale
+    : 'ca';
 }
 
 function buildClientPortalUrl(token: string, locale: string): string {
@@ -96,7 +91,13 @@ export async function issueClientPortalAccess(input: {
   const token = generatePortalToken();
   const tokenHash = hashPortalToken(token);
   const normalizedLocale = normalizePortalLocale(input.locale || booking.preferredLocale);
-  const expiresInDays = Math.max(1, Math.min(365, input.expiresInDays || DEFAULT_EXPIRY_DAYS));
+  const expiresInDays = Math.max(
+    CLIENT_PORTAL_ACCESS_EXPIRY_LIMITS.minDays,
+    Math.min(
+      CLIENT_PORTAL_ACCESS_EXPIRY_LIMITS.maxDays,
+      input.expiresInDays ?? CLIENT_PORTAL_ACCESS_EXPIRY_LIMITS.defaultDays,
+    ),
+  );
   const expiresAt = new Date(now.getTime() + expiresInDays * 24 * 60 * 60 * 1000);
 
   const access = await portalAccessRepo.create({
@@ -157,6 +158,7 @@ export async function findPortalAccessByRawToken(token: string) {
           pack: { include: { translations: true } },
           extras: { include: { extra: { include: { translations: true } } } },
           inventory: { include: { item: true } },
+          serviceLines: { select: { kind: true, label: true, revenueAmount: true, costAmount: true, collaboratorId: true, quantity: true, notes: true } },
           proposals: {
             orderBy: { createdAt: 'desc' },
             select: {
@@ -172,7 +174,26 @@ export async function findPortalAccessByRawToken(token: string) {
               contractSignatureBlob: true,
             },
           },
-          postEventReport: true,
+          postEventReport: { select: { id: true } },
+          deliveryNotes: {
+            orderBy: [{ signedAt: 'desc' }, { createdAt: 'desc' }],
+            select: {
+              reference: true,
+              status: true,
+              pdfUrl: true,
+              signedAt: true,
+              createdAt: true,
+            },
+          },
+          invoices: {
+            orderBy: { createdAt: 'desc' },
+            select: {
+              reference: true,
+              status: true,
+              pdfUrl: true,
+              createdAt: true,
+            },
+          },
           customer: true,
           lead: true,
         },

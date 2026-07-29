@@ -10,6 +10,7 @@ import PipelineBoard, { type PipelineCardContext } from '@/app/admin/components/
 import { ADMIN_PIPELINE_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 
 type PipelineBooking = {
   id: string;
@@ -19,7 +20,11 @@ type PipelineBooking = {
   eventDate: string;
   eventType: string;
   total: number;
+  depositAmount: number;
   depositPaid: boolean;
+  remainingAmount: number;
+  remainingPaid: boolean;
+  cashAmount: number | null;
   status: string;
   leadId: string | null;
   marginPct: number | null;
@@ -62,7 +67,11 @@ export default function BookingPipelineView() {
         eventDate: b.eventDate as string,
         eventType: b.eventType as string,
         total: Number(b.total) || 0,
+        depositAmount: Number(b.depositAmount) || 0,
         depositPaid: Boolean(b.depositPaid),
+        remainingAmount: Number(b.remainingAmount) || 0,
+        remainingPaid: Boolean(b.remainingPaid),
+        cashAmount: typeof b.cashAmount === 'number' ? b.cashAmount : null,
         status: b.status as string,
         leadId: (b.leadId as string) || (b.lead as Record<string, unknown>)?.id as string || null,
         marginPct: typeof b.marginPct === 'number' ? b.marginPct : null,
@@ -150,7 +159,7 @@ export default function BookingPipelineView() {
         {columnMetrics.map((col) => {
           const conf = BOOKING_STATUS_CONFIG[col.status];
           return (
-            <div key={col.status} className="rounded-xl border p-2 text-center">
+            <div key={col.status} className="ap-card p-2 text-center">
               <p className={`text-xs uppercase font-medium ${conf?.text || ''}`}>{col.label}</p>
               <p className="text-lg font-bold">{col.count}</p>
               <p className="text-xs">{formatCurrency(col.total)}</p>
@@ -179,7 +188,7 @@ export default function BookingPipelineView() {
                   column?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 }}
                 className={`h-2.5 rounded-full transition-all ${
-                  index === activeColumnIndex ? 'w-6 bg-[var(--admin-accent)]' : 'w-2.5 bk-pipeline-dot--inactive'
+                  index === activeColumnIndex ? 'w-6 bg-[var(--admin-accent)]' : 'w-2.5 bg-[var(--line2)]'
                 }`}
                 aria-label={help.title}
                 aria-pressed={index === activeColumnIndex}
@@ -239,13 +248,22 @@ function BookingCard({
   const canForward = statusIndex < columnCount - 1;
   const canBack = statusIndex > 0;
   const cardHelp = ADMIN_PIPELINE_HELP.booking.card(booking.reference, booking.clientName);
+  const paymentBreakdown = bookingOutstandingBreakdown({
+    total: booking.total,
+    depositAmount: booking.depositAmount,
+    remainingAmount: booking.remainingAmount,
+    depositPaid: booking.depositPaid,
+    remainingPaid: booking.remainingPaid,
+    cashAmount: booking.cashAmount,
+  });
+  const hasPendingDeposit = paymentBreakdown.depositAmount > 0;
 
   return (
     <div
       {...dragHandlers}
       aria-label={`Reserva ${booking.reference} — arrossega per moure`}
       {...helpAttrs(cardHelp)}
-      className={`admin-drag-item rounded-xl border p-3 transition-all hover:brightness-105 ${col.cardTone} ${
+      className={`admin-drag-item ap-card p-3 transition-all hover:brightness-105 ${col.cardTone} ${
         isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
       }`}
     >
@@ -264,7 +282,7 @@ function BookingCard({
                 type="button"
                 onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex - 1].status)}
                 disabled={isUpdating}
-                className="bk-pipeline-shift-btn disabled:opacity-50"
+                className="ap-btn ap-btn--xs"
                 title={help.title}
                 aria-label={help.title}
                 {...helpAttrs(help)}
@@ -280,7 +298,7 @@ function BookingCard({
                 type="button"
                 onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex + 1].status)}
                 disabled={isUpdating}
-                className="bk-pipeline-shift-btn disabled:opacity-50"
+                className="ap-btn ap-btn--xs"
                 title={help.title}
                 aria-label={help.title}
                 {...helpAttrs(help)}
@@ -308,7 +326,7 @@ function BookingCard({
             {booking.marginPct.toFixed(0)}%
           </span>
         )}
-        {!booking.depositPaid && (
+        {hasPendingDeposit && (
           <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-xs font-medium">
             Paga pendent
           </span>

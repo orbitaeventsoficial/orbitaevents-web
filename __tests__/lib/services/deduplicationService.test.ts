@@ -9,6 +9,14 @@ const { mockPrisma } = vi.hoisted(() => ({
       updateMany: vi.fn(),
     },
     lead: { updateMany: vi.fn() },
+    booking: { updateMany: vi.fn() },
+    proposal: { updateMany: vi.fn() },
+    invoice: { updateMany: vi.fn() },
+    task: { updateMany: vi.fn() },
+    clientPortalAccess: { updateMany: vi.fn() },
+    customerContact: { updateMany: vi.fn() },
+    consentRecord: { updateMany: vi.fn() },
+    dataRequest: { updateMany: vi.fn() },
     customerTestimonial: { updateMany: vi.fn() },
     customerDiscountCode: { updateMany: vi.fn() },
     customerActivity: { updateMany: vi.fn(), create: vi.fn() },
@@ -27,7 +35,7 @@ vi.mock('@/lib/services/customerActivityService', () => ({
   recordCustomersMerged: vi.fn(),
 }));
 
-import { findDuplicates, mergeCustomers } from '@/lib/services/deduplicationService';
+import { findDuplicates } from '@/lib/services/deduplicationService';
 import { recordCustomersMerged } from '@/lib/services/customerActivityService';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -49,6 +57,7 @@ function makeCustomer(overrides: Partial<Record<string, unknown>> = {}) {
     totalEvents: 2,
     totalSpent: 3000,
     lastEventDate: new Date('2025-06-01'),
+    referredById: null,
     ...overrides,
   };
 }
@@ -230,93 +239,5 @@ describe('findDuplicates', () => {
         take: 100,
       })
     );
-  });
-});
-
-// ─── mergeCustomers ──────────────────────────────────────────────────────────
-
-describe('mergeCustomers', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('fusiona estadístiques (suma totalEvents i totalSpent)', async () => {
-    const primary = makeCustomer({ id: 'p', totalEvents: 3, totalSpent: 5000 });
-    const dup1 = makeCustomer({ id: 'd1', totalEvents: 2, totalSpent: 2000 });
-
-    mockPrisma.customer.findMany.mockResolvedValue([
-      { ...primary, leads: [], testimonials: [], discountCodes: [] },
-      { ...dup1, leads: [], testimonials: [], discountCodes: [] },
-    ]);
-    mockPrisma.$transaction.mockResolvedValue([]);
-    mockPrisma.customer.findUnique.mockResolvedValue({ ...primary, totalEvents: 5, totalSpent: 7000 });
-
-    const result = await mergeCustomers('p', ['d1']);
-
-    expect(result.mergedCustomer.totalEvents).toBe(5);
-    expect(result.mergedCustomer.totalSpent).toBe(7000);
-    expect(result.deletedIds).toEqual(['d1']);
-  });
-
-  it('llança error si client principal no trobat', async () => {
-    mockPrisma.customer.findMany.mockResolvedValue([
-      makeCustomer({ id: 'd1', leads: [], testimonials: [], discountCodes: [] }),
-    ]);
-
-    await expect(mergeCustomers('p-missing', ['d1'])).rejects.toThrow('principal no trobat');
-  });
-
-  it('fusiona consentiments amb OR', async () => {
-    const primary = makeCustomer({ id: 'p', gdprConsent: false, marketingConsent: false });
-    const dup1 = makeCustomer({ id: 'd1', gdprConsent: true, marketingConsent: true });
-
-    mockPrisma.customer.findMany.mockResolvedValue([
-      { ...primary, leads: [], testimonials: [], discountCodes: [] },
-      { ...dup1, leads: [], testimonials: [], discountCodes: [] },
-    ]);
-    mockPrisma.$transaction.mockResolvedValue([]);
-    mockPrisma.customer.findUnique.mockResolvedValue({ ...primary, gdprConsent: true, marketingConsent: true });
-
-    const result = await mergeCustomers('p', ['d1']);
-    expect(result.fieldsUpdated).toContain('gdprConsent');
-    expect(result.fieldsUpdated).toContain('marketingConsent');
-  });
-
-  it('omple camps buits del primary amb dades dels duplicats', async () => {
-    const primary = makeCustomer({ id: 'p', phone: null, instagram: null });
-    const dup1 = makeCustomer({ id: 'd1', phone: '+34699999999', instagram: '@joan_insta' });
-
-    mockPrisma.customer.findMany.mockResolvedValue([
-      { ...primary, leads: [], testimonials: [], discountCodes: [] },
-      { ...dup1, leads: [], testimonials: [], discountCodes: [] },
-    ]);
-    mockPrisma.$transaction.mockResolvedValue([]);
-    mockPrisma.customer.findUnique.mockResolvedValue({ ...primary, phone: '+34699999999', instagram: '@joan_insta' });
-
-    const result = await mergeCustomers('p', ['d1']);
-    expect(result.fieldsUpdated).toContain('phone');
-    expect(result.fieldsUpdated).toContain('instagram');
-  });
-
-  it('crea activity log CUSTOMERS_MERGED', async () => {
-    const primary = makeCustomer({ id: 'p' });
-    const dup = makeCustomer({ id: 'd1' });
-
-    mockPrisma.customer.findMany.mockResolvedValue([
-      { ...primary, leads: [], testimonials: [], discountCodes: [] },
-      { ...dup, leads: [], testimonials: [], discountCodes: [] },
-    ]);
-    mockPrisma.$transaction.mockResolvedValue([]);
-    mockPrisma.customer.findUnique.mockResolvedValue(primary);
-
-    await mergeCustomers('p', ['d1']);
-
-    expect(recordCustomersMerged).toHaveBeenCalledWith({
-      customerId: 'p',
-      mergedIds: ['d1'],
-      fieldsUpdated: [],
-      totalEventsAfterMerge: 4,
-      totalSpentAfterMerge: 6000,
-    });
   });
 });

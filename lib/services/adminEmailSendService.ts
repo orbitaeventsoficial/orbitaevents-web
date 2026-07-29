@@ -1,31 +1,15 @@
 import { sendEmail } from '@/lib/email';
 import { getEmailSignatureHtml } from '@/lib/services/signatureService';
-import { fetchAttachmentPart } from '@/lib/imap';
+import { fetchAttachmentPart, type OrbitaContext, type OrbitaEntityKind } from '@/lib/imap';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
-import {
-  createQuoteFromLead,
-  generateQuoteHTML,
-  type QuoteData,
-} from '@/lib/services/documentService';
-import { resolveQuotePack } from '@/lib/services/quotes/quotePack';
-import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 import { translateTextForLocale } from '@/lib/services/translationService';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { absoluteUrl, getAppBaseUrl } from '@/lib/site';
 import { recordEmailSend, updateEmailSendResult, wrapLinksForTracking } from '@/lib/services/emailTrackingService';
 import { recordCustomerEmailSent } from '@/lib/services/customerActivityService';
 import { recordLeadEmailSent } from '@/lib/services/leadActivityService';
-import { calcVatAmount, roundMoney } from '@/lib/constants/pricing';
-
-type QuoteAttachmentInput = {
-  packId?: string;
-  price?: number;
-  clientName?: string;
-  eventType?: string;
-  eventLocation?: string;
-};
 
 type ImapAttachmentRef = {
   uid: number;
@@ -42,11 +26,14 @@ type AdminEmailPayload = {
   leadId?: string;
   replyToId?: string;
   customerId?: string;
-  quote?: QuoteAttachmentInput | null;
+  quote?: unknown;
   locale?: string | null;
   templateKey?: string | null;
   imapAttachments?: ImapAttachmentRef[];
+  orbita?: Partial<OrbitaContext>;
 };
+
+const ORBITA_ENTITY_KINDS: OrbitaEntityKind[] = ['lead', 'customer', 'booking', 'dossier', 'proposal', 'admin'];
 
 const APP_BASE_URL = getAppBaseUrl().replace(/\/+$/, '');
 const EMAIL_LOGO_URL = `${APP_BASE_URL}/img/logosoloplaneta.png`;
@@ -80,6 +67,14 @@ function getTemplateTexts(locale: string) {
   if (locale === 'en') return { subtitle: 'Professional DJ services for your event', footer: 'Thank you for your trust. We are here to help.', legal: 'This is an informational message from Òrbita Events.' };
   if (locale === 'es') return { subtitle: 'Servicios profesionales de DJ para tu evento', footer: 'Gracias por tu confianza. Estamos a tu disposición.', legal: 'Este es un mensaje informativo de Òrbita Events.' };
   return { subtitle: 'Serveis professionals de DJ per al teu esdeveniment', footer: 'Gràcies per la teva confiança. Estem a la teva disposició.', legal: "Aquest és un missatge informatiu d'Òrbita Events." };
+}
+
+function normalizeOrbitaContext(value: AdminEmailPayload['orbita']): OrbitaContext | null {
+  const rawKind = String(value?.kind || '').trim();
+  if (!ORBITA_ENTITY_KINDS.includes(rawKind as OrbitaEntityKind)) return null;
+  const id = typeof value?.id === 'string' && value.id.trim() ? value.id.trim() : undefined;
+  const origin = typeof value?.origin === 'string' && value.origin.trim() ? value.origin.trim() : 'admin-compose';
+  return { kind: rawKind as OrbitaEntityKind, id, origin };
 }
 
 function buildBrandedEmailHtml(contentHtml: string, locale: string, logoUrl: string): string {
@@ -123,8 +118,17 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
   const translatedSubject = await translateTextForLocale(String(subject), resolvedLocale);
   const translatedBody = await translateTextForLocale(String(messageBody), resolvedLocale);
   const quoteAttachment = quote && typeof quote === 'object' ? quote : null;
+  if (quoteAttachment) {
+    return {
+      ok: false as const,
+      status: 410,
+      body: {
+        error: 'Adjuntar pressupostos des del redactor antic està desactivat. Envia el pressupost des de Proposal.',
+        canonicalRoute: '/admin/presupuestos',
+      },
+    };
+  }
   const emailCountBefore = resolvedLeadId ? await prisma.leadActivity.count({ where: { leadId: resolvedLeadId, type: 'EMAIL' } }) : 0;
-  const leadForQuote = quoteAttachment && resolvedLeadId ? await prisma.lead.findUnique({ where: { id: resolvedLeadId } }) : null;
   let attachments: { filename: string; content: Buffer | string; contentType: string }[] | undefined;
 
   /* Adjunts reenviats des d'IMAP: baixar cada part i adjuntar-la */
@@ -140,49 +144,6 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
     if (valid.length > 0) attachments = valid;
   }
 
-  if (quoteAttachment) {
-    const qa = quoteAttachment;
-    const packId = String(qa.packId || '').trim().toLowerCase();
-    const price = Number(qa.price || 0);
-    if (!packId || !Number.isFinite(price) || price <= 0) {
-      return { ok: false as const, status: 400, body: { error: 'Per adjuntar pressupost: pack i preu són obligatoris' } };
-    }
-
-    const template = await getQuoteTemplateSettings();
-    const pack = await resolveQuotePack(packId, resolvedLocale);
-    const fallbackVat = calcVatAmount(price, true);
-    const quoteData: QuoteData = leadForQuote
-      ? createQuoteFromLead(leadForQuote, { ...pack, price })
-      : {
-          clientName: String(qa.clientName || to).slice(0, 120),
-          clientEmail: String(to),
-          eventType: String(qa.eventType || 'OTHER'),
-          eventDate: new Date(),
-          eventLocation: String(qa.eventLocation || ''),
-          guestCount: 0,
-          packName: pack.name,
-          packDescription: pack.description,
-          packPrice: price,
-          djHours: pack.djHours,
-          extraHourPrice: pack.extraHourPrice,
-          subtotal: price,
-          iva: fallbackVat,
-          total: roundMoney(price + fallbackVat),
-          quoteNumber: `TMP-${Date.now().toString(36).toUpperCase()}`,
-          validUntil: new Date(Date.now() + template.validityDays * 24 * 60 * 60 * 1000),
-          notes: undefined,
-        };
-    const quoteHtml = generateQuoteHTML(quoteData, {
-      introTitle: template.introTitle,
-      introSubtitle: template.introSubtitle,
-      ctaTitle: template.ctaTitle,
-      ctaSubtitle: template.ctaSubtitle,
-      conditions: template.conditions,
-    });
-    const quoteEntry = { filename: `pressupost-${quoteData.quoteNumber}.html`, content: quoteHtml, contentType: 'text/html; charset=utf-8' };
-    attachments = attachments ? [...attachments, quoteEntry] : [quoteEntry];
-  }
-
   const emailLogoUrl = await getAdminEmailLogoUrl();
   const contentHtml = await bodyToHtml(translatedBody);
   let finalHtml = buildBrandedEmailHtml(contentHtml, resolvedLocale, emailLogoUrl);
@@ -190,11 +151,12 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
   // Vinculació conversa ↔ entitat (sense BD): X-Orbita-* + Message-ID estable.
   // Quan el client respongui, el seu `In-Reply-To` permetrà matchejar
   // l'entitat sense haver de fer cap consulta a la BD.
+  const requestOrbitaCtx = normalizeOrbitaContext(body?.orbita);
   const orbitaCtx = resolvedLeadId
-    ? { kind: 'lead' as const, id: resolvedLeadId, origin: quoteAttachment ? 'admin-compose-quote' : 'admin-compose' }
+    ? { kind: 'lead' as const, id: resolvedLeadId, origin: 'admin-compose' }
     : (customerForLocale?.id
       ? { kind: 'customer' as const, id: customerForLocale.id, origin: 'admin-compose' }
-      : { kind: 'admin' as const, origin: 'admin-compose' });
+      : requestOrbitaCtx || { kind: 'admin' as const, origin: 'admin-compose' });
 
   // Tracking: crear registre amb context Òrbita i injectar pixel d'obertura
   let trackingRecord: { id: string; trackingToken: string } | null = null;
@@ -274,7 +236,7 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
         to,
         subject: translatedSubject,
         channel: 'email',
-        flow: quoteAttachment ? 'admin_compose_with_quote' : 'admin_compose',
+        flow: 'admin_compose',
         hasAttachments: Boolean(attachments),
         locale: resolvedLocale,
         templateKey: templateKey || null,
@@ -285,5 +247,3 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }
-
-

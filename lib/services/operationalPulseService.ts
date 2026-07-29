@@ -9,6 +9,7 @@
 import { prisma } from '@/lib/prisma';
 import { loadPendingFollowUps } from '@/lib/services/responseTrackingService';
 import { loadPipelineSuggestions, type PipelineSuggestion, type SuggestionPriority } from '@/lib/services/leadPipelineSuggestionsService';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -53,6 +54,15 @@ export type PulseInput = {
   customerRetentionRate: number;
   pipelineDrivers?: PulsePipelineDriver[];
   now: Date;
+};
+
+export type PulsePaymentBooking = {
+  total: number | string | { toString(): string };
+  depositAmount: number | string | { toString(): string };
+  remainingAmount?: number | string | { toString(): string } | null;
+  depositPaid: boolean;
+  remainingPaid: boolean;
+  cashAmount?: number | string | { toString(): string } | null;
 };
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -174,6 +184,19 @@ export function generateOperationalPulse(input: PulseInput): OperationalPulse {
   };
 }
 
+export function calculatePaymentCollectionRate(bookings: PulsePaymentBooking[]): number {
+  if (bookings.length === 0) return 100;
+  const settled = bookings.filter((booking) => bookingOutstandingAmount({
+    total: Number(booking.total) || 0,
+    depositAmount: Number(booking.depositAmount) || 0,
+    remainingAmount: booking.remainingAmount == null ? null : Number(booking.remainingAmount) || 0,
+    depositPaid: booking.depositPaid,
+    remainingPaid: booking.remainingPaid,
+    cashAmount: booking.cashAmount == null ? null : Number(booking.cashAmount) || 0,
+  }) <= 0).length;
+  return (settled / bookings.length) * 100;
+}
+
 // ───────────────────────────────────────────────────────────────────────────
 // WRAPPER
 // ───────────────────────────────────────────────────────────────────────────
@@ -194,8 +217,7 @@ export async function loadOperationalPulse(now: Date = new Date()): Promise<Oper
     pipelineSuggestions,
     totalTasks,
     overdueTasks,
-    totalBookings,
-    paidBookings,
+    paymentBookings,
     totalCustomers,
     activeCustomers,
   ] = await Promise.all([
@@ -219,8 +241,17 @@ export async function loadOperationalPulse(now: Date = new Date()): Promise<Oper
     prisma.task.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } } }),
     prisma.task.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] }, dueDate: { lt: todayStart } } }),
     // Payment
-    prisma.booking.count({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: thirtyDaysAgo } } }),
-    prisma.booking.count({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, remainingPaid: true, eventDate: { gte: thirtyDaysAgo } } }),
+    prisma.booking.findMany({
+      where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: thirtyDaysAgo } },
+      select: {
+        total: true,
+        depositAmount: true,
+        remainingAmount: true,
+        depositPaid: true,
+        remainingPaid: true,
+        cashAmount: true,
+      },
+    }),
     // Retention
     prisma.customer.count(),
     prisma.customer.count({ where: { lifecycleStage: { in: ['RETURNING', 'VIP'] } } }),
@@ -257,7 +288,7 @@ export async function loadOperationalPulse(now: Date = new Date()): Promise<Oper
     : 100;
   const pipelineConversionRate = totalPipelineLeads > 0 ? (wonLeads / totalPipelineLeads) * 100 : 0;
   const overdueTasksRate = totalTasks > 0 ? (overdueTasks / totalTasks) * 100 : 0;
-  const paymentCollectionRate = totalBookings > 0 ? (paidBookings / totalBookings) * 100 : 100;
+  const paymentCollectionRate = calculatePaymentCollectionRate(paymentBookings);
   const customerRetentionRate = totalCustomers > 0 ? (activeCustomers / totalCustomers) * 100 : 0;
   const pipelineDrivers: PulsePipelineDriver[] = pipelineSuggestions
     .filter((suggestion): suggestion is PipelineSuggestion & { priority: Exclude<SuggestionPriority, 'INFO'> } => suggestion.priority !== 'INFO')

@@ -27,7 +27,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
   try {
     const body = await request.json();
-    const result = await replaceLeadServiceLines(params.id, Array.isArray(body?.lines) ? body.lines : []);
+    const distanceKm = typeof body?.distanceKm === 'number' ? body.distanceKm : (body?.distanceKm === null ? null : undefined);
+    const tollsEur = typeof body?.tollsEur === 'number' ? body.tollsEur : (body?.tollsEur === null ? null : undefined);
+    const result = await replaceLeadServiceLines(params.id, Array.isArray(body?.lines) ? body.lines : [], distanceKm, tollsEur);
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error desant línies del bolo del lead:', error as Error);

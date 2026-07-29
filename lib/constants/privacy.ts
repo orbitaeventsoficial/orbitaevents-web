@@ -65,6 +65,9 @@ export const PRIVACY_REQUEST_ARTICLES: Record<string, string> = {
   AUTOMATED: '22',
 };
 
+/** Tipus de sol·licitud RGPD que generen un export de dades descarregable (ACCESS/PORTABILITY). */
+export const DOWNLOADABLE_PRIVACY_REQUEST_TYPES = new Set(['ACCESS', 'PORTABILITY']);
+
 export function getPrivacyConsentLabel(consentType: string) {
   return PRIVACY_CONSENT_LABELS[consentType] || consentType;
 }
@@ -80,3 +83,9 @@ export function getPrivacyRequestStatusDisplay(status: string) {
 export function getPrivacyPriorityDisplay(priority: string) {
   return PRIVACY_PRIORITY_CONFIG[priority] || PRIVACY_PRIORITY_CONFIG.MEDIUM;
 }
+
+/**
+ * Versió vigent del consentiment RGPD bàsic (GDPR_BASIC) que es registra quan un
+ * client envia el formulari de contacte. Pujar quan canviï el text legal de privacitat.
+ */
+export const PRIVACY_CONSENT_VERSION = '1.0';

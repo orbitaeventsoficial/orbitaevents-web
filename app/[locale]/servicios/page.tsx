@@ -81,6 +81,7 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
           backup: t('hero.features.backup'),
           guarantee: t('hero.features.guarantee'),
           mostPopular: t('mostPopular'),
+          newBadge: t('newBadge'),
           viewService: t('viewService'),
           ctaTitle: t('cta.title'),
           ctaSubtitle: t('cta.subtitle'),

@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockRequirePermission, mockGetBookingDetail, mockUpdateBooking, mockDeleteBooking, mockDispatchAutoTrigger } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockRequirePermission, mockGetBookingDetail, mockUpdateBooking, mockDeleteBooking, mockDispatchAutoTrigger } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockRequirePermission: vi.fn(),
   mockGetBookingDetail: vi.fn(),
   mockUpdateBooking: vi.fn(),
@@ -28,6 +29,8 @@ vi.mock('@/lib/logger', () => ({
 vi.mock('@/lib/request-context', () => ({
   getRequestId: () => 'test-req-id',
 }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { GET, PATCH, DELETE } from '@/app/api/admin/bookings/[id]/route';
 
@@ -73,7 +76,7 @@ const sampleBooking = {
 describe('GET /api/admin/bookings/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockGetBookingDetail.mockResolvedValue({ status: 200, body: { booking: sampleBooking } });
   });
@@ -133,7 +136,7 @@ describe('GET /api/admin/bookings/[id]', () => {
 describe('PATCH /api/admin/bookings/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockUpdateBooking.mockResolvedValue({
       status: 200,
@@ -168,7 +171,56 @@ describe('PATCH /api/admin/bookings/[id]', () => {
     expect(mockUpdateBooking).toHaveBeenCalledWith('book-1', { status: 'PREPARING' });
   });
 
-  it('dispara auto-trigger quan status és CONFIRMED', async () => {
+  it('trimmeja i propaga camps editables que bookingRouteService ja suporta', async () => {
+    const { req, params } = makePatchRequest('book-1', {
+      clientName: ' Maria Soler ',
+      clientEmail: ' maria@example.com ',
+      clientPhone: ' 600 111 222 ',
+      eventType: 'CORPORATE',
+      eventLocation: ' Girona ',
+      sourceCollaboratorId: ' collab-source ',
+      billedCollaboratorId: null,
+      discount: 25,
+      tollsEur: 12.5,
+      serviceLines: [
+        {
+          collaboratorId: ' partner-1 ',
+          kind: 'PROVIDER_SERVICE',
+          label: ' Animacio partner ',
+          revenueAmount: 300,
+          costAmount: 120,
+          notes: ' Porta facturable ',
+        },
+      ],
+    });
+
+    const res = await PATCH(req, params);
+
+    expect(res.status).toBe(200);
+    expect(mockUpdateBooking).toHaveBeenCalledWith('book-1', {
+      clientName: 'Maria Soler',
+      clientEmail: 'maria@example.com',
+      clientPhone: '600 111 222',
+      eventType: 'CORPORATE',
+      eventLocation: 'Girona',
+      sourceCollaboratorId: 'collab-source',
+      billedCollaboratorId: null,
+      discount: 25,
+      tollsEur: 12.5,
+      serviceLines: [
+        {
+          collaboratorId: 'partner-1',
+          kind: 'PROVIDER_SERVICE',
+          label: 'Animacio partner',
+          revenueAmount: 300,
+          costAmount: 120,
+          notes: 'Porta facturable',
+        },
+      ],
+    });
+  });
+
+  it('delega el status CONFIRMED al servei de reserva', async () => {
     mockUpdateBooking.mockResolvedValueOnce({
       status: 200,
       body: { booking: { ...sampleBooking, status: 'CONFIRMED' } },
@@ -176,15 +228,7 @@ describe('PATCH /api/admin/bookings/[id]', () => {
     });
     const { req, params } = makePatchRequest('book-1', { status: 'CONFIRMED' });
     await PATCH(req, params);
-    expect(mockDispatchAutoTrigger).toHaveBeenCalledWith({
-      type: 'booking.confirmed',
-      bookingId: 'book-1',
-    });
-  });
-
-  it('no dispara auto-trigger per altres status', async () => {
-    const { req, params } = makePatchRequest('book-1', { status: 'PREPARING' });
-    await PATCH(req, params);
+    expect(mockUpdateBooking).toHaveBeenCalledWith('book-1', expect.objectContaining({ status: 'CONFIRMED' }));
     expect(mockDispatchAutoTrigger).not.toHaveBeenCalled();
   });
 
@@ -194,21 +238,60 @@ describe('PATCH /api/admin/bookings/[id]', () => {
     expect(res.status).toBe(400);
   });
 
+  it('rebutja totalPrice negatiu', async () => {
+    const { req, params } = makePatchRequest('book-1', { totalPrice: -100 });
+    const res = await PATCH(req, params);
+    expect(res.status).toBe(400);
+    expect(mockUpdateBooking).not.toHaveBeenCalled();
+  });
+
+  it('rebutja editables obligatoris formats nomes per espais', async () => {
+    const { req, params } = makePatchRequest('book-1', {
+      clientName: '   ',
+      eventLocation: '   ',
+      serviceLines: [{ kind: 'DJ', label: '   ', revenueAmount: 100 }],
+    });
+
+    const res = await PATCH(req, params);
+
+    expect(res.status).toBe(400);
+    expect(mockUpdateBooking).not.toHaveBeenCalled();
+  });
+
   it('rebutja camps desconeguts (strict)', async () => {
     const { req, params } = makePatchRequest('book-1', { unknownField: 'xyz' });
     const res = await PATCH(req, params);
     expect(res.status).toBe(400);
+  });
+
+  it('rebutja línies de col·laborador sense cost real', async () => {
+    const { req, params } = makePatchRequest('book-1', {
+      serviceLines: [
+        {
+          collaboratorId: 'partner-1',
+          kind: 'PROVIDER_SERVICE',
+          label: 'Animació partner',
+          revenueAmount: 240,
+        },
+      ],
+    });
+
+    const res = await PATCH(req, params);
+    expect(res.status).toBe(400);
+    expect(mockUpdateBooking).not.toHaveBeenCalled();
+    const body = await res.json();
+    expect(JSON.stringify(body.details)).toContain('cost real');
   });
 });
 
 describe('DELETE /api/admin/bookings/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockGetBookingDetail.mockResolvedValue({
       status: 200,
-      body: { booking: { id: 'book-1', reference: 'ORB-2026-001', status: 'PENDING', customerId: 'cust-1' } },
+      body: { booking: { id: 'book-1', reference: 'ORB-2026-001', status: 'PENDING', customerId: 'cust-1', eventDate: '2026-06-20' } },
     });
     mockDeleteBooking.mockResolvedValue({ status: 200, body: { ok: true } });
   });

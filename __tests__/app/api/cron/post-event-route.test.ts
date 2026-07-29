@@ -20,6 +20,7 @@ vi.mock('@/lib/services/cronRunStatusService', () => ({
 }));
 
 import { GET } from '@/app/api/cron/post-event/route';
+import { ADMIN_POST_EVENT_CRON_STATUS_PREFIX } from '@/lib/constants/admin';
 
 function makeRequest(token?: string) {
   return new NextRequest('http://localhost/api/cron/post-event', {
@@ -68,7 +69,7 @@ describe('GET /api/cron/post-event', () => {
     expect(body.summary.sent).toBe(2);
     expect(body.results).toHaveLength(2);
     expect(mockSaveCronRunStatus).toHaveBeenCalledWith(
-      expect.objectContaining({ prefix: 'automation.postEvent', status: 'ok' })
+      expect.objectContaining({ prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX, status: 'ok' })
     );
   });
 
@@ -101,7 +102,7 @@ describe('GET /api/cron/post-event', () => {
     const body = await res.json();
     expect(body.error).toBe('Error processant esdeveniments');
     expect(mockSaveCronRunStatus).toHaveBeenCalledWith(
-      expect.objectContaining({ prefix: 'automation.postEvent', status: 'error', message: 'DB crash' })
+      expect.objectContaining({ prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX, status: 'error', message: 'DB crash' })
     );
   });
 });

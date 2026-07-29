@@ -14,7 +14,7 @@ const URGENCY_CHIP: Record<string, string> = {
   CRITICAL: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
   HIGH: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
   MEDIUM: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
-  LOW: 'border-white/20 bg-white/5 text-white/55',
+  LOW: 'border-[var(--line)] bg-[var(--raised)] text-[var(--t3)]',
 };
 
 export default function NBAExplainPanel() {
@@ -36,7 +36,7 @@ export default function NBAExplainPanel() {
   if (loading) {
     return (
       <div className="ap-card p-4 animate-pulse">
-        <div className="mb-3 h-2.5 w-32 rounded bg-white/10" />
+        <div className="mb-3 h-2.5 w-32 rounded bg-[var(--raised)]" />
         <div className="space-y-2">
           <div className="h-3 w-full rounded bg-[var(--o-admin-fill-3)]" />
           <div className="h-3 w-4/5 rounded bg-[var(--o-admin-fill-3)]" />
@@ -54,7 +54,7 @@ export default function NBAExplainPanel() {
         </span>
         <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--gold)]" />
       </div>
-      <p className="text-sm leading-relaxed text-white/85">{data!.explanation}</p>
+      <p className="text-sm leading-relaxed text-[var(--t2)]">{data!.explanation}</p>
       {data!.actions.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {data!.actions.map((action) => (

@@ -26,7 +26,13 @@ interface InsightInput {
   pendingPayments: number;
   revenueThisMonth: number;
   revenueTarget: number;
-  nextEvent: { daysUntil: number; clientName: string; depositPaid: boolean; remainingPaid: boolean } | null;
+  nextEvent: {
+    daysUntil: number;
+    clientName: string;
+    depositPaid: boolean;
+    remainingPaid: boolean;
+    outstandingAmount?: number;
+  } | null;
   inventoryMaintenance: number;
   inventoryBroken: number;
   // Week-over-week comparison
@@ -124,7 +130,11 @@ export function generateDashboardInsights(input: InsightInput, now: Date = new D
 
   // Pròxim event
   if (input.nextEvent) {
-    if (input.nextEvent.daysUntil <= 3 && !input.nextEvent.remainingPaid) {
+    const hasPendingPayment = typeof input.nextEvent.outstandingAmount === 'number'
+      ? input.nextEvent.outstandingAmount > 0
+      : !input.nextEvent.remainingPaid;
+
+    if (input.nextEvent.daysUntil <= 3 && hasPendingPayment) {
       insights.push({
         id: 'next-event-payment',
         icon: '🚨',

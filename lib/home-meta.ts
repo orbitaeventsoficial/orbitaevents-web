@@ -34,19 +34,3 @@ export function getHomeKeywords(locale: PublicLocale = 'ca'): string[] {
   return Array.isArray(keywords) ? keywords : [];
 }
 
-export function getDefaultHomeMeta(locale: PublicLocale = 'es'): Required<Pick<HomeMeta, 'title' | 'description' | 'ogTitle' | 'ogDescription' | 'ogImageAlt'>> & { keywords: string[] } {
-  const meta = getHomeMeta(locale);
-  const fallback = getHomeMeta('ca');
-  const localKeywords = getHomeKeywords(locale);
-  const fallbackKeywords = getHomeKeywords('ca');
-
-  return {
-    title: meta.title || fallback.title || 'Orbita Events',
-    description: meta.description || fallback.description || '',
-    keywords: localKeywords.length > 0 ? localKeywords : fallbackKeywords,
-    ogTitle: meta.ogTitle || meta.title || fallback.ogTitle || fallback.title || 'Orbita Events',
-    ogDescription: meta.ogDescription || meta.description || fallback.ogDescription || fallback.description || '',
-    ogImageAlt: meta.ogImageAlt || fallback.ogImageAlt || 'Orbita Events',
-  };
-}
-

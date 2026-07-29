@@ -40,7 +40,6 @@ import {
   listPortfolioPhotos,
   updateGalleryPhoto,
   deleteGalleryPhoto,
-  getGallerySummary,
   createGalleryShareToken,
   revokeGalleryShareToken,
   getGalleryByShareToken,
@@ -429,56 +428,6 @@ describe('deleteGalleryPhoto', () => {
     expect(result).toBe(true);
     expect(mockDeleteFile).not.toHaveBeenCalled();
     expect(mockPrisma.bookingGalleryPhoto.delete).toHaveBeenCalled();
-  });
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
-// getGallerySummary
-// ═══════════════════════════════════════════════════════════════════════════
-
-describe('getGallerySummary', () => {
-  it('retorna comptadors correctes', async () => {
-    mockPrisma.bookingGalleryPhoto.count
-      .mockResolvedValueOnce(10)   // total
-      .mockResolvedValueOnce(3)    // portfolioCount
-      .mockResolvedValueOnce(7);   // portalCount
-
-    const result = await getGallerySummary('bk-1');
-
-    expect(result).toEqual({
-      total: 10,
-      portfolioCount: 3,
-      portalCount: 7,
-    });
-  });
-
-  it('retorna zeros quan no hi ha fotos', async () => {
-    mockPrisma.bookingGalleryPhoto.count
-      .mockResolvedValueOnce(0)
-      .mockResolvedValueOnce(0)
-      .mockResolvedValueOnce(0);
-
-    const result = await getGallerySummary('bk-1');
-
-    expect(result).toEqual({
-      total: 0,
-      portfolioCount: 0,
-      portalCount: 0,
-    });
-  });
-
-  it('crida count amb els filtres correctes', async () => {
-    mockPrisma.bookingGalleryPhoto.count
-      .mockResolvedValueOnce(5)
-      .mockResolvedValueOnce(2)
-      .mockResolvedValueOnce(4);
-
-    await getGallerySummary('bk-1');
-
-    expect(mockPrisma.bookingGalleryPhoto.count).toHaveBeenCalledTimes(3);
-    expect(mockPrisma.bookingGalleryPhoto.count).toHaveBeenCalledWith({ where: { bookingId: 'bk-1' } });
-    expect(mockPrisma.bookingGalleryPhoto.count).toHaveBeenCalledWith({ where: { bookingId: 'bk-1', isPortfolio: true } });
-    expect(mockPrisma.bookingGalleryPhoto.count).toHaveBeenCalledWith({ where: { bookingId: 'bk-1', isPortal: true } });
   });
 });
 

@@ -1,10 +1,19 @@
+import { PORTAL_TIMELINE_MILESTONE_MESSAGE_KEYS } from '@/lib/constants/clientPortalTimeline';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
+
+export { PORTAL_TIMELINE_MILESTONE_MESSAGE_KEYS };
+
 export type ClientPortalTimelineBooking = {
   createdAt: Date;
   eventDate: Date;
+  total?: number | null;
+  depositAmount?: number | null;
   depositPaid: boolean;
   depositPaidAt: Date | null;
+  remainingAmount?: number | null;
   remainingPaid: boolean;
   remainingPaidAt: Date | null;
+  cashAmount?: number | null;
 };
 
 export type ClientPortalTimelineProposal = {
@@ -14,19 +23,13 @@ export type ClientPortalTimelineProposal = {
 
 export type MilestoneStatus = 'done' | 'upcoming' | 'future';
 
+export type ClientPortalTimelineMilestoneKey =
+  keyof typeof PORTAL_TIMELINE_MILESTONE_MESSAGE_KEYS;
+
 export type ClientPortalTimelineMilestone = {
-  key: string;
+  key: ClientPortalTimelineMilestoneKey;
   status: MilestoneStatus;
   date: Date | null;
-};
-
-export const PORTAL_TIMELINE_MILESTONE_MESSAGE_KEYS: Record<string, string> = {
-  booking_created: 'milestoneBookingCreated',
-  proposal_sent: 'milestoneProposalSent',
-  contract_signed: 'milestoneContractSigned',
-  deposit_paid: 'milestoneDepositPaid',
-  event: 'milestoneEvent',
-  remaining_paid: 'milestoneRemainingPaid',
 };
 
 export function buildClientPortalTimelinePath(locale: string, token: string): string {
@@ -41,14 +44,27 @@ export function getClientPortalTimeline(
   const latestProposal = proposals[0] ?? null;
   const contractSignedAt = latestProposal?.contractSignedAt ?? null;
   const eventPast = booking.eventDate < now;
+  const depositAmount = booking.depositAmount ?? 0;
+  const remainingAmount = booking.remainingAmount ?? Math.max(0, (booking.total ?? 0) - depositAmount);
+  const total = booking.total ?? depositAmount + remainingAmount;
+  const paymentBreakdown = bookingOutstandingBreakdown({
+    total,
+    depositAmount,
+    remainingAmount,
+    depositPaid: booking.depositPaid,
+    remainingPaid: booking.remainingPaid,
+    cashAmount: booking.cashAmount,
+  });
+  const depositSettled = paymentBreakdown.depositAmount <= 0;
+  const remainingSettled = paymentBreakdown.remainingAmount <= 0;
 
-  const raw: Array<{ key: string; done: boolean; date: Date | null }> = [
+  const raw: Array<{ key: ClientPortalTimelineMilestoneKey; done: boolean; date: Date | null }> = [
     { key: 'booking_created', done: true, date: booking.createdAt },
     { key: 'proposal_sent', done: !!latestProposal, date: latestProposal?.createdAt ?? null },
     { key: 'contract_signed', done: !!contractSignedAt, date: contractSignedAt },
-    { key: 'deposit_paid', done: booking.depositPaid, date: booking.depositPaidAt },
+    { key: 'deposit_paid', done: depositSettled, date: booking.depositPaidAt },
     { key: 'event', done: eventPast, date: booking.eventDate },
-    { key: 'remaining_paid', done: booking.remainingPaid, date: booking.remainingPaidAt },
+    { key: 'remaining_paid', done: remainingSettled, date: booking.remainingPaidAt },
   ];
 
   let foundUpcoming = false;

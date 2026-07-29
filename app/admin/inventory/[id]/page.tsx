@@ -17,6 +17,7 @@ import {
 } from '@/lib/inventory-utils';
 import { formatDate, formatNumber, DEFAULT_EXPECTED_LIFE_HOURS, getBookingStatusLabel } from '@/lib/constants';
 import InventoryItemEditor from './InventoryItemEditor';
+import ReplacementSearchButton from './ReplacementSearchButton';
 import InventoryPhotoUpload from './InventoryPhotoUpload';
 
 export const dynamic = 'force-dynamic';
@@ -89,6 +90,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
   const lifeRemaining = calculateLifeRemainingPercent(item.totalHoursUsed, item.expectedLifeHours);
   const expectedLifeHours = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
   const remainingHours = Math.max(0, expectedLifeHours - item.totalHoursUsed);
+  const purchaseSourceIsUrl = item.purchasePriceSource?.startsWith('http://') || item.purchasePriceSource?.startsWith('https://');
 
   return (
     <AdminPage
@@ -99,7 +101,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
 
       {/* KPIs */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Valor Actual</p>
           <p className="mt-2 text-3xl font-bold">
             {item.purchasePrice ? `${formatNumber(currentValue)}€` : `${formatNumber(item.value)}€`}
@@ -110,7 +112,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
             </p>
           )}
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Hores Acumulades</p>
           <p className="mt-2 text-3xl font-bold">
             {formatNumber(item.totalHoursUsed)}h
@@ -119,7 +121,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
             de {formatNumber(item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS)}h vida útil
           </p>
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Cost / Hora</p>
           <p className="mt-2 text-3xl font-bold">
             {item.purchasePrice ? `${formatNumber(costPerHour)}€` : '—'}
@@ -130,7 +132,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
             </p>
           )}
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Vida Restant</p>
           <p className="mt-2 text-3xl font-bold">
             {lifeRemaining}%
@@ -151,13 +153,48 @@ export default async function InventoryItemPage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="rounded-2xl border p-4">
+      <section className="ap-card p-4">
         <h2 className="text-sm font-semibold">Com es calcula l&apos;amortització</h2>
         <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
           <p>Cost/hora = Cost de compra ÷ Vida útil (hores).</p>
           <p>Valor actual = Cost de compra × (% vida restant).</p>
           <p>Hores restants = Vida útil estimada − Hores acumulades.</p>
           <p>Aquest càlcul et dona una referència de cost real d&apos;ús per reserva.</p>
+        </div>
+        {item.purchasePriceSource && (
+          <div className="mt-4 border-t pt-3 text-xs">
+            <p className="font-medium uppercase">Font del preu</p>
+            {purchaseSourceIsUrl ? (
+              <a
+                href={item.purchasePriceSource}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-block underline decoration-[var(--line)]"
+              >
+                {item.purchasePriceSource}
+              </a>
+            ) : (
+              <p className="mt-1">{item.purchasePriceSource}</p>
+            )}
+            {item.purchasePriceSourceCheckedAt && (
+              <p className="mt-1">Comprovat: {formatDate(item.purchasePriceSourceCheckedAt)}</p>
+            )}
+          </div>
+        )}
+        <div className="mt-4 border-t pt-3">
+          <p className="text-xs font-medium uppercase text-[var(--t3)]">Reposició</p>
+          {item.purchaseUrl && (
+            <a
+              href={item.purchaseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ap-btn ap-btn--xs mt-2 mr-2"
+            >
+              Comprar reposició ↗
+            </a>
+          )}
+          <p className="mt-2 mb-2 text-xs text-[var(--t3)]">DJ Mania primer (finançament) + el més barat d&apos;altres botigues.</p>
+          <ReplacementSearchButton itemId={item.id} />
         </div>
       </section>
 
@@ -180,7 +217,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
 
       {/* Packs vinculats */}
       {item.packItems.length > 0 && (
-        <section className="rounded-2xl border admin-card-glass p-6">
+        <section className="ap-card p-6">
           <h2 className="ap-h2 mb-4">Packs vinculats</h2>
           <div className="flex flex-wrap gap-2">
             {item.packItems.map((pi) => {
@@ -191,9 +228,9 @@ export default async function InventoryItemPage({ params }: PageProps) {
                 <Link
                   key={pi.id}
                   href={buildPackHref(pi.pack.id)}
-                  className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors hover:bg-white/5"
+                  className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors hover:bg-[var(--raised)]"
                 >
-                  <span className="font-medium underline decoration-white/20">{packName}</span>
+                  <span className="font-medium underline decoration-[var(--line)]">{packName}</span>
                   <span className="">x{pi.quantity}</span>
                   {pi.isRequired && (
                     <span className="text-xs px-1.5 py-0.5 rounded">obligatori</span>
@@ -206,7 +243,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
       )}
 
       {/* Historial de bolos */}
-      <section className="rounded-2xl border admin-card-glass overflow-hidden">
+      <section className="ap-card overflow-hidden">
         <div className="border-b p-4">
           <h2 className="font-semibold">
             Historial de bolos
@@ -275,7 +312,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
       </section>
 
       {/* Historial d'ús (hores) */}
-      <section className="rounded-2xl border admin-card-glass overflow-hidden">
+      <section className="ap-card overflow-hidden">
         <div className="border-b p-4">
           <h2 className="font-semibold">
             Historial d&apos;ús

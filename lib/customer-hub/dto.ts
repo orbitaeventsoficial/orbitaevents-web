@@ -13,15 +13,21 @@ export type ProposalStatus = 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REJECTE
 export type ProposalDTO = {
   id: string;
   reference: string;
+  customerId?: string | null;
+  leadId?: string | null;
+  bookingId?: string | null;
   status: ProposalStatus;
   total: number;
   createdAt: string;
   sentAt?: string;
   acceptedAt?: string;
+  pdfUrl?: string | null;
+  pdfKey?: string | null;
   snapshot?: Record<string, unknown>;
   // Contract fields
   contractReference?: string | null;
   contractStatus?: string | null;
+  contractPdfUrl?: string | null;
   contractSentAt?: string | null;
   contractSignedAt?: string | null;
 };
@@ -36,7 +42,9 @@ export type BookingDTO = {
   venue?: string;
   distanceKm?: number;
   depositAmount?: number;
+  remainingAmount?: number;
   totalAmount?: number;
+  cashAmount?: number;
   reference?: string;
   eventType?: string;
   packName?: string;
@@ -44,6 +52,41 @@ export type BookingDTO = {
   depositPaid?: boolean;
   remainingPaid?: boolean;
   discountCode?: string;
+  invoices?: Array<{
+    id: string;
+    reference: string;
+    status: string;
+    total: number;
+    pdfUrl?: string | null;
+    holdedInvoiceUrl?: string | null;
+    createdAt: string;
+  }>;
+  deliveryNotes?: Array<{
+    id: string;
+    reference: string;
+    status: string;
+    pdfUrl?: string | null;
+    deliveredAt?: string | null;
+    signedAt?: string | null;
+    createdAt: string;
+  }>;
+  postEventReport?: {
+    id: string;
+    status: string;
+    completedAt?: string | null;
+    createdAt: string;
+    soundQuality?: number | null;
+    maxDancefloor?: number | null;
+    hadIncidents?: boolean;
+  } | null;
+  clientSurvey?: {
+    id: string;
+    submittedAt: string;
+    overallRating: number;
+    npsScore: number;
+    testimonialPermission: string;
+    createdTestimonialId?: string | null;
+  } | null;
 };
 
 export type DiscountCodeDTO = {
@@ -137,6 +180,7 @@ export type TimelineEventDTO = {
   title: string;
   meta?: Record<string, unknown>;
   link?: { label: string; href: string };
+  originLinks?: Array<{ label: string; href: string }>;
 };
 
 export type ActiveDocumentDTO = {
@@ -167,6 +211,7 @@ export type LeadDTO = {
     total: number;
     depositAmount?: number;
     remainingAmount?: number;
+    cashAmount?: number;
     discountCode?: string;
     eventType?: string;
     date?: string;

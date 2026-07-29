@@ -1,8 +1,25 @@
+**MANOLO és l'única capa que toca el producte i la màquina; tot el que ve després va sota Manolo.**
+
+**Sempre, després d'aquesta frase, és obligatori llegir tot el protocol de treball abans de tocar res.**
+
 # Òrbita Events — Protocol de Treball
 
 ## Propòsit
 
 Aquest fitxer és la constitució del repo. Conté normes estables de treball, patrons de codi i la llista de zones protegides.
+
+### 📍 Ordre de lectura canònic (per a qualsevol que entri, humà o IA)
+
+El projecte té UNA jerarquia de lectura, no 39 documents solts. Es llegeix en aquest ordre:
+
+1. **`docs/DIAGNOSTIC-I-FULL-DE-RUTA.md`** ← **LLEGEIX-HO PRIMER.** L'auditoria d'Opus de
+   l'organisme: què és, la mida real, el diagnòstic honest i el full de ruta en 5 fases.
+   Conté el **mapa de documents** (què és viu vs vell). És la «llicència per operar».
+2. **Aquest `CLAUDE.md`** ← la LLEI: normes innegociables, patrons, zones protegides.
+3. **`docs/admin-protocol.md`** ← el MANUAL OPERATIU del dia a dia (§6 backlog, §9 història).
+
+La resta de `docs/**` són **referència** (es consulten quan toca) o **arxiu** (feina ja
+tancada). El mapa complet, classificat viu/vell, viu al §8 del DIAGNÒSTIC.
 
 Per estat funcional i peces consolidades:
 - `docs/protocol-executiu.md` → resum operatiu curt (qui decideix què, com s'auditen òrgans i què vol dir fet)
@@ -49,6 +66,28 @@ Cada canvi, per petit que sigui, ha de complir TOT això abans de considerar-se 
 - Reportar l'estat final quan no quedi cap ítem pendent, no en cada canvi.
 - **Pressupost/tokens (ordre del propietari 2026-06-08)**: treballar a tope SENSE preguntar ni avisar mai pel pressupost o els tokens. Prohibit oferir parar per estalviar tokens o condicionar la feina al pressupost. Si s'esgoten els tokens és problema del propietari. Acció directa sempre. Veure `budgetPolicy` a `docs/agent-runtime-policy.json`.
 
+## Manolo — clau única del producte i de la màquina
+
+**Ordre del propietari 2026-07-10.** Manolo és l'única capa autoritzada a tocar
+el producte i la màquina.
+
+Manolo no és un agent concret ni un prompt decoratiu. Manolo és el sistema
+complet de lectura, criteri, registre i execució definit a `docs/MANOLO.md`:
+protocol viu, atles, fitxes, auditories, fulls de ruta, captures, dades,
+costura i criteri humà. Sense aquest sistema carregat, ningú toca el repo.
+
+Conseqüències vinculants:
+
+- Cap IA, agent o humà toca codi, docs, schema, scripts, dades operatives o
+  superfícies de producte fora del règim Manolo.
+- Claude, Codex o qualsevol eina no són autoritat pròpia: només executen Manolo.
+- Tocar vol dir canviar qualsevol peça que afecti el producte, la màquina,
+  l'admin, la web, els documents, la BD, els scripts, els tests o el protocol.
+- Manolo conserva registre de tot el que es fa via `docs/admin-protocol.md`,
+  `docs/admin-diary.md`, `docs/agent-sync.md`, captures i evidència de validació.
+- Si una intervenció no pot explicar quina part de Manolo està activant, s'atura
+  abans de tocar res.
+
 ## Flux obligatori abans de tocar res
 
 1. Llegir `CLAUDE.md`.
@@ -57,7 +96,8 @@ Cada canvi, per petit que sigui, ha de complir TOT això abans de considerar-se 
 4. Si la tasca és d'admin o toca una zona ja consolidada, llegir `docs/estat-admin.md`.
 5. Si la tasca és d'admin o toca una zona consolidada, llegir també `docs/admin-protocol.md`, el tram rellevant del `§6` i el final del `§9` abans de començar.
 6. Si la tasca és d'admin, llegir `docs/protocol-executiu.md` com a resum operatiu abans de decidir el tall.
-7. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
+7. Llegir `docs/MANOLO.md` quan la tasca toqui producte, admin, màquina, E2E, costura, UX, dades o full de ruta.
+8. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
 
 **Cap IA ni agent (Claude, Codex o qualsevol altre) pot començar feina real al repo sense haver fet aquesta lectura mínima.** No és opcional ni es pot saltar "perquè el canvi és petit". Una IA que comenci a editar sense haver llegit i confirmat aquest flux està incomplint el protocol i la seva passada s'ha de revertir.
 
@@ -90,7 +130,7 @@ Exemples: estats, labels, nav meta, ordres, llindars, presets, FAQs, cards, pack
 
 ### 3. És estil reutilitzable o token visual?
 Exemples: colors, superfícies, gradients, animacions compartides, layout chrome, classes reutilitzables.
-- Sí → `app/globals.css`, `app/admin/admin-theme.css`, `app/admin/control-room.css`
+- Sí → `app/globals.css`, `app/admin/admin-theme.css`, `app/admin/admin-shell.css`
 - No → continuar
 
 ### 4. És wiring o presentació exclusivament local del component?
@@ -102,6 +142,21 @@ Exemples: estat React, refs, handlers, càlcul temporal de UI, composició local
 Exemples: coordenades calculades, amplades dinàmiques, transform puntual.
 - Sí → inline és acceptable
 - No → ha d'anar a la capa comuna adequada
+
+## Un sol cervell, moltes pàgines (norma vinculant, propietari 2026-07-02)
+
+**Principi constitucional del repo.** Tota lògica de domini —sobretot els diners (transport, cost, marge, pasta, repartiment, tresoreria)— viu en UN sol **cervell** i les **pàgines només hi criden**.
+
+- **Cervell = capa de serveis** (`lib/services/*`): funcions pures, font ÚNICA de veritat de cada càlcul. El cervell és **sagrat**: la seva responsabilitat no es duplica ni es reparteix.
+- **Pàgines/vistes = crides** (`app/**`): poden crear-se, modificar-se o eliminar-se lliurement, però **NO calculen res de domini**. Demanen el número al cervell i el mostren.
+- **Un càlcul = una funció.** Si el mateix número (un càrrec, un marge, un headcount, una pasta) es calcula a més d'una pàgina, és un BUG d'arquitectura que s'ha de consolidar. La regla de tres del propietari: *«un sol cervell, moltes pàgines»*.
+- **Els diners són el domini d'Economia.** Tot el que és pasta viu al cervell econòmic (`costEngine`, `travelLaborCost`, `repartimentService`, `collaboratorPayoutService`…); `/admin/economia` n'és la vista-hub, però lead, reserva, portal i PDFs també hi **criden** — mai reinventen el càlcul.
+- **Cervells de diners consolidats (font única — no en facis de paral·lels):**
+  - Transport al client i cost de ruta → `computeBoloTransport` (`lib/services/travelLaborCost.ts`). El marge del transport es decideix a UNA constant (`CLIENT_TRAVEL_MARGIN`). Headcount → `deriveTravelHeadcount`. Prohibit `calculateTravelCharge` (fórmula de trams, retirada).
+  - Marge/cost del bolo → `computeBookingFinancialSummary` (`costEngine.ts`).
+  - Qui cobra què → `computeBoloRepartiment` (`repartimentService.ts`).
+  - Pasta d'un col·laborador → `loadCollaboratorPayout` (`collaboratorPayoutService.ts`).
+- **Com afegir una pàgina que mostra diners:** importa la funció del cervell, crida-la, mostra el resultat. Zero `reduce`/fórmules/ratios propis sobre imports. Si el cervell no exposa el que necessites, **s'amplia el cervell**, després la pàgina hi crida.
 
 ## Hardcode i monocapa
 
@@ -131,6 +186,7 @@ Exemples: coordenades calculades, amplades dinàmiques, transform puntual.
 5. **Tipografia de token.** Mides via `--o-text-*` (o `text-xs`+, que admin força ≥12px). Prohibit `text-[Npx]` i `font-black` als números (usar `font-bold`/`--display`).
 6. **Radi únic.** Totes les cards tenen el MATEIX radi (`--o-r-md`). Normalitzat a una capa: `html.admin-mode [class*="rounded-xl|2xl|3xl"]` → `--o-r-md` (admin-shell.css). No barrejar radis de card.
 7. **Responsiu amb la mateixa importància que el canon.** Tot component admin nou/modificat ha de funcionar a 375px (mòbil), tablet i desktop. Verificar amb captura als 3 breakpoints abans de tancar.
+8. **Controls ≠ diners · zero debug com a UI (norma vinculant, propietari 2026-07-03).** Una peça d'admin NO barreja controls d'edició crus (inputs/selects) amb outputs financers al mateix nivell sense jerarquia (l'anti-patró de la «taula d'enginyer»). Els controls s'AGRUPEN per intenció amb una etiqueta de grup (`--mono` daurada, p. ex. «Ruta» / «Equip»); el resultat de diner viu en la seva pròpia zona destacada. **El text tècnic de debug MAI és interfície:** res de `«es cobren 0 h de 0,56 h · cotxe: X · condueix: Y»` — es converteix en llenguatge humà (`«Ruta curta: dins la 1a hora inclosa»`) o s'elimina. Els detalls secundaris (repartiment, desglossaments) van plegats (`<details>`), no en panells sempre-oberts desproporcionats. Referència: el bloc «Desplaçament» de la fitxa de lead (#1377).
 
 ### Referència i prevenció
 - **Òrgan de referència NET:** la fitxa de lead (`app/admin/leads/[id]`, cas «Cristina») i el calendari. Tota pàgina nova ha de semblar germana d'aquestes.
@@ -252,6 +308,7 @@ Formularis validats          → client + servidor
 - **ServiceSlug**: `'fiestas' | 'bodas' | 'discomovil' | 'empresas'` — sense produccion ni alquiler.
 - **Semàfor pagament**: `depositPaid && remainingPaid` = verd, `depositPaid` = groc, cap = vermell.
 - **Client hub**: `fetchCustomerHub()` és la font única per a tota la fitxa client.
+- **Herència de context**: qualsevol peça comercial ha de poder tornar a la cadena `Customer → Lead → Dossier/Proposal/Quote → Booking → Invoice/Contract/Documents → Post-event`. `resolveCustomerHubCustomerId()` és el resolutor canònic per entrar al Customer Hub des de client, lead, reserva, proposta, dossier, factura, tasques, activitats o documents quan la dada existeix.
 
 ### Emails
 
@@ -286,6 +343,12 @@ Quan el propietari demani un canvi visual significant, consultar via `Agent(mode
 
 **Tokens de referència (#874+#875):** canvas `#111116`, T3 `#9a9286`, `--o-lh-*`, `--o-row-h`, `--ax-action`.
 
+### Manolo — mirada comercial digital
+
+Quan el propietari invoqui `Manolo`, l'agent aplica la mirada definida a `docs/admin-protocol.md` §0.1.2: Expert/a en Experiència Comercial Digital, fred, tallant i àcid amb la peça, sense diplomàcia amb el que no ven, no transmet confiança, no sembla premium o no es pot operar. Manolo combina UX/UI, CRO, marca, service design, negoci d'esdeveniments, revenue, arquitectura d'informació, copy comercial, direcció visual i growth. La sortida mínima és veredicte, problema real, tres millores, tall recomanat i risc de no fer-ho. Quan Manolo s'activa en un front o sessió, continua governant tota la passada fins que el propietari l'aturi o canviï explícitament de criteri.
+
+Límit vinculant: Manolo no autoritza schema, Manolo no autoritza migracions i Manolo no autoritza endpoints/API/BD. Si una recomanació Manolo requereix qualsevol d'aquests perímetres, cal autorització explícita del propietari escrita al Canvi #N abans de tocar-ho. Sense aquesta línia, Manolo només pot canviar diagnòstic, jerarquia, copy, UI i criteri de producte dins el workflow normal.
+
 ## CSS architecture admin
 
 ### Regla canònica de sistema visual (2026-05-26)
@@ -300,8 +363,7 @@ Quan el propietari demani un canvi visual significant, consultar via `Agent(mode
 
 - `../studio/orbita-tokens.css` — font canònica de tokens visuals compartits entre Studio i admin
 - `admin-shell.css` — shell admin, navegació, error boundary i aliases `.ax-*` consumint tokens de Studio
-- `admin-theme.css` — compatibilitat legacy (`--at-*`), glass i semantic tones mentre dura la migració
-- `control-room.css` — dashboard específic amb tokens `--at-cr-*`
+- `admin-theme.css` — compatibilitat legacy (`--at-*`), glass, semantic tones i tokens del Control Room (`--at-cr-*`) mentre dura la migració
 
 ### Regles de cascada
 

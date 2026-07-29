@@ -62,6 +62,10 @@ const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hora
 let cachedForecasts: WeatherForecast[] | null = null;
 let cachedAt = 0;
 
+function shouldSkipExternalWeather(): boolean {
+  return process.env.NODE_ENV !== 'production' && process.env.ADMIN_DEV_EXTERNAL_WEATHER !== '1';
+}
+
 function isCacheValid(): boolean {
   return cachedForecasts !== null && Date.now() - cachedAt < CACHE_TTL_MS;
 }
@@ -202,6 +206,8 @@ export async function getWeatherForEvent(
   location: string,
   eventDate: Date,
 ): Promise<EventWeather | null> {
+  if (shouldSkipExternalWeather()) return null;
+
   const apiKey = process.env.OPENWEATHERMAP_API_KEY;
   if (!apiKey) return null;
 
@@ -300,6 +306,10 @@ export async function getWeatherForEvent(
 // ─── Funció principal ───────────────────────────────────────────────
 
 export async function getEventWeatherForecast(): Promise<WeatherForecast[]> {
+  if (shouldSkipExternalWeather()) {
+    return [];
+  }
+
   // Retornar buit si no hi ha API key
   const apiKey = process.env.OPENWEATHERMAP_API_KEY;
   if (!apiKey) {

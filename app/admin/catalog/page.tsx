@@ -1,6 +1,5 @@
 ﻿import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { prisma } from '@/lib/prisma';
@@ -48,23 +47,23 @@ function resolveHealthTone(marginPct: number, targetMarginPct: number): {
     return {
       tone: 'green',
       label: 'Sa',
-      badgeClass: '',
-      dotClass: '',
+      badgeClass: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+      dotClass: 'admin-tone-bg-success',
     };
   }
   if (marginPct >= warnMargin) {
     return {
       tone: 'amber',
       label: 'Vigilar',
-      badgeClass: '',
-      dotClass: '',
+      badgeClass: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+      dotClass: 'admin-tone-bg-warning',
     };
   }
   return {
     tone: 'red',
     label: 'Crític',
-    badgeClass: '',
-    dotClass: '',
+    badgeClass: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
+    dotClass: 'admin-tone-bg-danger',
   };
 }
 
@@ -174,7 +173,6 @@ export default async function CatalogPage({
 
   const packsWithoutInventory = sortedRows.filter((row) => row.inventory.length === 0).length;
   const highDivergenceCount = sortedRows.filter((row) => Math.abs(row.divergencePct) >= 20).length;
-  const topCriticalPack = sortedRows.find((row) => row.semaforo.tone === 'red');
 
   const stripSystemItems: string[] = [];
   if (sortedRows.length > 0) {
@@ -228,97 +226,17 @@ export default async function CatalogPage({
         ? 'info'
         : 'success';
 
-  const stripNextStep = !pricingConfig
-    ? {
-        eyebrow: 'Següent pas · Configuració',
-        title: 'Configurar model de preus',
-        detail:
-          'Sense `getPackPricingModelConfig` no es pot avaluar salut de packs. Configura el model abans de continuar amb catàleg.',
-        href: '/admin/pricing',
-        ctaLabel: 'Obrir preus',
-      }
-    : sortedRows.length === 0
-      ? {
-          eyebrow: 'Següent pas · Primer pack',
-          title: 'Crear el primer pack actiu',
-          detail:
-            'El catàleg no té cap pack actiu. Crea el primer per poder oferir packs al web i començar a rebre reserves.',
-          href: '/admin/packs/new',
-          ctaLabel: 'Crear pack',
-        }
-      : redCount > 0
-        ? {
-            eyebrow: 'Següent pas · Crític',
-            title: `Resol ${redCount} ${pluralize(redCount, 'pack crític', 'packs crítics')}`,
-            detail: topCriticalPack
-              ? `"${topCriticalPack.name}" té ${formatPct(topCriticalPack.marginPct)} marge (objectiu ${formatPct(targetMarginPct)}). Puja preu o redueix costos abans de vendre'l més.`
-              : 'Hi ha packs amb marge sota llindar crític. Puja preu o redueix costos abans de vendre més.',
-            href: '/admin/packs?focus=critical-margin',
-            ctaLabel: 'Obrir packs crítics',
-            secondaryAction: { href: '/admin/pricing', label: 'Gestor de preus' },
-          }
-        : packsWithoutInventory > 0
-          ? {
-              eyebrow: 'Següent pas · Inventari',
-              title: `${packsWithoutInventory} ${pluralize(packsWithoutInventory, 'pack', 'packs')} sense components`,
-              detail:
-                'Sense inventari associat, el cost directe no inclou equipament real. Vincula elements d\'inventari per obtenir salut de preu fiable.',
-              href: '/admin/packs?focus=without-inventory',
-              ctaLabel: 'Obrir packs sense inventari',
-            }
-          : avgMargin < targetMarginPct
-            ? {
-                eyebrow: 'Següent pas · Marge',
-                title: 'Marge mitjà per sota d\'objectiu',
-                detail: `El marge mitjà és ${formatPct(avgMargin)} quan l'objectiu és ${formatPct(targetMarginPct)}. Revisa el gestor de preus per acostar-te al target.`,
-                href: '/admin/pricing',
-                ctaLabel: 'Obrir gestor de preus',
-              }
-            : {
-                eyebrow: 'Següent pas',
-                title: 'Catàleg saludable',
-                detail: `${greenCount} packs sans · marge mitjà ${formatPct(avgMargin)}. Aprofita per crear un pack nou o revisar rendibilitat.`,
-                href: '/admin/packs/new',
-                ctaLabel: 'Crear pack nou',
-                secondaryAction: { href: '/admin/economia', label: 'Revisar rendibilitat' },
-              };
 
   return (
     <AdminPage
       title="Catàleg"
       subtitle="Punt únic per operar packs, extres, inventari i regles de preu."
       alert={pricingAlerts > 0 ? (
-        <p className="inline-flex rounded-full border px-3 py-1 text-xs font-semibold">
+        <p className="ap-badge ap-badge--warning">
           ⚠ {pricingAlerts} alertes de divergència de preu en packs
         </p>
       ) : undefined}
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic · Catàleg',
-          title:
-            sortedRows.length === 0
-              ? 'Sense packs actius'
-              : redCount > 0
-                ? 'Salut del catàleg amb risc'
-                : 'Salut del catàleg',
-          tone: stripSystemTone,
-          items: stripSystemItems,
-          emptyText: 'Sense packs al catàleg.',
-        }}
-        manual={{
-          eyebrow: 'Manual · Backlog',
-          title:
-            stripManualItems.length === 0
-              ? 'Cap senyal manual'
-              : `${stripManualItems.length} ${pluralize(stripManualItems.length, 'senyal per revisar', 'senyals per revisar')}`,
-          tone: stripManualTone,
-          items: stripManualItems,
-          emptyText: 'Cap pack crític, sense inventari ni amb desviació alta.',
-        }}
-        nextStep={stripNextStep}
-      />
-
       <nav className="flex flex-wrap gap-2">
         {(Object.keys(CATALOG_TAB_META) as CatalogTab[]).map((tab) => {
           const isActive = tab === activeTab;
@@ -326,10 +244,10 @@ export default async function CatalogPage({
             <Link
               key={tab}
               href={`/admin/catalog?tab=${tab}`}
-              className={`admin-catalog-tab rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              className={`ap-tab rounded-full border px-4 py-2 text-sm font-semibold transition ${
                 isActive
-                  ? 'admin-catalog-tab--active'
-                  : 'admin-catalog-tab--idle'
+                  ? 'ap-tab--active'
+                  : 'ap-tab--idle'
               }`}
             >
               {CATALOG_TAB_META[tab].label}
@@ -347,13 +265,13 @@ export default async function CatalogPage({
             <>
               <Link
                 href="/admin/packs"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Obrir gestió de packs
               </Link>
               <Link
                 href="/admin/packs/new"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Crear pack nou
               </Link>
@@ -363,7 +281,7 @@ export default async function CatalogPage({
                     <Link
                       key={pack.id}
                       href={buildPackHref(pack.id)}
-                      className="rounded-xl border px-4 py-3 text-sm"
+                      className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -403,13 +321,13 @@ export default async function CatalogPage({
             <>
               <Link
                 href="/admin/packs/extras"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Obrir catàleg d&apos;extres
               </Link>
               <Link
                 href="/admin/pricing"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Revisar vendes d&apos;extres
               </Link>
@@ -419,13 +337,13 @@ export default async function CatalogPage({
             <>
               <Link
                 href="/admin/inventory"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Obrir inventari complet
               </Link>
               <Link
                 href="/admin/inventory/new"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Afegir element nou
               </Link>
@@ -434,22 +352,22 @@ export default async function CatalogPage({
           {activeTab === 'pricing' && (
             <>
               <div className="sm:col-span-2 mt-1 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <article className="rounded-xl border px-4 py-3">
+                <article className="ap-card px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide">Sa</p>
                   <p className="mt-1 text-2xl font-bold">{greenCount}</p>
                   <p className="text-xs">Marge &gt;= objectiu ({formatPct(targetMarginPct)})</p>
                 </article>
-                <article className="rounded-xl border px-4 py-3">
+                <article className="ap-card px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide">Vigilar</p>
                   <p className="mt-1 text-2xl font-bold">{amberCount}</p>
                   <p className="text-xs">Marge proper al límit</p>
                 </article>
-                <article className="rounded-xl border px-4 py-3">
+                <article className="ap-card px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide">Crític</p>
                   <p className="mt-1 text-2xl font-bold">{redCount}</p>
                   <p className="text-xs">Requereix pujar preu o baixar cost</p>
                 </article>
-                <article className="rounded-xl border px-4 py-3">
+                <article className="ap-card px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide">Marge mitjà</p>
                   <p className="mt-1 text-2xl font-bold">{formatPct(avgMargin)}</p>
                   <p className="text-xs">Objectiu global: {formatPct(targetMarginPct)}</p>
@@ -457,13 +375,13 @@ export default async function CatalogPage({
               </div>
               <Link
                 href="/admin/pricing"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Obrir gestor de preus
               </Link>
               <Link
                 href="/admin/economia"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Revisar rendibilitat
               </Link>
@@ -513,7 +431,7 @@ export default async function CatalogPage({
                           <td className="px-3 py-2 text-right">{formatPct(row.marginPct)}</td>
                           <td className="px-3 py-2 text-right">{formatPct(row.costRatioPct)}</td>
                           <td className="px-3 py-2 text-right">{formatCurrency(row.recommendedPrice)}</td>
-                          <td className={`px-3 py-2 text-right font-semibold ${Math.abs(row.divergencePct) >= 20 ? 'admin-tone-text-warning' : 'text-white/70'}`}>
+                          <td className={`px-3 py-2 text-right font-semibold ${Math.abs(row.divergencePct) >= 20 ? 'admin-tone-text-warning' : 'text-[var(--t2)]'}`}>
                             {formatPct(row.divergencePct)}
                           </td>
                           <td className="px-3 py-2 text-xs">
@@ -534,4 +452,3 @@ export default async function CatalogPage({
     </AdminPage>
   );
 }
-

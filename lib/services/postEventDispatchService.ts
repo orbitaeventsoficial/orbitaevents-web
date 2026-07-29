@@ -12,7 +12,15 @@ import {
 } from '@/lib/services/postEventEmailService';
 import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
 import { recordCustomerPostEventEmailSent } from '@/lib/services/customerActivityService';
-import { recordEmailSend } from '@/lib/services/emailTrackingService';
+import {
+  recordEmailSend,
+  updateEmailSendResult,
+  wrapLinksForTracking,
+} from '@/lib/services/emailTrackingService';
+import { getBookingQuestionnaire } from '@/lib/services/questionnaireService';
+import { issueClientPortalAccess } from '@/lib/services/clientPortalAccess';
+import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
+import { buildPendingPostEventEmailBookingWhere } from '@/lib/services/postEventPendingService';
 
 export type PostEventDispatchResult = {
   bookingId: string;
@@ -24,17 +32,18 @@ export type PostEventDispatchResult = {
 };
 
 export async function listPendingPostEventBookings(now = new Date()) {
-  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-  const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
-
   return prisma.booking.findMany({
-    where: {
-      status: 'COMPLETED',
-      eventDate: { gte: twoDaysAgo, lte: oneDayAgo },
-      postEventEmailSent: false,
+    where: buildPendingPostEventEmailBookingWhere(now),
+    select: {
+      id: true,
+      reference: true,
+      clientName: true,
+      clientEmail: true,
+      eventDate: true,
+      pack: { select: { translations: true } },
     },
-    select: { id: true, clientName: true, clientEmail: true },
-    take: 50,
+    orderBy: { eventDate: 'desc' },
+    take: POST_EVENT_WORKFLOW.pendingTake,
   });
 }
 
@@ -42,6 +51,30 @@ function buildReviewToken(bookingId: string, randomize: boolean) {
   return randomize
     ? crypto.randomBytes(32).toString('base64url')
     : Buffer.from(`${bookingId}:${Date.now()}`).toString('base64url');
+}
+
+export function buildPostEventReviewUrl(params: {
+  baseUrl: string;
+  locale: string;
+  reviewToken: string;
+  bookingReference: string;
+}) {
+  const url = new URL(`/${params.locale}/valoracio`, params.baseUrl);
+  url.searchParams.set('token', params.reviewToken);
+  url.searchParams.set('ref', params.bookingReference);
+  return url.toString();
+}
+
+const POST_EVENT_EMAIL_TEMPLATE_KEY = 'post-event';
+const POST_EVENT_ORBITA_ORIGIN = 'post-event-dispatch';
+
+function buildTrackedPostEventEmailHtml(html: string, trackingToken: string, baseUrl: string): string {
+  const trackedHtml = wrapLinksForTracking(html, trackingToken, baseUrl);
+  const pixel = `<img src="${baseUrl}/api/tracking/open/${trackingToken}" width="1" height="1" alt="" style="display:none" />`;
+  if (/<\/body>/i.test(trackedHtml)) {
+    return trackedHtml.replace(/<\/body>/i, `${pixel}</body>`);
+  }
+  return `${trackedHtml}${pixel}`;
 }
 
 export async function sendPostEventEmailForBooking(
@@ -98,30 +131,76 @@ export async function sendPostEventEmailForBooking(
   }
 
   const reviewToken = buildReviewToken(booking.id, options?.randomizeToken !== false);
-  const baseUrl = getAppBaseUrl();
-  const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
+  const baseUrl = getAppBaseUrl().replace(/\/+$/, '');
+  const reviewUrl = buildPostEventReviewUrl({
+    baseUrl,
+    locale,
+    reviewToken,
+    bookingReference: booking.reference,
+  });
   const packName = resolvePackName(booking.pack?.translations, locale);
+
+  // Enquesta de satisfacció: si hi ha una plantilla activa i encara no s'ha
+  // respost, generem l'accés al portal del client i incloem l'enllaç a l'email.
+  let questionnaireUrl: string | undefined;
+  try {
+    const questionnaire = await getBookingQuestionnaire(booking.id);
+    if (questionnaire && !questionnaire.response) {
+      const portal = await issueClientPortalAccess({
+        bookingId: booking.id,
+        locale,
+        createdBy: 'post-event-dispatch',
+      });
+      questionnaireUrl = portal.url;
+    }
+  } catch (error) {
+    // No bloquejar l'enviament del post-event si l'enquesta falla.
+    console.error('[postEventDispatch] No s\'ha pogut preparar l\'enquesta', error);
+  }
 
   const emailHtml = generatePostEventEmail({
     name,
     packName,
     eventDate: booking.eventDate,
     reviewUrl,
+    questionnaireUrl,
     googleReviewUrl: SITE_CONFIG.reviews.googleReviewUrl,
     locale,
   });
 
   const subject = getPostEventSubject(locale, name);
-  await sendEmail({ to: email, subject, html: emailHtml });
-
-  await recordEmailSend({
+  const orbita = booking.lead?.id
+    ? { kind: 'lead' as const, id: booking.lead.id, origin: POST_EVENT_ORBITA_ORIGIN }
+    : { kind: 'booking' as const, id: booking.id, origin: POST_EVENT_ORBITA_ORIGIN };
+  const trackingRecord = await recordEmailSend({
     to: email,
     subject,
-    templateKey: 'post-event',
+    templateKey: POST_EVENT_EMAIL_TEMPLATE_KEY,
     leadId: booking.lead?.id ?? null,
     customerId: booking.lead?.customerId ?? null,
     locale,
-  }).catch(() => { /* no bloquejar si falla el tracking */ });
+    htmlBody: emailHtml,
+    orbitaKind: orbita.kind,
+    orbitaId: orbita.id,
+    orbitaOrigin: orbita.origin,
+  });
+  const sendResult = await sendEmail({
+    to: email,
+    subject,
+    html: buildTrackedPostEventEmailHtml(emailHtml, trackingRecord.trackingToken, baseUrl),
+    orbita,
+  });
+
+  await updateEmailSendResult(trackingRecord.id, {
+    smtpAccepted: sendResult.smtp.accepted,
+    smtpRejected: sendResult.smtp.rejected,
+    smtpResponse: sendResult.smtp.response,
+    smtpMessageId: sendResult.smtp.messageId,
+    imapAppendOk: sendResult.imapSent.attempted ? sendResult.imapSent.ok : null,
+    imapSentFolder: sendResult.imapSent.folder,
+    imapSentUid: sendResult.imapSent.uid ?? null,
+    imapError: sendResult.imapSent.error ?? null,
+  }).catch(() => undefined);
 
   await prisma.booking.update({
     where: { id: booking.id },
@@ -140,7 +219,15 @@ export async function sendPostEventEmailForBooking(
     await recordBookingCommunicationLog({
       action: CUSTOMER_ACTIVITY_ACTIONS.SEND_POST_EVENT_EMAIL,
       bookingId: booking.id,
-      details: { email, reference: booking.reference },
+      details: {
+        email,
+        reference: booking.reference,
+        emailSendId: trackingRecord.id,
+        emailSnapshot: 'EmailSend.htmlBody',
+        orbitaKind: orbita.kind,
+        orbitaId: orbita.id,
+        orbitaOrigin: orbita.origin,
+      },
     });
   }
 

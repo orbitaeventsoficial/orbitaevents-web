@@ -12,7 +12,7 @@ import { buildCustomerCommercialRiskLink } from '@/lib/customer-hub/nextActionLi
 // TYPES I CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-type TimelineFilter = 'all' | 'proposals' | 'bookings' | 'tasks' | 'comms';
+type TimelineFilter = 'all' | 'documents' | 'proposals' | 'bookings' | 'tasks' | 'comms';
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -75,6 +75,36 @@ function groupByDay(events: TimelineEventDTO[]): Array<{ date: string; label: st
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
+function getTimelineMetaString(event: TimelineEventDTO, key: string): string | null {
+  const value = event.meta?.[key];
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function isDossierDocumentEvent(event: TimelineEventDTO): boolean {
+  const documentType = getTimelineMetaString(event, 'documentType')?.toUpperCase();
+  const entityType = getTimelineMetaString(event, 'entityType');
+  return documentType === 'DOSSIER'
+    || entityType === 'dossier'
+    || Boolean(getTimelineMetaString(event, 'dossierId'));
+}
+
+function isDocumentTimelineEvent(event: TimelineEventDTO): boolean {
+  return Boolean(getTimelineMetaString(event, 'documentType'))
+    || Boolean(getTimelineMetaString(event, 'contractPdfUrl'))
+    || isDossierDocumentEvent(event);
+}
+
+function matchesTimelineFilter(event: TimelineEventDTO, filter: TimelineFilter): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'documents') return isDocumentTimelineEvent(event);
+  if (filter === 'comms' && isDocumentTimelineEvent(event)) return false;
+  return CUSTOMER_TIMELINE_EVENT_META[event.type]?.filter === filter;
+}
+
+function shouldOpenTimelineLinkInNewTab(href: string): boolean {
+  return /^https?:\/\//i.test(href) || href.startsWith('/api/');
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
@@ -109,8 +139,7 @@ export default function TimelinePanel({
   }), [customerId, customerName, customerPhone, followUpSummary, insights.commercialRisk]);
 
   const filteredTimeline = useMemo(() => {
-    if (filter === 'all') return timeline;
-    return timeline.filter((event) => CUSTOMER_TIMELINE_EVENT_META[event.type]?.filter === filter);
+    return timeline.filter((event) => matchesTimelineFilter(event, filter));
   }, [timeline, filter]);
 
   const groupedTimeline = useMemo(() => {
@@ -130,7 +159,7 @@ export default function TimelinePanel({
   }, []);
 
   return (
-    <aside className="ch__timeline" data-help-title="Cronologia del client" data-help-desc="Agrupa l'activitat del client per dies i et deixa filtrar per pressupostos, reserves, tasques o comunicacions.">
+    <aside className="min-w-0 overflow-hidden rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-1)] p-4 lg:sticky lg:top-[220px]" data-help-title="Cronologia del client" data-help-desc="Agrupa l'activitat del client per dies i et deixa filtrar per pressupostos, reserves, tasques o comunicacions.">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -186,13 +215,13 @@ export default function TimelinePanel({
         </div>
       )}
 
-      <div className="ch__timeline-filters" data-help-title="Filtres de cronologia" data-help-desc="Serveixen per reduir la cronologia al tipus d'activitat que t'interessa revisar ara mateix.">
+      <div className="mt-3 flex flex-wrap gap-1" data-help-title="Filtres de cronologia" data-help-desc="Serveixen per reduir la cronologia al tipus d'activitat que t'interessa revisar ara mateix.">
         {CUSTOMER_TIMELINE_FILTER_OPTIONS.map((opt) => (
           <button
             key={opt.key}
             type="button"
             onClick={() => setFilter(opt.key)}
-            className={`ch__timeline-filter${filter === opt.key ? ' ch__timeline-filter--active' : ''}`}
+            className={`cursor-pointer rounded-full border px-2 py-0.5 text-xs font-semibold transition-colors ${filter === opt.key ? 'border-[var(--o-admin-line-2)] bg-[var(--raised)] text-[var(--t)] shadow-[inset_0_0_0_1px_var(--line2)]' : 'border-[var(--o-admin-line)] bg-[var(--ax-fill-2)] text-[var(--t3)] hover:border-[var(--o-admin-line-2)] hover:bg-[var(--ax-fill-3)] hover:text-[var(--t2)]'}`}
           >
             {opt.icon} {opt.label}
           </button>
@@ -200,21 +229,21 @@ export default function TimelinePanel({
       </div>
 
       {/* Timeline content */}
-      <div className={`ch__timeline-scroll${expanded ? ' ch__timeline-scroll--expanded' : ''}`}>
+      <div className={`mt-4 min-w-0 overflow-y-auto overflow-x-hidden pr-1 ${expanded ? 'max-h-[80vh]' : 'max-h-[50vh]'}`}>
         {filteredTimeline.length === 0 ? (
           <EmptyState filter={filter} />
         ) : (
           displayedGroups.map((group) => (
             <div key={group.date}>
               {/* Day header */}
-              <div className="ch__timeline-day">
-                <p className="ch__timeline-day-label">
+              <div className="sticky top-0 z-10 bg-[var(--ax-fill-1)] py-1">
+                <p className="m-0 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--t3)]">
                   {group.label}
                 </p>
               </div>
 
               {/* Events */}
-              <div className="ch__timeline-events">
+              <div className="mb-4 mt-1 flex flex-col gap-1.5">
                 {group.events.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}
@@ -229,7 +258,7 @@ export default function TimelinePanel({
         <button
           type="button"
           onClick={toggleExpand}
-          className="mt-3 w-full rounded-xl border py-2 text-xs transition-colors"
+          className="ap-btn ap-btn--xs mt-3 w-full"
         >
           {expanded ? 'Mostra menys ↑' : `Mostra més (${groupedTimeline.length - 5} dies més) ↓`}
         </button>
@@ -244,8 +273,9 @@ export default function TimelinePanel({
 
 function EventCard({ event }: { event: TimelineEventDTO }) {
   const meta = CUSTOMER_TIMELINE_EVENT_META[event.type];
-  const icon = meta?.icon || '•';
-  const toneClass = meta?.toneClass || 'ch__timeline-event--activity';
+  const dossierDocument = isDossierDocumentEvent(event);
+  const icon = dossierDocument ? '📄' : meta?.icon || '•';
+  const toneClass = dossierDocument ? 'border-l-[var(--o-info)] bg-[var(--ax-info-bg)]' : meta?.toneClass || 'border-l-[var(--o-admin-line)]';
   const preview = typeof event.meta?.preview === 'string' ? event.meta.preview.trim() : '';
   const direction = typeof event.meta?.direction === 'string' ? event.meta.direction : null;
   const channel = typeof event.meta?.channel === 'string' ? event.meta.channel : null;
@@ -255,24 +285,29 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
 
   return (
     <article
-      className={`ch__timeline-event ${toneClass}`}
+      className={`min-w-0 overflow-hidden rounded-[var(--o-r-lg)] border-l-2 py-2.5 pl-3 pr-2.5 ${dossierDocument ? 'ring-1 ring-[var(--ax-info-border)]' : 'bg-[var(--o-admin-fill-1)]'} ${toneClass}`}
     >
       <div className="flex items-start gap-2">
-        <span className="ch__timeline-icon">{icon}</span>
+        <span className="text-sm leading-[1.35]">{icon}</span>
         <div className="flex-1 min-w-0">
-          <p className="ch__timeline-title">
+          {dossierDocument && (
+            <span className="mb-1 inline-flex max-w-full rounded-full border admin-tone-border-info admin-tone-bg-info px-2 py-0.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] admin-tone-text-info">
+              Document dossier
+            </span>
+          )}
+          <p className="m-0 break-words text-xs font-semibold text-[var(--t)]">
             {sanitizeEventTitle(event.title)}
           </p>
-          <p className="ch__timeline-time">
+          <p className="m-0 mt-0.5 break-words text-xs text-[var(--t3)]">
             {formatTime(event.at)}
           </p>
           {commMeta && (
-            <p className="ch__timeline-meta">
+            <p className="m-0 mt-0.5 break-words text-xs uppercase tracking-[0.08em] text-[var(--t3)]">
               {commMeta}
             </p>
           )}
           {preview && preview !== event.title && (
-            <p className="ch__timeline-preview">
+            <p className="m-0 mt-1 break-words text-xs leading-normal text-[var(--t2)]">
               {preview}
             </p>
           )}
@@ -280,20 +315,47 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
       </div>
 
       {event.link && (
-        <Link
-          href={event.link.href}
-          className="ch__timeline-link"
-        >
-          {event.link.label} →
-        </Link>
+        <TimelineEventLink link={event.link} />
+      )}
+      {event.originLinks && event.originLinks.length > 0 && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-1 text-xs">
+          <span className="font-semibold uppercase tracking-[0.08em] text-[var(--t3)]">Origen</span>
+          {event.originLinks.map((link) => (
+            <Link
+              key={`${link.label}:${link.href}`}
+              href={link.href}
+              className="rounded-full border border-[var(--o-admin-line)] bg-[var(--sunk)] px-2 py-0.5 font-semibold text-[var(--t2)] no-underline hover:text-[var(--gold)]"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       )}
     </article>
+  );
+}
+
+function TimelineEventLink({ link }: { link: NonNullable<TimelineEventDTO['link']> }) {
+  const opensInNewTab = shouldOpenTimelineLinkInNewTab(link.href);
+  const className = 'mt-1.5 inline-block max-w-full truncate text-xs text-[var(--gold)] no-underline transition-colors hover:text-[var(--gold-bright)]';
+  if (opensInNewTab) {
+    return (
+      <a href={link.href} target="_blank" rel="noopener noreferrer" className={className}>
+        {link.label} →
+      </a>
+    );
+  }
+  return (
+    <Link href={link.href} className={className}>
+      {link.label} →
+    </Link>
   );
 }
 
 function EmptyState({ filter }: { filter: TimelineFilter }) {
   const messages: Record<TimelineFilter, string> = {
     all: 'Encara no hi ha activitat registrada.',
+    documents: 'Sense documents.',
     proposals: 'Sense pressupostos.',
     bookings: 'Sense reserves.',
     tasks: 'Sense tasques.',
@@ -301,8 +363,8 @@ function EmptyState({ filter }: { filter: TimelineFilter }) {
   };
 
   return (
-    <div className="ch__timeline-empty">
-      <p>{messages[filter]}</p>
+    <div className="rounded-[var(--o-r-lg)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-2)] p-4 text-center text-[var(--t2)]">
+      <p className="m-0 text-sm">{messages[filter]}</p>
     </div>
   );
 }

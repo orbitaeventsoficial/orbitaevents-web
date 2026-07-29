@@ -5,8 +5,26 @@ import { verifyCsrf } from '@/lib/csrf';
 import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
 import { z } from 'zod';
-import { createAdminProposal, listAdminProposals } from '@/lib/services/proposalAdminService';
+import {
+  createAdminProposal,
+  getProposalFinancialConsistencyIssues,
+  listAdminProposals,
+  ProposalCanonicalDispatchError,
+} from '@/lib/services/proposalAdminService';
 import { VAT_RATE_INVOICE } from '@/lib/constants/pricing';
+
+function addFinancialConsistencyIssues(
+  ctx: z.RefinementCtx,
+  data: { subtotal: number; discount: number; vatRate: number; vatAmount: number; total: number },
+) {
+  for (const issue of getProposalFinancialConsistencyIssues(data)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [issue.field],
+      message: issue.message,
+    });
+  }
+}
 
 const createProposalSchema = z.object({
   customerId: z.string().min(1).optional(),
@@ -24,7 +42,7 @@ const createProposalSchema = z.object({
   snapshot: z.record(z.unknown()),
   pdfUrl: z.string().url().optional(),
   pdfKey: z.string().optional(),
-});
+}).superRefine((data, ctx) => addFinancialConsistencyIssues(ctx, data));
 
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
@@ -69,6 +87,9 @@ export async function POST(req: NextRequest) {
     const result = await createAdminProposal(parsed.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
+    if (error instanceof ProposalCanonicalDispatchError) {
+      return NextResponse.json(error.body, { status: error.status });
+    }
     log.error('Error creant pressupost', error, {
       context: { requestId, endpoint: 'admin/proposals:POST', customerId: customerIdForLog },
     });

@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-const { mockSendEmail, mockReadCronStatus } = vi.hoisted(() => ({
-  mockSendEmail: vi.fn(),
+const { mockSendTrackedStandaloneEmail, mockReadCronStatus } = vi.hoisted(() => ({
+  mockSendTrackedStandaloneEmail: vi.fn(),
   mockReadCronStatus: vi.fn(),
 }));
 
-vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
+vi.mock('@/lib/email', () => ({ sendTrackedStandaloneEmail: mockSendTrackedStandaloneEmail }));
 vi.mock('@/lib/services/cronRunStatusService', () => ({
   readCronRunStatus: mockReadCronStatus,
 }));
@@ -22,7 +22,7 @@ const originalEnv = { ...process.env };
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockSendEmail.mockResolvedValue({});
+  mockSendTrackedStandaloneEmail.mockResolvedValue({});
   mockReadCronStatus.mockResolvedValue({
     lastRun: null,
     lastStatus: null,
@@ -78,8 +78,12 @@ describe('sendAdminTestEmail', () => {
 
     expect(result.ok).toBe(true);
     expect(result.status).toBe(200);
-    expect(mockSendEmail).toHaveBeenCalledWith(
-      expect.objectContaining({ to: 'admin@test.com' })
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateKey: 'admin-test-notification',
+        to: 'admin@test.com',
+        orbita: expect.objectContaining({ kind: 'admin', origin: 'admin-test-notification' }),
+      })
     );
   });
 
@@ -90,8 +94,11 @@ describe('sendAdminTestEmail', () => {
 
     await sendAdminTestEmail('custom@test.com');
 
-    expect(mockSendEmail).toHaveBeenCalledWith(
-      expect.objectContaining({ to: 'custom@test.com' })
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateKey: 'admin-test-notification',
+        to: 'custom@test.com',
+      })
     );
   });
 });

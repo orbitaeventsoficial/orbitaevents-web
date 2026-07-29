@@ -1,4 +1,5 @@
 import { PACK_PRICING_MODEL_DEFAULTS } from '@/lib/constants/admin';
+import { roundRecommendedSellingPrice } from '@/lib/constants/pricing';
 import { prisma } from '@/lib/prisma';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 type PackWithInventory = {
@@ -239,13 +240,16 @@ export function computePackPricingHealth(pack: PackWithInventory, config: Pricin
   const laborTier: 'mixed' = 'mixed';
 
   const baseCost = (inventoryCostPerHour * Math.max(pack.djHours, 1)) + (laborCostPerHourUsed * Math.max(pack.djHours, 1)) + config.fixedPackCost;
-  const recommendedPrice = round2(baseCost / (1 - config.marginTargetPct));
+  const recommendedPriceRaw = round2(baseCost / (1 - config.marginTargetPct));
+  const recommendedPrice = roundRecommendedSellingPrice(recommendedPriceRaw);
   const publicPrice = round2(pack.price);
   const divergencePct = recommendedPrice > 0 ? round2(((publicPrice - recommendedPrice) / recommendedPrice) * 100) : 0;
   const baseExtraHourCost = inventoryCostPerHour + laborCostPerHourUsed;
-  const recommendedExtraHourPrice = round2(baseExtraHourCost / (1 - config.marginTargetPct));
+  const recommendedExtraHourPriceRaw = round2(baseExtraHourCost / (1 - config.marginTargetPct));
+  const recommendedExtraHourPrice = roundRecommendedSellingPrice(recommendedExtraHourPriceRaw);
   const baseOperatorExtraHourCost = inventoryCostPerHour + config.operatorCostPerHour;
-  const recommendedOperatorExtraHourPrice = round2(baseOperatorExtraHourCost / (1 - config.marginTargetPct));
+  const recommendedOperatorExtraHourPriceRaw = round2(baseOperatorExtraHourCost / (1 - config.marginTargetPct));
+  const recommendedOperatorExtraHourPrice = roundRecommendedSellingPrice(recommendedOperatorExtraHourPriceRaw);
   const publicExtraHourPrice = round2(pack.extraHourPrice || 0);
   const extraHourDivergencePct = recommendedExtraHourPrice > 0 ? round2(((publicExtraHourPrice - recommendedExtraHourPrice) / recommendedExtraHourPrice) * 100) : 0;
 

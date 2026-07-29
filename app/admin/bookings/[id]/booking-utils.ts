@@ -46,6 +46,8 @@ export type BookingNumericCompat = {
   distanceKm?: number | null;
   vehicleCostPerKm?: number | null;
   fuelCostPerKm?: number | null;
+  tollsEur?: number | null;
+  travelCost?: number | null;
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

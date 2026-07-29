@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockCreateNote, mockCleanupNotes, mockDeleteNote } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockCreateNote, mockCleanupNotes, mockDeleteNote } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockCreateNote: vi.fn(),
   mockCleanupNotes: vi.fn(),
   mockDeleteNote: vi.fn(),
@@ -19,6 +20,8 @@ vi.mock('@/lib/services/leadNoteService', () => ({
 vi.mock('@/lib/logger', () => ({
   log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { POST, PUT, DELETE } from '@/app/api/admin/leads/[id]/notes/route';
 
@@ -53,7 +56,7 @@ function makeDeleteReq(id = 'lead-1', noteId?: string) {
 describe('POST /api/admin/leads/[id]/notes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockCreateNote.mockResolvedValue({ status: 200, body: { id: 'note-1', content: 'Hola' } });
   });
 
@@ -91,7 +94,7 @@ describe('POST /api/admin/leads/[id]/notes', () => {
 describe('PUT /api/admin/leads/[id]/notes (cleanup)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockCleanupNotes.mockResolvedValue({ removed: 2 });
   });
 
@@ -122,7 +125,7 @@ describe('PUT /api/admin/leads/[id]/notes (cleanup)', () => {
 describe('DELETE /api/admin/leads/[id]/notes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockDeleteNote.mockResolvedValue({ status: 200, body: { ok: true } });
   });
 

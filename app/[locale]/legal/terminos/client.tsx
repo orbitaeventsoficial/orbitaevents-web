@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { toIntlLocale } from '@/lib/constants';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import PublicPageHeader from '@/app/components/public/PublicPageHeader';
 
 export default function TerminosClient() {
   const t = useTranslations('legal.terminos');
@@ -12,7 +13,7 @@ export default function TerminosClient() {
   return (
     <main className="min-h-screen bg-bg-main py-20 relative">
       <div className="container mx-auto px-4 max-w-4xl">
-        <h1 className="text-4xl font-bold text-white mb-8">{t('title')}</h1>
+        <PublicPageHeader title={t('title')} align="left" spacing="compact" />
 
         <div className="prose prose-invert prose-gold max-w-none space-y-8 text-white/80">
           <p className="text-lg" suppressHydrationWarning>

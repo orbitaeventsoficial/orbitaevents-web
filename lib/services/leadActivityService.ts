@@ -423,6 +423,7 @@ export async function recordLeadCommercialSequenceStepSent(input: {
   templateSlug: string;
   locale: 'ca' | 'es' | 'en';
   delayHours: number;
+  emailSendId?: string | null;
 }) {
   return prisma.leadActivity.create({
     data: {
@@ -438,6 +439,7 @@ export async function recordLeadCommercialSequenceStepSent(input: {
         channel: input.channel,
         locale: input.locale,
         delayHours: input.delayHours,
+        ...(input.emailSendId ? { emailSendId: input.emailSendId } : {}),
       },
     },
   });

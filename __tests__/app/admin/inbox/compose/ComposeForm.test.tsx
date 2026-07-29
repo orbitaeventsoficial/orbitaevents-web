@@ -5,7 +5,7 @@ import type { BulkComposeSegmentAudience } from '@/lib/services/bulkComposeSegme
 
 const { generateSmartTemplatesMock, generateAllTemplatesMock } = vi.hoisted(() => ({
   generateSmartTemplatesMock: vi.fn(),
-  generateAllTemplatesMock: vi.fn(() => []),
+  generateAllTemplatesMock: vi.fn(() => [] as Array<Record<string, unknown>>),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -169,5 +169,53 @@ describe('ComposeForm', () => {
     expect(screen.getByText('Audiència segmentada')).toBeInTheDocument();
     expect(screen.getAllByText('Clients de bodes 2025')).toHaveLength(2);
     expect(screen.getByText("1 destinataris preparats per l'enviament massiu.")).toBeInTheDocument();
+  });
+
+  it('no exposa el mode pressupost legacy', () => {
+    render(
+      <ComposeForm
+        leads={LEADS}
+        packs={[]}
+        returnHref="/admin/inbox"
+        initialTemplate="enviament-pressupost"
+      />
+    );
+
+    expect(screen.queryByRole('tab', { name: /pressupost/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /envia correu/i })).toBeInTheDocument();
+  });
+
+  it('aplica la plantilla inicial de client quan arriba per query', async () => {
+    generateAllTemplatesMock.mockReturnValueOnce([
+      {
+        key: 'referral',
+        label: 'Referral',
+        icon: '🤝',
+        description: 'Demanar referral',
+        subject: 'Subject referral',
+        body: 'Body referral',
+        mode: 'email',
+      },
+    ]);
+
+    render(
+      <ComposeForm
+        leads={[]}
+        packs={[]}
+        returnHref="/admin/clientes/customer-1"
+        initialCustomer={{
+          id: 'customer-1',
+          name: 'Client Primera',
+          email: 'primera@example.com',
+          preferredLocale: 'ca',
+        }}
+        initialTemplate="referral"
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Assumpte de l'email")).toHaveValue('Subject referral');
+      expect(screen.getByPlaceholderText('Escriu el teu missatge...')).toHaveValue('Body referral');
+    });
   });
 });

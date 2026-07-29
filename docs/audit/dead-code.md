@@ -21,7 +21,6 @@ Verificats sense ús (`count==1`), però **conscientment NO eliminats** perquè 
 
 ### C — Domini / constants monocapa (decisió de producte)
 - `lib/constants/pricing-intelligence.ts`: `getHourlyColor`, `getPriceDeviationAlert`, `MARGIN_ADVICE`, `SOLIDARITY_RULES`.
-- `lib/constants/pricingRules.ts`: `DATE_PRICING_RULE_PRIORITY_MAX`.
 - `lib/constants/admin.ts`: `ADMIN_SHORTCUT_ROUTES`, `ADMIN_KONAMI_SEQUENCE`, `ADMIN_PAGE_LABELS`, `ADMIN_DETAIL_PAGE_LABELS`, `BOOKING_ACTIVITY_ACTION_LABELS`, `ADMIN_FAB_ITEMS`, `ADMIN_MOBILE_PRIMARY_NAV`, `COLLABORATOR_DEFAULT_MARKUP`.
 - `lib/constants/index.ts`: `INVENTORY_CATEGORY_LABELS`, `INTAKE_SOURCE_SELECTED_STYLES`, `INVOICE_STATUS_LABELS`, `PUBLIC_HALLOWEEN_PREVIEW_ICONS`, `PUBLIC_FOOTER_TRUST_SIGNAL_META`, + types (`PublicHomePillar*`, `TaskSource`, `PublicHomeMobileCard`, `PublicPortfolioShowcaseBaseItem`).
 - `app/config/equipment-config.ts`: `getEquipmentByCategory`, `getEquipmentByBrand`, `getTotalEquipmentCount`, `isEquipmentAvailable`, `getTotalInventoryValue`, `validateInventory`.

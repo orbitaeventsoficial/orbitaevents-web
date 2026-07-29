@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BookingFieldNotesComposer from '@/app/admin/bookings/[id]/BookingFieldNotesComposer';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -16,10 +16,16 @@ vi.mock('@/lib/csrf', () => ({
 }));
 
 const mockFetchWithCsrf = vi.mocked(fetchWithCsrf);
+let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
   mockRefresh.mockReset();
   mockFetchWithCsrf.mockReset();
+  consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+});
+
+afterEach(() => {
+  consoleErrorSpy.mockRestore();
 });
 
 describe('BookingFieldNotesComposer', () => {
@@ -53,7 +59,7 @@ describe('BookingFieldNotesComposer', () => {
     expect(appendSpy).toHaveBeenCalledWith('isPortal', 'false');
     expect(appendSpy).toHaveBeenCalledWith('isPortfolio', 'false');
     expect(mockRefresh).toHaveBeenCalled();
-    expect(screen.getByText('Captura guardada al bolo')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Captura guardada al bolo');
 
     appendSpy.mockRestore();
   });
@@ -71,9 +77,10 @@ describe('BookingFieldNotesComposer', () => {
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByText('Fitxer massa gran')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('Fitxer massa gran');
     });
 
+    expect(screen.getByRole('button', { name: '+ Foto' })).toHaveAttribute('aria-invalid', 'true');
     expect(mockRefresh).not.toHaveBeenCalled();
   });
 });

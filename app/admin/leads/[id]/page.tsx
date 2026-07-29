@@ -1,3 +1,7 @@
+// TANCAT CHARLIE - validat pel propietari (2026-07-09, Canvi #1759).
+// Ruta protegida: no reobrir /admin/leads/[id] per auditories generiques; nomes
+// per ordre explicita del propietari o regressio demostrable.
+
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import '../leads-design.css';
@@ -5,6 +9,7 @@ import LeadDetailClient from './LeadDetailClient';
 import { getWeatherForEvent } from '@/lib/services/weatherService';
 import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import { DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
+import { TRAVEL_COST_LINE_MARKER, computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { WxData } from '@/app/admin/components/WxBadge';
@@ -34,6 +39,10 @@ const STAGE_KEY_MAP: Record<string, string> = {
   NEGOTIATING: 'contactat', WON: 'guanyat', LOST: 'perdut',
 };
 
+function isTravelCostLine(line: { notes?: string | null }): boolean {
+  return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
+}
+
 export default async function LeadDetailPage({ params }: Props) {
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
@@ -54,6 +63,8 @@ export default async function LeadDetailPage({ params }: Props) {
       assignedTo: true,
       eventPhone: true,
       eventAddress: true,
+      distanceKm: true,
+      tollsEur: true,
       eventStartTime: true,
       eventEndTime: true,
       sourceCollaboratorId: true,
@@ -90,6 +101,9 @@ export default async function LeadDetailPage({ params }: Props) {
           paymentMethod: true, invoiceRequired: true, cashAmount: true,
           extraHours: true,
           travelCost: true,
+          distanceKm: true,
+          tollsEur: true,
+          fuelCostPerKm: true,
           pack: {
             select: {
               code: true,
@@ -120,16 +134,10 @@ export default async function LeadDetailPage({ params }: Props) {
               revenueAmount: true,
               costAmount: true,
               quantity: true,
+              notes: true,
               collaboratorId: true,
               collaborator: { select: { name: true } },
             },
-          },
-          collaboratorBookings: {
-            select: {
-              commissionAmount: true,
-              collaborator: { select: { name: true } },
-            },
-            take: 1,
           },
         },
       },
@@ -172,8 +180,12 @@ export default async function LeadDetailPage({ params }: Props) {
   // mostrar un marge inflat (la base contractada té cost real, no només ingrés).
   let bookingEconomia: {
     net: number; marginPct: number; total: number; directCost: number;
+    travelCharge: number; travelCost: number;
     acquisitionCost: number; serviceLinesCost: number; fixedOperationalCost: number;
     tone: 'emerald' | 'amber' | 'orange' | 'rose'; label: string;
+    ownServiceRevenue: number; ownServiceCost: number; ownServiceMarginAmount: number; ownServiceMarginPct: number;
+    subcontractedCost: number; subcontractedMarkupAmount: number; subcontractedMarkupPct: number;
+    subcontractedMarkupOk: boolean; transportMarginAmount: number; transportMarginPct: number; orbitaTechIncome: number;
   } | null = null;
   if (lead.booking) {
     const b = lead.booking;
@@ -181,9 +193,22 @@ export default async function LeadDetailPage({ params }: Props) {
     if (profitabilityConfig) {
       const extrasTotal = (b.extras ?? []).reduce(
         (s, e) => s + Number(e.price || 0) * (e.quantity || 1), 0);
-      const slRevenue = (b.serviceLines ?? []).reduce(
+      const visibleServiceLines = (b.serviceLines ?? []).filter((line) => !isTravelCostLine(line));
+      const bookingDistanceKm = b.distanceKm != null ? Number(b.distanceKm) : Number(lead.distanceKm || 0);
+      const bookingTollsEur = b.tollsEur != null ? Number(b.tollsEur) : Number(lead.tollsEur || 0);
+      const bookingTransport = bookingDistanceKm > 0
+        ? computeBoloTransport({
+          roundTripKm: bookingDistanceKm,
+          serviceLines: visibleServiceLines,
+          hasOrbitaPack: Number(b.pack?.price || 0) > 0,
+          tollsEur: bookingTollsEur,
+          vehicleCostPerKm: b.fuelCostPerKm ?? vehicleCostPerKm,
+        })
+        : null;
+      const bookingTravelRevenue = bookingTransport?.clientCharge ?? 0;
+      const slRevenue = visibleServiceLines.reduce(
         (s, l) => s + Number(l.revenueAmount || 0) * (l.quantity || 1), 0);
-      const slCost = (b.serviceLines ?? []).reduce(
+      const slCost = visibleServiceLines.reduce(
         (s, l) => s + Number(l.costAmount || 0) * (l.quantity || 1), 0);
       const summary = computeBookingFinancialSummary({
         total: Number(b.total),
@@ -191,22 +216,39 @@ export default async function LeadDetailPage({ params }: Props) {
         extrasTotal,
         extraHours: b.extraHours ?? 0,
         extraHourPrice: b.pack?.extraHourPrice ? Number(b.pack.extraHourPrice) : 0,
-        distanceKm: 0,
+        distanceKm: bookingDistanceKm,
+        vehicleCostPerKm: b.fuelCostPerKm ?? vehicleCostPerKm,
+        travelRevenue: bookingTravelRevenue,
         travelCost: b.travelCost ? Number(b.travelCost) : 0,
         serviceLinesRevenue: slRevenue,
         serviceLinesCost: slCost,
+        serviceLines: visibleServiceLines,
+        serviceLinesOwnCostRatio: 0,
         source: lead.source,
       }, profitabilityConfig);
       bookingEconomia = {
         net: summary.netMargin,
         marginPct: summary.marginPct,
         total: summary.total,
+        travelCharge: bookingTravelRevenue,
+        travelCost: b.travelCost ? Number(b.travelCost) : 0,
         directCost: summary.directCost,
         acquisitionCost: summary.acquisitionCost,
         serviceLinesCost: summary.serviceLinesCost,
         fixedOperationalCost: summary.fixedOperationalCost,
         tone: summary.marginTone.tone,
         label: summary.marginTone.label,
+        ownServiceRevenue: summary.ownServiceMargin.revenue,
+        ownServiceCost: summary.ownServiceMargin.cost,
+        ownServiceMarginAmount: summary.ownServiceMargin.marginAmount,
+        ownServiceMarginPct: summary.ownServiceMargin.marginPct,
+        subcontractedCost: summary.subcontractedMarkup.cost,
+        subcontractedMarkupAmount: summary.subcontractedMarkup.markupAmount,
+        subcontractedMarkupPct: summary.subcontractedMarkup.markupPct,
+        subcontractedMarkupOk: summary.subcontractedMarkup.ok,
+        transportMarginAmount: summary.transportMargin.marginAmount,
+        transportMarginPct: summary.transportMargin.marginPct,
+        orbitaTechIncome: summary.orbitaTechIncome,
       };
     }
   }
@@ -214,6 +256,8 @@ export default async function LeadDetailPage({ params }: Props) {
   return (
       <LeadDetailClient
         vehicleCostPerKm={vehicleCostPerKm}
+        initialDistanceKm={lead.distanceKm ?? null}
+        initialTollsEur={lead.tollsEur ?? null}
         bookingEconomia={bookingEconomia}
         proposals={lead.proposals.map((p) => ({
           id: p.id,
@@ -319,7 +363,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 meta: 'extra',
               });
             }
-            for (const line of lead.booking.serviceLines || []) {
+            for (const line of (lead.booking.serviceLines || []).filter((item) => !isTravelCostLine(item))) {
               products.push({
                 id: `line-${products.length}`,
                 kind: line.kind,
@@ -341,19 +385,20 @@ export default async function LeadDetailPage({ params }: Props) {
             }
             return products;
           })(),
-          collaboratorCost: lead.booking.collaboratorBookings?.[0]
-            ? {
-                amount: Number(lead.booking.collaboratorBookings[0].commissionAmount),
-                name: lead.booking.collaboratorBookings[0].collaborator.name,
-              }
-            : null,
+          collaboratorCost: (() => {
+            // Cost de col·laborador = línies de servei subcontractades (amb collaboratorId).
+            const collabLines = (lead.booking.serviceLines || []).filter((l) => l.collaboratorId && !isTravelCostLine(l));
+            if (collabLines.length === 0) return null;
+            const amount = collabLines.reduce((sum, l) => sum + Number(l.costAmount || 0) * (l.quantity || 1), 0);
+            return amount > 0 ? { amount, name: collabLines[0].collaborator?.name || 'Col·laborador' } : null;
+          })(),
           costFloor: (() => {
-            // Pack base + transport + col·laborador = cost mínim estimat
+            // Pack base + transport + cost de col·laborador (línies) = cost mínim estimat
             const packCost = lead.booking.pack?.price ? Number(lead.booking.pack.price) : 0;
             const travelCost = lead.booking.travelCost ? Number(lead.booking.travelCost) : 0;
-            const collabCost = lead.booking.collaboratorBookings?.[0]
-              ? Number(lead.booking.collaboratorBookings[0].commissionAmount)
-              : 0;
+            const collabCost = (lead.booking.serviceLines || [])
+              .filter((l) => l.collaboratorId && !isTravelCostLine(l))
+              .reduce((sum, l) => sum + Number(l.costAmount || 0) * (l.quantity || 1), 0);
             const floor = packCost + travelCost + collabCost;
             return floor > 0 ? floor : null;
           })(),

@@ -95,48 +95,4 @@ describe('Auth Utilities', () => {
       expect(result.error).toBe('Invalid token');
     });
   });
-
-  describe('getClientIP', () => {
-    it('should extract IP from x-forwarded-for header', async () => {
-      const { getClientIP } = await import('@/lib/auth');
-
-      const mockRequest = {
-        headers: {
-          get: (name: string) => {
-            if (name === 'x-forwarded-for') return '192.168.1.1, 10.0.0.1';
-            return null;
-          },
-        },
-      } as unknown as NextRequest;
-
-      expect(getClientIP(mockRequest)).toBe('192.168.1.1');
-    });
-
-    it('should fallback to x-real-ip', async () => {
-      const { getClientIP } = await import('@/lib/auth');
-
-      const mockRequest = {
-        headers: {
-          get: (name: string) => {
-            if (name === 'x-real-ip') return '10.0.0.5';
-            return null;
-          },
-        },
-      } as unknown as NextRequest;
-
-      expect(getClientIP(mockRequest)).toBe('10.0.0.5');
-    });
-
-    it('should return unknown when no IP found', async () => {
-      const { getClientIP } = await import('@/lib/auth');
-
-      const mockRequest = {
-        headers: {
-          get: () => null,
-        },
-      } as unknown as NextRequest;
-
-      expect(getClientIP(mockRequest)).toBe('unknown');
-    });
-  });
 });

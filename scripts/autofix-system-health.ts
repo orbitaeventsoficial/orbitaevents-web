@@ -11,6 +11,11 @@ import {
   getPackPricingModelConfigEditable,
   upsertPackPricingModelConfig,
 } from '../lib/services/packPricingHealth';
+import {
+  ADMIN_POST_EVENT_CRON_STATUS_PREFIX,
+  getAdminPostEventCronSettingKeys,
+  readAdminPostEventCronSetting,
+} from '../lib/constants/admin';
 
 const ALERT_KEY = 'alerts.system.autofixFailureCount';
 const TASK_PREFIX = 'ALERTA AUTOFIX';
@@ -282,12 +287,12 @@ async function runChecks(): Promise<CheckResult[]> {
   // 6) Cron freshness (emails + commercial automation)
   try {
     const settings = await getSettingMap([
-      'emails.cron.lastRun',
+      ...getAdminPostEventCronSettingKeys(),
       'automation.commercial.lastRun',
     ]);
     const now = Date.now();
     const maxAgeMs = 48 * 60 * 60 * 1000; // 48h
-    const emailCronTs = Date.parse(settings['emails.cron.lastRun'] || '');
+    const emailCronTs = Date.parse(readAdminPostEventCronSetting(settings, 'lastRun') || '');
     const commercialCronTs = Date.parse(settings['automation.commercial.lastRun'] || '');
     const emailCronStale = !Number.isFinite(emailCronTs) || (now - emailCronTs) > maxAgeMs;
     const commercialCronStale = !Number.isFinite(commercialCronTs) || (now - commercialCronTs) > maxAgeMs;
@@ -301,7 +306,7 @@ async function runChecks(): Promise<CheckResult[]> {
       details: stale === 0
         ? 'OK'
         : `Stale: ${[
-            emailCronStale ? 'emails.cron.lastRun' : null,
+            emailCronStale ? `${ADMIN_POST_EVENT_CRON_STATUS_PREFIX}.lastRun` : null,
             commercialCronStale ? 'automation.commercial.lastRun' : null,
           ].filter(Boolean).join(', ')}`,
     });

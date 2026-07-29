@@ -34,6 +34,7 @@ import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getFinanceAlertsSummary } from '@/lib/services/financeAlertsService';
 import { computePackPricingHealth, getPackPricingModelConfigEditable } from '@/lib/services/packPricingHealth';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
+import { ADMIN_POST_EVENT_CRON_STATUS_PREFIX } from '@/lib/constants/admin';
 
 function queueInventoryCounts(...values: number[]) {
   values.forEach((value) => mockPrisma.inventoryItem.count.mockResolvedValueOnce(value));
@@ -52,7 +53,7 @@ describe('adminHealthService', () => {
     vi.clearAllMocks();
 
     mockPrisma.setting.findMany.mockResolvedValue([
-      { key: 'emails.cron.lastRun', value: new Date().toISOString() },
+      { key: `${ADMIN_POST_EVENT_CRON_STATUS_PREFIX}.lastRun`, value: new Date().toISOString() },
       { key: 'automation.commercial.lastRun', value: new Date().toISOString() },
     ]);
     queueInventoryCounts(0, 0, 0, 0);
@@ -62,7 +63,7 @@ describe('adminHealthService', () => {
     queueExtraCounts(0, 0);
     mockPrisma.extra.findMany.mockResolvedValue([]);
     mockPrisma.lead.count.mockResolvedValue(0);
-    queueBookingCounts(0, 0);
+    queueBookingCounts(0);
     mockPrisma.booking.findMany.mockResolvedValue([]);
     mockPrisma.task.count.mockResolvedValue(0);
     mockPrisma.customer.count.mockResolvedValue(0);
@@ -136,7 +137,7 @@ describe('adminHealthService', () => {
     const now = new Date();
 
     mockPrisma.setting.findMany.mockResolvedValue([
-      { key: 'emails.cron.lastRun', value: '2026-01-01T00:00:00.000Z' },
+      { key: `${ADMIN_POST_EVENT_CRON_STATUS_PREFIX}.lastRun`, value: '2026-01-01T00:00:00.000Z' },
       { key: 'automation.commercial.lastRun', value: '2026-01-01T00:00:00.000Z' },
       { key: 'alerts.finance.autofixFailureCount', value: '2' },
       { key: 'alerts.system.autofixFailureCount', value: '1' },
@@ -155,25 +156,37 @@ describe('adminHealthService', () => {
     ]);
     mockPrisma.lead.count.mockResolvedValue(5);
     mockPrisma.booking.count.mockReset();
-    queueBookingCounts(6, 1);
+    queueBookingCounts(1);
     mockPrisma.booking.findMany.mockResolvedValue([
       {
         id: 'booking-overdue-deposit',
         eventDate: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000),
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 2000,
         depositPaid: false,
         remainingPaid: false,
+        cashAmount: null,
       },
       {
         id: 'booking-overdue-remaining',
         eventDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 2000,
         depositPaid: true,
         remainingPaid: false,
+        cashAmount: null,
       },
       {
         id: 'booking-due-soon',
         eventDate: new Date(now.getTime() + 35 * 24 * 60 * 60 * 1000),
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 2000,
         depositPaid: false,
         remainingPaid: false,
+        cashAmount: null,
       },
     ]);
     mockPrisma.task.count.mockResolvedValue(7);
@@ -261,6 +274,29 @@ describe('adminHealthService', () => {
     expect(operationsSection?.items.some((item) => item.href === '/admin/leads')).toBe(true);
   });
 
+  it('no compta cobraments de Salut si l\'efectiu ja cobreix els trams pendents', async () => {
+    const now = new Date();
+    mockPrisma.booking.findMany.mockResolvedValue([
+      {
+        id: 'booking-cash-covered',
+        eventDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 2000,
+        depositPaid: false,
+        remainingPaid: false,
+        cashAmount: 3000,
+      },
+    ]);
+
+    const snapshot = await getAdminHealthSnapshot();
+    const operationsSection = snapshot.sections.find((section) => section.scope === 'operations');
+
+    expect(operationsSection?.items.some((item) => item.id === 'operations-upcoming-unpaid')).toBe(false);
+    expect(operationsSection?.items.some((item) => item.id === 'operations-bookings-payments-overdue')).toBe(false);
+    expect(operationsSection?.items.some((item) => item.id === 'operations-bookings-payments-due-soon')).toBe(false);
+  });
+
   it('detecta inventari a fi de vida útil (critical >95%) i envellint (warning >80%)', async () => {
     mockPrisma.inventoryItem.findMany.mockReset();
     mockPrisma.inventoryItem.findMany
@@ -286,5 +322,21 @@ describe('adminHealthService', () => {
     const catalogSection = snapshot.sections.find((s) => s.scope === 'catalog');
 
     expect(catalogSection?.items.some((item) => item.id === 'catalog-inventory-unused' && item.count === 5)).toBe(true);
+  });
+
+  it('saneja comptadors autofix de settings abans de crear incidències', async () => {
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: `${ADMIN_POST_EVENT_CRON_STATUS_PREFIX}.lastRun`, value: new Date().toISOString() },
+      { key: 'automation.commercial.lastRun', value: new Date().toISOString() },
+      { key: 'alerts.finance.autofixFailureCount', value: '2.9' },
+      { key: 'alerts.system.autofixFailureCount', value: 'no-num' },
+    ]);
+
+    const snapshot = await getAdminHealthSnapshot();
+    const financeItems = snapshot.sections.find((section) => section.scope === 'finances')?.items || [];
+    const systemItems = snapshot.sections.find((section) => section.scope === 'system')?.items || [];
+
+    expect(financeItems.some((item) => item.id === 'finance-autofix-open' && item.count === 2)).toBe(true);
+    expect(systemItems.some((item) => item.id === 'system-autofix-open')).toBe(false);
   });
 });

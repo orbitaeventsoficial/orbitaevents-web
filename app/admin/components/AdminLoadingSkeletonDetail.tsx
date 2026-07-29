@@ -19,7 +19,7 @@ export default function AdminLoadingSkeletonDetail() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-white/[0.07] pb-0">
+      <div className="flex gap-1 border-b border-[var(--line)] pb-0">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="h-9 w-28 rounded-t-lg bg-[var(--o-admin-fill-1)]" />
         ))}

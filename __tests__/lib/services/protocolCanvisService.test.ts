@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   indexProtocolCanvisByNumber,
-  indexProtocolSectionsById,
   parseProtocolCanvis,
   parseProtocolSections,
 } from '@/lib/services/protocolCanvisService';
@@ -187,23 +186,6 @@ describe('parseProtocolSections', () => {
     const sections = parseProtocolSections(md);
     expect(sections.map((s) => s.id)).toEqual(['2.1.0', '6.18']);
     expect(sections[0]?.anchorId).toBe('seccio-2-1-0');
-  });
-});
-
-describe('indexProtocolSectionsById', () => {
-  it('exposa Map amb lookup O(1) per id (string)', () => {
-    const md = [
-      '## 6.15 Roadmap',
-      'Body 1.',
-      '## 6.16 Marketing',
-      'Body 2.',
-    ].join('\n');
-
-    const index = indexProtocolSectionsById(parseProtocolSections(md));
-    expect(index.size).toBe(2);
-    expect(index.get('6.15')?.title).toBe('Roadmap');
-    expect(index.get('6.16')?.title).toBe('Marketing');
-    expect(index.get('9.99')).toBeUndefined();
   });
 });
 

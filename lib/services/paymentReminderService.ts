@@ -18,7 +18,14 @@ import {
   formatDateFull,
 } from '@/lib/constants';
 import { log } from '@/lib/logger';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
+import { getAppBaseUrl } from '@/lib/site';
+import {
+  recordEmailSend,
+  updateEmailSendResult,
+  wrapLinksForTracking,
+} from '@/lib/services/emailTrackingService';
 
 interface PaymentReminderResult {
   checked: number;
@@ -29,11 +36,51 @@ interface PaymentReminderResult {
 
 type Locale = keyof typeof PAYMENT_REMINDER_COPY;
 
+type PaymentReminderBooking = {
+  total: number;
+  depositAmount: number;
+  remainingAmount?: number | null;
+  depositPaid: boolean;
+  remainingPaid: boolean;
+  cashAmount?: number | null;
+};
+
 function normalizeLocale(value?: string | null): Locale {
   const raw = String(value || '').toLowerCase();
   if (raw.startsWith('en')) return 'en';
   if (raw.startsWith('ca')) return 'ca';
   return 'es';
+}
+
+function buildPendingReminderItems(
+  booking: PaymentReminderBooking,
+  locale: Locale,
+  labels: { deposit: string; remaining: string },
+): { pendingAmount: number; pendingItems: string[] } {
+  const breakdown = bookingOutstandingBreakdown(booking);
+  const pendingItems: string[] = [];
+
+  if (breakdown.depositAmount > 0) {
+    pendingItems.push(`${labels.deposit}: ${formatCurrency(breakdown.depositAmount, locale)}`);
+  }
+
+  if (breakdown.remainingAmount > 0) {
+    pendingItems.push(`${labels.remaining}: ${formatCurrency(breakdown.remainingAmount, locale)}`);
+  }
+
+  return { pendingAmount: breakdown.total, pendingItems };
+}
+
+const PAYMENT_REMINDER_TEMPLATE_KEY = 'payment-reminder';
+const PAYMENT_REMINDER_ORBITA_ORIGIN = 'payment-reminder';
+
+function buildTrackedPaymentReminderHtml(html: string, trackingToken: string, baseUrl: string): string {
+  const trackedHtml = wrapLinksForTracking(html, trackingToken, baseUrl);
+  const pixel = `<img src="${baseUrl}/api/tracking/open/${trackingToken}" width="1" height="1" alt="" style="display:none" />`;
+  if (/<\/body>/i.test(trackedHtml)) {
+    return trackedHtml.replace(/<\/body>/i, `${pixel}</body>`);
+  }
+  return `${trackedHtml}${pixel}`;
 }
 
 export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
@@ -58,8 +105,10 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
       eventDate: true,
       total: true,
       depositAmount: true,
+      remainingAmount: true,
       depositPaid: true,
       remainingPaid: true,
+      cashAmount: true,
       preferredLocale: true,
     },
   });
@@ -88,25 +137,9 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
         continue;
       }
 
-      const depositAmount = Number(booking.depositAmount) || 0;
-      const total = Number(booking.total) || 0;
-      let pendingAmount = 0;
-
       const locale = normalizeLocale(booking.preferredLocale);
       const t = PAYMENT_REMINDER_COPY[locale];
-      const pendingItems: string[] = [];
-
-      if (!booking.depositPaid && depositAmount > 0) {
-        pendingAmount += depositAmount;
-        pendingItems.push(`${t.deposit}: ${formatCurrency(depositAmount, locale)}`);
-      }
-      if (!booking.remainingPaid) {
-        const remaining = total - depositAmount;
-        if (remaining > 0) {
-          pendingAmount += remaining;
-          pendingItems.push(`${t.remaining}: ${formatCurrency(remaining, locale)}`);
-        }
-      }
+      const { pendingAmount, pendingItems } = buildPendingReminderItems(booking, locale, t);
 
       if (pendingAmount <= 0) {
         result.skipped++;
@@ -118,6 +151,7 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
       );
 
       const ref = booking.reference || booking.id.slice(0, 8);
+      const subject = t.subject(ref);
       const html = `
         <div style="font-family:Segoe UI,Arial,sans-serif;background:#0b1120;color:#e2e8f0;padding:24px;border-radius:12px">
           <h2 style="margin:0 0 12px 0;color:#f8fafc">${t.title}</h2>
@@ -131,12 +165,37 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
           <p style="margin-top:16px;font-size:12px;color:#94a3b8">${t.thanks}</p>
         </div>
       `;
-
-      await sendEmail({
+      const baseUrl = getAppBaseUrl().replace(/\/+$/, '');
+      const orbita = { kind: 'booking' as const, id: booking.id, origin: PAYMENT_REMINDER_ORBITA_ORIGIN };
+      const trackingRecord = await recordEmailSend({
+        templateKey: PAYMENT_REMINDER_TEMPLATE_KEY,
         to: booking.clientEmail,
-        subject: t.subject(ref),
-        html,
+        subject,
+        leadId: null,
+        customerId: null,
+        locale,
+        htmlBody: html,
+        orbitaKind: orbita.kind,
+        orbitaId: orbita.id,
+        orbitaOrigin: orbita.origin,
       });
+
+      const sendResult = await sendEmail({
+        to: booking.clientEmail,
+        subject,
+        html: buildTrackedPaymentReminderHtml(html, trackingRecord.trackingToken, baseUrl),
+        orbita,
+      });
+      await updateEmailSendResult(trackingRecord.id, {
+        smtpAccepted: sendResult.smtp.accepted,
+        smtpRejected: sendResult.smtp.rejected,
+        smtpResponse: sendResult.smtp.response,
+        smtpMessageId: sendResult.smtp.messageId,
+        imapAppendOk: sendResult.imapSent.attempted ? sendResult.imapSent.ok : null,
+        imapSentFolder: sendResult.imapSent.folder,
+        imapSentUid: sendResult.imapSent.uid ?? null,
+        imapError: sendResult.imapSent.error ?? null,
+      }).catch(() => undefined);
 
       await recordBookingCommunicationLog({
         action: CUSTOMER_ACTIVITY_ACTIONS.PAYMENT_REMINDER_SENT,
@@ -146,6 +205,11 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
           daysToEvent,
           clientEmail: booking.clientEmail,
           locale,
+          emailSendId: trackingRecord.id,
+          emailSnapshot: 'EmailSend.htmlBody',
+          orbitaKind: orbita.kind,
+          orbitaId: orbita.id,
+          orbitaOrigin: orbita.origin,
         },
       });
 

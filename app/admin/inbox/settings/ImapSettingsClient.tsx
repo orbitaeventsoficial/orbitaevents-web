@@ -1,5 +1,5 @@
 // app/admin/inbox/settings/ImapSettingsClient.tsx
-// Canvi #802 — extirpació ap-*/admin-tone-*, reconstrucció ix__settings* classes
+// 100% canònic — .ap-card/.ap-btn/.ap-badge/.ap-inline-alert/.adm-input (eradicació classes pròpies d'òrgan)
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -20,6 +20,9 @@ interface ConnectionResult {
   ok: boolean;
   error?: string;
 }
+
+const labelClass = 'text-xs font-bold uppercase tracking-[0.1em] text-[var(--t2)]';
+const cardTitleClass = 'text-xs font-bold uppercase tracking-[0.08em] text-[var(--t3)]';
 
 export default function ImapSettingsClient() {
   const toast = useToast();
@@ -179,18 +182,26 @@ export default function ImapSettingsClient() {
 
   if (loading) {
     return (
-      <div className="ix__settings-loading" role="status">
-        <span className="ix__settings-spinner" />
-        Carregant configuració...
+      <div className="ap-card">
+        <div className="ap-card-body flex items-center gap-2.5 text-sm text-[var(--t2)]" role="status">
+          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--line2)] border-t-[var(--gold)]" />
+          Carregant configuració...
+        </div>
       </div>
     );
   }
 
-  const connClass = connection?.ok
-    ? 'ix__connstat is-ok'
+  const alertVariant = connection?.ok
+    ? 'success'
     : config?.configured
-      ? 'ix__connstat is-error'
-      : 'ix__connstat is-pending';
+      ? 'danger'
+      : 'warning';
+
+  const dotClass = connection?.ok
+    ? 'bg-[var(--at-green)]'
+    : config?.configured
+      ? 'bg-[var(--at-red)]'
+      : 'bg-[var(--at-orange)]';
 
   const connTitle = connection?.ok
     ? 'IMAP connectat i operatiu'
@@ -203,139 +214,144 @@ export default function ImapSettingsClient() {
     config?.source === 'db' ? 'Configurat des de l\'admin' :
     null;
 
+  const configRows: [string, string][] = config?.configured
+    ? [
+        ['Servidor', config.host],
+        ['Port', String(config.port)],
+        ['Usuari', config.user],
+        ['SSL/TLS', config.secure ? 'Sí (port 993)' : 'No'],
+        ['Contrasenya', '••••••••'],
+      ]
+    : [];
+
   return (
     <>
       {/* Estat de connexió */}
-      <div className={connClass}>
-        <div className="ix__connstat-header">
-          <div className="ix__connstat-left">
-            <span className="ix__connstat-dot" />
+      <div className={`ap-inline-alert ap-inline-alert--${alertVariant}`}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className={`h-3 w-3 shrink-0 rounded-full ${dotClass}`} />
             <div>
-              <p className="ix__connstat-title">{connTitle}</p>
-              {sourceLabel && <p className="ix__connstat-source">{sourceLabel}</p>}
+              <p className="font-semibold text-[var(--t)]">{connTitle}</p>
+              {sourceLabel && <p className="mt-0.5 text-xs text-[var(--t3)]">{sourceLabel}</p>}
             </div>
           </div>
-          {connection?.ok && <span className="ix__connstat-badge">ONLINE</span>}
+          {connection?.ok && <span className="ap-badge ap-badge--success">ONLINE</span>}
         </div>
         {connection && !connection.ok && connection.error && (
-          <p className="ix__connstat-error">{connection.error}</p>
+          <p className="mt-2.5 text-[var(--t)]">{connection.error}</p>
         )}
       </div>
 
       {/* Config actual */}
       {config?.configured && (
-        <div className="ix__configcard">
-          <p className="ix__configcard-title">Configuració actual</p>
-          <div className="ix__configrow">
-            <span className="ix__configlabel">Servidor</span>
-            <span className="ix__configval">{config.host}</span>
+        <section className="ap-card">
+          <div className="ap-card-body">
+            <p className={cardTitleClass}>Configuració actual</p>
+            <div className="mt-3.5 grid gap-2.5">
+              {configRows.map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex items-center justify-between gap-3 border-b border-[var(--line2)] pb-2.5 text-sm last:border-0 last:pb-0"
+                >
+                  <span className="text-[var(--t3)]">{label}</span>
+                  <span className="font-mono text-[var(--t)]">{value}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="ix__configrow">
-            <span className="ix__configlabel">Port</span>
-            <span className="ix__configval">{config.port}</span>
-          </div>
-          <div className="ix__configrow">
-            <span className="ix__configlabel">Usuari</span>
-            <span className="ix__configval">{config.user}</span>
-          </div>
-          <div className="ix__configrow">
-            <span className="ix__configlabel">SSL/TLS</span>
-            <span className="ix__configval">{config.secure ? 'Sí (port 993)' : 'No'}</span>
-          </div>
-          <div className="ix__configrow">
-            <span className="ix__configlabel">Contrasenya</span>
-            <span className="ix__configval">••••••••</span>
-          </div>
-        </div>
+        </section>
       )}
 
       {/* Formulari de configuració */}
       {!config?.configured || showForm ? (
-        <div className="ix__formcard">
-          <p className="ix__formcard-title">
-            {config?.configured ? 'Modificar configuració' : 'Configurar connexió IMAP'}
-          </p>
-          <div className="ix__formgrid">
-            <div className="ix__formfield">
-              <label htmlFor="imap-host" className="ix__formlabel">Servidor IMAP</label>
-              <input
-                id="imap-host"
-                type="text"
-                value={host}
-                onChange={(e) => setHost(e.target.value)}
-                placeholder="imap.dondominio.com"
-                className="ix__forminput"
-              />
+        <section className="ap-card">
+          <div className="ap-card-body">
+            <p className={cardTitleClass}>
+              {config?.configured ? 'Modificar configuració' : 'Configurar connexió IMAP'}
+            </p>
+            <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
+              <div className="grid gap-1.5">
+                <label htmlFor="imap-host" className={labelClass}>Servidor IMAP</label>
+                <input
+                  id="imap-host"
+                  type="text"
+                  value={host}
+                  onChange={(e) => setHost(e.target.value)}
+                  placeholder="imap.dondominio.com"
+                  className="adm-input"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <label htmlFor="imap-port" className={labelClass}>Port</label>
+                <input
+                  id="imap-port"
+                  type="number"
+                  value={port}
+                  onChange={(e) => setPort(e.target.value)}
+                  placeholder="993"
+                  min={1}
+                  className="adm-input"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <label htmlFor="imap-user" className={labelClass}>Usuari (email)</label>
+                <input
+                  id="imap-user"
+                  type="email"
+                  value={user}
+                  onChange={(e) => setUser(e.target.value)}
+                  placeholder="info@orbitaevents.com"
+                  className="adm-input"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <label htmlFor="imap-pass" className={labelClass}>Contrasenya</label>
+                <input
+                  id="imap-pass"
+                  type="password"
+                  value={pass}
+                  onChange={(e) => setPass(e.target.value)}
+                  placeholder="••••••••"
+                  className="adm-input"
+                />
+              </div>
             </div>
-            <div className="ix__formfield">
-              <label htmlFor="imap-port" className="ix__formlabel">Port</label>
-              <input
-                id="imap-port"
-                type="number"
-                value={port}
-                onChange={(e) => setPort(e.target.value)}
-                placeholder="993"
-                min={1}
-                className="ix__forminput"
-              />
-            </div>
-            <div className="ix__formfield">
-              <label htmlFor="imap-user" className="ix__formlabel">Usuari (email)</label>
-              <input
-                id="imap-user"
-                type="email"
-                value={user}
-                onChange={(e) => setUser(e.target.value)}
-                placeholder="info@orbitaevents.com"
-                className="ix__forminput"
-              />
-            </div>
-            <div className="ix__formfield">
-              <label htmlFor="imap-pass" className="ix__formlabel">Contrasenya</label>
-              <input
-                id="imap-pass"
-                type="password"
-                value={pass}
-                onChange={(e) => setPass(e.target.value)}
-                placeholder="••••••••"
-                className="ix__forminput"
-              />
-            </div>
-          </div>
-          <div className="ix__formactions">
-            <button
-              type="button"
-              disabled={testing}
-              onClick={testConnection}
-              className="ix__settingsbtn"
-            >
-              {testing ? 'Provant...' : 'Provar connexió'}
-            </button>
-            <button
-              type="button"
-              disabled={saving}
-              onClick={saveConfig}
-              className="ix__settingsbtn is-primary"
-            >
-              {saving ? 'Desant...' : 'Desa i connecta'}
-            </button>
-            {showForm && (
+            <div className="mt-4 flex flex-wrap gap-2.5">
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
-                className="ix__settingsbtn"
+                disabled={testing}
+                onClick={testConnection}
+                className="ap-btn ap-btn--secondary"
               >
-                Cancel·lar
+                {testing ? 'Provant...' : 'Provar connexió'}
               </button>
-            )}
+              <button
+                type="button"
+                disabled={saving}
+                onClick={saveConfig}
+                className="ap-btn ap-btn--primary"
+              >
+                {saving ? 'Desant...' : 'Desa i connecta'}
+              </button>
+              {showForm && (
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="ap-btn ap-btn--secondary"
+                >
+                  Cancel·lar
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        </section>
       ) : (
-        <div className="ix__formactions">
+        <div className="flex flex-wrap gap-2.5">
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="ix__settingsbtn"
+            className="ap-btn ap-btn--secondary"
           >
             Modificar configuració
           </button>
@@ -343,7 +359,7 @@ export default function ImapSettingsClient() {
             <button
               type="button"
               onClick={deleteConfig}
-              className="ix__settingsbtn is-danger"
+              className="ap-btn ap-btn--danger"
             >
               Eliminar configuració
             </button>
@@ -352,45 +368,49 @@ export default function ImapSettingsClient() {
       )}
 
       {/* Firma de mail */}
-      <div className="ix__formcard">
-        <p className="ix__formcard-title">Firma de mail</p>
-        <p className="ix__formcard-hint">
-          Text que apareix al peu de tots els emails enviats des de l&apos;admin. Si és buit, s&apos;usa la firma per defecte (nom, telèfon, web).
-        </p>
-        <div className="ix__formfield ix__formfield--signature">
-          <label htmlFor="email-signature" className="ix__formlabel">Text de la firma</label>
-          <textarea
-            id="email-signature"
-            value={signature}
-            onChange={e => setSignature(e.target.value)}
-            placeholder={`Òrbita Events\n+34 XXX XXX XXX · info@orbitaevents.com\nwww.orbitaevents.com`}
-            rows={5}
-            className="ix__forminput ix__forminput--textarea"
-          />
+      <section className="ap-card">
+        <div className="ap-card-body">
+          <p className={cardTitleClass}>Firma de mail</p>
+          <p className="mt-2 text-xs text-[var(--t3)]">
+            Text que apareix al peu de tots els emails enviats des de l&apos;admin. Si és buit, s&apos;usa la firma per defecte (nom, telèfon, web).
+          </p>
+          <div className="mt-3.5 grid gap-1.5">
+            <label htmlFor="email-signature" className={labelClass}>Text de la firma</label>
+            <textarea
+              id="email-signature"
+              value={signature}
+              onChange={e => setSignature(e.target.value)}
+              placeholder={`Òrbita Events\n+34 XXX XXX XXX · info@orbitaevents.com\nwww.orbitaevents.com`}
+              rows={5}
+              className="adm-input adm-input--textarea"
+            />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2.5">
+            <button
+              type="button"
+              disabled={savingSignature}
+              onClick={saveSignature}
+              className="ap-btn ap-btn--primary"
+            >
+              {savingSignature ? 'Desant...' : 'Desar firma'}
+            </button>
+          </div>
         </div>
-        <div className="ix__formactions">
-          <button
-            type="button"
-            disabled={savingSignature}
-            onClick={saveSignature}
-            className="ix__settingsbtn is-primary"
-          >
-            {savingSignature ? 'Desant...' : 'Desar firma'}
-          </button>
-        </div>
-      </div>
+      </section>
 
       <ConfirmDialog {...dialogProps} />
 
       {/* Com funciona */}
-      <div className="ix__howto">
-        <p className="ix__howto-title">Com funciona</p>
-        <ul className="ix__howto-list">
-          <li className="ix__howto-item">• La safata llegeix correus directament del servidor IMAP (DonDominio).</li>
-          <li className="ix__howto-item">• Les credencials es guarden xifrades a la base de dades.</li>
-          <li className="ix__howto-item">• Si tens variables d&apos;entorn configurades a Railway, tenen prioritat.</li>
-        </ul>
-      </div>
+      <section className="ap-card">
+        <div className="ap-card-body">
+          <p className={cardTitleClass}>Com funciona</p>
+          <ul className="mt-3 flex flex-col gap-1.5 text-sm text-[var(--t2)]">
+            <li>• La safata llegeix correus directament del servidor IMAP (DonDominio).</li>
+            <li>• Les credencials es guarden xifrades a la base de dades.</li>
+            <li>• Si tens variables d&apos;entorn configurades a Railway, tenen prioritat.</li>
+          </ul>
+        </div>
+      </section>
     </>
   );
 }

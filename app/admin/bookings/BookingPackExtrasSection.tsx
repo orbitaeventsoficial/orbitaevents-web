@@ -1,13 +1,17 @@
 /* ============================================================================
-   ÒRBITA ADMIN — NewBookingForm · Secció Pack + Extres (Brass & Obsidian)
+   ÒRBITA ADMIN — NewBookingForm · Secció Pack + Extres
    ----------------------------------------------------------------------------
-   Reescrit al sistema visual nb-* (Canvi #842). Packs amb jerarquia clara
-   (preu daurat prominent, descripció en t3), extres com a llista compacta.
+   Canònic: AdminSection + .adm-input + .ap-btn + Tailwind/tokens (canonització
+   2026-06-30, sistema propi `nb-*` eradicat). Packs amb jerarquia clara (preu daurat),
+   extres com a llista compacta.
 ============================================================================ */
 
+import { useState } from 'react';
 import { SERVICE_LABELS } from '@/lib/constants';
 import { CUSTOM_BOOKING_PACK_SLUG } from '@/lib/constants/pricing';
 import type { ServiceSlug } from '@/app/config/packs-config';
+import { AdminSection } from '../components/AdminPage';
+import { NB_FIELD, NB_LABEL, NB_HINT } from './booking-form-classes';
 import type { BookingExtra, BookingPack, BookingSelectedExtras } from './booking-form.types';
 
 // Etiqueta humana del servei del pack (Bodes/Discomòbil/Empreses/...).
@@ -33,6 +37,8 @@ interface BookingPackExtrasSectionProps {
   onUpdateExtraQuantity: (extraId: string, qty: number) => void;
 }
 
+const NARROW_FIELD = `${NB_FIELD} max-w-[12.5rem] flex-1 basis-40`;
+
 export default function BookingPackExtrasSection({
   packs,
   displayExtras,
@@ -49,20 +55,21 @@ export default function BookingPackExtrasSection({
   onUpdateExtraQuantity,
 }: BookingPackExtrasSectionProps) {
   const catalogPacks = packs.filter((pack) => pack.slug !== CUSTOM_BOOKING_PACK_SLUG);
+  const selectedExtrasCount = Object.keys(selectedExtras).length;
+  const [extrasOpen, setExtrasOpen] = useState(selectedExtrasCount > 0);
   return (
     <>
-      <section className="nb__panel">
-        <div className="nb__phead nb__phead--toggle">
-          <div>
-            <h2 className="nb__h2">Partir d&apos;un pack</h2>
-            <span className="nb__pintro">Opcional · una tarifa tancada de catàleg</span>
-          </div>
-          <button type="button" className="nb__toggle" onClick={onToggleCollapsed}>
+      {(!collapsed || selectedPackId) && <AdminSection
+        title="Partir d'un pack"
+        description="Opcional · una tarifa tancada de catàleg"
+        actions={(
+          <button type="button" className="ap-btn ap-btn--xs" onClick={onToggleCollapsed}>
             {collapsed ? 'Triar pack' : 'Amagar'}
           </button>
-        </div>
+        )}
+      >
         {!collapsed && (
-        <div className="nb__packs">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(11.25rem,1fr))] gap-2.5">
           {catalogPacks.map((pack) => {
             const name = pack.translations[0]?.name || pack.slug;
             const desc = pack.translations[0]?.description || '';
@@ -74,13 +81,17 @@ export default function BookingPackExtrasSection({
                 type="button"
                 onClick={() => onPackSelect(pack.id)}
                 aria-pressed={isSelected}
-                className={`nb__pack${isSelected ? ' is-on' : ''}`}
+                className={`flex flex-col gap-1.5 rounded-[var(--o-r-md)] border px-3.5 py-3.5 text-left transition-colors ${
+                  isSelected
+                    ? 'border-[var(--gold)] bg-[var(--ax-gold-tint-1)]'
+                    : 'border-[var(--line)] bg-[var(--sunk)] hover:border-[var(--hair-gold)]'
+                }`}
               >
-                {serviceLbl && <span className="nb__packservice">{serviceLbl}</span>}
-                <span className="nb__packname">{name}</span>
-                <span className="nb__packprice">{pack.price}€</span>
-                {desc && <span className="nb__packdesc">{desc}</span>}
-                <span className="nb__packmeta">
+                {serviceLbl && <span className="font-mono text-[length:var(--o-text-2xs)] font-bold uppercase tracking-[0.13em] text-[var(--gold)]">{serviceLbl}</span>}
+                <span className="text-base font-bold text-[var(--t)]">{name}</span>
+                <span className="font-mono text-lg font-extrabold tabular-nums text-[var(--gold-bright)]">{pack.price}€</span>
+                {desc && <span className="text-xs leading-snug text-[var(--t3)]">{desc}</span>}
+                <span className="mt-1 flex flex-wrap gap-1.5 font-mono text-[length:var(--o-text-2xs)] text-[var(--t3)]">
                   <span>{pack.djHours}h</span>
                   <span>·</span>
                   <span>{pack.soundWatts}W</span>
@@ -96,58 +107,65 @@ export default function BookingPackExtrasSection({
         )}
 
         {!collapsed && selectedPackId && (
-          <div className="nb__pack-tune">
-            <p className="nb__pack-tune-title">Personalitza aquest pack</p>
-            <div className="nb__pack-tune-grid">
-              <div className="nb__field nb__field--narrow">
-                <label htmlFor="nb-extra-hours" className="nb__label">Hores extra</label>
+          <div className="mt-4 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[color-mix(in_oklab,var(--panel)_60%,transparent)] p-3.5">
+            <p className="mb-2.5 text-xs font-semibold uppercase tracking-[0.04em] text-[var(--t3)]">Personalitza aquest pack</p>
+            <div className="flex flex-wrap gap-4">
+              <div className={NARROW_FIELD}>
+                <label htmlFor="nb-extra-hours" className={NB_LABEL}>Hores extra</label>
                 <input
                   id="nb-extra-hours" type="number" min={0} max={10}
                   value={extraHours} onChange={(e) => onExtraHoursChange(e.target.value)}
-                  className="nb__input"
+                  className="adm-input"
                 />
               </div>
-              <div className="nb__field nb__field--narrow">
-                <label htmlFor="nb-custom-price" className="nb__label">Preu del pack</label>
+              <div className={NARROW_FIELD}>
+                <label htmlFor="nb-custom-price" className={NB_LABEL}>Preu del pack</label>
                 <input
                   id="nb-custom-price" type="number" min={0} placeholder="tarifa per defecte"
                   value={customPackPrice} onChange={(e) => onCustomPackPriceChange(e.target.value)}
-                  className="nb__input"
+                  className="adm-input"
                 />
-                <span className="nb__field-hint">si has pactat un preu diferent al de tarifa</span>
+                <span className={NB_HINT}>si has pactat un preu diferent al de tarifa</span>
               </div>
             </div>
           </div>
         )}
-      </section>
+      </AdminSection>}
 
       {displayExtras.length > 0 && (
-        <section className="nb__panel">
-          <div className="nb__phead nb__phead--toggle">
-            <div>
-              <h2 className="nb__h2">Extres</h2>
-              <span className="nb__pintro">Opcionals</span>
+        <AdminSection
+          title="Extres"
+          description={selectedExtrasCount > 0 ? `${selectedExtrasCount} seleccionats` : 'Opcionals'}
+          actions={(
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className="ap-btn ap-btn--xs" onClick={() => setExtrasOpen((value) => !value)}>
+                {extrasOpen ? 'Amagar' : 'Veure extres'}
+              </button>
+              <a href="/admin/packs/extras" target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--xs">Gestionar extres ↗</a>
             </div>
-            <a href="/admin/packs/extras" target="_blank" rel="noopener noreferrer" className="nb__toggle">Gestionar extres ↗</a>
-          </div>
-          <div className="nb__extras">
+          )}
+        >
+          {extrasOpen && <div className="flex flex-col overflow-hidden rounded-[var(--o-r-md)] border border-[var(--line)]">
             {displayExtras.map((extra) => {
               const name = extra.translations[0]?.name || extra.slug;
               const isSelected = !!selectedExtras[extra.id];
               return (
-                <label key={extra.id} className="nb__extra">
+                <label
+                  key={extra.id}
+                  className="flex items-center gap-3 border-b border-[color-mix(in_oklab,var(--line)_50%,transparent)] bg-[var(--panel)] px-3.5 py-2.5 transition-colors last:border-b-0 hover:bg-[var(--ax-gold-tint-1)]"
+                >
                   <input
                     type="checkbox"
-                    className="nb__extra-cbx"
+                    className="h-4 w-4 shrink-0 cursor-pointer accent-[var(--gold)]"
                     checked={isSelected}
                     onChange={() => onToggleExtra(extra)}
                     aria-label={`Afegir ${name}`}
                   />
-                  <span className="nb__extra-name">
+                  <span className="min-w-0 flex-1 text-sm text-[var(--t)]">
                     {name}
-                    {extra.isOperatorExtra && <small>Preu per hora extra</small>}
+                    {extra.isOperatorExtra && <small className="mt-0.5 block font-mono text-xs text-[var(--t3)]">Preu per hora extra</small>}
                   </span>
-                  <span className="nb__extra-price">{extra.price}€{extra.isOperatorExtra ? '/h' : ''}</span>
+                  <span className="font-mono text-sm font-bold tabular-nums text-[var(--gold-bright)]">{extra.price}€{extra.isOperatorExtra ? '/h' : ''}</span>
                   {isSelected && !extra.isOperatorExtra && (
                     <input
                       type="number"
@@ -155,15 +173,15 @@ export default function BookingPackExtrasSection({
                       max={20}
                       value={selectedExtras[extra.id].quantity}
                       onChange={(e) => onUpdateExtraQuantity(extra.id, parseInt(e.target.value, 10) || 1)}
-                      className="nb__extra-qty"
+                      className="adm-input w-16 text-center"
                       aria-label={`Quantitat de ${name}`}
                     />
                   )}
                 </label>
               );
             })}
-          </div>
-        </section>
+          </div>}
+        </AdminSection>
       )}
     </>
   );

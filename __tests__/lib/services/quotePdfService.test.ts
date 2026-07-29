@@ -7,6 +7,10 @@ vi.mock('@/lib/logo-lockup-light-base64', () => ({
 import { generateQuotePDF, type QuoteData } from '@/lib/services/quotePdfService';
 import { getPacksByService } from '@/app/config/packs-config';
 
+function pdfText(doc: Awaited<ReturnType<typeof generateQuotePDF>>): string {
+  return String((doc as unknown as { internal: { pages: unknown[][] } }).internal.pages.flat().join('\n'));
+}
+
 function makeQuoteData(overrides: Partial<QuoteData> = {}): QuoteData {
   const pack = getPacksByService('bodas')[0];
   return {
@@ -56,14 +60,11 @@ describe('generateQuotePDF', () => {
     expect(output.byteLength).toBeGreaterThan(500);
   });
 
-  it('inclou descompte i recàrrec de temporada', async () => {
+  it('inclou descompte sense cap recàrrec de temporada', async () => {
     const doc = await generateQuotePDF(makeQuoteData({
       discount: 100,
       discountReason: 'Promo especial',
-      seasonSurcharge: 200,
-      seasonLabel: 'Recàrrec alta temporada',
-      seasonPct: 10,
-      total: 1300,
+      total: 1100,
     }));
     const output = doc.output('arraybuffer');
     expect(output).toBeInstanceOf(ArrayBuffer);
@@ -83,6 +84,34 @@ describe('generateQuotePDF', () => {
     expect(output.byteLength).toBeGreaterThan(500);
   });
 
+  it('mostra el desglossament d’IVA quan el pressupost l’aplica', async () => {
+    const doc = await generateQuotePDF(makeQuoteData({
+      taxableBase: 1000,
+      vatRate: 21,
+      vatAmount: 210,
+      total: 1210,
+    }));
+    const text = pdfText(doc);
+
+    expect(text).toContain('Base imposable');
+    expect(text).toContain('IVA 21%');
+    expect(text).toContain('Preus amb IVA desglossat.');
+    expect(text).not.toContain('Preus sense IVA.');
+  });
+
+  it('mostra explícitament que no hi ha IVA aplicat quan vatRate és 0', async () => {
+    const doc = await generateQuotePDF(makeQuoteData({
+      taxableBase: 1000,
+      vatRate: 0,
+      vatAmount: 0,
+      total: 1000,
+    }));
+    const text = pdfText(doc);
+
+    expect(text).toContain('Preus sense IVA aplicat.');
+    expect(text).not.toContain('IVA 21%');
+  });
+
   it('funciona sense dades de client opcionals', async () => {
     const doc = await generateQuotePDF(makeQuoteData({
       clientName: undefined,
@@ -92,5 +121,40 @@ describe('generateQuotePDF', () => {
     const output = doc.output('arraybuffer');
     expect(output).toBeInstanceOf(ArrayBuffer);
     expect(output.byteLength).toBeGreaterThan(500);
+  });
+
+  it('usa labels comercials polides en català', async () => {
+    const doc = await generateQuotePDF(makeQuoteData({
+      whyChooseUs: 'Equip propi, muntatge puntual i una proposta clara abans de reservar.',
+    }), 'ca');
+    const text = pdfText(doc);
+
+    expect(text).toContain('QUÈ INCLOU');
+    expect(text).toContain('RESUM ECONÒMIC');
+    expect(text).toContain('PER QUÈ ESCOLLIR-NOS');
+    expect(text).toContain('Accepta la proposta');
+    expect(text).toContain('Reserva amb paga i senyal');
+    expect(text).toContain('Esdeveniment assegurat');
+    expect(text).not.toContain('Que inclou');
+    expect(text).not.toContain('Resum economic');
+    expect(text).not.toContain('Per que escollir-nos');
+    expect(text).not.toContain('Reserva amb dipòsit');
+  });
+
+  it('usa accents correctes en castellà', async () => {
+    const doc = await generateQuotePDF(makeQuoteData({
+      whyChooseUs: 'Equipo propio, montaje puntual y una propuesta clara antes de reservar.',
+    }), 'es');
+    const text = pdfText(doc);
+
+    expect(text).toContain('QUÉ INCLUYE');
+    expect(text).toContain('RESUMEN ECONÓMICO');
+    expect(text).toContain('POR QUÉ ELEGIRNOS');
+    expect(text).toContain('Acepta la propuesta');
+    expect(text).toContain('días');
+    expect(text).not.toContain('Que incluye');
+    expect(text).not.toContain('Resumen economico');
+    expect(text).not.toContain('Por que elegirnos');
+    expect(text).not.toContain('dias');
   });
 });

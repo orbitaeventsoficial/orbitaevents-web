@@ -1,4 +1,4 @@
-import { PUBLIC_SERVICE_MEDIA_CONFIG, type PublicMobileServiceCardId, type PublicServiceMediaKey } from '@/lib/constants/public-service-media';
+import { PUBLIC_SERVICE_MEDIA_CONFIG, type PublicServiceMediaKey } from '@/lib/constants/public-service-media';
 
 export type { PublicMobileServiceCardId, PublicServiceMediaKey } from '@/lib/constants/public-service-media';
 import { listPortfolioPhotos } from '@/lib/services/galleryService';
@@ -16,7 +16,6 @@ type ServiceMediaSnapshot = {
 const PUBLIC_MEDIA_LOOKUP_LIMIT = 12;
 const warningKeys = new Set<string>();
 const serviceMediaSnapshotCache = new Map<PublicServiceMediaKey, Promise<ServiceMediaSnapshot>>();
-let mobileServiceCardImagesCache: Promise<Record<PublicMobileServiceCardId, string>> | null = null;
 
 function dedupe(items: string[]) {
   return Array.from(new Set(items.filter(Boolean)));
@@ -54,10 +53,6 @@ function getManagedGalleryPlacementKey(key: PublicServiceMediaKey): string | nul
     case 'monmagic': return 'themes.monmagic.gallery';
     default: return null;
   }
-}
-
-export function getPublicServicePortfolioSlug(key: PublicServiceMediaKey) {
-  return PUBLIC_SERVICE_MEDIA_CONFIG[key].portfolioSlug;
 }
 
 async function resolveServiceMediaSnapshot(key: PublicServiceMediaKey): Promise<ServiceMediaSnapshot> {
@@ -146,44 +141,4 @@ export async function getPublicServiceGalleryImages(key: PublicServiceMediaKey, 
 
   const combined = dedupe([...snapshot.mediaImages, ...snapshot.bookingImages]).slice(0, limit);
   return combined.length > 0 ? combined : [snapshot.fallbackImage];
-}
-
-async function resolveMobileServiceCardImages(): Promise<Record<PublicMobileServiceCardId, string>> {
-  const mapping: Record<PublicMobileServiceCardId, PublicServiceMediaKey> = {
-    bodas: 'bodas',
-    halloween: 'halloween',
-    monmagic: 'monmagic',
-    fiestas: 'fiestas',
-    empresas: 'empresas',
-  };
-
-  const entries: Array<readonly [PublicMobileServiceCardId, string]> = [];
-
-  for (const [cardId, serviceKey] of Object.entries(mapping)) {
-    try {
-      const cardOverride = await getManagedImageOverride(`home.servicesCards.${cardId}`);
-      if (cardOverride?.src) {
-        entries.push([cardId as PublicMobileServiceCardId, cardOverride.src] as const);
-        continue;
-      }
-    } catch (error) {
-      logPublicMediaWarning('mobile-card-override', cardId, error);
-    }
-
-    entries.push([cardId as PublicMobileServiceCardId, await getPublicServiceHeroImage(serviceKey)] as const);
-  }
-
-  return Object.fromEntries(entries) as Record<PublicMobileServiceCardId, string>;
-}
-
-export async function listPublicMobileServiceCardImages(): Promise<Record<PublicMobileServiceCardId, string>> {
-  if (!isProductionRuntime()) {
-    return resolveMobileServiceCardImages();
-  }
-
-  if (!mobileServiceCardImagesCache) {
-    mobileServiceCardImagesCache = resolveMobileServiceCardImages();
-  }
-
-  return mobileServiceCardImagesCache;
 }

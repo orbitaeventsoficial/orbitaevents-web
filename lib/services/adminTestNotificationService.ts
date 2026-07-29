@@ -1,5 +1,5 @@
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { sendEmail } from '@/lib/email';
+import { sendTrackedStandaloneEmail } from '@/lib/email';
 import { readCronRunStatus } from '@/lib/services/cronRunStatusService';
 
 function buildTestEmailHtml(recipient: string, timestamp: string) {
@@ -169,10 +169,12 @@ export async function sendAdminTestEmail(email?: string) {
     timeStyle: 'medium',
   });
 
-  await sendEmail({
+  await sendTrackedStandaloneEmail({
+    templateKey: 'admin-test-notification',
     to: recipient,
     subject: '✅ Test Òrbita Events - Email funciona!',
     html: buildTestEmailHtml(recipient, timestamp),
+    orbita: { kind: 'admin', origin: 'admin-test-notification' },
   });
 
   return {

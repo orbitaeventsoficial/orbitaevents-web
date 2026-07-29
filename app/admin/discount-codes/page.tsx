@@ -6,14 +6,12 @@
  * No acumulable amb descomptes web (per defecte)
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { formatDateSimple } from '@/lib/constants';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useAsyncForm } from '../components/useAsyncForm';
-import { pluralize } from '@/lib/utils/pluralize';
 import { log } from '@/lib/logger';
 
 type DiscountCode = {
@@ -153,9 +151,9 @@ export default function DiscountCodesPage() {
   const toggleActive = async (id: string, active: boolean) => {
     try {
       const res = await fetchWithCsrf('/api/admin/discount-codes', {
-        method: 'POST',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ _action: 'toggle', id, isActive: !active }),
+        body: JSON.stringify({ id, isActive: !active }),
       });
 
       if (!res.ok) {
@@ -173,185 +171,32 @@ export default function DiscountCodesPage() {
 
   const isExpired = (d: string) => new Date(d) < new Date();
 
-  const strip = useMemo(() => {
-    if (!stats) return null;
-
-    const now = Date.now();
-    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
-
-    const expiredFlaggedActive = codes.filter((c) => c.isActive && isExpired(c.validUntil)).length;
-    const exhaustedFlaggedActive = codes.filter(
-      (c) => c.isActive && c.maxUses != null && c.currentUses >= c.maxUses,
-    ).length;
-    const nearMaxUses = codes.filter(
-      (c) =>
-        c.isActive &&
-        !isExpired(c.validUntil) &&
-        c.maxUses != null &&
-        c.currentUses < c.maxUses &&
-        c.currentUses / c.maxUses >= 0.8,
-    ).length;
-    const aboutToExpire = codes.filter((c) => {
-      if (!c.isActive || isExpired(c.validUntil)) return false;
-      const until = new Date(c.validUntil).getTime();
-      return until - now <= SEVEN_DAYS;
-    }).length;
-    const unusedActive = codes.filter(
-      (c) => c.isActive && !isExpired(c.validUntil) && c.currentUses === 0,
-    ).length;
-    const firstExpiredFlag = codes.find((c) => c.isActive && isExpired(c.validUntil));
-
-    const systemItems: string[] = [];
-    if (stats.total > 0) {
-      systemItems.push(`${stats.total} codis al catàleg · ${stats.active} actius · ${stats.expired} caducats`);
-    }
-    if (stats.totalUses > 0) {
-      systemItems.push(`${stats.totalUses} ${pluralize(stats.totalUses, 'ús acumulat', 'usos acumulats')}`);
-    }
-    if (stats.total === 0) {
-      systemItems.push('Cap codi creat encara');
-    }
-
-    const manualItems: string[] = [];
-    if (expiredFlaggedActive > 0) {
-      manualItems.push(
-        `${expiredFlaggedActive} ${pluralize(expiredFlaggedActive, 'codi caducat encara marcat', 'codis caducats encara marcats')} actius`,
-      );
-    }
-    if (exhaustedFlaggedActive > 0) {
-      manualItems.push(
-        `${exhaustedFlaggedActive} ${pluralize(exhaustedFlaggedActive, 'codi ha', 'codis han')} esgotat els usos màxims`,
-      );
-    }
-    if (aboutToExpire > 0) {
-      manualItems.push(
-        `${aboutToExpire} ${pluralize(aboutToExpire, 'codi caduca', 'codis caduquen')} en ≤7 dies`,
-      );
-    }
-    if (nearMaxUses > 0) {
-      manualItems.push(
-        `${nearMaxUses} ${pluralize(nearMaxUses, 'codi està', 'codis estan')} a ≥80% d'usos`,
-      );
-    }
-    if (unusedActive > 0) {
-      manualItems.push(
-        `${unusedActive} ${pluralize(unusedActive, 'codi actiu sense ús', 'codis actius sense cap ús')}`,
-      );
-    }
-
-    const systemTone: 'info' | 'warning' | 'success' =
-      stats.total === 0 ? 'info' : stats.active === 0 ? 'warning' : 'success';
-
-    const manualTone: 'info' | 'warning' | 'success' =
-      expiredFlaggedActive > 0 || exhaustedFlaggedActive > 0
-        ? 'warning'
-        : manualItems.length > 0
-          ? 'info'
-          : 'success';
-
-    const nextStep =
-      stats.total === 0
-        ? {
-            eyebrow: 'Següent pas · Primer codi',
-            title: 'Crear el primer codi de descompte',
-            detail:
-              'Encara no hi ha cap codi promocional. Activa un per enganxar campanyes, referits o segones reserves.',
-            href: '#nou-codi',
-            ctaLabel: 'Obrir formulari',
-          }
-        : expiredFlaggedActive > 0
-          ? {
-              eyebrow: 'Següent pas · Higiene',
-              title: `Desactivar ${expiredFlaggedActive} ${pluralize(expiredFlaggedActive, 'codi caducat', 'codis caducats')}`,
-              detail: firstExpiredFlag
-                ? `"${firstExpiredFlag.code}" i ${expiredFlaggedActive - 1 >= 0 ? expiredFlaggedActive - 1 : 0} més tenen la bandera activa tot i haver caducat. Desactiva'ls per evitar errors d'aplicació.`
-                : 'Hi ha codis caducats amb la bandera activa. Desactiva\'ls per evitar errors d\'aplicació.',
-              href: '#codis-list',
-              ctaLabel: 'Revisar llista',
-            }
-          : exhaustedFlaggedActive > 0
-            ? {
-                eyebrow: 'Següent pas · Usos',
-                title: 'Tancar codis esgotats',
-                detail: `${exhaustedFlaggedActive} ${pluralize(exhaustedFlaggedActive, 'codi ha', 'codis han')} arribat al màxim d'usos però continuen actius. Desactiva\'ls per mantenir el catàleg net.`,
-                href: '#codis-list',
-                ctaLabel: 'Revisar llista',
-              }
-            : aboutToExpire > 0
-              ? {
-                  eyebrow: 'Següent pas · Renovació',
-                  title: `${aboutToExpire} ${pluralize(aboutToExpire, 'codi caduca', 'codis caduquen')} aviat`,
-                  detail:
-                    'Revisa si cal crear un codi de relleu abans que caduqui. Sense codi viu no pots aplicar promoció en aquest període.',
-                  href: '#nou-codi',
-                  ctaLabel: 'Nou codi',
-                  secondaryAction: { href: '#codis-list', label: 'Veure llista' },
-                }
-              : stats.active === 0 && stats.total > 0
-                ? {
-                    eyebrow: 'Següent pas · Reviu',
-                    title: 'Cap codi actiu ara mateix',
-                    detail:
-                      'Tots els codis del catàleg estan inactius o caducats. Activa\'n un d\'existent o crea\'n un de nou.',
-                    href: '#codis-list',
-                    ctaLabel: 'Revisar catàleg',
-                    secondaryAction: { href: '#nou-codi', label: 'Nou codi' },
-                  }
-                : {
-                    eyebrow: 'Següent pas',
-                    title: 'Catàleg de codis al dia',
-                    detail: `${stats.active} ${pluralize(stats.active, 'codi actiu disponible', 'codis actius disponibles')}. Aprofita per crear codis dirigits (referits, campanyes, segona reserva).`,
-                    href: '#nou-codi',
-                    ctaLabel: 'Nou codi',
-                  };
-
-    return {
-      system: {
-        eyebrow: 'Automàtic · Catàleg',
-        title:
-          stats.total === 0
-            ? 'Sense codis encara'
-            : stats.active === 0
-              ? 'Sense codi actiu'
-              : 'Catàleg promocional',
-        tone: systemTone,
-        items: systemItems,
-        emptyText: 'Encara no hi ha codis.',
-      },
-      manual: {
-        eyebrow: 'Manual · Backlog',
-        title:
-          manualItems.length === 0
-            ? 'Cap senyal manual'
-            : `${manualItems.length} ${pluralize(manualItems.length, 'senyal per revisar', 'senyals per revisar')}`,
-        tone: manualTone,
-        items: manualItems,
-        emptyText: 'Sense codis caducats, esgotats ni propers a vèncer.',
-      },
-      nextStep,
-    };
-  }, [codes, stats]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
-      </div>
+      <AdminPage title="Codis de descompte" subtitle="Gestiona codis promocionals per a reserves" className="max-w-5xl">
+        <div className="ap-card flex items-center gap-3 p-6" role="status" aria-live="polite">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--line)] border-t-transparent" aria-hidden="true" />
+          <span>Carregant codis de descompte...</span>
+        </div>
+      </AdminPage>
     );
   }
 
   if (error && !codes.length) {
     return (
       <AdminPage title="Codis de descompte" subtitle="Gestiona codis promocionals per a reserves" className="max-w-5xl">
-        <AdminEmptyState
-          icon="⚠️"
-          title={error}
-          action={
-            <button type="button" onClick={() => { setLoading(true); loadCodes(); }} className="ap-btn ap-btn--primary">
-              Reintentar
-            </button>
-          }
-        />
+        <div role="alert" aria-live="assertive">
+          <AdminEmptyState
+            icon="⚠️"
+            title={error}
+            action={
+              <button type="button" onClick={() => { setLoading(true); loadCodes(); }} className="ap-btn ap-btn--primary">
+                Reintentar
+              </button>
+            }
+          />
+        </div>
       </AdminPage>
     );
   }
@@ -371,29 +216,21 @@ export default function DiscountCodesPage() {
       }
       className="max-w-5xl"
     >
-      {strip && (
-        <OwnerControlStrip
-          className="mb-2"
-          system={strip.system}
-          manual={strip.manual}
-          nextStep={strip.nextStep}
-        />
-      )}
       {stats && (
         <div className="grid gap-4 sm:grid-cols-4">
-          <div className="rounded-2xl border p-4">
+          <div className="ap-card p-4">
             <p className="text-xs font-medium uppercase">Total codis</p>
             <p className="mt-2 text-3xl font-bold">{stats.total}</p>
           </div>
-          <div className="rounded-2xl border p-4">
+          <div className="ap-card p-4">
             <p className="text-xs font-medium uppercase">Actius</p>
             <p className="mt-2 text-3xl font-bold">{stats.active}</p>
           </div>
-          <div className="rounded-2xl border p-4">
+          <div className="ap-card p-4">
             <p className="text-xs font-medium uppercase">Caducats</p>
             <p className="mt-2 text-3xl font-bold">{stats.expired}</p>
           </div>
-          <div className="rounded-2xl border p-4">
+          <div className="ap-card p-4">
             <p className="text-xs font-medium uppercase">Usos totals</p>
             <p className="mt-2 text-3xl font-bold">{stats.totalUses}</p>
           </div>
@@ -401,19 +238,19 @@ export default function DiscountCodesPage() {
       )}
 
       {success && (
-        <div className="rounded-xl border p-4">
+        <div className="ap-inline-alert ap-inline-alert--success" role="status" aria-live="polite">
           <p className="text-sm">{success}</p>
         </div>
       )}
       {formError && (
-        <div className="rounded-xl border p-4">
+        <div className="ap-inline-alert ap-inline-alert--danger" role="alert" aria-live="assertive">
           <p className="text-sm">{formError}</p>
         </div>
       )}
 
       <div id="nou-codi" aria-hidden="true" />
       {showForm && (
-        <div className="rounded-2xl border p-5 space-y-4">
+        <div className="ap-card p-5 space-y-4">
           <h2 className="text-sm font-semibold">Nou codi de descompte</h2>
 
           <div className="grid gap-4 sm:grid-cols-3">
@@ -425,7 +262,7 @@ export default function DiscountCodesPage() {
                 value={form.code}
                 onChange={(e) => updateField('code', e.target.value.toUpperCase())}
                 placeholder="BODA2026"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 font-mono"
+                className="adm-input mt-1 font-mono"
               />
             </div>
             <div>
@@ -434,22 +271,16 @@ export default function DiscountCodesPage() {
                 <button
                   type="button"
                   onClick={() => updateField('type', 'PERCENTAGE')}
-                  className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
-                    form.type === 'PERCENTAGE'
-                      ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
-                      : 'admin-tone-idle'
-                  }`}
+                  aria-pressed={form.type === 'PERCENTAGE'}
+                  className={`ap-tab flex-1 ${form.type === 'PERCENTAGE' ? 'ap-tab--active' : 'ap-tab--idle'}`}
                 >
                   Percentatge %
                 </button>
                 <button
                   type="button"
                   onClick={() => updateField('type', 'FIXED_AMOUNT')}
-                  className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
-                    form.type === 'FIXED_AMOUNT'
-                      ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
-                      : 'admin-tone-idle'
-                  }`}
+                  aria-pressed={form.type === 'FIXED_AMOUNT'}
+                  className={`ap-tab flex-1 ${form.type === 'FIXED_AMOUNT' ? 'ap-tab--active' : 'ap-tab--idle'}`}
                 >
                   Import fix
                 </button>
@@ -457,7 +288,7 @@ export default function DiscountCodesPage() {
             </div>
             <div>
               <label htmlFor="dc-value" className="text-xs">
-                Valor * {form.type === 'PERCENTAGE' ? '(%)' : '(â‚¬)'}
+                Valor * {form.type === 'PERCENTAGE' ? '(%)' : '(€)'}
               </label>
               <input
                 id="dc-value"
@@ -465,7 +296,7 @@ export default function DiscountCodesPage() {
                 min={0}
                 value={form.value}
                 onChange={(e) => updateField('value', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                className="adm-input mt-1"
               />
             </div>
           </div>
@@ -478,7 +309,7 @@ export default function DiscountCodesPage() {
                 type="date"
                 value={form.validUntil}
                 onChange={(e) => updateField('validUntil', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                className="adm-input mt-1"
               />
             </div>
             <div>
@@ -490,11 +321,11 @@ export default function DiscountCodesPage() {
                 value={form.maxUses}
                 onChange={(e) => updateField('maxUses', e.target.value)}
                 placeholder="Il·limitat"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                className="adm-input mt-1"
               />
             </div>
             <div>
-              <label htmlFor="dc-min-order" className="text-xs">Comanda mínima (â‚¬)</label>
+              <label htmlFor="dc-min-order" className="text-xs">Comanda mínima (€)</label>
               <input
                 id="dc-min-order"
                 type="number"
@@ -502,7 +333,7 @@ export default function DiscountCodesPage() {
                 value={form.minOrderValue}
                 onChange={(e) => updateField('minOrderValue', e.target.value)}
                 placeholder="Sense mínim"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                className="adm-input mt-1"
               />
             </div>
           </div>
@@ -515,7 +346,7 @@ export default function DiscountCodesPage() {
               value={form.description}
               onChange={(e) => updateField('description', e.target.value)}
               placeholder="Descripció interna del codi..."
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+              className="adm-input mt-1"
             />
           </div>
 
@@ -536,6 +367,7 @@ export default function DiscountCodesPage() {
               type="button"
               onClick={handleCreate}
               disabled={submitting || !form.code || !form.value || !form.validUntil}
+              aria-busy={submitting}
               className="ap-btn ap-btn--primary disabled:opacity-50"
             >
               {submitting ? 'Creant...' : 'Crear codi'}
@@ -543,7 +375,7 @@ export default function DiscountCodesPage() {
             <button
               type="button"
               onClick={() => { setShowForm(false); reset(); }}
-              className="rounded-xl border px-4 py-2.5 text-sm transition-colors"
+              className="ap-btn"
             >
               Cancel·lar
             </button>
@@ -562,15 +394,15 @@ export default function DiscountCodesPage() {
             <article key={c.id} className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <code className="text-sm font-mono px-2 py-0.5 rounded bg-white/5">{c.code}</code>
+                  <code className="text-sm font-mono px-2 py-0.5 rounded bg-[var(--raised)]">{c.code}</code>
                   {c.description && <p className="text-xs mt-1">{c.description}</p>}
                 </div>
                 <div className="text-right shrink-0">
                   <span className="font-bold text-lg">
-                    {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}
+                    {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}
                   </span>
                   <span className={`block mt-0.5 rounded-full px-2 py-0.5 text-xs font-medium text-center ${
-                    active ? 'admin-tone-soft-success' : 'bg-white/5 text-white/40'
+                    active ? 'admin-tone-soft-success' : 'bg-[var(--raised)] text-[var(--t3)]'
                   }`}>
                     {active ? 'Actiu' : 'Inactiu'}
                   </span>
@@ -587,7 +419,7 @@ export default function DiscountCodesPage() {
                 <button
                   type="button"
                   onClick={() => toggleActive(c.id, c.isActive)}
-                  className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors min-h-[44px]"
+                  className="ap-btn ap-btn--xs"
                 >
                   {c.isActive ? 'Desactivar' : 'Activar'}
                 </button>
@@ -630,8 +462,8 @@ export default function DiscountCodesPage() {
                       {c.description && <p className="text-xs mt-0.5">{c.description}</p>}
                     </td>
                     <td className="px-4 py-3">{c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}</td>
-                    <td className="px-4 py-3 font-semibold">{c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}</td>
-                    <td className={`px-4 py-3 ${expired ? 'admin-tone-text-danger' : 'text-white/60'}`}>
+                    <td className="px-4 py-3 font-semibold">{c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}</td>
+                    <td className={`px-4 py-3 ${expired ? 'admin-tone-text-danger' : 'text-[var(--t2)]'}`}>
                       {formatDateSimple(c.validUntil)}
                       {expired && <span className="block text-xs">Caducat</span>}
                     </td>
@@ -644,7 +476,7 @@ export default function DiscountCodesPage() {
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                           c.isActive && !expired && !maxReached
                             ? 'admin-tone-soft-success'
-                            : 'bg-white/5 text-white/40'
+                            : 'bg-[var(--raised)] text-[var(--t3)]'
                         }`}
                       >
                         {c.isActive && !expired && !maxReached ? 'Actiu' : 'Inactiu'}
@@ -655,7 +487,7 @@ export default function DiscountCodesPage() {
                       <button
                         type="button"
                         onClick={() => toggleActive(c.id, c.isActive)}
-                        className="rounded-xl border px-2.5 py-1.5 text-xs font-medium transition-colors"
+                        className="ap-btn ap-btn--xs"
                       >
                         {c.isActive ? 'Desactivar' : 'Activar'}
                       </button>
@@ -680,4 +512,3 @@ export default function DiscountCodesPage() {
     </AdminPage>
   );
 }
-

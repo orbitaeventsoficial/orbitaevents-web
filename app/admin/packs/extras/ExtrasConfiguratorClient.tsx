@@ -27,6 +27,7 @@ export default function ExtrasConfiguratorClient() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [isDefault, setIsDefault] = useState(false);
 
   const serviceList = useMemo(() => ALL_SERVICES, []);
@@ -43,9 +44,11 @@ export default function ExtrasConfiguratorClient() {
         setExtras(Array.isArray(data?.config) ? data.config : []);
         setIsDefault(Boolean(data?.isDefault));
         setError(null);
+        setNotice(null);
       } catch (err) {
         if (!active) return;
         setError('No s\'ha pogut carregar la configuració.');
+        setNotice(null);
       } finally {
         if (active) setLoading(false);
       }
@@ -58,12 +61,14 @@ export default function ExtrasConfiguratorClient() {
   }, []);
 
   const updateExtra = (index: number, patch: Partial<ExtraDefinition>) => {
+    setNotice(null);
     setExtras((prev) =>
       prev.map((extra, i) => (i === index ? { ...extra, ...patch } : extra))
     );
   };
 
   const toggleService = (index: number, service: ServiceSlug) => {
+    setNotice(null);
     setExtras((prev) =>
       prev.map((extra, i) => {
         if (i !== index) return extra;
@@ -82,6 +87,7 @@ export default function ExtrasConfiguratorClient() {
     try {
       setSaving(true);
       setError(null);
+      setNotice(null);
       const res = await fetchWithCsrf('/api/admin/extras', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -92,8 +98,10 @@ export default function ExtrasConfiguratorClient() {
         throw new Error(payload?.error || 'Error desant');
       }
       setIsDefault(false);
+      setNotice('Canvis desats.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desant');
+      setNotice(null);
     } finally {
       setSaving(false);
     }
@@ -101,8 +109,8 @@ export default function ExtrasConfiguratorClient() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border p-6">
-        Carregant configuració d\'extres...
+      <div className="ap-card p-6" role="status" aria-live="polite">
+        Carregant configuració d'extres...
       </div>
     );
   }
@@ -124,8 +132,11 @@ export default function ExtrasConfiguratorClient() {
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={() => setExtras((prev) => [...prev, defaultExtra()])}
-            className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
+            onClick={() => {
+              setNotice(null);
+              setExtras((prev) => [...prev, defaultExtra()]);
+            }}
+            className="ap-btn ap-btn--secondary"
           >
             + Nou extra
           </button>
@@ -133,7 +144,8 @@ export default function ExtrasConfiguratorClient() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="ap-btn ap-btn--primary"
+            aria-busy={saving}
+            className="ap-btn ap-btn--primary disabled:opacity-60"
           >
             {saving ? 'Desant…' : 'Desar canvis'}
           </button>
@@ -141,8 +153,14 @@ export default function ExtrasConfiguratorClient() {
       </div>
 
       {error && (
-        <div className="rounded-xl border p-3 text-sm">
-          {error}
+        <div className="ap-inline-alert ap-inline-alert--danger" role="alert" aria-live="assertive">
+          Error: {error}
+        </div>
+      )}
+
+      {notice && (
+        <div className="ap-inline-alert ap-inline-alert--success" role="status" aria-live="polite">
+          {notice}
         </div>
       )}
 
@@ -150,7 +168,7 @@ export default function ExtrasConfiguratorClient() {
         {extras.map((extra, index) => (
           <div
             key={`${extra.id}-${index}`}
-            className="rounded-2xl border p-5"
+            className="ap-card p-5"
           >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="grid flex-1 gap-3 sm:grid-cols-2">
@@ -255,8 +273,11 @@ export default function ExtrasConfiguratorClient() {
 
               <button
                 type="button"
-                onClick={() => setExtras((prev) => prev.filter((_, i) => i !== index))}
-                className="rounded-xl border px-3 py-2 text-xs font-semibold"
+                onClick={() => {
+                  setNotice(null);
+                  setExtras((prev) => prev.filter((_, i) => i !== index));
+                }}
+                className="ap-btn ap-btn--danger ap-btn--xs"
               >
                 Eliminar
               </button>
@@ -272,10 +293,11 @@ export default function ExtrasConfiguratorClient() {
                       key={service}
                       type="button"
                       onClick={() => toggleService(index, service)}
+                      aria-pressed={Boolean(active)}
                       className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                         active
                           ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
-                          : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10'
+                          : 'border-[var(--line)] bg-[var(--raised)] text-[var(--t2)] hover:bg-[var(--raised)]'
                       }`}
                     >
                       {SERVICE_LABELS[service]}
@@ -290,4 +312,3 @@ export default function ExtrasConfiguratorClient() {
     </div>
   );
 }
-

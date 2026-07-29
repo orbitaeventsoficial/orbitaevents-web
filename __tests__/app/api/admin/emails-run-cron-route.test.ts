@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockListPending, mockSendEmail, mockSaveCronRunStatus } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockListPending, mockSendEmail, mockSaveCronRunStatus } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockListPending: vi.fn(),
   mockSendEmail: vi.fn(),
   mockSaveCronRunStatus: vi.fn(),
@@ -16,12 +17,15 @@ vi.mock('@/lib/services/postEventDispatchService', () => ({
 vi.mock('@/lib/services/cronRunStatusService', () => ({ saveCronRunStatus: mockSaveCronRunStatus }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn() } }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { POST } from '@/app/api/admin/emails/run-cron/route';
+import { ADMIN_POST_EVENT_CRON_STATUS_PREFIX } from '@/lib/constants/admin';
 
 describe('POST /api/admin/emails/run-cron', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockListPending.mockResolvedValue([
       { id: 'b1', clientName: 'Anna', clientEmail: 'anna@test.cat' },
     ]);
@@ -41,7 +45,7 @@ describe('POST /api/admin/emails/run-cron', () => {
     expect(body.ok).toBe(true);
     expect(body.summary.processed).toBe(1);
     expect(body.summary.sent).toBe(1);
-    expect(mockSaveCronRunStatus).toHaveBeenCalledWith(expect.objectContaining({ prefix: 'emails.cron', status: 'ok' }));
+    expect(mockSaveCronRunStatus).toHaveBeenCalledWith(expect.objectContaining({ prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX, status: 'ok' }));
   });
 
   it('gestiona errors individuals', async () => {
@@ -56,6 +60,6 @@ describe('POST /api/admin/emails/run-cron', () => {
     mockListPending.mockRejectedValueOnce(new Error('DB crash'));
     const res = await POST(new NextRequest('http://localhost/x', { method: 'POST' }));
     expect(res.status).toBe(500);
-    expect(mockSaveCronRunStatus).toHaveBeenCalledWith(expect.objectContaining({ prefix: 'emails.cron', status: 'error' }));
+    expect(mockSaveCronRunStatus).toHaveBeenCalledWith(expect.objectContaining({ prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX, status: 'error' }));
   });
 });

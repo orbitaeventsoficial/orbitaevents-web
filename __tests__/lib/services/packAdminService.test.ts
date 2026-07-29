@@ -127,6 +127,32 @@ describe('createAdminPack', () => {
     expect(mockPrisma.pack.create).toHaveBeenCalled();
     expect(mockPrisma.adminLog.create).toHaveBeenCalled();
   });
+
+  it('arrodoneix PVP i hora extra sempre amunt en crear', async () => {
+    const result = await createAdminPack({
+      slug: 'premium',
+      price: 340.01,
+      extraHourPrice: 75.1,
+      djHours: 5,
+    });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.pack.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          price: 350,
+          extraHourPrice: 80,
+        }),
+      })
+    );
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          details: { slug: 'premium', price: 350 },
+        }),
+      })
+    );
+  });
 });
 
 describe('getAdminPackById', () => {
@@ -160,6 +186,21 @@ describe('updateAdminPack', () => {
     expect(result.status).toBe(200);
     expect(mockPrisma.pack.update).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: 'p1' } })
+    );
+  });
+
+  it('arrodoneix PVP i hora extra sempre amunt en actualitzar', async () => {
+    const result = await updateAdminPack('p1', { price: 340.01, extraHourPrice: 49.99 });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.pack.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'p1' },
+        data: expect.objectContaining({
+          price: 350,
+          extraHourPrice: 50,
+        }),
+      })
     );
   });
 });

@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockGetChecklist, mockSaveChecklist } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockGetChecklist, mockSaveChecklist } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockGetChecklist: vi.fn(),
   mockSaveChecklist: vi.fn(),
 }));
@@ -13,6 +14,8 @@ vi.mock('@/lib/services/bookingChecklistService', () => ({
   saveBookingChecklist: mockSaveChecklist,
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { GET, PUT } from '@/app/api/admin/bookings/[id]/checklist/route';
 
@@ -30,7 +33,7 @@ function makePutReq(id: string, body: unknown) {
 }
 
 describe('GET /api/admin/bookings/[id]/checklist', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockGetChecklist.mockResolvedValue([{ label: 'DJ', done: true }]); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockGetChecklist.mockResolvedValue([{ label: 'DJ', done: true }]); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -55,7 +58,7 @@ describe('GET /api/admin/bookings/[id]/checklist', () => {
 });
 
 describe('PUT /api/admin/bookings/[id]/checklist', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockSaveChecklist.mockResolvedValue(undefined); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockSaveChecklist.mockResolvedValue(undefined); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));

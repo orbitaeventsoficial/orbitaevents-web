@@ -9,6 +9,26 @@ const { mockPrisma } = vi.hoisted(() => ({
       update: vi.fn(),
       delete: vi.fn(),
     },
+    lead: {
+      groupBy: vi.fn(),
+      count: vi.fn(),
+    },
+    booking: {
+      groupBy: vi.fn(),
+      count: vi.fn(),
+    },
+    leadServiceLine: {
+      count: vi.fn(),
+    },
+    bookingServiceLine: {
+      count: vi.fn(),
+    },
+    collaboratorPayment: {
+      count: vi.fn(),
+    },
+    crewBlock: {
+      count: vi.fn(),
+    },
   },
 }));
 
@@ -29,6 +49,14 @@ beforeEach(() => {
   mockPrisma.collaborator.create.mockResolvedValue({ id: 'c1', name: 'Test' });
   mockPrisma.collaborator.update.mockResolvedValue({ id: 'c1' });
   mockPrisma.collaborator.delete.mockResolvedValue({});
+  mockPrisma.lead.groupBy.mockResolvedValue([]);
+  mockPrisma.lead.count.mockResolvedValue(0);
+  mockPrisma.booking.groupBy.mockResolvedValue([]);
+  mockPrisma.booking.count.mockResolvedValue(0);
+  mockPrisma.leadServiceLine.count.mockResolvedValue(0);
+  mockPrisma.bookingServiceLine.count.mockResolvedValue(0);
+  mockPrisma.collaboratorPayment.count.mockResolvedValue(0);
+  mockPrisma.crewBlock.count.mockResolvedValue(0);
 });
 
 describe('listAdminCollaborators', () => {
@@ -36,31 +64,64 @@ describe('listAdminCollaborators', () => {
     mockPrisma.collaborator.findMany.mockResolvedValue([
       {
         id: 'c1', isActive: true,
-        _count: { sourcedLeads: 2, sourcedBookings: 1 },
         bookings: [
           { commissionAmount: 100, isPaid: false, booking: { total: 1000 } },
           { commissionAmount: 200, isPaid: true, booking: { total: 2000 } },
         ],
-        products: [],
+        products: [
+          { id: 'p1', isActive: true, sellPrice: 199.99 },
+          { id: 'p2', isActive: false, sellPrice: 500 },
+        ],
       },
       {
         id: 'c2', isActive: false,
-        _count: { sourcedLeads: 1, sourcedBookings: 0 },
         bookings: [],
-        products: [],
+        products: [{ id: 'p3', isActive: true, sellPrice: 40.15 }],
       },
+    ]);
+    mockPrisma.lead.groupBy.mockResolvedValue([
+      { sourceCollaboratorId: 'c1', _count: { _all: 2 } },
+      { sourceCollaboratorId: 'c2', _count: { _all: 1 } },
+    ]);
+    mockPrisma.booking.groupBy.mockResolvedValue([
+      { sourceCollaboratorId: 'c1', _count: { _all: 1 } },
     ]);
 
     const result = await listAdminCollaborators();
 
+    expect(mockPrisma.collaborator.findMany).toHaveBeenCalledWith({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        products: {
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        },
+      },
+    });
     expect(result.kpis.total).toBe(2);
     expect(result.kpis.active).toBe(1);
-    expect(result.kpis.totalBookings).toBe(2);
-    expect(result.kpis.totalRevenue).toBe(3000);
-    expect(result.kpis.totalCommissions).toBe(300);
-    expect(result.kpis.pendingCommissions).toBe(100);
+    expect(result.kpis.totalProducts).toBe(2);
+    expect(result.kpis.catalogValue).toBe(240.14);
+    // Comissions retirades (#1196): el cost de col·laborador va per línies de servei (+20%).
     expect(result.kpis.totalSourcedLeads).toBe(3);
     expect(result.kpis.totalSourcedBookings).toBe(1);
+  });
+
+  it('carrega el cataleg encara que falli un comptador informatiu', async () => {
+    mockPrisma.collaborator.findMany.mockResolvedValue([
+      {
+        id: 'c1',
+        isActive: true,
+        products: [{ id: 'p1', isActive: true, sellPrice: 100 }],
+      },
+    ]);
+    mockPrisma.lead.groupBy.mockResolvedValue([{ sourceCollaboratorId: 'c1', _count: { _all: 2 } }]);
+    mockPrisma.booking.groupBy.mockRejectedValue(new Error('missing collaborator_bookings'));
+
+    const result = await listAdminCollaborators();
+
+    expect(result.collaborators).toHaveLength(1);
+    expect(result.collaborators[0]._count).toEqual({ sourcedLeads: 2, sourcedBookings: 0 });
+    expect(result.kpis.totalProducts).toBe(1);
   });
 });
 
@@ -109,6 +170,36 @@ describe('createAdminCollaborator', () => {
       }),
     });
   });
+
+  it('saneja comissió i cost per hora bruts', async () => {
+    await createAdminCollaborator({
+      name: 'Brut',
+      commissionPct: -12,
+      costPerHour: 'no-num',
+    });
+
+    expect(mockPrisma.collaborator.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        commissionPct: 0,
+        costPerHour: null,
+      }),
+    });
+  });
+
+  it('conserva decimals monetaris de comissió i cost per hora', async () => {
+    await createAdminCollaborator({
+      name: 'Decimal',
+      commissionPct: '12.345',
+      costPerHour: '45.678',
+    });
+
+    expect(mockPrisma.collaborator.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        commissionPct: 12.35,
+        costPerHour: 45.68,
+      }),
+    });
+  });
 });
 
 describe('getAdminCollaborator', () => {
@@ -134,13 +225,66 @@ describe('updateAdminCollaborator', () => {
       data: expect.objectContaining({ name: 'Updated', isActive: false }),
     });
   });
+
+  it('saneja imports numèrics en actualitzar', async () => {
+    await updateAdminCollaborator('c1', { commissionPct: -4, costPerHour: Number.NaN });
+
+    expect(mockPrisma.collaborator.update).toHaveBeenCalledWith({
+      where: { id: 'c1' },
+      data: expect.objectContaining({ commissionPct: 0, costPerHour: null }),
+    });
+  });
 });
 
 describe('deleteAdminCollaborator', () => {
   it('elimina per id', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue({
+      id: 'c1',
+      _count: { products: 0, members: 0 },
+    });
     const result = await deleteAdminCollaborator('c1');
 
     expect(result.status).toBe(200);
     expect(mockPrisma.collaborator.delete).toHaveBeenCalledWith({ where: { id: 'c1' } });
+  });
+
+  it('retorna 404 si el col·laborador no existeix', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue(null);
+
+    const result = await deleteAdminCollaborator('ghost');
+
+    expect(result.status).toBe(404);
+    expect(mockPrisma.collaborator.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja l esborrat si encara té dependències operatives', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue({
+      id: 'c1',
+      _count: { products: 1, members: 0 },
+    });
+    mockPrisma.bookingServiceLine.count.mockResolvedValueOnce(2);
+
+    const result = await deleteAdminCollaborator('c1');
+
+    expect(result.status).toBe(409);
+    expect(result.body.impact).toEqual(expect.objectContaining({
+      products: 1,
+      bookingServiceLines: 2,
+    }));
+    expect(mockPrisma.collaborator.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja l esborrat si no pot verificar totes les dependències', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue({
+      id: 'c1',
+      _count: { products: 0, members: 0 },
+    });
+    mockPrisma.leadServiceLine.count.mockRejectedValueOnce(new Error('relation missing'));
+
+    const result = await deleteAdminCollaborator('c1');
+
+    expect(result.status).toBe(409);
+    expect(result.body.impact).toEqual({ verificationFailed: ['leadServiceLines'] });
+    expect(mockPrisma.collaborator.delete).not.toHaveBeenCalled();
   });
 });

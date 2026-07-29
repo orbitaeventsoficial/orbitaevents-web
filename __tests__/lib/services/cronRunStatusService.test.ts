@@ -195,4 +195,25 @@ describe('readCronRunStatuses', () => {
     expect(a.health).toBe(b.health);
     expect(a.health).toBe('ok');
   });
+
+  it('respecta maxAgeHours per freqüències diferents', async () => {
+    const anchor = new Date('2026-04-19T12:00:00Z');
+    const threeHoursAgo = new Date('2026-04-19T09:00:00Z').toISOString();
+    const fiveDaysAgo = new Date('2026-04-14T12:00:00Z').toISOString();
+
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'cron.fast.lastRun', value: threeHoursAgo },
+      { key: 'cron.fast.lastStatus', value: 'ok' },
+      { key: 'cron.weekly.lastRun', value: fiveDaysAgo },
+      { key: 'cron.weekly.lastStatus', value: 'ok' },
+    ]);
+
+    const result = await readCronRunStatuses([
+      { prefix: 'cron.fast', maxAgeHours: 2 },
+      { prefix: 'cron.weekly', maxAgeHours: 192 },
+    ], anchor);
+
+    expect(result[0].health).toBe('warning');
+    expect(result[1].health).toBe('ok');
+  });
 });

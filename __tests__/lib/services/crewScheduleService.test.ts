@@ -10,6 +10,7 @@ import {
   intervalsOverlap,
   buildCrewSchedule,
   buildPayoutSummary,
+  filterSupersededLeadLines,
   OWNER_KEY,
   DEFAULT_ASSIGNMENT_HOURS,
   type CrewLineInput,
@@ -203,7 +204,9 @@ describe('buildPayoutSummary', () => {
     expect(r.totals.ownerNet).toBe(150); // 380 - 230
     const carlos = r.people.find((p) => p.personKey === 'col_carlos');
     expect(carlos?.amount).toBe(230);
-    expect(carlos?.assignments).toBe(2);
+    // assignments = nre. de BOLOS on surt (no de línies): les 2 línies són del mateix
+    // bolo (parentId 'lead1') → 1 assignació agregada (repartiment per bolo, #1358).
+    expect(carlos?.assignments).toBe(1);
     const owner = r.people.find((p) => p.isOwner);
     expect(owner?.amount).toBe(150);
   });
@@ -215,5 +218,18 @@ describe('buildPayoutSummary', () => {
     expect(r.totals.collaboratorCost).toBe(120);
     expect(r.totals.revenue).toBe(150);
     expect(r.totals.ownerNet).toBe(30);
+  });
+});
+
+describe('filterSupersededLeadLines', () => {
+  it('retira les línies del lead quan la reserva vinculada ja és la font de veritat', () => {
+    const rows = filterSupersededLeadLines([
+      line({ lineId: 'lead-line', origin: 'lead', parentId: 'lead-cristina', parentRef: 'Cristina Rey', revenueAmount: 280 }),
+      line({ lineId: 'booking-line', origin: 'booking', parentId: 'booking-cristina', parentRef: 'Cristina Rey', revenueAmount: 280 }),
+      line({ lineId: 'lead-open', origin: 'lead', parentId: 'lead-adria', parentRef: 'Adrià', revenueAmount: 390 }),
+    ], new Set(['lead-cristina']));
+
+    expect(rows.map((row) => row.lineId)).toEqual(['booking-line', 'lead-open']);
+    expect(buildPayoutSummary(rows, names).totals.revenue).toBe(670);
   });
 });

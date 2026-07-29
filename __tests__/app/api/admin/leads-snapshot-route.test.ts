@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockProcessSnapshot } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockProcessSnapshot } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockProcessSnapshot: vi.fn(),
 }));
 
@@ -15,6 +16,8 @@ vi.mock('@/lib/services/leadSnapshotService', () => ({
 vi.mock('@/lib/logger', () => ({
   log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { POST } from '@/app/api/admin/leads/[id]/snapshot/route';
 
@@ -32,7 +35,7 @@ function makePostReq(id: string, body: Record<string, unknown>) {
 describe('POST /api/admin/leads/[id]/snapshot', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockProcessSnapshot.mockResolvedValue({ status: 200, body: { ok: true } });
   });
 

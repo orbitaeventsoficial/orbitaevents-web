@@ -35,11 +35,10 @@ function portalAccess(overrides: Record<string, unknown> = {}) {
           id: 'proposal-1',
           leadId: 'lead-1',
           contractReference: 'CTR-2026-AB12',
-          contractStatus: 'SENT',
-          contractSignedAt: null,
-          contractPdfUrl: 'https://cdn.test/contract.pdf',
-          pdfUrl: null,
-        },
+              contractStatus: 'SENT',
+              contractSignedAt: null,
+              contractPdfUrl: 'https://cdn.test/contract.pdf',
+            },
       ],
     },
     ...overrides,
@@ -98,7 +97,7 @@ describe('signContractOnline', () => {
 
   it('rebutja contractes ja signats', async () => {
     mockPrisma.clientPortalAccess.findUnique.mockResolvedValue(portalAccess({
-      booking: { proposals: [{ id: 'proposal-1', contractStatus: 'SIGNED', contractSignedAt: new Date(), contractPdfUrl: 'https://cdn.test/contract.pdf', pdfUrl: null }] },
+      booking: { proposals: [{ id: 'proposal-1', contractStatus: 'SIGNED', contractSignedAt: new Date(), contractPdfUrl: 'https://cdn.test/contract.pdf' }] },
     }));
 
     const result = await signContractOnline({ rawToken: RAW_TOKEN, signedBy: 'Maria', ip: null, userAgent: null });
@@ -108,7 +107,7 @@ describe('signContractOnline', () => {
 
   it('rebutja contractes que encara no estan enviats', async () => {
     mockPrisma.clientPortalAccess.findUnique.mockResolvedValue(portalAccess({
-      booking: { proposals: [{ id: 'proposal-1', contractStatus: 'DRAFT', contractSignedAt: null, contractPdfUrl: 'https://cdn.test/contract.pdf', pdfUrl: null }] },
+      booking: { proposals: [{ id: 'proposal-1', contractStatus: 'DRAFT', contractSignedAt: null, contractPdfUrl: 'https://cdn.test/contract.pdf' }] },
     }));
 
     const result = await signContractOnline({ rawToken: RAW_TOKEN, signedBy: 'Maria', ip: null, userAgent: null });
@@ -118,7 +117,7 @@ describe('signContractOnline', () => {
 
   it('rebutja contractes enviats sense PDF material', async () => {
     mockPrisma.clientPortalAccess.findUnique.mockResolvedValue(portalAccess({
-      booking: { proposals: [{ id: 'proposal-1', contractStatus: 'SENT', contractSignedAt: null, contractPdfUrl: null, pdfUrl: null }] },
+      booking: { proposals: [{ id: 'proposal-1', contractStatus: 'SENT', contractSignedAt: null, contractPdfUrl: null }] },
     }));
 
     const result = await signContractOnline({ rawToken: RAW_TOKEN, signedBy: 'Maria', ip: null, userAgent: null });
@@ -127,6 +126,18 @@ describe('signContractOnline', () => {
     expect(mockPrisma.proposal.update).not.toHaveBeenCalled();
     expect(mockGenerateSignedContractPdf).not.toHaveBeenCalled();
     expect(mockRecordLeadContractSigned).not.toHaveBeenCalled();
+  });
+
+  it('rebutja contractes que només tenen PDF de pressupost', async () => {
+    mockPrisma.clientPortalAccess.findUnique.mockResolvedValue(portalAccess({
+      booking: { proposals: [{ id: 'proposal-1', contractStatus: 'SENT', contractSignedAt: null, contractPdfUrl: null, pdfUrl: 'https://cdn.test/quote.pdf' }] },
+    }));
+
+    const result = await signContractOnline({ rawToken: RAW_TOKEN, signedBy: 'Maria', ip: null, userAgent: null });
+
+    expect(result).toEqual({ ok: false, reason: 'NOT_SIGNABLE' });
+    expect(mockPrisma.proposal.update).not.toHaveBeenCalled();
+    expect(mockGenerateSignedContractPdf).not.toHaveBeenCalled();
   });
 
   it('marca el contracte com a signat i desa metadata de signatura', async () => {
@@ -178,5 +189,37 @@ describe('signContractOnline', () => {
         contractSignatureBlob: 'data:image/png;base64,abc123',
       }),
     }));
+  });
+
+  it('reverteix la signatura si falla la generacio del PDF signat', async () => {
+    mockGenerateSignedContractPdf.mockRejectedValueOnce(new Error('PDF_FAILED'));
+
+    await expect(signContractOnline({
+      rawToken: RAW_TOKEN,
+      signedBy: 'Maria Garcia',
+      ip: '127.0.0.1',
+      userAgent: 'Vitest UA',
+      signatureBlob: 'data:image/png;base64,abc123',
+    })).rejects.toThrow('PDF_FAILED');
+
+    expect(mockPrisma.proposal.update).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      where: { id: 'proposal-1' },
+      data: expect.objectContaining({
+        contractStatus: 'SIGNED',
+        contractSignedBy: 'Maria Garcia',
+      }),
+    }));
+    expect(mockPrisma.proposal.update).toHaveBeenNthCalledWith(2, {
+      where: { id: 'proposal-1' },
+      data: {
+        contractStatus: 'SENT',
+        contractSignedAt: null,
+        contractSignedBy: null,
+        contractSignatureIp: null,
+        contractSignatureUa: null,
+        contractSignatureBlob: null,
+      },
+    });
+    expect(mockRecordLeadContractSigned).not.toHaveBeenCalled();
   });
 });

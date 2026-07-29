@@ -55,6 +55,24 @@ describe('/api/admin/testimonials', () => {
     await expect(res.json()).resolves.toEqual({ ok: true, testimonials: [] });
   });
 
+  it('saneja paginació bruta en lectura', async () => {
+    await GET(new NextRequest('http://localhost/api/admin/testimonials?limit=Infinity&offset=-4'));
+
+    expect(mockListAdminTestimonials).toHaveBeenLastCalledWith({
+      status: null,
+      limit: 50,
+      offset: 0,
+    });
+
+    await GET(new NextRequest('http://localhost/api/admin/testimonials?limit=250.9&offset=7.8'));
+
+    expect(mockListAdminTestimonials).toHaveBeenLastCalledWith({
+      status: null,
+      limit: 200,
+      offset: 7,
+    });
+  });
+
   it('rebutja auth abans de CSRF en PATCH', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response('{}', { status: 401 }));
 

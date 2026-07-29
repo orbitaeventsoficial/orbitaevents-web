@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const {
   mockPrisma,
-  mockSendEmail,
+  mockSendTrackedStandaloneEmail,
   mockRecordLeadTechnicalSnapshotSaved,
   mockRecordLeadTechnicalSnapshotSent,
 } = vi.hoisted(() => ({
@@ -11,13 +11,13 @@ const {
     leadDocument: { create: vi.fn() },
     leadNote: { create: vi.fn() },
   },
-  mockSendEmail: vi.fn(),
+  mockSendTrackedStandaloneEmail: vi.fn(),
   mockRecordLeadTechnicalSnapshotSaved: vi.fn(),
   mockRecordLeadTechnicalSnapshotSent: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
-vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
+vi.mock('@/lib/email', () => ({ sendTrackedStandaloneEmail: mockSendTrackedStandaloneEmail }));
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: { business: { email: 'admin@orbita.com' } },
 }));
@@ -97,7 +97,6 @@ describe('buildLeadTechnicalSnapshot', () => {
         reviewSubmittedAt: null,
         postEventReport: { id: 'report-1' },
         clientSurvey: null,
-        clientFeedback: { id: 'fb-1' },
       },
     });
 
@@ -106,7 +105,7 @@ describe('buildLeadTechnicalSnapshot', () => {
     expect(snap.stats.postEvent?.reviewToken).toBe('tok-123');
     expect(snap.stats.postEvent?.hasPostEventReport).toBe(true);
     expect(snap.stats.postEvent?.hasClientSurvey).toBe(false);
-    expect(snap.stats.postEvent?.hasClientFeedback).toBe(true);
+    expect(snap.stats.postEvent).not.toHaveProperty('hasClientFeedback');
   });
 
   it('normalitza nulls amb ?? null', () => {
@@ -158,7 +157,7 @@ describe('processLeadTechnicalSnapshot', () => {
     vi.clearAllMocks();
     mockPrisma.leadDocument.create.mockResolvedValue({ id: 'doc-1' });
     mockPrisma.leadNote.create.mockResolvedValue({});
-    mockSendEmail.mockResolvedValue(undefined);
+    mockSendTrackedStandaloneEmail.mockResolvedValue(undefined);
     mockRecordLeadTechnicalSnapshotSaved.mockResolvedValue({});
     mockRecordLeadTechnicalSnapshotSent.mockResolvedValue({});
   });
@@ -217,10 +216,14 @@ describe('processLeadTechnicalSnapshot', () => {
 
     expect(result.status).toBe(200);
     expect(result.body.recipient).toBe('admin@test.com');
-    expect(mockSendEmail).toHaveBeenCalledWith(
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(
       expect.objectContaining({
+        templateKey: 'lead-technical-snapshot',
         to: 'admin@test.com',
         subject: expect.stringContaining('Joan Garcia'),
+        leadId: 'lead-1',
+        customerId: 'cust-1',
+        orbita: expect.objectContaining({ kind: 'lead', id: 'lead-1' }),
       }),
     );
     expect(mockRecordLeadTechnicalSnapshotSent).toHaveBeenCalledWith({
@@ -251,7 +254,6 @@ describe('processLeadTechnicalSnapshot', () => {
         reviewSubmittedAt: null,
         postEventReport: null,
         clientSurvey: null,
-        clientFeedback: null,
       },
     });
 
@@ -267,5 +269,7 @@ describe('processLeadTechnicalSnapshot', () => {
     const parsed = JSON.parse(decodedUrl);
     expect(parsed.stats.hasBooking).toBe(true);
     expect(parsed.stats.postEvent.postEventEmailSent).toBe(true);
+    expect(parsed.stats.postEvent).not.toHaveProperty('hasClientFeedback');
+    expect(mockPrisma.lead.findUnique.mock.calls[0][0].include.booking.select).not.toHaveProperty('clientFeedback');
   });
 });

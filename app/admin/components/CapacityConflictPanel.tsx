@@ -44,7 +44,7 @@ export default function CapacityConflictPanel({ report }: { report: CapacityConf
         </div>
         <Link
           href="/admin/bookings"
-          className="shrink-0 rounded-lg border border-white/10 px-3 py-2 text-xs font-bold transition-colors hover:bg-white/10"
+          className="shrink-0 rounded-lg border border-[var(--line)] px-3 py-2 text-xs font-bold transition-colors hover:bg-[var(--raised)]"
         >
           Reserves →
         </Link>

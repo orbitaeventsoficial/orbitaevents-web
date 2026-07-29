@@ -162,18 +162,6 @@ export async function deleteGalleryPhoto(photoId: string) {
   return true;
 }
 
-/**
- * Obtenir resum de galeria per un booking
- */
-export async function getGallerySummary(bookingId: string) {
-  const [total, portfolioCount, portalCount] = await Promise.all([
-    prisma.bookingGalleryPhoto.count({ where: { bookingId } }),
-    prisma.bookingGalleryPhoto.count({ where: { bookingId, isPortfolio: true } }),
-    prisma.bookingGalleryPhoto.count({ where: { bookingId, isPortal: true } }),
-  ]);
-  return { total, portfolioCount, portalCount };
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
 // GALERIA COMPARTIDA (share link públic)
 // ═══════════════════════════════════════════════════════════════════════════

@@ -11,6 +11,11 @@ function isCriticalProfitabilityConfig(config: Awaited<ReturnType<typeof getProf
   );
 }
 
+function sanitizeAlertCount(value?: string | null): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 0;
+}
+
 export async function getFinanceAlertsSummary() {
   const [
     reportResult,
@@ -44,8 +49,8 @@ export async function getFinanceAlertsSummary() {
     packPricingConfig.specialistCostPerHour <= 0 ||
     packPricingConfig.alertDivergencePct <= 0
   );
-  const autofixFailureCount = Number(autofixFailureAlertSetting?.value || '0') || 0;
-  const systemAutofixFailureCount = Number(systemAutofixFailureAlertSetting?.value || '0') || 0;
+  const autofixFailureCount = sanitizeAlertCount(autofixFailureAlertSetting?.value);
+  const systemAutofixFailureCount = sanitizeAlertCount(systemAutofixFailureAlertSetting?.value);
 
   const criticalCount = Number(profitabilityCritical) + Number(missingMarginTarget) + Number(packPricingCritical);
   const count = lowMarginRiskCount + criticalCount + packPricingAlertsCount + autofixFailureCount + systemAutofixFailureCount;

@@ -14,7 +14,26 @@ type SubmitPublicTestimonialInput = {
   videoUrl?: string;
   allowGoogleShare: boolean;
   consentPhotoPublication: boolean;
+  token?: string;
+  bookingRef?: string;
 };
+
+const DEFAULT_PUBLIC_TESTIMONIAL_LIMIT = 10;
+const MAX_PUBLIC_TESTIMONIAL_LIMIT = 50;
+
+export function normalizePublicTestimonialPagination(limit: number, offset: number) {
+  const safeLimit = Number.isFinite(limit)
+    ? Math.trunc(limit)
+    : DEFAULT_PUBLIC_TESTIMONIAL_LIMIT;
+  const safeOffset = Number.isFinite(offset)
+    ? Math.trunc(offset)
+    : 0;
+
+  return {
+    limit: Math.min(Math.max(safeLimit, 1), MAX_PUBLIC_TESTIMONIAL_LIMIT),
+    offset: Math.max(safeOffset, 0),
+  };
+}
 
 function generateDiscountCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -53,6 +72,7 @@ async function reserveDiscountCode() {
 }
 
 export async function listApprovedPublicTestimonials(limit: number, offset: number, locale: Locale) {
+  const pagination = normalizePublicTestimonialPagination(limit, offset);
   const testimonials = await prisma.customerTestimonial.findMany({
     where: {
       isApproved: true,
@@ -67,8 +87,8 @@ export async function listApprovedPublicTestimonials(limit: number, offset: numb
     orderBy: {
       createdAt: 'desc',
     },
-    take: limit,
-    skip: offset,
+    take: pagination.limit,
+    skip: pagination.offset,
   });
 
   const total = await prisma.customerTestimonial.count({
@@ -86,7 +106,7 @@ export async function listApprovedPublicTestimonials(limit: number, offset: numb
       createdAt: testimonial.createdAt,
     })),
     total,
-    hasMore: offset + limit < total,
+    hasMore: pagination.offset + pagination.limit < total,
   };
 }
 
@@ -129,9 +149,24 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
   validUntil.setMonth(validUntil.getMonth() + 6);
 
   return prisma.$transaction(async (tx) => {
-    let customer = await tx.customer.findUnique({
-      where: { emailNormalized },
-    });
+    const booking = input.token && input.bookingRef
+      ? await tx.booking.findFirst({
+          where: {
+            reference: input.bookingRef,
+            reviewToken: input.token,
+          },
+          select: {
+            id: true,
+            customerId: true,
+            eventType: true,
+            eventDate: true,
+          },
+        })
+      : null;
+
+    let customer = booking?.customerId
+      ? await tx.customer.findUnique({ where: { id: booking.customerId } })
+      : await tx.customer.findUnique({ where: { emailNormalized } });
 
     if (!customer) {
       customer = await tx.customer.create({
@@ -153,6 +188,8 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
         customerId: customer.id,
         text: input.comment,
         rating: input.rating,
+        eventType: booking?.eventType || null,
+        eventDate: booking?.eventDate || null,
         photoUrl: input.photoUrl || null,
         showName: true,
         showPhoto: input.consentPhotoPublication,
@@ -160,7 +197,7 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
       },
     });
 
-    await tx.customerDiscountCode.create({
+    const discount = await tx.customerDiscountCode.create({
       data: {
         customerId: customer.id,
         code: discountCode,
@@ -176,8 +213,15 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
 
     await tx.customerTestimonial.update({
       where: { id: testimonial.id },
-      data: { discountCodeId: discountCode },
+      data: { discountCodeId: discount.id },
     });
+
+    if (booking) {
+      await tx.booking.update({
+        where: { id: booking.id },
+        data: { reviewSubmittedAt: new Date() },
+      });
+    }
 
     await recordCustomerTestimonialSubmitted({
       customerId: customer.id,

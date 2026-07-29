@@ -184,15 +184,37 @@ describe('assembleNextBestActions — leads', () => {
     expect(overdue!.title).toContain('2 tasques vençudes');
   });
 
-  it('ignora leads WON/LOST', () => {
+  it('ignora leads WON amb reserva, LOST i DISQUALIFIED', () => {
     const actions = assembleNextBestActions(makeInput({
       leads: [
-        makeLead({ id: 'won', status: 'WON' }),
+        makeLead({ id: 'won', status: 'WON', hasBooking: true }),
         makeLead({ id: 'lost', status: 'LOST' }),
+        makeLead({ id: 'disq', status: 'DISQUALIFIED' }),
       ],
     }));
 
     expect(actions).toHaveLength(0);
+  });
+
+  it('avisa de lead GUANYAT SENSE reserva (forat negre: bolo tancat no materialitzat)', () => {
+    const actions = assembleNextBestActions(makeInput({
+      leads: [makeLead({ id: 'won-nobooking', name: 'Cristina', status: 'WON', hasBooking: false })],
+    }));
+
+    expect(actions).toHaveLength(1);
+    expect(actions[0].actionType).toBe('CLOSE_DEAL');
+    expect(actions[0].title).toContain('Crear reserva');
+    expect(actions[0].title).toContain('Cristina');
+  });
+
+  it('lead guanyat amb event proper sense reserva → CRITICAL', () => {
+    // 'now' del test és 2026-06-15; event 5 dies després = dins el llindar (<=14)
+    const actions = assembleNextBestActions(makeInput({
+      leads: [makeLead({ id: 'won-soon', status: 'WON', hasBooking: false, eventDate: new Date('2026-06-20T10:00:00Z') })],
+    }));
+
+    const wonAction = actions.find((a) => a.title.includes('Crear reserva'));
+    expect(wonAction?.urgency).toBe('CRITICAL');
   });
 
   // Regressió: `estimateBudget` ha d'interpretar format europeu ("1.500,50"),

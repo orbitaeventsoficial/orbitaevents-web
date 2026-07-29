@@ -23,6 +23,7 @@ export default function BookingTotalEditor({
   const [value, setValue] = useState(String(Math.round(total * 100) / 100));
   const [saving, setSaving] = useState(false);
   const [pendingTotal, setPendingTotal] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const displayTotal = pendingTotal ?? total;
   const marginAlert = costFloor != null && displayTotal < costFloor;
@@ -33,50 +34,63 @@ export default function BookingTotalEditor({
   async function save() {
     const newTotal = parseFloat(value);
     if (!Number.isFinite(newTotal) || newTotal <= 0) {
+      setError('Import invàlid');
       toast.error('Import invàlid');
       return;
     }
     setSaving(true);
+    setError(null);
     try {
-      await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ totalPrice: newTotal }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || 'Error desant el total.');
+      }
       setPendingTotal(newTotal);
       toast.success('Total actualitzat.');
+      setError(null);
       setEditing(false);
       router.refresh();
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error desant el total.';
       console.error('[BookingTotalEditor] Error saving total', error);
-      toast.error('Error desant el total.');
+      setError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <span className="bd-total-editor">
+    <span className="inline-flex flex-col gap-1">
       {editing ? (
-        <span className="bd-total-editor__form">
+        <span className="inline-flex items-center gap-1.5">
           <input
             type="number"
             min={0}
             step={0.01}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => {
+              setValue(e.target.value);
+              setError(null);
+            }}
             onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
             autoFocus
-            className="bd-total-editor__input"
+            aria-invalid={error ? true : undefined}
+            className="ap-input w-[6.25rem] font-bold text-[var(--gold)]"
           />
           <span className="text-xs text-[var(--t3)]">€</span>
-          <button onClick={save} disabled={saving} className="fxd__savebtn text-xs">✓</button>
-          <button onClick={() => setEditing(false)} className="fxd__cancelbtn text-xs">✕</button>
+          <button onClick={save} disabled={saving} aria-invalid={error ? true : undefined} className="ap-btn ap-btn--primary ap-btn--xs">✓</button>
+          <button onClick={() => setEditing(false)} className="ap-btn ap-btn--xs">✕</button>
         </span>
       ) : (
         <button
           onClick={() => setEditing(true)}
-          className="bd-total-editor__trigger"
+          className="cursor-pointer border-0 border-b border-dashed border-[var(--gold)] bg-transparent p-0 font-bold text-[var(--gold)] hover:opacity-80"
           title="Clic per editar el total"
         >
           {formatCurrency(displayTotal)}
@@ -85,17 +99,23 @@ export default function BookingTotalEditor({
 
       {/* Alerta marge negatiu */}
       {marginAlert && costFloor != null && (
-        <span className="bd-total-editor__alert">
+        <span className="ap-badge ap-badge--danger">
           ⚠ Cost estimat {formatCurrency(costFloor)} · marge {formatCurrency(displayTotal - costFloor)}
           {suggestedPrice != null && (
             <button
               onClick={() => { setValue(String(suggestedPrice)); setEditing(true); }}
-              className="bd-total-editor__suggestion"
+              className="font-bold text-[var(--gold)] hover:text-[var(--t)]"
               title={`Preu suggerit amb marge ${TARGET_MARGIN * 100}%`}
             >
               → {formatCurrency(suggestedPrice)}?
             </button>
           )}
+        </span>
+      )}
+
+      {error && (
+        <span role="alert" className="rounded-[var(--o-r-md)] border border-[var(--ax-danger-border)] px-2 py-1 text-xs font-semibold text-[var(--o-danger)]">
+          {error}
         </span>
       )}
     </span>

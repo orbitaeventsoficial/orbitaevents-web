@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import type { QuestionnaireTemplateDTO, QuestionnaireResponseDTO, QuestionnaireQuestion } from '@/lib/services/questionnaireService';
+import { CLIENT_PORTAL_TONE_CLASS } from '@/lib/constants/clientPortalTones';
+import { CLIENT_PORTAL_DEFAULT_ACCENT_COLOR } from '@/lib/constants/clientPortalPersonalization';
 
 type Messages = {
   alreadySubmitted: string;
@@ -12,6 +14,9 @@ type Messages = {
   successBack: string;
   error: string;
   required: string;
+  requiredField: string;
+  noAnswer: string;
+  selectPlaceholder: string;
 };
 
 type Props = {
@@ -26,10 +31,12 @@ function QuestionField({
   question,
   value,
   onChange,
+  selectPlaceholder,
 }: {
   question: QuestionnaireQuestion;
   value: string | string[];
   onChange: (v: string | string[]) => void;
+  selectPlaceholder: string;
 }) {
   const strVal = typeof value === 'string' ? value : '';
   const arrVal = Array.isArray(value) ? value : [];
@@ -66,11 +73,10 @@ function QuestionField({
         id={`q-${question.id}`}
         value={strVal}
         onChange={(e) => onChange(e.target.value)}
-        aria-label={question.label}
         required={question.required}
         className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
       >
-        <option value="">—</option>
+        <option value="">{selectPlaceholder}</option>
         {(question.options ?? []).map((opt) => (
           <option key={opt} value={opt}>{opt}</option>
         ))}
@@ -104,12 +110,21 @@ function QuestionField({
   return null;
 }
 
+function formatAnswerSummary(value: string | string[] | undefined, noAnswer: string) {
+  if (Array.isArray(value)) {
+    return value.length > 0 ? value.join(', ') : noAnswer;
+  }
+
+  const text = value?.trim();
+  return text || noAnswer;
+}
+
 export default function QuestionnaireForm({
   token,
   template,
   existingResponse,
   messages: m,
-  accentHex = '#06b6d4',
+  accentHex = CLIENT_PORTAL_DEFAULT_ACCENT_COLOR,
 }: Props) {
   const [editing, setEditing] = useState(!existingResponse);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>(
@@ -123,11 +138,15 @@ export default function QuestionnaireForm({
     setAnswers((prev) => ({ ...prev, [id]: val }));
   }
 
+  function formatRequiredFieldError(label: string) {
+    return m.requiredField.replace('{field}', label);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const missing = template.questions.find((q) => q.required && !answers[q.id]);
     if (missing) {
-      setError(`"${missing.label}" és un ${m.required}.`);
+      setError(formatRequiredFieldError(missing.label));
       return;
     }
     setSaving(true);
@@ -150,7 +169,9 @@ export default function QuestionnaireForm({
   if (submitted) {
     return (
       <div className="space-y-4 text-center">
-        <p className="text-emerald-300 font-semibold">{m.success}</p>
+        <p className={`${CLIENT_PORTAL_TONE_CLASS.successText} font-semibold`} role="status">
+          {m.success}
+        </p>
         <a
           href={`../`}
           className="inline-flex rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/10"
@@ -164,15 +185,13 @@ export default function QuestionnaireForm({
   if (!editing && existingResponse) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-emerald-300">{m.alreadySubmitted}</p>
+        <p className={`text-sm ${CLIENT_PORTAL_TONE_CLASS.successText}`}>{m.alreadySubmitted}</p>
         <dl className="space-y-3">
           {template.questions.map((q) => (
             <div key={q.id}>
               <dt className="text-xs text-white/40">{q.label}</dt>
               <dd className="text-sm text-white">
-                {Array.isArray(existingResponse.answers[q.id])
-                  ? (existingResponse.answers[q.id] as string[]).join(', ')
-                  : (existingResponse.answers[q.id] as string) || '—'}
+                {formatAnswerSummary(existingResponse.answers[q.id], m.noAnswer)}
               </dd>
             </div>
           ))}
@@ -194,18 +213,26 @@ export default function QuestionnaireForm({
         <p className="text-sm text-white/60">{template.description}</p>
       )}
       {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</p>
+        <p className={`rounded-lg border px-4 py-2 text-sm ${CLIENT_PORTAL_TONE_CLASS.dangerSoft}`} role="alert">
+          {error}
+        </p>
       )}
       {template.questions.map((q) => (
         <div key={q.id}>
           <label htmlFor={`q-${q.id}`} className="block text-sm font-medium text-white/80">
             {q.label}
-            {q.required && <span className="ml-1 text-xs text-red-300" aria-hidden="true">*</span>}
+            {q.required && (
+              <>
+                <span className={`ml-1 text-xs ${CLIENT_PORTAL_TONE_CLASS.dangerText}`} aria-hidden="true">*</span>
+                <span className="sr-only"> ({m.required})</span>
+              </>
+            )}
           </label>
           <QuestionField
             question={q}
             value={answers[q.id] ?? (q.type === 'multiselect' ? [] : '')}
             onChange={(v) => setAnswer(q.id, v)}
+            selectPlaceholder={m.selectPlaceholder}
           />
         </div>
       ))}

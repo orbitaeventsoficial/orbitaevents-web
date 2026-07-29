@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { ACTIVE_BOOKING_STATUSES, ACTIVE_INVENTORY_BOOKING_STATUSES } from '@/lib/constants';
 import { getInventoryBundles } from '@/lib/services/inventoryBundles';
+import { buildBookingInventoryConflictBookingWhere } from '@/lib/services/bookingInventoryAvailability';
 
 type InventoryAssignmentFailure = {
   ok: false;
@@ -69,8 +70,11 @@ export async function getBookingInventoryView(bookingId: string, requestUrl: str
       }),
       bookingItems: {
         none: {
-          bookingId: { not: bookingId },
-          booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
+          booking: buildBookingInventoryConflictBookingWhere({
+            bookingId,
+            eventDate: booking.eventDate,
+            statuses: ACTIVE_BOOKING_STATUSES,
+          }),
         },
       },
       NOT: { id: { in: assigned.map((a) => a.itemId) } },
@@ -119,8 +123,11 @@ export async function assignBookingInventory(bookingId: string, body: unknown) {
     const overlapping = await prisma.bookingInventory.count({
       where: {
         itemId: targetItemId,
-        bookingId: { not: bookingId },
-        booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
+        booking: buildBookingInventoryConflictBookingWhere({
+          bookingId,
+          eventDate: booking.eventDate,
+          statuses: ACTIVE_BOOKING_STATUSES,
+        }),
       },
     });
     if (overlapping > 0) return { ok: false as const, reason: 'OVERLAP' as const, itemId: targetItemId, itemCode: item.code, itemName: item.name };

@@ -59,6 +59,11 @@ type Ga4ConfigStatus = {
   reason?: string;
 };
 
+const GA4_REPORT_CACHE_TTL_MS = 2 * 60 * 1000;
+
+let ga4ReportCache: { data: Ga4Report | null; timestamp: number } | null = null;
+let ga4ReportInFlight: Promise<Ga4Report | null> | null = null;
+
 export function getGa4ConfigStatus(): Ga4ConfigStatus {
   const propertyId = process.env.GA4_PROPERTY_ID;
   const clientEmail = process.env.GA4_CLIENT_EMAIL;
@@ -162,6 +167,26 @@ function mapRealtimeRows(rows: Ga4ApiRow[], dimensionIndex = 0, metricIndex = 0)
 }
 
 export async function getGa4Report(): Promise<Ga4Report | null> {
+  const cached = ga4ReportCache;
+  if (cached && Date.now() - cached.timestamp < GA4_REPORT_CACHE_TTL_MS) {
+    return cached.data;
+  }
+
+  if (ga4ReportInFlight) {
+    return ga4ReportInFlight;
+  }
+
+  ga4ReportInFlight = loadGa4Report().then((data) => {
+    ga4ReportCache = { data, timestamp: Date.now() };
+    return data;
+  }).finally(() => {
+    ga4ReportInFlight = null;
+  });
+
+  return ga4ReportInFlight;
+}
+
+async function loadGa4Report(): Promise<Ga4Report | null> {
   const config = getGa4Config();
   if (!config) return null;
 

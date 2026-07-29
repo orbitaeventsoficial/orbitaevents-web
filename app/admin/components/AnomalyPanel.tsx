@@ -3,7 +3,7 @@ import type { AnomalyReport, AnomalyAlert } from '@/lib/services/dailyAnomalySer
 const LEVEL_STYLE = {
   POSITIVE: { border: 'admin-tone-border-success', bg: 'admin-tone-bg-success', text: 'admin-tone-text-success', badge: 'admin-tone-bg-success admin-tone-text-success' },
   NEGATIVE: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', badge: 'admin-tone-bg-danger admin-tone-text-danger' },
-  NEUTRAL: { border: 'border-white/10', bg: 'bg-[var(--o-admin-fill-1)]', text: 'text-white/60', badge: 'bg-white/10 text-white/60' },
+  NEUTRAL: { border: 'border-[var(--line)]', bg: 'bg-[var(--o-admin-fill-1)]', text: 'text-[var(--t2)]', badge: 'bg-[var(--raised)] text-[var(--t2)]' },
 };
 
 function DeviationBar({ deviation }: { deviation: number }) {

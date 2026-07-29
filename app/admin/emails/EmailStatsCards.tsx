@@ -65,7 +65,7 @@ export default function EmailStatsCards({ stats }: { stats: Stats }) {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" data-help-title="Mètriques d'emails" data-help-desc="Resumeixen el volum recent de leads amb correu, post-event enviats, pendents, valoracions i codis de descompte generats.">
       {cards.map((card) => (
-        <div key={card.label} className={`${card.cardClass} admin-card-glass rounded-2xl`} data-help-title={card.label} data-help-desc={card.sublabel}>
+        <div key={card.label} className={`${card.cardClass} rounded-2xl`} data-help-title={card.label} data-help-desc={card.sublabel}>
           <div className="ap-card-body p-4">
             <div className="mb-2 flex items-center gap-2">
               <span className="text-xl">{card.icon}</span>

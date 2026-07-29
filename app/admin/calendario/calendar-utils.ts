@@ -29,6 +29,15 @@ export type CalendarApiDay = {
     eventStartTime?: string | null;
     eventEndTime?: string | null;
     packName?: string | null;
+    economicRisk?: {
+      level: 'critical' | 'warning';
+      label: string;
+      reasons: string[];
+      marginPct: number;
+      outstandingAmount: number;
+      netMargin: number;
+      daysUntil: number;
+    } | null;
   }[];
   bloqueos: {
     id: string;
@@ -124,6 +133,71 @@ export function getCalendarToneClasses(tone: ReturnType<typeof getCalendarTone>)
     text: '',
     subtle: 'admin-tone-bg-neutral',
   };
+}
+
+export function getCalendarEconomicRiskClasses(risk: CalendarApiDay['reservas'][number]['economicRisk']): string {
+  if (!risk) return '';
+  return risk.level === 'critical'
+    ? 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger'
+    : 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning';
+}
+
+export type CalendarEconomicRiskSummary = {
+  total: number;
+  critical: number;
+  warning: number;
+};
+
+export function summarizeCalendarEconomicRisk(day?: Pick<CalendarApiDay, 'reservas'> | null): CalendarEconomicRiskSummary {
+  const summary: CalendarEconomicRiskSummary = { total: 0, critical: 0, warning: 0 };
+
+  for (const booking of day?.reservas ?? []) {
+    if (!booking.economicRisk) continue;
+    summary.total += 1;
+    if (booking.economicRisk.level === 'critical') {
+      summary.critical += 1;
+    } else {
+      summary.warning += 1;
+    }
+  }
+
+  return summary;
+}
+
+export function selectCalendarEconomicRiskBooking(day?: Pick<CalendarApiDay, 'reservas'> | null): CalendarApiDay['reservas'][number] | null {
+  const riskyBookings = (day?.reservas ?? []).filter((booking) => booking.economicRisk);
+  return riskyBookings.find((booking) => booking.economicRisk?.level === 'critical') ?? riskyBookings[0] ?? null;
+}
+
+export function formatCalendarEconomicRiskActionReason(booking: CalendarApiDay['reservas'][number] | null | undefined): string | null {
+  const risk = booking?.economicRisk;
+  if (!risk) return null;
+  return risk.reasons.find((reason) => reason.trim().length > 0)?.trim() || risk.label;
+}
+
+export function resolveCalendarEconomicRiskActionHash(booking: CalendarApiDay['reservas'][number] | null | undefined): 'sec-finances' | 'sec-marge' | null {
+  const risk = booking?.economicRisk;
+  if (!risk) return null;
+
+  const text = [risk.label, ...risk.reasons].join(' ').toLowerCase();
+  if (risk.outstandingAmount > 0 || /pendent|pagament|cobrament|caixa/.test(text)) {
+    return 'sec-finances';
+  }
+  if (risk.marginPct < 25 || /marge/.test(text)) {
+    return 'sec-marge';
+  }
+  return null;
+}
+
+export function formatCalendarEconomicRiskSummary(summary: CalendarEconomicRiskSummary): string {
+  if (summary.total === 0) return 'Cap';
+  if (summary.critical > 0 && summary.warning > 0) {
+    const criticalLabel = summary.critical === 1 ? 'crític' : 'crítics';
+    const warningLabel = summary.warning === 1 ? 'avís' : 'avisos';
+    return `${summary.total} (${summary.critical} ${criticalLabel}, ${summary.warning} ${warningLabel})`;
+  }
+  if (summary.critical > 0) return `${summary.total} ${summary.total === 1 ? 'crític' : 'crítics'}`;
+  return `${summary.total} ${summary.total === 1 ? 'avís' : 'avisos'}`;
 }
 
 export function resolveServiceLabel(booking: CalendarApiDay['reservas'][number]): string {

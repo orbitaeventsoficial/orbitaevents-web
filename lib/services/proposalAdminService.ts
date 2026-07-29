@@ -1,5 +1,7 @@
 import { Prisma, ProposalStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { PROPOSAL_FINANCIAL_FIELDS, roundMoney } from '@/lib/constants/pricing';
+import { isSentLikeProposalStatus } from '@/lib/proposals/status';
 
 type ProposalListInput = {
   customerId?: string;
@@ -45,9 +47,103 @@ type ProposalUpdateInput = {
   acceptedAt?: string | null;
 };
 
+type ProposalFinancialField = (typeof PROPOSAL_FINANCIAL_FIELDS)[number];
+
+type ProposalFinancialInput = Record<ProposalFinancialField, number>;
+
+export type ProposalFinancialConsistencyIssue = {
+  field: 'vatAmount' | 'total';
+  message: string;
+};
+
 const DEFAULT_PROPOSALS_PAGE = 1;
 const DEFAULT_PROPOSALS_LIMIT = 50;
 const MAX_PROPOSALS_LIMIT = 200;
+
+export class ProposalFinancialConsistencyError extends Error {
+  constructor(public readonly issues: ProposalFinancialConsistencyIssue[]) {
+    super('Proposta econòmicament incoherent');
+    this.name = 'ProposalFinancialConsistencyError';
+  }
+}
+
+export class ProposalCanonicalDispatchError extends Error {
+  public readonly status = 410;
+  public readonly body = {
+    ok: false,
+    error: 'Els camps d’enviament del pressupost només es poden escriure des de /api/admin/proposals/:id/send.',
+    canonicalRoute: '/api/admin/proposals/:id/send',
+  };
+
+  constructor() {
+    super('Dispatch canònic de Proposal requerit');
+    this.name = 'ProposalCanonicalDispatchError';
+  }
+}
+
+export class ProposalCanonicalAcceptanceError extends Error {
+  public readonly status = 409;
+  public readonly body = {
+    ok: false,
+    error: 'Només es pot acceptar un pressupost enviat amb PDF arxivat. Envia o repara el pressupost pel flux canònic abans d’acceptar-lo.',
+    canonicalRoute: '/api/admin/proposals/:id/send',
+  };
+
+  constructor() {
+    super('Acceptació canònica de Proposal requerida');
+    this.name = 'ProposalCanonicalAcceptanceError';
+  }
+}
+
+function assertProposalDispatchFieldsNotWritten(data: {
+  status?: ProposalStatus;
+  pdfUrl?: string;
+  pdfKey?: string;
+  sentAt?: string | null;
+}): void {
+  if (isSentLikeProposalStatus(data.status) || data.pdfUrl !== undefined || data.pdfKey !== undefined || data.sentAt !== undefined) {
+    throw new ProposalCanonicalDispatchError();
+  }
+}
+
+function isCanonicalSentProposalArtifact(proposal: {
+  status: string;
+  sentAt: Date | null;
+  pdfUrl: string | null;
+  pdfKey: string | null;
+}): boolean {
+  return (
+    isSentLikeProposalStatus(proposal.status) &&
+    Boolean(proposal.sentAt) &&
+    Boolean(proposal.pdfUrl?.trim()) &&
+    Boolean(proposal.pdfKey?.trim())
+  );
+}
+
+function isAcceptingProposal(data: ProposalUpdateInput): boolean {
+  return data.status === 'ACCEPTED' || Boolean(data.acceptedAt);
+}
+
+async function assertProposalCanBeAccepted(id: string, data: ProposalUpdateInput): Promise<Date | undefined> {
+  if (!isAcceptingProposal(data)) return undefined;
+
+  const existing = await prisma.proposal.findUnique({
+    where: { id },
+    select: {
+      status: true,
+      sentAt: true,
+      pdfUrl: true,
+      pdfKey: true,
+    },
+  });
+
+  if (!existing) return undefined;
+  if (!isCanonicalSentProposalArtifact(existing)) {
+    throw new ProposalCanonicalAcceptanceError();
+  }
+
+  return data.acceptedAt ? new Date(data.acceptedAt) : new Date();
+}
 
 function normalizeProposalSnapshot(
   snapshot: Record<string, unknown> | undefined,
@@ -55,6 +151,12 @@ function normalizeProposalSnapshot(
   if (snapshot === undefined) return undefined;
   return JSON.parse(JSON.stringify(snapshot)) as Prisma.InputJsonValue;
 }
+
+function normalizePositiveInteger(value: unknown, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+}
+
 async function generateProposalReference(): Promise<string> {
   const year = new Date().getFullYear();
   const prefix = `PROP-${year}-`;
@@ -68,9 +170,66 @@ async function generateProposalReference(): Promise<string> {
   return `${prefix}${String(next).padStart(4, '0')}`;
 }
 
+function isMoneyClose(actual: number, expected: number): boolean {
+  return Math.abs(roundMoney(actual) - roundMoney(expected)) <= 0.01;
+}
+
+export function getProposalFinancialConsistencyIssues(
+  data: ProposalFinancialInput,
+): ProposalFinancialConsistencyIssue[] {
+  const taxableBase = Math.max(0, roundMoney(data.subtotal - data.discount));
+  const expectedVatAmount = roundMoney(taxableBase * (data.vatRate / 100));
+  const expectedTotal = roundMoney(taxableBase + expectedVatAmount);
+  const issues: ProposalFinancialConsistencyIssue[] = [];
+
+  if (!isMoneyClose(data.vatAmount, expectedVatAmount)) {
+    issues.push({
+      field: 'vatAmount',
+      message: 'IVA incoherent amb subtotal, descompte i vatRate',
+    });
+  }
+  if (!isMoneyClose(data.total, expectedTotal)) {
+    issues.push({
+      field: 'total',
+      message: 'Total incoherent amb subtotal, descompte i IVA',
+    });
+  }
+
+  return issues;
+}
+
+function assertProposalFinancialConsistency(data: ProposalFinancialInput): void {
+  const issues = getProposalFinancialConsistencyIssues(data);
+  if (issues.length > 0) {
+    throw new ProposalFinancialConsistencyError(issues);
+  }
+}
+
+function assertCompleteFinancialUpdate(data: ProposalUpdateInput): void {
+  const presentFinancialFields = PROPOSAL_FINANCIAL_FIELDS.filter((field) => data[field] !== undefined);
+  if (presentFinancialFields.length === 0) return;
+
+  if (presentFinancialFields.length !== PROPOSAL_FINANCIAL_FIELDS.length) {
+    throw new ProposalFinancialConsistencyError([
+      {
+        field: 'total',
+        message: 'Els camps econòmics del pressupost s’han d’actualitzar junts',
+      },
+    ]);
+  }
+
+  assertProposalFinancialConsistency({
+    subtotal: data.subtotal!,
+    discount: data.discount!,
+    vatRate: data.vatRate!,
+    vatAmount: data.vatAmount!,
+    total: data.total!,
+  });
+}
+
 export async function listAdminProposals(input: ProposalListInput) {
-  const page = Math.max(1, Number(input.page) || DEFAULT_PROPOSALS_PAGE);
-  const limit = Math.min(MAX_PROPOSALS_LIMIT, Math.max(1, Number(input.limit) || DEFAULT_PROPOSALS_LIMIT));
+  const page = normalizePositiveInteger(input.page, DEFAULT_PROPOSALS_PAGE);
+  const limit = Math.min(MAX_PROPOSALS_LIMIT, normalizePositiveInteger(input.limit, DEFAULT_PROPOSALS_LIMIT));
   const where = {
     ...(input.customerId ? { customerId: input.customerId } : {}),
     ...(input.leadId ? { leadId: input.leadId } : {}),
@@ -106,6 +265,12 @@ export async function listAdminProposals(input: ProposalListInput) {
 }
 
 export async function createAdminProposal(data: ProposalCreateInput) {
+  assertProposalDispatchFieldsNotWritten(data);
+  if (data.status && data.status !== 'DRAFT') {
+    throw new ProposalCanonicalDispatchError();
+  }
+  assertProposalFinancialConsistency(data);
+
   const reference = await generateProposalReference();
   const customer = data.customerId
     ? await prisma.customer.findUnique({
@@ -135,7 +300,7 @@ export async function createAdminProposal(data: ProposalCreateInput) {
       pdfKey: data.pdfKey,
     },
     include: {
-      customer: { select: { id: true, name: true, email: true } },
+      customer: { select: { id: true, name: true, email: true, phone: true } },
     },
   });
 
@@ -147,7 +312,36 @@ export async function getAdminProposalById(id: string) {
     where: { id },
     include: {
       customer: { select: { id: true, name: true, email: true } },
-      lead: { select: { id: true, name: true, email: true } },
+      lead: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          eventDate: true,
+          eventStartTime: true,
+          eventEndTime: true,
+          eventLocation: true,
+          eventAddress: true,
+          distanceKm: true,
+          tollsEur: true,
+          guestCount: true,
+          serviceLines: {
+            orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+            select: {
+              id: true,
+              collaboratorId: true,
+              kind: true,
+              label: true,
+              revenueAmount: true,
+              costAmount: true,
+              quantity: true,
+              hours: true,
+              notes: true,
+            },
+          },
+        },
+      },
       booking: { select: { id: true, reference: true, status: true } },
     },
   });
@@ -160,10 +354,18 @@ export async function getAdminProposalById(id: string) {
 }
 
 export async function updateAdminProposal(id: string, data: ProposalUpdateInput) {
+  assertProposalDispatchFieldsNotWritten(data);
+  assertCompleteFinancialUpdate(data);
+  const acceptedAtFromCanonicalTransition = await assertProposalCanBeAccepted(id, data);
+  const resolvedStatus = data.status ?? (data.acceptedAt ? 'ACCEPTED' : undefined);
+  const resolvedAcceptedAt =
+    acceptedAtFromCanonicalTransition ??
+    (data.acceptedAt === undefined ? undefined : data.acceptedAt ? new Date(data.acceptedAt) : null);
+
   const proposal = await prisma.proposal.update({
     where: { id },
     data: {
-      ...(data.status !== undefined ? { status: data.status } : {}),
+      ...(resolvedStatus !== undefined ? { status: resolvedStatus } : {}),
       ...(data.locale !== undefined ? { locale: data.locale } : {}),
       ...(data.currency !== undefined ? { currency: data.currency } : {}),
       ...(data.validityDays !== undefined ? { validityDays: data.validityDays } : {}),
@@ -176,7 +378,7 @@ export async function updateAdminProposal(id: string, data: ProposalUpdateInput)
       ...(data.pdfUrl !== undefined ? { pdfUrl: data.pdfUrl } : {}),
       ...(data.pdfKey !== undefined ? { pdfKey: data.pdfKey } : {}),
       sentAt: data.sentAt === undefined ? undefined : data.sentAt ? new Date(data.sentAt) : null,
-      acceptedAt: data.acceptedAt === undefined ? undefined : data.acceptedAt ? new Date(data.acceptedAt) : null,
+      acceptedAt: resolvedAcceptedAt,
     },
     include: {
       customer: { select: { id: true, name: true, email: true } },

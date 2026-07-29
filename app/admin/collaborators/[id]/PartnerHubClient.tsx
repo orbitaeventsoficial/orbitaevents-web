@@ -28,18 +28,6 @@ interface SourcedBooking {
   eventDate: string | null;
 }
 
-interface ContractedBooking {
-  id: string;
-  commissionAmount: number;
-  collaboratorPrice: number | null;
-  isPaid: boolean;
-  reference: string;
-  clientName: string;
-  status: string;
-  total: number;
-  eventDate: string | null;
-}
-
 interface PartnerProduct {
   id: string;
   name: string;
@@ -79,10 +67,6 @@ interface PartnerHubData {
     sourcedLeadsCount: number;
     sourcedBookingsCount: number;
     sourcedRevenue: number;
-    contractedCount: number;
-    contractedRevenue: number;
-    totalCommissions: number;
-    pendingCommissions: number;
     productsCount: number;
     catalogValue: number;
     catalogCost: number;
@@ -92,17 +76,41 @@ interface PartnerHubData {
   };
   sourcedLeads: SourcedLead[];
   sourcedBookings: SourcedBooking[];
-  contractedBookings: ContractedBooking[];
   products: PartnerProduct[];
 }
 
-type TabKey = 'resum' | 'membres' | 'passa' | 'contractem' | 'cataleg' | 'economia' | 'notes';
+interface PayoutBolo {
+  origin: 'lead' | 'booking';
+  parentId: string;
+  parentRef: string;
+  dateKey: string | null;
+  status: 'PREVI' | 'ENTREGAT' | 'PAGAT';
+  amount: number;
+  paidAt: string | null;
+  paymentId: string | null;
+  paymentMethod: string | null;
+}
+interface PayoutMonth { month: string; previ: number; aPagar: number; pagat: number }
+export interface CollaboratorPayoutData {
+  collaboratorId: string;
+  collaboratorName: string;
+  totals: { previ: number; aPagar: number; pagat: number };
+  bolos: PayoutBolo[];
+  months: PayoutMonth[];
+}
+
+type TabKey = 'resum' | 'membres' | 'passa' | 'pasta' | 'cataleg' | 'economia' | 'notes';
+
+type PartnerHubMutationError = {
+  error?: string;
+  message?: string;
+};
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'resum', label: 'Resum' },
   { key: 'membres', label: 'Equip / membres' },
   { key: 'passa', label: 'Bolos que ens passa' },
-  { key: 'contractem', label: 'Bolos on el contractem' },
+  { key: 'pasta', label: 'Pasta' },
   { key: 'cataleg', label: 'Material i catàleg' },
   { key: 'economia', label: 'Economia' },
   { key: 'notes', label: 'Notes i contacte' },
@@ -116,14 +124,50 @@ function Empty({ text }: { text: string }) {
   return <p className="ap-muted text-sm py-4">{text}</p>;
 }
 
-export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
+async function readPartnerHubMutationError(res: Response, fallback: string): Promise<string> {
+  const payload = (await res.json().catch(() => ({}))) as PartnerHubMutationError;
+  return payload.error || payload.message || fallback;
+}
+
+export default function PartnerHubClient({ data, payout }: { data: PartnerHubData; payout: CollaboratorPayoutData | null }) {
   const router = useRouter();
   const toast = useToast();
   const [tab, setTab] = useState<TabKey>('resum');
   const [newName, setNewName] = useState('');
   const [newRole, setNewRole] = useState('OTHER');
   const [adding, setAdding] = useState(false);
+  const [payingId, setPayingId] = useState<string | null>(null);
   const { partner, economics } = data;
+
+  async function togglePayment(bolo: PayoutBolo) {
+    setPayingId(bolo.parentId);
+    try {
+      if (bolo.status === 'PAGAT' && bolo.paymentId) {
+        const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/payments?paymentId=${encodeURIComponent(bolo.paymentId)}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut desfer el pagament."));
+        toast.success('Pagament desfet.');
+      } else {
+        const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/payments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId: bolo.origin === 'booking' ? bolo.parentId : null,
+            leadId: bolo.origin === 'lead' ? bolo.parentId : null,
+            amount: bolo.amount,
+            method: 'CASH',
+          }),
+        });
+        if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut marcar com a pagat."));
+        toast.success('Marcat com a pagat (avui, cash).');
+      }
+      router.refresh();
+    } catch (e) {
+      console.error('[partner-payout] togglePayment', e);
+      toast.error(e instanceof Error && e.message ? e.message : 'Error registrant el pagament.');
+    } finally {
+      setPayingId(null);
+    }
+  }
 
   async function addMember() {
     if (!newName.trim()) { toast.error('El nom és obligatori'); return; }
@@ -134,13 +178,13 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newName.trim(), role: newRole }),
       });
-      if (!res.ok) throw new Error('No s\'ha pogut afegir');
+      if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut afegir el membre."));
       setNewName(''); setNewRole('OTHER');
       toast.success('Membre afegit.');
       router.refresh();
     } catch (e) {
       console.error('[PartnerHub] addMember', e);
-      toast.error('Error afegint el membre.');
+      toast.error(e instanceof Error && e.message ? e.message : 'Error afegint el membre.');
     } finally {
       setAdding(false);
     }
@@ -153,24 +197,24 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isFavorite: !partner.isFavorite }),
       });
-      if (!res.ok) throw new Error('No s\'ha pogut desar');
+      if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut desar el favorit."));
       toast.success(partner.isFavorite ? 'Tret de favorits.' : 'Marcat com a favorit. Sortirà als desplegables de reserva.');
       router.refresh();
     } catch (e) {
       console.error('[PartnerHub] toggleFavorite', e);
-      toast.error('Error desant el favorit.');
+      toast.error(e instanceof Error && e.message ? e.message : 'Error desant el favorit.');
     }
   }
 
   async function removeMember(memberId: string) {
     try {
       const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/members/${memberId}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('No s\'ha pogut eliminar');
+      if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut eliminar el membre."));
       toast.success('Membre eliminat.');
       router.refresh();
     } catch (e) {
       console.error('[PartnerHub] removeMember', e);
-      toast.error('Error eliminant el membre.');
+      toast.error(e instanceof Error && e.message ? e.message : 'Error eliminant el membre.');
     }
   }
 
@@ -198,9 +242,9 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
         <div className="flex flex-col gap-4">
           <div className="ap-kpi-row">
             <div className="ap-kpi"><span className="ap-kpi-label">Bolos que ens passa</span><span className="ap-kpi-value">{economics.sourcedLeadsCount + economics.sourcedBookingsCount}</span></div>
-            <div className="ap-kpi ap-kpi--info"><span className="ap-kpi-label">On el contractem</span><span className="ap-kpi-value">{economics.contractedCount}</span></div>
+            <div className="ap-kpi ap-kpi--info"><span className="ap-kpi-label">Línies subcontractades</span><span className="ap-kpi-value">{economics.serviceLinesCount}</span></div>
             <div className="ap-kpi"><span className="ap-kpi-label">Productes</span><span className="ap-kpi-value">{economics.productsCount}</span></div>
-            <div className={`ap-kpi ${economics.pendingCommissions > 0 ? 'ap-kpi--warning' : 'ap-kpi--success'}`}><span className="ap-kpi-label">Comissions pendents</span><span className="ap-kpi-value">{formatCurrency(economics.pendingCommissions)}</span></div>
+            <div className="ap-kpi"><span className="ap-kpi-label">Cost subcontractat</span><span className="ap-kpi-value">{formatCurrency(economics.serviceLinesPaid)}</span></div>
           </div>
           <section className="ap-card p-5">
             <h2 className="ap-h2 mb-3">Identitat</h2>
@@ -302,25 +346,78 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
         </section>
       )}
 
-      {tab === 'contractem' && (
+      {tab === 'pasta' && (
         <section className="ap-card p-5">
-          <h2 className="ap-h2 mb-3">Bolos on el contractem</h2>
-          <p className="ap-muted text-sm mb-4">Reserves on Òrbita contracta aquest partner (<code>CollaboratorBooking</code>) — cost i comissió.</p>
-          {data.contractedBookings.length === 0 ? <Empty text="Encara no l&apos;hem contractat en cap reserva." /> : (
-            <table className="w-full text-sm">
-              <thead><tr className="text-left ap-muted"><th scope="col" className="py-2">Ref</th><th scope="col">Client</th><th scope="col">Data</th><th scope="col">Comissió</th><th scope="col">Pagat</th></tr></thead>
-              <tbody>
-                {data.contractedBookings.map((item) => (
-                  <tr key={item.id}>
-                    <td className="py-2">{item.reference}</td>
-                    <td>{item.clientName}</td>
-                    <td>{item.eventDate ? formatDate(item.eventDate) : '—'}</td>
-                    <td>{formatCurrency(item.commissionAmount)}</td>
-                    <td><span className={`ap-badge ${item.isPaid ? 'ap-badge--success' : 'ap-badge--warning'}`}>{item.isPaid ? 'Pagat' : 'Pendent'}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="ap-h2">Pasta · què li devem</h2>
+            <Link href={`/api/admin/collaborators/${partner.id}/payout-pdf`} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--xs">PDF liquidació</Link>
+          </div>
+          {!payout || payout.bolos.length === 0 ? (
+            <Empty text="Aquest col·laborador encara no té bolos amb pasta assignada." />
+          ) : (
+            <>
+              <div className="ap-kpi-row mb-4">
+                <div className="ap-kpi"><span className="ap-kpi-label">Previst (futur)</span><span className="ap-kpi-value">{formatCurrency(payout.totals.previ)}</span></div>
+                <div className="ap-kpi ap-kpi--warning"><span className="ap-kpi-label">A pagar (entregat)</span><span className="ap-kpi-value">{formatCurrency(payout.totals.aPagar)}</span></div>
+                <div className="ap-kpi ap-kpi--success"><span className="ap-kpi-label">Pagat (històric)</span><span className="ap-kpi-value">{formatCurrency(payout.totals.pagat)}</span></div>
+              </div>
+
+              {payout.months.length > 0 && (
+                <div className="mb-4">
+                  <h3 className="text-sm font-semibold mb-2">Per mes</h3>
+                  <div className="flex min-h-20 items-end gap-2 overflow-x-auto pb-2">
+                    {payout.months.map((m) => {
+                      const total = m.previ + m.aPagar + m.pagat;
+                      const max = Math.max(...payout.months.map((x) => x.previ + x.aPagar + x.pagat), 1);
+                      const h = (v: number) => `${Math.round((v / max) * 64)}px`;
+                      return (
+                        <div key={m.month} className="flex w-12 shrink-0 flex-col items-center gap-1">
+                          <div className="flex w-full flex-col-reverse" title={`${m.month}: ${formatCurrency(total)}`}>
+                            <div className="admin-tone-bg-success" style={{ height: h(m.pagat) }} />
+                            <div className="admin-tone-bg-warning" style={{ height: h(m.aPagar) }} />
+                            <div className="bg-[var(--line2)]" style={{ height: h(m.previ) }} />
+                          </div>
+                          <span className="ap-muted text-[length:var(--o-text-2xs)]">{m.month.slice(5)}/{m.month.slice(2, 4)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="ap-muted text-[length:var(--o-text-2xs)]">Verd = pagat · ambre = a pagar · gris = previst</p>
+                </div>
+              )}
+
+              <table className="w-full text-sm">
+                <thead><tr className="text-left ap-muted"><th scope="col" className="py-2">Bolo</th><th scope="col">Data</th><th scope="col">Estat</th><th scope="col" className="text-right">Pasta</th><th scope="col"></th></tr></thead>
+                <tbody>
+                  {payout.bolos.map((bolo) => (
+                    <tr key={bolo.parentId}>
+                      <td className="py-2">
+                        <Link href={bolo.origin === 'booking' ? buildBookingHref(bolo.parentId) : buildLeadWorkspaceHref(bolo.parentId)} className="ap-link">{bolo.parentRef}</Link>
+                      </td>
+                      <td>{bolo.dateKey ? formatDate(new Date(bolo.dateKey)) : '—'}</td>
+                      <td>
+                        <span className={`ap-badge ${bolo.status === 'PAGAT' ? 'admin-tone-text-success' : bolo.status === 'ENTREGAT' ? 'admin-tone-text-warning' : ''}`}>
+                          {bolo.status === 'PAGAT' ? 'Pagat' : bolo.status === 'ENTREGAT' ? 'A pagar' : 'Previst'}
+                        </span>
+                      </td>
+                      <td className="text-right tabular-nums font-semibold">{formatCurrency(bolo.amount)}</td>
+                      <td className="text-right">
+                        {bolo.status !== 'PREVI' && (
+                          <button
+                            type="button"
+                            className={`ap-btn ap-btn--xs ${bolo.status === 'PAGAT' ? '' : 'ap-btn--primary'}`}
+                            disabled={payingId === bolo.parentId}
+                            onClick={() => togglePayment(bolo)}
+                          >
+                            {payingId === bolo.parentId ? '…' : bolo.status === 'PAGAT' ? 'Desfer' : 'Marcar pagat'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
           )}
         </section>
       )}
@@ -356,9 +453,6 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
           </div>
           <div className="grid gap-4 md:grid-cols-2 text-sm">
             <div><span className="ap-muted">Ingrés generat (bolos que ens passa)</span><div className="text-lg font-semibold">{formatCurrency(economics.sourcedRevenue)}</div></div>
-            <div><span className="ap-muted">Volum on el contractem</span><div className="text-lg font-semibold">{formatCurrency(economics.contractedRevenue)}</div></div>
-            <div><span className="ap-muted">Comissions que li paguem</span><div className="text-lg font-semibold">{formatCurrency(economics.totalCommissions)}</div></div>
-            <div><span className="ap-muted">Comissions pendents de pagar</span><div className="text-lg font-semibold">{formatCurrency(economics.pendingCommissions)}</div></div>
             <div><span className="ap-muted">Pagat en serveis subcontractats ({economics.serviceLinesCount})</span><div className="text-lg font-semibold">{formatCurrency(economics.serviceLinesPaid)}</div></div>
             <div><span className="ap-muted">Valor del catàleg (PVP)</span><div className="text-lg font-semibold">{formatCurrency(economics.catalogValue)}</div></div>
           </div>

@@ -18,7 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
-const PAGE_CLASS_RE = /\.(bd__|tk__|cl__|ch__|lr__|fx__|sf__|ix-|nb__|bk-|cx-|ni-|lp2__|fxd__)/;
+const PAGE_CLASS_RE = /\.(bd__|tk__|cl__|ch__|lr__|sf__|ix-|nb__|bk-|cx-|ni-|lp2__)/;
 // Classes NO pròpies que poden tenir !important legítim
 const LEGACY_TARGET_RE = /\.(ap-card|admin-booking|ap-sticky|ax__page|admin-ui|admin-control)/;
 

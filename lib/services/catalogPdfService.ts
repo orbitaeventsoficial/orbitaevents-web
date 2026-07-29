@@ -35,9 +35,9 @@ interface CatalogTranslations {
 
 function getCatalogTranslations(locale: SupportedLocale): CatalogTranslations {
   return {
-    ca: { brochure: 'Catàleg de Serveis', ourPacks: 'Els Nostres Packs', hours: 'hores', popular: 'MÉS POPULAR', extras: 'Extres Disponibles', from: 'des de', contactText: 'Tens dubtes? Escriu-nos sense compromís!' },
-    es: { brochure: 'Catálogo de Servicios', ourPacks: 'Nuestros Packs', hours: 'horas', popular: 'MÁS POPULAR', extras: 'Extras Disponibles', from: 'desde', contactText: '¿Tienes dudas? ¡Escríbenos sin compromiso!' },
-    en: { brochure: 'Service Catalog', ourPacks: 'Our Packages', hours: 'hours', popular: 'MOST POPULAR', extras: 'Available Extras', from: 'from', contactText: 'Have questions? Contact us with no obligation!' },
+    ca: { brochure: 'Catàleg de Serveis', ourPacks: 'Els Nostres Packs', hours: 'hores', popular: 'MÉS POPULAR', extras: 'Extres Disponibles', from: 'des de', contactText: 'Quan tingueu clara la direcció, ajustem proposta, data i detalls.' },
+    es: { brochure: 'Catálogo de Servicios', ourPacks: 'Nuestros Packs', hours: 'horas', popular: 'MÁS POPULAR', extras: 'Extras Disponibles', from: 'desde', contactText: 'Cuando tengáis clara la dirección, ajustamos propuesta, fecha y detalles.' },
+    en: { brochure: 'Service Catalog', ourPacks: 'Our Packages', hours: 'hours', popular: 'MOST POPULAR', extras: 'Available Extras', from: 'from', contactText: 'When the direction is clear, we tailor the proposal, date, and details.' },
   }[locale];
 }
 

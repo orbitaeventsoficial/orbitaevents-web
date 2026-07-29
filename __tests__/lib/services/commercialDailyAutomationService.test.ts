@@ -22,7 +22,7 @@ const {
   mockEnforceLeadSla,
   mockSendPaymentReminders,
   mockScoreLead,
-  mockSendEmail,
+  mockSendTrackedStandaloneEmail,
   mockSendWhatsAppText,
   mockSaveCronRunStatus,
   mockLoadDailyBrief,
@@ -50,7 +50,7 @@ const {
   mockEnforceLeadSla: vi.fn(),
   mockSendPaymentReminders: vi.fn(),
   mockScoreLead: vi.fn(),
-  mockSendEmail: vi.fn(),
+  mockSendTrackedStandaloneEmail: vi.fn(),
   mockSendWhatsAppText: vi.fn(),
   mockSaveCronRunStatus: vi.fn(),
   mockLoadDailyBrief: vi.fn(),
@@ -74,7 +74,7 @@ vi.mock('@/lib/services/commercialScoring', () => ({
   scoreLead: mockScoreLead,
 }));
 vi.mock('@/lib/email', () => ({
-  sendEmail: mockSendEmail,
+  sendTrackedStandaloneEmail: mockSendTrackedStandaloneEmail,
 }));
 vi.mock('@/lib/services/whatsappService', () => ({
   sendWhatsAppText: mockSendWhatsAppText,
@@ -129,7 +129,7 @@ beforeEach(() => {
   mockEnforceLeadSla.mockResolvedValue({ createdTasks: 2, escalated: 0 });
   mockSendPaymentReminders.mockResolvedValue({ checked: 3, sent: 2, skipped: 1, errors: 0 });
   mockScoreLead.mockImplementation((lead: { id: string }) => ({ score: Number(lead.id.split('-')[1]) }));
-  mockSendEmail.mockResolvedValue({ ok: true });
+  mockSendTrackedStandaloneEmail.mockResolvedValue({ ok: true });
   mockSendWhatsAppText.mockResolvedValue({ ok: true });
   mockSaveCronRunStatus.mockResolvedValue({});
   mockGetRecipientsAsString.mockResolvedValue('');
@@ -166,7 +166,11 @@ describe('runCommercialDailyAutomation', () => {
     expect(mockScoreLead).toHaveBeenCalledTimes(51);
     expect(mockPrisma.lead.update).toHaveBeenCalledTimes(51);
     expect(mockPrisma.$transaction).toHaveBeenCalledTimes(2);
-    expect(mockSendEmail).toHaveBeenCalledTimes(1);
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledTimes(1);
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(expect.objectContaining({
+      templateKey: 'commercial-daily-summary',
+      orbita: expect.objectContaining({ kind: 'admin', origin: 'commercial-daily-summary' }),
+    }));
     expect(mockSendWhatsAppText).toHaveBeenCalledTimes(1);
     expect(mockSaveCronRunStatus).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -185,6 +189,27 @@ describe('runCommercialDailyAutomation', () => {
       commResponded: 5,
       responseRate: 0.25,
     });
+    expect(result.notifications).toEqual({ emailSent: true, whatsappSent: true, errors: 0 });
+  });
+
+  it('no tomba el cron si falla la notificació del resum', async () => {
+    mockSendTrackedStandaloneEmail.mockRejectedValueOnce(new Error('Connection timeout'));
+
+    const result = await runCommercialDailyAutomation();
+
+    expect(result.notifications).toEqual({ emailSent: false, whatsappSent: true, errors: 1 });
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ action: 'AUTOMATION_DAILY_SUMMARY_SENT' }),
+      })
+    );
+    expect(mockSaveCronRunStatus).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prefix: 'automation.commercial',
+        status: 'ok',
+        category: 'config',
+      })
+    );
   });
 
   it("inclou alertes CRITICAL del Daily Brief al resum guardat i a l'email", async () => {
@@ -217,7 +242,7 @@ describe('runCommercialDailyAutomation', () => {
 
     expect(result.dailyBrief.criticalCount).toBe(1);
     expect(result.dailyBrief.criticalAlerts[0]?.title).toContain('3 entrades sense resposta');
-    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(expect.objectContaining({
       html: expect.stringContaining('Alertes crítiques del matí (1)'),
     }));
   });
@@ -250,13 +275,13 @@ describe('runCommercialDailyAutomation', () => {
     expect(result.capacityConflicts.count).toBe(1);
     expect(result.capacityConflicts.verdict).toBe(verdict);
     expect(result.capacityConflicts.conflicts[0]?.itemName).toBe('Altaveu JBL');
-    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(expect.objectContaining({
       html: expect.stringContaining('Col·lisions d\'inventari (1)'),
     }));
-    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(expect.objectContaining({
       html: expect.stringContaining('Altaveu JBL'),
     }));
-    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(expect.objectContaining({
       html: expect.stringContaining(verdict),
     }));
   });
@@ -364,10 +389,10 @@ describe('runCommercialDailyAutomation', () => {
     expect(result.weeklyForecast.criticalCount).toBe(1);
     expect(result.weeklyForecast.warningCount).toBe(1);
     expect(result.weeklyForecast.criticalWeeks[0]?.weekStart).toBe('2026-06-01');
-    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(expect.objectContaining({
       html: expect.stringContaining('Forecast capacitat 4 setmanes'),
     }));
-    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(expect.objectContaining({
       html: expect.stringContaining('Setmana 2026-06-01'),
     }));
     expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
@@ -395,7 +420,7 @@ describe('runCommercialDailyAutomation', () => {
 
     await runCommercialDailyAutomation();
 
-    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(expect.objectContaining({
       html: expect.not.stringContaining('Forecast capacitat 4 setmanes'),
     }));
     expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({

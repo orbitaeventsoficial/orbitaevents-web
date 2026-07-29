@@ -2,27 +2,48 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import {
   findPortalAccessByRawToken,
   markPortalAccessHit,
   normalizePortalLocale,
 } from '@/lib/services/clientPortalAccess';
-import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
+import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { formatCurrency, toIntlLocale } from '@/lib/constants';
 import { listPortalPhotos } from '@/lib/services/galleryService';
 import Image from 'next/image';
-import { CLIENT_PORTAL_CONTRACT_STATUS_LABELS, CLIENT_PORTAL_MESSAGES, CLIENT_PORTAL_STATUS_LABELS, type ClientPortalLocale } from '@/lib/clientPortalMessages';
-import { buildClientPortalContractPath, getClientPortalContractSummary, type ClientPortalContractProposal } from '@/lib/clientPortalContract';
+import {
+  CLIENT_PORTAL_MESSAGES,
+  getClientPortalBookingStatusLabel,
+  getClientPortalContractStatusLabel,
+  getClientPortalExtraDisplayName,
+  getClientPortalGalleryPhotoCountLabel,
+  getClientPortalGalleryPhotoLabel,
+  getClientPortalPackDisplayName,
+  getClientPortalServiceQuantityLabel,
+  getClientPortalTravelHeadcountLabel,
+  type ClientPortalLocale,
+} from '@/lib/clientPortalMessages';
+import { buildClientPortalContractPath, getClientPortalContractSummary } from '@/lib/clientPortalContract';
 import { buildClientPortalPaymentsPath, getClientPortalPaymentSummary, type ClientPortalPaymentSummary } from '@/lib/clientPortalPayment';
 import { buildClientPortalTimelinePath } from '@/lib/clientPortalTimeline';
-import { buildClientPortalInvoicePath } from '@/lib/clientPortalInvoice';
+import { buildClientPortalInvoicePath, getClientPortalDeliveryNoteDocument } from '@/lib/clientPortalInvoice';
 import { getBookingQuestionnaire } from '@/lib/services/questionnaireService';
 import { buildClientPortalQuestionnairePath } from '@/lib/clientPortalQuestionnaire';
 import { buildClientPortalGalleryPath } from '@/lib/clientPortalGallery';
+import {
+  formatClientPortalEventPlace,
+  formatClientPortalGuestCount,
+  getClientPortalFirstName,
+  getClientPortalPersonalizedText,
+} from '@/lib/clientPortalEventDisplay';
 import CountdownTimer from './CountdownTimer';
 import StarIcon from '@/app/components/public/StarIcon';
-import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
+import { coercePortalPersonalization, toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from './PortalBottomNav';
+import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
+import { CLIENT_PORTAL_TONE_CLASS, clientPortalPaymentTone } from '@/lib/constants/clientPortalTones';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -31,8 +52,6 @@ export const metadata: Metadata = {
 
 type Locale = ClientPortalLocale;
 const MESSAGES = CLIENT_PORTAL_MESSAGES;
-const STATUS_LABELS = CLIENT_PORTAL_STATUS_LABELS;
-const CONTRACT_STATUS_LABELS = CLIENT_PORTAL_CONTRACT_STATUS_LABELS;
 
 function formatDistanceKm(km: number, locale: Locale): string {
   return new Intl.NumberFormat(toIntlLocale(locale), {
@@ -80,6 +99,7 @@ function getProgressSteps(
     status: string;
   },
   locale: Locale,
+  paymentSummary: ClientPortalPaymentSummary,
 ): Array<{ label: string; status: StepStatus }> {
   const hasProposal = booking.proposals.some((p) => p.pdfUrl);
   const hasSigned = booking.proposals.some((p) => p.contractSignedAt);
@@ -87,7 +107,7 @@ function getProgressSteps(
   const isConfirmedOrBeyond = ['CONFIRMED', 'PREPARING', 'COMPLETED'].includes(booking.status);
   const step1Done = isConfirmedOrBeyond || hasProposal;
   const step2Done = hasSigned;
-  const step3Done = booking.depositPaid;
+  const step3Done = paymentSummary.deposit.paid;
   const step4Done = booking.status === 'COMPLETED';
 
   const steps: Array<{ label: string; done: boolean }> = [
@@ -106,6 +126,12 @@ function getProgressSteps(
     }
     return { label, status: 'pending' as StepStatus };
   });
+}
+
+function getProgressStepStatusLabel(t: Record<string, string>, status: StepStatus): string {
+  if (status === 'done') return t.milestoneDone;
+  if (status === 'active') return t.milestoneUpcoming;
+  return t.pending;
 }
 
 function getNextActionLabel(
@@ -233,7 +259,7 @@ export default async function ClientPortalPage({
 }: {
   params: { locale: string; token: string };
 }) {
-  const locale = normalizePortalLocale(params.locale) as Locale;
+  const locale: Locale = normalizePortalLocale(params.locale);
   const t = MESSAGES[locale];
 
   const access = await findPortalAccessByRawToken(params.token);
@@ -247,22 +273,8 @@ export default async function ClientPortalPage({
   });
 
   const booking = access.booking;
-  const personalization = (access.personalization || {}) as {
-    headline?: string;
-    introMessage?: string;
-    accentColor?: string;
-    showTimeline?: boolean;
-    showPayments?: boolean;
-    showDocuments?: boolean;
-    showPostEvent?: boolean;
-    showQuestionnaire?: boolean;
-  };
-
-  const showTimeline = personalization.showTimeline ?? true;
-  const showPayments = personalization.showPayments ?? true;
-  const showDocuments = personalization.showDocuments ?? true;
-  const showPostEvent = personalization.showPostEvent ?? true;
-  const showQuestionnaire = personalization.showQuestionnaire ?? true;
+  const personalization = coercePortalPersonalization(access.personalization);
+  const visibility = getClientPortalVisibility(access.personalization);
 
   let portalPhotos: { id: string; photoUrl: string; caption: string | null }[] = [];
   try {
@@ -284,46 +296,38 @@ export default async function ClientPortalPage({
   const accentGlow = toRgba(accentHex, 0.18) || 'rgba(6, 182, 212, 0.18)';
 
   const packTranslation = getPackTranslation(booking.pack.translations, locale);
-  const proposals = booking.proposals as Array<{
-    id: string;
-    status: string;
-    reference: string;
-    pdfUrl: string | null;
-    createdAt: Date;
-    contractReference: string | null;
-    contractStatus: string | null;
-    contractPdfUrl: string | null;
-    contractSignedAt: Date | null;
-    contractSignatureBlob: string | null;
-  }>;
+  const packDisplayName = getClientPortalPackDisplayName(locale, packTranslation?.name);
+  const proposals = booking.proposals;
   const latestProposal = proposals.find((p) => !!p.pdfUrl) || proposals[0];
-  const contractSummary = getClientPortalContractSummary(proposals as ClientPortalContractProposal[]);
-  const paymentSummary = getClientPortalPaymentSummary(booking as {
-    depositAmount: number;
-    depositPaid: boolean;
-    depositPaymentUrl?: string | null;
-    remainingAmount: number;
-    remainingPaid: boolean;
-    remainingPaymentUrl?: string | null;
-  });
-  const bookingExtras = booking.extras as Array<{
-    id: string;
-    quantity: number;
-    price: number;
-    extra: {
-      slug: string;
-      translations: Array<{ locale: string; name: string; tagline?: string | null }>;
-    };
-  }>;
+  const contractSummary = getClientPortalContractSummary(proposals);
+  const deliveryNoteDocument = getClientPortalDeliveryNoteDocument(booking.deliveryNotes ?? []);
+  const latestInvoice = (booking.invoices ?? []).find((invoice) => invoice.status !== 'CANCELLED' && invoice.pdfUrl);
+  const hasDocument = Boolean(contractSummary || latestProposal || deliveryNoteDocument || latestInvoice);
+  const paymentSummary = getClientPortalPaymentSummary(booking);
+  const bookingExtras = booking.extras;
   const totalTravelKm = typeof booking.distanceKm === 'number' ? booking.distanceKm : 0;
-  const billableTravelKm = calculateBillableTravelKm(totalTravelKm, INCLUDED_TRAVEL_KM);
-  const travelBlocks = calculateTravelBlocks(totalTravelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
-  const travelCharge = calculateTravelCharge(totalTravelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
+  // Transport (#1369, monocapa): UNA crida al cervell econòmic. La vista NO calcula res.
+  const travel = computeBoloTransport({
+    roundTripKm: totalTravelKm,
+    serviceLines: booking.serviceLines ?? [],
+    hasOrbitaPack: (booking.pack.price ?? 0) > 0,
+    tollsEur: typeof booking.tollsEur === 'number' ? booking.tollsEur : 0,
+    vehicleCostPerKm: typeof booking.fuelCostPerKm === 'number' ? booking.fuelCostPerKm : null,
+  });
+  const travelHeadcount = travel.headcount;
+  const travelCharge = travel.clientCharge;
+  const portalPostEventTimelineStatus = booking.postEventReport
+    ? t.postEventDone
+    : booking.postEventEmailSent
+      ? t.postEventEmailSent
+      : t.postEventEmailPending;
 
-  const progressSteps = getProgressSteps(t, booking as Parameters<typeof getProgressSteps>[1], locale);
+  const progressSteps = getProgressSteps(t, booking, locale, paymentSummary);
   const nextAction = getNextActionLabel(t, paymentSummary, contractSummary);
 
-  const customerName = (access.customer?.name || booking.customer?.name || '').split(' ')[0];
+  const customerName = getClientPortalFirstName(access.customer?.name || booking.customer?.name);
+  const headlineText = getClientPortalPersonalizedText(personalization.headline, t.defaultHeadline);
+  const introText = getClientPortalPersonalizedText(personalization.introMessage, t.defaultIntro);
   const eventDateObj = new Date(booking.eventDate);
   const formattedEventDate = eventDateObj.toLocaleDateString(toIntlLocale(locale), {
     weekday: 'long',
@@ -331,6 +335,10 @@ export default async function ClientPortalPage({
     month: 'long',
     day: 'numeric',
   });
+  const deliveryNoteSignedDate = deliveryNoteDocument?.signedAt
+    ? new Date(deliveryNoteDocument.signedAt).toLocaleDateString(toIntlLocale(locale))
+    : null;
+  const eventPlace = formatClientPortalEventPlace(booking.eventVenue, booking.eventLocation);
   const isUpcoming = eventDateObj.getTime() > Date.now();
 
   return (
@@ -354,20 +362,23 @@ export default async function ClientPortalPage({
           <div className="mb-6 flex justify-center">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/40 tracking-widest uppercase">
               <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: accentHex }} />
-              Òrbita Events
+              {SITE_CONFIG.business.name}
             </span>
           </div>
 
           {/* Welcome + name */}
           <div className="text-center">
             <p className="text-sm font-medium mb-2" style={{ color: accentHex }}>
-              {personalization.headline || t.defaultHeadline}
+              {headlineText}
               {customerName ? `, ${customerName}` : ''}
             </p>
             <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight text-white mb-1">
-              {packTranslation?.name || booking.pack.slug}
+              {packDisplayName}
             </h1>
             <p className="text-white/40 text-sm">{t.booking} · {booking.reference}</p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/55">
+              {introText}
+            </p>
           </div>
 
           {/* Event info strip */}
@@ -376,13 +387,15 @@ export default async function ClientPortalPage({
               <IconCalendar className="w-4 h-4" />
               {formattedEventDate}
             </span>
-            <span className="flex items-center gap-1.5 text-white/60">
-              <IconMapPin className="w-4 h-4" />
-              {booking.eventVenue ? `${booking.eventVenue} · ${booking.eventLocation}` : booking.eventLocation}
-            </span>
+            {eventPlace && (
+              <span className="flex items-center gap-1.5 text-white/60">
+                <IconMapPin className="w-4 h-4" />
+                {eventPlace}
+              </span>
+            )}
             <span className="flex items-center gap-1.5 text-white/60">
               <IconUsers className="w-4 h-4" />
-              {booking.guestCount} {t.eventGuests.toLowerCase()}
+              {formatClientPortalGuestCount(locale, booking.guestCount)}
             </span>
           </div>
 
@@ -391,8 +404,12 @@ export default async function ClientPortalPage({
             <div className="mt-8 flex justify-center">
               <CountdownTimer
                 eventDateIso={booking.eventDate.toISOString()}
-                locale={locale}
                 accentHex={accentHex}
+                labels={{
+                  days: t.countdownDays,
+                  hours: t.countdownHours,
+                  minutes: t.countdownMinutes,
+                }}
               />
             </div>
           )}
@@ -403,11 +420,16 @@ export default async function ClientPortalPage({
           className="mb-8 rounded-2xl border p-5"
           style={{ borderColor: accentBorder, backgroundColor: accentBg }}
         >
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2" role="list" aria-label={t.timeline}>
             {progressSteps.map((step, i) => (
-              <div key={step.label} className="flex flex-1 flex-col items-center gap-2">
+              <div
+                key={step.label}
+                className="flex flex-1 flex-col items-center gap-2"
+                role="listitem"
+                aria-label={`${step.label}: ${getProgressStepStatusLabel(t, step.status)}`}
+              >
                 {/* connector left */}
-                <div className="flex w-full items-center">
+                <div className="flex w-full items-center" aria-hidden="true">
                   {i > 0 && (
                     <div
                       className="h-px flex-1"
@@ -481,6 +503,7 @@ export default async function ClientPortalPage({
                 style={{ backgroundColor: accentHex }}
               >
                 {nextAction.label}
+                <span className="sr-only"> ({t.opensInNewTab})</span>
               </a>
             ) : contractSummary?.awaitingInlineSignature ? (
               <Link
@@ -503,8 +526,8 @@ export default async function ClientPortalPage({
               className="rounded-xl p-4 mb-3"
               style={{ border: `1px solid ${toRgba(accentHex, 0.3)}`, backgroundColor: toRgba(accentHex, 0.08) ?? 'transparent' }}
             >
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: accentHex }}>Pack</p>
-              <p className="text-lg font-bold text-white">{packTranslation?.name || booking.pack.slug}</p>
+              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: accentHex }}>{t.packLabel}</p>
+              <p className="text-lg font-bold text-white">{packDisplayName}</p>
               {packTranslation?.tagline && (
                 <p className="text-sm text-white/50 mt-0.5">{packTranslation.tagline}</p>
               )}
@@ -516,8 +539,16 @@ export default async function ClientPortalPage({
                   return (
                     <div key={extra.id} className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.025] px-4 py-2.5 text-sm">
                       <span className="text-white/75">
-                        {translation?.name || extra.extra.slug}
-                        {extra.quantity > 1 ? ` ×${extra.quantity}` : ''}
+                        {getClientPortalExtraDisplayName(locale, translation?.name)}
+                        {extra.quantity > 1 && (
+                          <>
+                            <span aria-hidden="true"> ×{extra.quantity}</span>
+                            <span className="sr-only">
+                              {' '}
+                              {getClientPortalServiceQuantityLabel(locale, extra.quantity)}
+                            </span>
+                          </>
+                        )}
                       </span>
                       <span className="text-white/50 font-medium">{formatCurrency(extra.price)}</span>
                     </div>
@@ -528,7 +559,7 @@ export default async function ClientPortalPage({
           </SectionCard>
 
           {/* Payments */}
-          {showPayments && (
+          {visibility.payments && (
             <SectionCard icon={<IconCreditCard className="w-4 h-4" />} title={t.payments} accentHex={accentHex}>
               <p className="text-sm text-white/50 mb-4">{getPaymentNoticeMessage(t, paymentSummary.notice)}</p>
               <div className="grid gap-3 sm:grid-cols-2 mb-4">
@@ -536,14 +567,15 @@ export default async function ClientPortalPage({
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-4">
                   <p className="text-xs text-white/35 mb-1">{t.paymentDeposit}</p>
                   <p className="text-xl font-bold text-white">{formatCurrency(paymentSummary.deposit.amount)}</p>
-                  <p className={`text-xs font-medium mt-1 ${paymentSummary.deposit.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
-                    {paymentSummary.deposit.paid ? '✓ ' : '○ '}{paymentSummary.deposit.paid ? t.paid : t.pending}
+                  <p className={`text-xs font-medium mt-1 ${clientPortalPaymentTone(paymentSummary.deposit.paid)}`}>
+                    <span aria-hidden="true">{paymentSummary.deposit.paid ? '✓' : '○'}</span> {paymentSummary.deposit.paid ? t.paid : t.pending}
                   </p>
                   {paymentSummary.deposit.payableOnline && paymentSummary.deposit.paymentUrl && (
                     <a href={paymentSummary.deposit.paymentUrl} target="_blank" rel="noopener noreferrer"
                       className="mt-3 inline-flex w-full items-center justify-center rounded-lg py-2 text-sm font-semibold text-black hover:brightness-110 transition-all"
                       style={{ backgroundColor: accentHex }}>
                       {t.payDepositOnline}
+                      <span className="sr-only"> ({t.opensInNewTab})</span>
                     </a>
                   )}
                 </div>
@@ -551,14 +583,15 @@ export default async function ClientPortalPage({
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-4">
                   <p className="text-xs text-white/35 mb-1">{t.paymentRemaining}</p>
                   <p className="text-xl font-bold text-white">{formatCurrency(paymentSummary.remaining.amount)}</p>
-                  <p className={`text-xs font-medium mt-1 ${paymentSummary.remaining.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
-                    {paymentSummary.remaining.paid ? '✓ ' : '○ '}{paymentSummary.remaining.paid ? t.paid : t.pending}
+                  <p className={`text-xs font-medium mt-1 ${clientPortalPaymentTone(paymentSummary.remaining.paid)}`}>
+                    <span aria-hidden="true">{paymentSummary.remaining.paid ? '✓' : '○'}</span> {paymentSummary.remaining.paid ? t.paid : t.pending}
                   </p>
                   {paymentSummary.remaining.payableOnline && paymentSummary.remaining.paymentUrl && (
                     <a href={paymentSummary.remaining.paymentUrl} target="_blank" rel="noopener noreferrer"
                       className="mt-3 inline-flex w-full items-center justify-center rounded-lg py-2 text-sm font-semibold text-black hover:brightness-110 transition-all"
                       style={{ backgroundColor: accentHex }}>
                       {t.payRemainingOnline}
+                      <span className="sr-only"> ({t.opensInNewTab})</span>
                     </a>
                   )}
                 </div>
@@ -568,13 +601,13 @@ export default async function ClientPortalPage({
                 className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white hover:brightness-110 transition-all"
                 style={{ borderColor: accentBorder, backgroundColor: accentBg }}
               >
-                {t.paymentDetails} →
+                {t.paymentDetails} <span aria-hidden="true">→</span>
               </Link>
             </SectionCard>
           )}
 
           {/* Documents */}
-          {showDocuments && (
+          {visibility.documents && (
             <SectionCard icon={<IconFileText className="w-4 h-4" />} title={t.documents} accentHex={accentHex}>
               {contractSummary ? (
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-4 mb-3">
@@ -587,10 +620,10 @@ export default async function ClientPortalPage({
                     <div className="text-right">
                       <p className="text-xs text-white/35">{t.contractStatus}</p>
                       <p className="text-sm font-semibold text-white mt-0.5">
-                        {CONTRACT_STATUS_LABELS[locale][contractSummary.status] || contractSummary.status}
+                        {getClientPortalContractStatusLabel(locale, contractSummary.status)}
                       </p>
                       {contractSummary.awaitingInlineSignature && (
-                        <span className="text-xs text-amber-300">{t.inlineSignaturePending}</span>
+                        <span className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.warningText}`}>{t.inlineSignaturePending}</span>
                       )}
                     </div>
                   </div>
@@ -609,9 +642,33 @@ export default async function ClientPortalPage({
                     </Link>
                   </div>
                 </div>
-              ) : !latestProposal ? (
+              ) : !hasDocument ? (
                 <p className="text-sm text-white/40 mb-3">{t.noDocuments}</p>
               ) : null}
+              {deliveryNoteDocument && (
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-4 mb-3">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs text-white/35 uppercase tracking-wide">{t.deliveryNoteLabel}</p>
+                      <p className="text-base font-semibold text-white mt-0.5">{deliveryNoteDocument.reference}</p>
+                      <p className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.successText}`}>
+                        {t.deliveryNoteStatusSigned}
+                        {deliveryNoteSignedDate ? ` · ${deliveryNoteSignedDate}` : ''}
+                      </p>
+                    </div>
+                    <a
+                      href={deliveryNoteDocument.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
+                      style={{ borderColor: accentBorder, backgroundColor: accentBg }}
+                    >
+                      {t.deliveryNoteDownloadPdf}
+                      <span className="sr-only"> ({t.opensInNewTab})</span>
+                    </a>
+                  </div>
+                </div>
+              )}
               <div className="flex flex-wrap gap-2">
                 <Link href={buildClientPortalInvoicePath(locale, params.token)}
                   className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
@@ -623,6 +680,7 @@ export default async function ClientPortalPage({
                     className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
                     style={{ borderColor: accentBorder, backgroundColor: accentBg }}>
                     {t.openQuote} ({latestProposal.reference})
+                    <span className="sr-only"> ({t.opensInNewTab})</span>
                   </a>
                 )}
               </div>
@@ -630,12 +688,12 @@ export default async function ClientPortalPage({
           )}
 
           {/* Timeline */}
-          {showTimeline && (
+          {visibility.timeline && (
             <SectionCard icon={<IconActivity className="w-4 h-4" />} title={t.timeline} accentHex={accentHex}>
               <div className="grid gap-3 sm:grid-cols-3 mb-4">
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.status}</p>
-                  <p className="text-sm font-semibold">{STATUS_LABELS[locale][booking.status] || booking.status}</p>
+                  <p className="text-sm font-semibold">{getClientPortalBookingStatusLabel(locale, booking.status)}</p>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.portalLabel}</p>
@@ -647,13 +705,13 @@ export default async function ClientPortalPage({
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.postEvent}</p>
-                  <p className="text-sm font-semibold">{booking.postEventReport ? t.postEventDone : t.postEventProgress}</p>
+                  <p className="text-sm font-semibold">{portalPostEventTimelineStatus}</p>
                 </div>
               </div>
               <Link href={buildClientPortalTimelinePath(locale, params.token)}
                 className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
                 style={{ borderColor: accentBorder, backgroundColor: accentBg }}>
-                {t.timelineViewLink} →
+                {t.timelineViewLink} <span aria-hidden="true">→</span>
               </Link>
             </SectionCard>
           )}
@@ -665,13 +723,17 @@ export default async function ClientPortalPage({
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.travelDistance}</p>
                   <p className="text-sm font-semibold">{formatDistanceKm(totalTravelKm, locale)} km</p>
-                  <p className="text-xs text-white/35">{t.travelRoundTripFrom} Granollers</p>
-                  <p className="text-xs text-emerald-300 mt-0.5">{t.travelIncluded}: {INCLUDED_TRAVEL_KM} km</p>
+                  <p className="text-xs text-white/35">
+                    {t.travelRoundTripFrom} {SITE_CONFIG.business.address.city}
+                  </p>
+                  <p className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.successText} mt-0.5`}>{t.travelIncluded}: {INCLUDED_TRAVEL_KM} km</p>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.travelRate}</p>
-                  <p className="text-sm font-semibold">{TRAVEL_BLOCK_EUR}€ / {TRAVEL_BLOCK_KM} km extra</p>
-                  <p className="text-xs text-white/35 mt-0.5">{t.travelExtraKm}: {formatDistanceKm(billableTravelKm, locale)} km ({travelBlocks} trams)</p>
+                  <p className="text-sm font-semibold">{formatDistanceKm(totalTravelKm, locale)} km + {travel.chargeableHours.toLocaleString(toIntlLocale(locale))} h</p>
+                  <p className="text-xs text-white/35 mt-0.5">
+                    {t.travelExtraKm}: {getClientPortalTravelHeadcountLabel(locale, travelHeadcount)}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.travelEstimated}</p>
@@ -685,11 +747,11 @@ export default async function ClientPortalPage({
           {portalPhotos.length > 0 && (
             <SectionCard icon={<IconImage className="w-4 h-4" />} title={t.gallery} accentHex={accentHex}>
               <div className="grid grid-cols-3 gap-2 mb-3">
-                {portalPhotos.slice(0, 6).map((photo) => (
+                {portalPhotos.slice(0, 6).map((photo, index) => (
                   <div key={photo.id} className="relative aspect-square rounded-xl overflow-hidden border border-white/[0.06]">
                     <Image
                       src={photo.photoUrl}
-                      alt={photo.caption || t.gallery}
+                      alt={getClientPortalGalleryPhotoLabel(t.galleryPhotoLabel, photo.caption, index)}
                       fill
                       className="object-cover"
                       sizes="(max-width: 640px) 33vw, 25vw"
@@ -700,17 +762,27 @@ export default async function ClientPortalPage({
               <Link href={buildClientPortalGalleryPath(locale, params.token)}
                 className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
                 style={{ borderColor: accentBorder, backgroundColor: accentBg }}>
-                {t.galleryViewLink}{portalPhotos.length > 6 ? ` (${portalPhotos.length})` : ''} →
+                {t.galleryViewLink}
+                {portalPhotos.length > 6 && (
+                  <>
+                    <span aria-hidden="true"> ({portalPhotos.length})</span>
+                    <span className="sr-only">
+                      {' '}
+                      ({getClientPortalGalleryPhotoCountLabel(locale, portalPhotos.length)})
+                    </span>
+                  </>
+                )}
+                <span aria-hidden="true">→</span>
               </Link>
             </SectionCard>
           )}
 
           {/* Questionnaire */}
-          {showQuestionnaire && activeQuestionnaire && (
+          {visibility.questionnaire && activeQuestionnaire && (
             <SectionCard icon={<IconClipboard className="w-4 h-4" />} title={t.questionnaireLabel} accentHex={accentHex}>
               <div className="mb-4 flex items-center gap-2">
                 {activeQuestionnaire.response ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-medium text-emerald-200">
+                  <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${CLIENT_PORTAL_TONE_CLASS.successSoft}`}>
                     <IconCheck className="w-3 h-3" />
                     {t.questionnaireCompleted}
                   </span>
@@ -721,16 +793,16 @@ export default async function ClientPortalPage({
               <Link href={buildClientPortalQuestionnairePath(locale, params.token)}
                 className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
                 style={{ borderColor: accentBorder, backgroundColor: accentBg }}>
-                {activeQuestionnaire.response ? t.questionnaireEdit : t.questionnaireViewLink} →
+                {activeQuestionnaire.response ? t.questionnaireEdit : t.questionnaireViewLink} <span aria-hidden="true">→</span>
               </Link>
             </SectionCard>
           )}
 
           {/* Post-event */}
-          {showPostEvent && booking.status === 'COMPLETED' && (
+          {visibility.postEvent && booking.status === 'COMPLETED' && (
             <SectionCard icon={<StarIcon className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />} title={t.postEvent} accentHex={accentHex}>
               <p className="text-sm text-white/50">
-                {t.trackingStatus}: {(booking as Record<string, unknown>).clientFeedback ? t.feedbackSent : t.pendingClose}.
+                {t.trackingStatus}: {booking.postEventEmailSent ? t.postEventEmailSent : t.postEventEmailPending}.
               </p>
             </SectionCard>
           )}
@@ -743,7 +815,7 @@ export default async function ClientPortalPage({
             <Link href={`/${locale}`} className="text-xs text-white/25 hover:text-white/50 transition-colors">
               {t.backHome}
             </Link>
-            <p className="text-xs text-white/15">Òrbita Events</p>
+            <p className="text-xs text-white/15">{SITE_CONFIG.business.name}</p>
           </div>
         </footer>
 
@@ -752,12 +824,14 @@ export default async function ClientPortalPage({
         basePath={`/${locale}/portal/${params.token}`}
         accentHex={accentHex}
         labels={{
+          ariaLabel: t.portalNavigationLabel,
           hub: t.portalLabel,
           payments: t.payments,
           timeline: t.timelineLabel,
           contract: t.contract,
           gallery: t.navGallery,
         }}
+        hiddenItems={getClientPortalHiddenNavItems(visibility)}
       />
     </main>
   );

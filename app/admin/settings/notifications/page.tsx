@@ -57,7 +57,7 @@ function StatusCard({ title, ready, warning = false, successText, pendingText }:
   const icon = ready ? '✅' : warning ? '⚠️' : '❌';
 
   return (
-    <div className={`rounded-xl border p-6 shadow-sm ${tone}`}>
+    <div className={`ap-card p-6 shadow-sm ${tone}`}>
       <div className="mb-2 flex items-center gap-3">
         <span className="text-2xl">{icon}</span>
         <h2 className="ap-h2">{title}</h2>
@@ -70,7 +70,7 @@ function StatusCard({ title, ready, warning = false, successText, pendingText }:
 function ResultBox({ success, message }: { success: boolean; message: string }) {
   return (
     <div
-      className={`rounded-xl border p-4 ${
+      className={`ap-card p-4 ${
         success
           ? 'admin-tone-soft-success admin-tone-border-success admin-tone-text-success'
           : 'admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger'
@@ -94,7 +94,7 @@ function DeliveryPill({ active, label }: { active: boolean; label: string }) {
 }
 
 function NextAction({ children }: { children: React.ReactNode }) {
-  return <p className="mt-3 text-sm text-white/70">Acció següent: {children}</p>;
+  return <p className="mt-3 text-sm text-[var(--t2)]">Acció següent: {children}</p>;
 }
 
 export default function SettingsNotificationsPage() {
@@ -234,11 +234,11 @@ export default function SettingsNotificationsPage() {
         }}
       />
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="ap-h2">Radar viu de notificacions</h2>
-            <p className="text-sm text-white/70">El mateix recompte canònic que veu el shell admin, sense haver de sortir d'aquesta pantalla.</p>
+            <p className="text-sm text-[var(--t2)]">El mateix recompte canònic que veu el shell admin, sense haver de sortir d'aquesta pantalla.</p>
           </div>
           <span className="ap-badge ap-badge--info">Total viu: {totalCount}</span>
         </div>
@@ -247,21 +247,21 @@ export default function SettingsNotificationsPage() {
             <div className="ap-card-body">
               <div className="ap-kpi-label">Entrades noves</div>
               <div className="ap-kpi-value">{newLeadsCount}</div>
-              <p className="mt-2 text-sm text-white/70">Leads nous pendents d'atenció comercial.</p>
+              <p className="mt-2 text-sm text-[var(--t2)]">Leads nous pendents d'atenció comercial.</p>
             </div>
           </div>
           <div className="ap-card ap-card--success">
             <div className="ap-card-body">
               <div className="ap-kpi-label">Mail no llegit</div>
               <div className="ap-kpi-value">{inboxUnreadCount}</div>
-              <p className="mt-2 text-sm text-white/70">Correus nous o pendents a la safata IMAP.</p>
+              <p className="mt-2 text-sm text-[var(--t2)]">Correus nous o pendents a la safata IMAP.</p>
             </div>
           </div>
           <div className="ap-card ap-card--danger">
             <div className="ap-card-body">
               <div className="ap-kpi-label">Risc operatiu</div>
               <div className="ap-kpi-value">{packPriceAlertsCount + financeAlertsCount}</div>
-              <p className="mt-2 text-sm text-white/70">Alertes de preus i finances que demanen revisió.</p>
+              <p className="mt-2 text-sm text-[var(--t2)]">Alertes de preus i finances que demanen revisió.</p>
             </div>
           </div>
         </div>
@@ -283,17 +283,17 @@ export default function SettingsNotificationsPage() {
         />
       </div>
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <div className="mb-4">
           <h2 className="ap-h2">Cobertura real dels avisos</h2>
-          <p className="text-sm text-white/70">Per cada tipus d’alerta, veus quins canals tens realment operatius i on falla la cadena.</p>
+          <p className="text-sm text-[var(--t2)]">Per cada tipus d’alerta, veus quins canals tens realment operatius i on falla la cadena.</p>
         </div>
         <div className="space-y-3">
-          <div className="rounded-xl border border-white/10 p-4">
+          <div className="rounded-xl border border-[var(--line)] p-4">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="font-medium">Lead nou</h3>
-                <p className="text-sm text-white/70">Entrada comercial nova que hauria de disparar avís immediat.</p>
+                <p className="text-sm text-[var(--t2)]">Entrada comercial nova que hauria de disparar avís immediat.</p>
               </div>
               <span className="ap-badge ap-badge--info">Ara mateix: {newLeadsCount}</span>
             </div>
@@ -306,11 +306,11 @@ export default function SettingsNotificationsPage() {
             {emailReady && !(leadWebhookReady || whatsappReady) && <NextAction>activa `LEAD_WEBHOOK_URL` o una via WhatsApp perquè el lead també surti fora de l’admin.</NextAction>}
           </div>
 
-          <div className="rounded-xl border border-white/10 p-4">
+          <div className="rounded-xl border border-[var(--line)] p-4">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="font-medium">Mail nou</h3>
-                <p className="text-sm text-white/70">Correu entrant no llegit a la safata IMAP.</p>
+                <p className="text-sm text-[var(--t2)]">Correu entrant no llegit a la safata IMAP.</p>
               </div>
               <span className="ap-badge ap-badge--success">Ara mateix: {inboxUnreadCount}</span>
             </div>
@@ -323,11 +323,11 @@ export default function SettingsNotificationsPage() {
             {emailReady && <NextAction>el correu entrant ja es veu a l’admin; si vols push extern, caldrà una integració específica de safata.</NextAction>}
           </div>
 
-          <div className="rounded-xl border border-white/10 p-4">
+          <div className="rounded-xl border border-[var(--line)] p-4">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="font-medium">Resum diari i crítics</h3>
-                <p className="text-sm text-white/70">Resum comercial del matí, anomalies i alertes crítiques fora del dashboard.</p>
+                <p className="text-sm text-[var(--t2)]">Resum comercial del matí, anomalies i alertes crítiques fora del dashboard.</p>
               </div>
               <span className="ap-badge ap-badge--warning">Risc: {packPriceAlertsCount + financeAlertsCount}</span>
             </div>
@@ -343,7 +343,7 @@ export default function SettingsNotificationsPage() {
         </div>
       </section>
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <h2 className="mb-4 ap-h2">🧪 Test d'Email</h2>
 
         {testResult && <ResultBox success={testResult.success} message={testResult.message} />}
@@ -361,21 +361,21 @@ export default function SettingsNotificationsPage() {
         {!config?.status.emailReady && <p className="mt-2 text-sm">Configura primer les variables SMTP per poder testejar</p>}
       </section>
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <h2 className="mb-4 ap-h2">🤖 Pilot automàtic comercial</h2>
 
         <div className="grid gap-3 text-sm">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+          <div className="flex items-center justify-between border-b border-[var(--line)] pb-2">
             <span>CRON_SECRET</span>
             <span className={config?.automation.cronSecretConfigured ? 'admin-tone-text-success' : 'admin-tone-text-danger'}>
               {config?.automation.cronSecretConfigured ? '✅ Configurat' : '❌ FALTA'}
             </span>
           </div>
-          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+          <div className="flex items-center justify-between border-b border-[var(--line)] pb-2">
             <span>Última execució</span>
             <span>{config?.automation.lastRun ? formatDateTimeFull(config.automation.lastRun) : 'Mai'}</span>
           </div>
-          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+          <div className="flex items-center justify-between border-b border-[var(--line)] pb-2">
             <span>Estat</span>
             <span
               className={
@@ -390,7 +390,7 @@ export default function SettingsNotificationsPage() {
             </span>
           </div>
           {config?.automation.lastSummary && (
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p>
                 Seq: {config.automation.lastSummary.sequences?.executed ?? 0} · Email: {config.automation.lastSummary.sequences?.sentEmail ?? 0} · WA:{' '}
                 {config.automation.lastSummary.sequences?.sentWhatsapp ?? 0}
@@ -416,14 +416,14 @@ export default function SettingsNotificationsPage() {
         </button>
         {!config?.automation.cronSecretConfigured && (
           <p className="mt-2 text-sm">
-            Configura <code className="rounded bg-white/5 px-1">CRON_SECRET</code> per activar l’autopilot.
+            Configura <code className="rounded bg-[var(--raised)] px-1">CRON_SECRET</code> per activar l’autopilot.
           </p>
         )}
       </section>
 
       <RecipientsManager />
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <h2 className="mb-4 ap-h2">⚙️ Configuració Actual</h2>
 
         <div className="space-y-4">
@@ -431,7 +431,7 @@ export default function SettingsNotificationsPage() {
             <h3 className="mb-2 text-sm font-medium">SMTP (Email)</h3>
             <div className="grid gap-2 text-sm">
               {Object.entries(config?.smtp || {}).map(([key, value]) => (
-                <div key={key} className="flex justify-between border-b border-white/10 py-1">
+                <div key={key} className="flex justify-between border-b border-[var(--line)] py-1">
                   <span className="text-xs uppercase">{key}</span>
                   <span className={value.includes('✅') ? 'admin-tone-text-success' : value.includes('❌') ? 'admin-tone-text-danger' : ''}>{value}</span>
                 </div>
@@ -443,7 +443,7 @@ export default function SettingsNotificationsPage() {
             <h3 className="mb-2 text-sm font-medium">Destinataris</h3>
             <div className="grid gap-2 text-sm">
               {Object.entries(config?.recipients || {}).map(([key, value]) => (
-                <div key={key} className="flex justify-between border-b border-white/10 py-1">
+                <div key={key} className="flex justify-between border-b border-[var(--line)] py-1">
                   <span className="text-xs uppercase">{key}</span>
                   <span>{value}</span>
                 </div>
@@ -454,23 +454,23 @@ export default function SettingsNotificationsPage() {
       </section>
 
       {instructions.length > 0 && !config?.status.emailReady && (
-        <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+        <section className="ap-card p-6 shadow-sm">
           <h2 className="mb-4 ap-h2">📝 Instruccions de Configuració</h2>
 
           {instructions.map((instruction, index) => (
-            <pre key={index} className="mb-4 overflow-x-auto rounded-xl border p-4 text-sm whitespace-pre-wrap">
+            <pre key={index} className="mb-4 overflow-x-auto ap-card p-4 text-sm whitespace-pre-wrap">
               {instruction}
             </pre>
           ))}
         </section>
       )}
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <h2 className="mb-4 ap-h2">📚 Referència Ràpida</h2>
 
         <div className="prose prose-sm max-w-none">
           <h3 className="text-base font-medium">Variables d'entorn necessàries:</h3>
-          <div className="rounded-xl border bg-white/5 p-4 font-mono text-xs">
+          <div className="rounded-xl border bg-[var(--raised)] p-4 font-mono text-xs">
             <div># Obligatòries per email</div>
             <div>SMTP_HOST=smtp.dondominio.com</div>
             <div>SMTP_PORT=587</div>
@@ -486,7 +486,7 @@ export default function SettingsNotificationsPage() {
           <h3 className="mt-6 text-base font-medium">On configurar:</h3>
           <ol className="list-decimal space-y-1 pl-4">
             <li>Ves al <a href="https://railway.app" target="_blank" rel="noopener noreferrer" className="hover:underline">panell de Railway</a></li>
-            <li>Selecciona el projecte <code className="rounded bg-white/5 px-1">orbitaevents-web</code></li>
+            <li>Selecciona el projecte <code className="rounded bg-[var(--raised)] px-1">orbitaevents-web</code></li>
             <li>Configuració → Variables d&apos;entorn</li>
             <li>Afegeix cada variable amb el seu valor</li>
             <li>Redesplega el projecte</li>

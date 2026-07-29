@@ -1,17 +1,35 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockSendEmail, mockSendWhatsAppText } = vi.hoisted(() => ({
+const {
+  mockPrisma,
+  mockSendEmail,
+  mockSendWhatsAppText,
+  mockGetAppBaseUrl,
+  mockRecordEmailSend,
+  mockUpdateEmailSendResult,
+  mockWrapLinksForTracking,
+} = vi.hoisted(() => ({
   mockPrisma: {
     booking: { findUnique: vi.fn() },
     adminLog: { create: vi.fn() },
   },
   mockSendEmail: vi.fn(),
   mockSendWhatsAppText: vi.fn(),
+  mockGetAppBaseUrl: vi.fn(),
+  mockRecordEmailSend: vi.fn(),
+  mockUpdateEmailSendResult: vi.fn(),
+  mockWrapLinksForTracking: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
 vi.mock('@/lib/services/whatsappService', () => ({ sendWhatsAppText: mockSendWhatsAppText }));
+vi.mock('@/lib/site', () => ({ getAppBaseUrl: mockGetAppBaseUrl }));
+vi.mock('@/lib/services/emailTrackingService', () => ({
+  recordEmailSend: mockRecordEmailSend,
+  updateEmailSendResult: mockUpdateEmailSendResult,
+  wrapLinksForTracking: mockWrapLinksForTracking,
+}));
 vi.mock('@/lib/constants', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return {
@@ -69,7 +87,16 @@ describe('executeBookingCommunication', () => {
     vi.clearAllMocks();
     mockPrisma.booking.findUnique.mockResolvedValue(BOOKING);
     mockPrisma.adminLog.create.mockResolvedValue({});
-    mockSendEmail.mockResolvedValue(undefined);
+    mockGetAppBaseUrl.mockReturnValue('https://test.orbita.events/');
+    mockRecordEmailSend.mockResolvedValue({ id: 'email-send-comm-1', trackingToken: 'comm-token-1' });
+    mockUpdateEmailSendResult.mockResolvedValue(undefined);
+    mockWrapLinksForTracking.mockImplementation((html: string, token: string) => `${html}<a href="/tracked/${token}">tracked</a>`);
+    mockSendEmail.mockResolvedValue({
+      ok: true,
+      smtp: { accepted: ['joan@example.com'], rejected: [], response: '250 OK', messageId: '<comm@test>' },
+      imapSent: { attempted: true, ok: true, folder: 'Sent', uid: 82 },
+      orbitaMessageId: '<orbita.booking.bk-1.a.b@orbitaevents.com>',
+    });
     mockSendWhatsAppText.mockResolvedValue({ ok: true, providerMessageId: 'wa-123' });
   });
 
@@ -91,16 +118,55 @@ describe('executeBookingCommunication', () => {
       expect.objectContaining({
         to: 'joan@example.com',
         subject: expect.stringContaining('OE-2026-001'),
+        html: expect.stringContaining('/api/tracking/open/comm-token-1'),
+        orbita: { kind: 'booking', id: 'bk-1', origin: 'booking-communication' },
       }),
     );
+    expect(mockRecordEmailSend).toHaveBeenCalledWith(expect.objectContaining({
+      templateKey: 'booking-communication',
+      to: 'joan@example.com',
+      subject: expect.stringContaining('OE-2026-001'),
+      locale: 'ca',
+      htmlBody: expect.stringContaining('OE-2026-001'),
+      orbitaKind: 'booking',
+      orbitaId: 'bk-1',
+      orbitaOrigin: 'booking-communication',
+    }));
+    expect(mockUpdateEmailSendResult).toHaveBeenCalledWith('email-send-comm-1', expect.objectContaining({
+      smtpAccepted: ['joan@example.com'],
+      smtpRejected: [],
+      smtpResponse: '250 OK',
+      smtpMessageId: '<comm@test>',
+      imapAppendOk: true,
+      imapSentFolder: 'Sent',
+      imapSentUid: 82,
+      imapError: null,
+    }));
     expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         action: 'COMM_SENT',
         entity: 'booking',
         entityId: 'bk-1',
-        details: expect.objectContaining({ flow: 'PAYMENT', channel: 'email' }),
+        details: expect.objectContaining({
+          flow: 'PAYMENT',
+          channel: 'email',
+          emailSendId: 'email-send-comm-1',
+          emailSnapshot: 'EmailSend.htmlBody',
+          orbitaKind: 'booking',
+          orbitaId: 'bk-1',
+          orbitaOrigin: 'booking-communication',
+        }),
       }),
     });
+  });
+
+  it('send_email: no envia ni crea adminLog si falla EmailSend', async () => {
+    mockRecordEmailSend.mockRejectedValueOnce(new Error('tracking KO'));
+
+    await expect(executeBookingCommunication('bk-1', { action: 'send_email', flow: 'PAYMENT' })).rejects.toThrow('tracking KO');
+
+    expect(mockSendEmail).not.toHaveBeenCalled();
+    expect(mockPrisma.adminLog.create).not.toHaveBeenCalled();
   });
 
   it('send_email: subject en castellà si preferredLocale=es', async () => {

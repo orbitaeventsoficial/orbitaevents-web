@@ -1,14 +1,73 @@
-import { EventType } from '@prisma/client';
+import { ContractStatus, EventType, ProposalStatus } from '@prisma/client';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { CUSTOMER_ACTIVITY_ACTIONS, TASK_SOURCE } from '@/lib/constants';
 import { recordCustomerBookingCreated } from '@/lib/services/customerActivityService';
-import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
-import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
+import { DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { computeBoloTransport, withTravelHeadcountNote } from '@/lib/services/travelLaborCost';
+import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
 import { calcVatRate, calcDeposit, roundMoney, CUSTOM_BOOKING_PACK_SLUG, CUSTOM_BOOKING_PACK_MARKER } from '@/lib/constants/pricing';
 import { calculateEventDuration } from '@/lib/inventory-utils';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
+import { sendBookingConfirmationEmail } from '@/lib/services/bookingConfirmationEmailService';
+import { DEFAULT_BOOKING_PAYMENT_METHOD } from '@/lib/constants/booking-payment';
+import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
+import { buildBookingInventoryConflictBookingWhere } from '@/lib/services/bookingInventoryAvailability';
+import { syncBookingAvailabilityForState } from '@/lib/services/bookingAvailabilitySyncService';
+
+/**
+ * Imputa el so d'Isma com a cost inclos dins el DJ. No es factura a part i no
+ * depen del cataleg de proveidors: si el bolo porta pack o linia DJ, 50 eur del
+ * preu DJ es liquiden a Isma.
+ */
+async function appendSoundRentalLine(
+  lines: ReturnType<typeof normalizeServiceLines>,
+  hasPack: boolean,
+) {
+  const hasDjLine = lines.some((l) => {
+    const label = (l.label ?? '').toLowerCase();
+    return (l.revenueAmount || 0) > 0 && (l.kind === 'DJ' || /\bdj\b/.test(label));
+  });
+  if (!SOUND_RENTAL.enabled || (!hasPack && !hasDjLine)) return lines;
+  const alreadyHasSound = lines.some(
+    (l) => {
+      const label = (l.label ?? '').toLowerCase();
+      return Boolean(
+        l.notes?.includes(SOUND_RENTAL.notesMarker) ||
+        (l.collaboratorId === SOUND_RENTAL.collaboratorId && /so|altaveu|speaker/.test(label)) ||
+        (l.kind === 'EQUIPMENT' && label.includes('so')),
+      );
+    },
+  );
+  if (alreadyHasSound) return lines;
+  const rental = await prisma.collaborator.findFirst({
+    where: {
+      OR: [
+        { id: SOUND_RENTAL.collaboratorId },
+        { name: SOUND_RENTAL.collaboratorName, roles: { has: 'EQUIPMENT_RENTAL' } },
+      ],
+    },
+    select: { id: true },
+  });
+  if (!rental) return lines;
+  return [
+    ...lines,
+    {
+      collaboratorId: rental.id,
+      sortOrder: lines.length,
+      partyType: null,
+      kind: 'EQUIPMENT' as const,
+      label: SOUND_RENTAL.label,
+      revenueAmount: 0,
+      costAmount: SOUND_RENTAL.costPerEvent,
+      quantity: 1,
+      hours: null,
+      notes: `${SOUND_RENTAL.notesMarker} Cost inclos dins el preu del DJ; no es factura a part al client.`,
+    },
+  ];
+}
 
 const OPERATOR_EXTRA_ID = '__operator_extra__';
 const OPERATOR_EXTRA_SLUG = 'operator-support-hour';
@@ -70,9 +129,11 @@ type BookingServiceLineInput = {
   quantity?: number | null;
   hours?: number | null;
   notes?: string | null;
+  travelHeadcount?: number | null;
 };
 
 type BookingCreateInput = {
+  proposalId?: string;
   leadId?: string;
   customerId?: string;
   sourceCollaboratorId?: string | null;
@@ -97,6 +158,7 @@ type BookingCreateInput = {
   discountCode?: string;
   notes?: string;
   distanceKm?: number;
+  tollsEur?: number;
   fuelCostPerKm?: number;
   travelCost?: number;
   serviceLines?: BookingServiceLineInput[];
@@ -208,6 +270,16 @@ function sanitizeMoney(value?: number | null): number | null {
   return Math.max(0, Math.round(value * 100) / 100);
 }
 
+function normalizeBookingExtras(extras?: BookingExtraInput[]) {
+  if (!Array.isArray(extras)) return [];
+
+  return extras.map((extra) => ({
+    extraId: extra.extraId,
+    quantity: typeof extra.quantity === 'number' && extra.quantity > 0 ? Math.floor(extra.quantity) : 1,
+    price: sanitizeMoney(extra.price) ?? 0,
+  }));
+}
+
 function normalizeServiceLines(lines?: BookingServiceLineInput[]) {
   if (!Array.isArray(lines)) return [];
 
@@ -218,11 +290,11 @@ function normalizeServiceLines(lines?: BookingServiceLineInput[]) {
       partyType: line.partyType?.trim() || null,
       kind: line.kind || 'OTHER',
       label: line.label?.trim(),
-      revenueAmount: sanitizeMoney(line.revenueAmount),
-      costAmount: sanitizeMoney(line.costAmount),
+      revenueAmount: sanitizeRevenueAmount(line.revenueAmount),
+      costAmount: sanitizeServiceLineCostAmount({ kind: line.kind || 'OTHER', label: line.label, costAmount: line.costAmount }),
       quantity: typeof line.quantity === 'number' && line.quantity > 0 ? Math.floor(line.quantity) : null,
       hours: typeof line.hours === 'number' && line.hours > 0 ? Math.round(line.hours * 100) / 100 : null,
-      notes: line.notes?.trim() || null,
+      notes: withTravelHeadcountNote(line.notes, line.travelHeadcount),
     }))
     .filter((line) => Boolean(line.label));
 }
@@ -235,7 +307,7 @@ async function resolveBilledPartner(id?: string | null) {
   });
 }
 
-async function assignPackInventory(bookingId: string, packId: string) {
+async function assignPackInventory(bookingId: string, packId: string, eventDate?: Date | string | null) {
   try {
     const packInventory = await prisma.packInventory.findMany({
       where: { packId },
@@ -251,8 +323,11 @@ async function assignPackInventory(bookingId: string, packId: string) {
       by: ['itemId'],
       where: {
         itemId: { in: itemIds },
-        bookingId: { not: bookingId },
-        booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
+        booking: buildBookingInventoryConflictBookingWhere({
+          bookingId,
+          eventDate,
+          statuses: ACTIVE_BOOKING_STATUSES,
+        }),
       },
     });
     const busyItemIds = new Set(overlappingItems.map((o) => o.itemId));
@@ -287,21 +362,59 @@ async function assignPackInventory(bookingId: string, packId: string) {
 }
 
 export async function createBookingFromInput(data: BookingCreateInput): Promise<BookingCreationResult> {
-  let linkedCustomerId: string | null = data.customerId || null;
+  const linkedProposal = data.proposalId
+    ? await prisma.proposal.findUnique({
+        where: { id: data.proposalId },
+        select: {
+          id: true,
+          customerId: true,
+          leadId: true,
+          bookingId: true,
+          total: true,
+          vatRate: true,
+          acceptedAt: true,
+          contractStatus: true,
+        },
+      })
+    : null;
+
+  if (data.proposalId && !linkedProposal) {
+    return { status: 404, body: { error: 'Pressupost no trobat' } };
+  }
+  if (linkedProposal?.bookingId) {
+    return { status: 409, body: { error: 'Aquest pressupost ja té una reserva vinculada', bookingId: linkedProposal.bookingId } };
+  }
+  if (linkedProposal?.leadId && data.leadId && linkedProposal.leadId !== data.leadId) {
+    return { status: 400, body: { error: 'El lead de la reserva no coincideix amb el pressupost' } };
+  }
+  if (linkedProposal?.customerId && data.customerId && linkedProposal.customerId !== data.customerId) {
+    return { status: 400, body: { error: 'El client de la reserva no coincideix amb el pressupost' } };
+  }
+
+  const effectiveLeadId = data.leadId || linkedProposal?.leadId || undefined;
+  const effectiveCustomerId = data.customerId || linkedProposal?.customerId || undefined;
+  const effectiveManualTotalPrice = data.manualTotalPrice ?? (
+    linkedProposal && linkedProposal.total > 0 ? linkedProposal.total : undefined
+  );
+  const effectiveInvoiceRequired = data.invoiceRequired ?? (
+    linkedProposal ? linkedProposal.vatRate > 0 : undefined
+  );
+
+  let linkedCustomerId: string | null = effectiveCustomerId || null;
   let sourceCollaboratorId: string | null = data.sourceCollaboratorId || null;
   const billedPartner = await resolveBilledPartner(data.billedCollaboratorId || null);
   const billedCollaboratorId = billedPartner?.id || null;
 
   let leadBoloLines: BookingServiceLineInput[] = [];
-  if (data.leadId) {
+  if (effectiveLeadId) {
     const lead = await prisma.lead.findUnique({
-      where: { id: data.leadId },
+      where: { id: effectiveLeadId },
       select: {
         customerId: true,
         sourceCollaboratorId: true,
         serviceLines: {
           orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
-          select: { collaboratorId: true, kind: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true, notes: true },
+          select: { collaboratorId: true, kind: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true, partyType: true, notes: true },
         },
       },
     });
@@ -317,6 +430,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       costAmount: l.costAmount ?? undefined,
       quantity: l.quantity ?? undefined,
       hours: l.hours ?? undefined,
+      partyType: l.partyType ?? undefined,
       notes: l.notes ?? undefined,
     }));
   }
@@ -332,6 +446,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   }
 
   // Bolo personalitzat (sense pack de catàleg): resol el pack tècnic 0€.
+  const hasCatalogPack = Boolean(data.packId && data.packId !== CUSTOM_BOOKING_PACK_MARKER);
   const resolvedPackId = (data.packId === CUSTOM_BOOKING_PACK_MARKER || !data.packId)
     ? await ensureCustomBookingPackId()
     : data.packId;
@@ -355,49 +470,79 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     packDjHours: pack.djHours,
   });
   const extraHoursPrice = extraHours * pack.extraHourPrice;
-  const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
+  const normalizedExtras = normalizeBookingExtras(data.extras);
+  const resolvedExtras = normalizedExtras.length > 0
+    ? (await Promise.all(
+        normalizedExtras.map(async (extra) => {
+          const resolvedId = await resolveExtraId(extra.extraId);
+          if (!resolvedId) return null;
+          return {
+            extraId: resolvedId,
+            quantity: extra.quantity,
+            price: extra.price,
+          };
+        })
+      )).filter((extra): extra is { extraId: string; quantity: number; price: number } => extra !== null)
+    : [];
+  const extrasPrice = resolvedExtras.reduce((sum, e) => sum + e.price * e.quantity, 0);
   // Si el payload no porta línies però el lead té un bolo muntat, s'hereten (Fase 2).
-  const serviceLines = normalizeServiceLines(
+  const serviceLinesBase = normalizeServiceLines(
     (data.serviceLines && data.serviceLines.length > 0) ? data.serviceLines : leadBoloLines
   );
-  const serviceLinesRevenue = serviceLines.reduce((sum, line) => sum + (line.revenueAmount || 0), 0);
+  // So Isma inclos dins el DJ: cost real sense producte extra client-facing.
+  const serviceLines = await appendSoundRentalLine(serviceLinesBase, hasCatalogPack);
+  const serviceLinesRevenue = serviceLines.reduce(
+    (sum, line) => sum + (line.revenueAmount || 0) * (line.quantity || 1),
+    0
+  );
   // El pack, les hores extra, els extres i les línies de servei se SUMEN tots
   // (les línies són serveis addicionals, no substitueixen el pack). El total
   // manual (manualTotalPrice), si s'informa, guanya sobre aquest càlcul més avall.
   const subtotalBase = packPrice + extraHoursPrice + extrasPrice + serviceLinesRevenue;
 
   let distanceKm = data.distanceKm != null ? sanitizeNonNegative(data.distanceKm, 0) : null;
+  let autoTollsEur: number | null = null;
   if (distanceKm == null) {
     const destination = [data.eventVenue || '', data.eventLocation || ''].filter(Boolean).join(', ').trim();
     if (destination) {
       try {
         const route = await calculateGoogleMapsDistance({ destination });
         distanceKm = sanitizeNonNegative(route.roundTripKm, 0);
+        autoTollsEur = route.tollsEur; // peatges automàtics (#1373) si Google en dona
       } catch {
         distanceKm = null;
       }
     }
   }
 
-  const fuelReference = await getFuelCostPerKmReference();
+  const vehicleCostReference = await getEffectiveVehicleCostPerKm();
   const fuelCostPerKm = sanitizeNonNegative(
-    data.fuelCostPerKm ?? fuelReference.costPerKm,
+    data.fuelCostPerKm ?? vehicleCostReference.costPerKm,
     DEFAULT_VEHICLE_COST_PER_KM
   );
-  const travelCost = distanceKm != null ? calculateTravelCost(distanceKm, fuelCostPerKm) : null;
-  const travelCharge = distanceKm != null ? calculateTravelCharge(distanceKm) : 0;
+  // Peatges: manual (data.tollsEur) prioritari; si no, els automàtics de Google (#1373).
+  const tollsEur = data.tollsEur != null ? sanitizeNonNegative(data.tollsEur, 0) : (autoTollsEur ?? 0);
+  // Transport (#1369, monocapa): UNA crida al cervell econòmic. `cost` = cost intern real
+  // (cotxe + tripulació + peatges); `clientCharge` = el que paga el client (amb franquícia
+  // de 50 km i peatges). El headcount surt de les línies del bolo.
+  const transport = distanceKm != null
+    ? computeBoloTransport({ roundTripKm: distanceKm, serviceLines, hasOrbitaPack: packPrice > 0, tollsEur, vehicleCostPerKm: fuelCostPerKm })
+    : null;
+  const travelCost = transport ? transport.cost : null;
+  const travelCharge = transport ? transport.clientCharge : 0;
   const subtotalCalculated = subtotalBase + travelCharge;
-  const discount = data.discount || 0;
-  const vatRate = calcVatRate(data.invoiceRequired ?? false);
-  const manualTotal = data.manualTotalPrice != null && data.manualTotalPrice > 0
-    ? roundMoney(data.manualTotalPrice)
+  const discount = sanitizeMoney(data.discount) ?? 0;
+  const invoiceRequired = Boolean(effectiveInvoiceRequired);
+  const vatRate = calcVatRate(invoiceRequired);
+  const manualTotal = effectiveManualTotalPrice != null && effectiveManualTotalPrice > 0
+    ? roundMoney(effectiveManualTotalPrice)
     : null;
   const subtotal = manualTotal !== null
-    ? data.invoiceRequired
+    ? invoiceRequired
       ? roundMoney(manualTotal * 100 / (100 + vatRate))
       : manualTotal
     : subtotalCalculated;
-  const baseAfterDiscount = manualTotal !== null ? subtotal : subtotal - discount;
+  const baseAfterDiscount = manualTotal !== null ? subtotal : Math.max(0, subtotal - discount);
   // Money es desa com a Float al schema: arrodonir a cèntims evita soroll de
   // coma flotant a BD i desquadres amb Stripe (cobra en cèntims sencers).
   // Mateix patró canònic que publicBookingService.ts.
@@ -410,24 +555,10 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const depositAmount = calcDeposit(total);
   const reference = await generateReference();
 
-  const resolvedExtras = data.extras
-    ? (await Promise.all(
-        data.extras.map(async (extra) => {
-          const resolvedId = await resolveExtraId(extra.extraId);
-          if (!resolvedId) return null;
-          return {
-            extraId: resolvedId,
-            quantity: extra.quantity || 1,
-            price: extra.price,
-          };
-        })
-      )).filter((extra): extra is { extraId: string; quantity: number; price: number } => extra !== null)
-    : [];
-
   const booking = await prisma.booking.create({
     data: {
       reference,
-      leadId: data.leadId,
+      leadId: effectiveLeadId,
       customerId: linkedCustomerId,
       sourceCollaboratorId,
       billedCollaboratorId,
@@ -444,16 +575,19 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       packId: resolvedPackId,
       extraHours,
       distanceKm,
+      tollsEur: tollsEur > 0 ? tollsEur : null,
       fuelCostPerKm,
       travelCost,
       subtotal,
       discount: manualTotal !== null ? 0 : discount,
       discountCode: data.discountCode,
+      invoiceRequired,
       vatRate,
       vatAmount,
       total,
       depositAmount,
       remainingAmount: Math.round((total - depositAmount) * 100) / 100,
+      paymentMethod: DEFAULT_BOOKING_PAYMENT_METHOD,
       notes: data.notes,
       extras: resolvedExtras.length > 0 ? { create: resolvedExtras } : undefined,
       serviceLines: serviceLines.length > 0 ? { create: serviceLines } : undefined,
@@ -464,7 +598,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     },
   });
 
-  await assignPackInventory(booking.id, booking.packId);
+  await assignPackInventory(booking.id, booking.packId, booking.eventDate);
 
   if (linkedCustomerId) {
     await recordCustomerBookingCreated({
@@ -483,7 +617,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       data: {
         customerId: linkedCustomerId,
         bookingId: booking.id,
-        leadId: data.leadId || null,
+        leadId: effectiveLeadId || null,
         title: `Preparar reserva ${booking.reference}`,
         description: 'Revisa horaris, ubicació, inventari, extres i confirmació final amb client.',
         dueDate: prepDueDate,
@@ -495,9 +629,9 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     });
   }
 
-  if (data.leadId) {
+  if (effectiveLeadId) {
     await prisma.lead.update({
-      where: { id: data.leadId },
+      where: { id: effectiveLeadId },
       data: {
         status: 'WON',
         convertedAt: new Date(),
@@ -506,17 +640,12 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     });
   }
 
-  await prisma.availability.upsert({
-    where: { date: eventDate },
-    create: {
-      date: eventDate,
-      status: 'BOOKED',
-      bookingId: booking.id,
-    },
-    update: {
-      status: 'BOOKED',
-      bookingId: booking.id,
-    },
+  await syncBookingAvailabilityForState({
+    bookingId: booking.id,
+    reference: booking.reference,
+    clientName: booking.clientName,
+    nextEventDate: booking.eventDate,
+    nextStatus: booking.status,
   });
 
   await prisma.adminLog.create({
@@ -524,9 +653,49 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       action: 'CREATE',
       entity: 'booking',
       entityId: booking.id,
-      details: { reference, clientName: data.clientName, total },
+      details: { reference, clientName: data.clientName, total, proposalId: linkedProposal?.id || null },
     },
   });
+
+  if (linkedProposal) {
+    const shouldQueueContract = !linkedProposal.contractStatus || linkedProposal.contractStatus === ContractStatus.DRAFT;
+    await prisma.proposal.update({
+      where: { id: linkedProposal.id },
+      data: {
+        bookingId: booking.id,
+        status: ProposalStatus.ACCEPTED,
+        acceptedAt: linkedProposal.acceptedAt ?? new Date(),
+        ...(shouldQueueContract ? { contractStatus: ContractStatus.DRAFT, contractSentAt: null } : {}),
+      },
+    });
+  }
+
+  // Confirmació al client (plantilla editable booking_confirmation). No bloqueja la
+  // creació si l'enviament falla: la reserva ja està desada.
+  const confirmationEmail = billedPartner?.email || data.clientEmail;
+  if (confirmationEmail) {
+    const sent = await sendBookingConfirmationEmail({
+      to: confirmationEmail,
+      locale: null,
+      bookingId: booking.id,
+      leadId: effectiveLeadId || null,
+      customerId: linkedCustomerId || null,
+      reference: booking.reference,
+      clientName: data.clientName,
+      eventDate,
+      startTime: data.eventStartTime,
+      endTime: data.eventEndTime,
+      packId: resolvedPackId,
+      location: data.eventLocation,
+      total,
+      depositAmount,
+    });
+    if (!sent.ok && sent.skipped !== 'smtp_not_configured') {
+      log.error('Confirmació de reserva no enviada', undefined, {
+        context: { reference: booking.reference, reason: sent.error },
+      });
+    }
+  }
 
   return { status: 200, body: { ok: true, booking } };
 }

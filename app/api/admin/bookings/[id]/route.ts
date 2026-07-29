@@ -8,7 +8,7 @@ import { requireAuth, requirePermission } from '@/lib/auth';
 import { getRequestId } from '@/lib/request-context';
 import { deleteBookingIfAllowed, getBookingDetail, updateBookingDetail } from '@/lib/services/bookingRouteService';
 import type { ManagedBookingStatus } from '@/lib/services/bookingStatusTransitionService';
-import { dispatchAutoTrigger } from '@/lib/services/automationTriggers';
+import { collaboratorLineCostErrorMessage, findCollaboratorLinesWithoutCost } from '@/lib/booking-service-line-validation';
 
 interface Params {
   params: { id: string };
@@ -18,10 +18,16 @@ type DeleteBookingPayload = {
   id: string;
   reference: string;
   status: ManagedBookingStatus;
+  eventDate: Date | string;
   customerId?: string | null;
 };
 
 const MANAGED_BOOKING_STATUSES: ManagedBookingStatus[] = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED'];
+const EVENT_TYPES = ['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'] as const;
+const requiredTrimmedString = z.string().trim().min(1);
+const optionalTrimmedString = z.string().trim().optional();
+const nullableTrimmedString = z.string().trim().nullable().optional();
+const nullableTrimmedNonEmptyString = z.string().trim().min(1).nullable().optional();
 
 function isDeleteBookingPayload(value: unknown): value is DeleteBookingPayload {
   if (!value || typeof value !== 'object') return false;
@@ -30,52 +36,70 @@ function isDeleteBookingPayload(value: unknown): value is DeleteBookingPayload {
     typeof candidate.id === 'string' &&
     typeof candidate.reference === 'string' &&
     typeof candidate.status === 'string' &&
+    (candidate.eventDate instanceof Date || typeof candidate.eventDate === 'string') &&
     MANAGED_BOOKING_STATUSES.includes(candidate.status as ManagedBookingStatus)
   );
 }
 
+const serviceLineSchema = z.object({
+  collaboratorId: nullableTrimmedNonEmptyString,
+  sortOrder: z.number().int().optional(),
+  partyType: nullableTrimmedString,
+  kind: z.enum(['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER']).optional(),
+  label: requiredTrimmedString,
+  revenueAmount: z.number().min(0).nullable().optional(),
+  costAmount: z.number().nullable().optional(),
+  quantity: z.number().int().positive().nullable().optional(),
+  hours: z.number().positive().nullable().optional(),
+  notes: nullableTrimmedString,
+});
+
 const updateBookingSchema = z.object({
   status: z.enum(['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED']).optional(),
-  eventDate: z.string().optional(),
-  eventLocation: z.string().optional(),
-  sourceCollaboratorId: z.string().nullable().optional(),
-  billedCollaboratorId: z.string().nullable().optional(),
+  clientName: requiredTrimmedString.optional(),
+  clientEmail: z.string().trim().email().optional(),
+  clientPhone: requiredTrimmedString.optional(),
+  eventType: z.enum(EVENT_TYPES).optional(),
+  eventDate: requiredTrimmedString.optional(),
+  eventLocation: requiredTrimmedString.optional(),
+  sourceCollaboratorId: nullableTrimmedNonEmptyString,
+  billedCollaboratorId: nullableTrimmedNonEmptyString,
   guestCount: z.number().optional(),
-  eventVenue: z.string().optional(),
-  totalPrice: z.number().optional(),
-  depositAmount: z.number().optional(),
+  eventVenue: optionalTrimmedString,
+  totalPrice: z.number().positive().optional(),
+  depositAmount: z.number().min(0).optional(),
   depositPaid: z.boolean().optional(),
-  depositPaidAt: z.string().nullable().optional(),
-  remainingAmount: z.number().optional(),
+  depositPaidAt: nullableTrimmedString,
+  remainingAmount: z.number().min(0).optional(),
   remainingPaid: z.boolean().optional(),
-  remainingPaidAt: z.string().nullable().optional(),
-  notes: z.string().optional(),
-  internalNotes: z.string().optional(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
+  remainingPaidAt: nullableTrimmedString,
+  notes: optionalTrimmedString,
+  internalNotes: optionalTrimmedString,
+  startTime: optionalTrimmedString,
+  endTime: optionalTrimmedString,
   distanceKm: z.number().min(0).optional(),
   fuelCostPerKm: z.number().min(0).optional(),
+  tollsEur: z.number().min(0).optional(),
   travelCost: z.number().min(0).optional(),
+  discount: z.number().min(0).optional(),
   paymentMethod: z.enum(['INVOICE', 'CASH', 'TRANSFER']).optional(),
   invoiceRequired: z.boolean().optional(),
-  cashAmount: z.number().nullable().optional(),
-  eventPhone: z.string().nullable().optional(),
-  eventAddress: z.string().nullable().optional(),
-  eventStartTime: z.string().nullable().optional(),
-  eventEndTime: z.string().nullable().optional(),
-  serviceLines: z.array(z.object({
-    collaboratorId: z.string().nullable().optional(),
-    sortOrder: z.number().int().optional(),
-    partyType: z.string().nullable().optional(),
-    kind: z.enum(['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER']).optional(),
-    label: z.string().min(1),
-    revenueAmount: z.number().min(0).nullable().optional(),
-    costAmount: z.number().min(0).nullable().optional(),
-    quantity: z.number().int().positive().nullable().optional(),
-    hours: z.number().positive().nullable().optional(),
-    notes: z.string().nullable().optional(),
-  })).optional(),
-}).strict();
+  cashAmount: z.number().min(0).nullable().optional(),
+  eventPhone: nullableTrimmedString,
+  eventAddress: nullableTrimmedString,
+  eventStartTime: nullableTrimmedString,
+  eventEndTime: nullableTrimmedString,
+  serviceLines: z.array(serviceLineSchema).optional(),
+}).strict().superRefine((data, ctx) => {
+  const issue = findCollaboratorLinesWithoutCost(data.serviceLines ?? [])[0];
+  if (!issue) return;
+
+  ctx.addIssue({
+    code: z.ZodIssueCode.custom,
+    path: ['serviceLines', issue.index, 'costAmount'],
+    message: collaboratorLineCostErrorMessage(issue),
+  });
+});
 
 export async function GET(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
@@ -114,11 +138,6 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     const result = await updateBookingDetail(params.id, { ...parseResult.data });
     customerIdForLog = result.customerId ?? null;
-
-    // Auto-trigger: booking confirmed → pre-event checklist
-    if (parseResult.data.status === 'CONFIRMED') {
-      dispatchAutoTrigger({ type: 'booking.confirmed', bookingId: params.id }).catch(() => {});
-    }
 
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
@@ -169,4 +188,3 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Error eliminant reserva' }, { status: 500 });
   }
 }
-

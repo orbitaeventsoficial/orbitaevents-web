@@ -149,6 +149,34 @@ describe('getTemplate', () => {
     expect(result.source).toBe('default');
     expect(result.bodyHtml).toContain('Test');
   });
+
+  it('fallback post_event EN demana review en comptes de feedback', async () => {
+    const result = await getTemplate('post_event', 'en', {
+      clientName: 'Maria',
+      packName: 'Premium',
+      reviewUrl: 'https://test.com/review',
+      googleReviewUrl: 'https://google.com/review',
+    });
+
+    expect(result.source).toBe('default');
+    expect(result.bodyHtml).toContain('Your review is very important to us');
+    expect(result.bodyHtml).toContain('Leave a review');
+    expect(result.bodyHtml).not.toContain('Your feedback is very important to us');
+    expect(result.bodyHtml).not.toContain('Leave your feedback');
+  });
+
+  it('fallback testimonial_reminder EN demana review en comptes de feedback', async () => {
+    const result = await getTemplate('testimonial_reminder', 'en', {
+      clientName: 'Maria',
+      reviewUrl: 'https://test.com/review',
+    });
+
+    expect(result.source).toBe('default');
+    expect(result.subject).toContain("we'd love your review");
+    expect(result.bodyHtml).toContain('your review would really help us improve');
+    expect(result.subject).not.toContain('feedback');
+    expect(result.bodyHtml).not.toContain('feedback');
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────

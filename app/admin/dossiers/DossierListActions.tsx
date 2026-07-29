@@ -2,25 +2,34 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Eye, FileText, RotateCcw, Send, Trash2, XCircle } from 'lucide-react';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
-import type { AnimacioProduct } from '@/lib/constants/animacio-products';
-import { buildDossierHtml, type DossierClientInfo, type DossierCopy } from '@/lib/utils/dossier-html-builder';
+import { buildDossierCompositePdfHref, buildDossierStoredPreviewHref } from '@/lib/admin/dossierWorkspaceHref';
+
+const ACTIONS_WRAP = 'grid w-full grid-cols-2 gap-2 sm:grid-cols-4 md:flex md:w-auto md:flex-wrap md:items-center md:justify-end';
+const ACTION_BTN = 'ap-btn ap-btn--xs min-h-10 justify-center gap-1.5';
+const ACTION_ICON = 'h-3.5 w-3.5 shrink-0';
+
+export async function readDossierListActionError(response: Response, fallback: string): Promise<string> {
+  try {
+    const payload = await response.json() as { error?: string; message?: string };
+    return payload.error || payload.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 interface Props {
   dossierId: string;
+  leadId?: string;
   email?: string;
   nom: string;
-  productIds: string[];
-  products: AnimacioProduct[];
-  clientInfo: DossierClientInfo;
-  dossierCopy: DossierCopy;
   alreadySent: boolean;
-  logoDataUri?: string;
   isDeleted?: boolean;
 }
 
-export function DossierListActions({ dossierId, email, nom, productIds, products, clientInfo, dossierCopy, alreadySent, logoDataUri, isDeleted }: Props) {
+export function DossierListActions({ dossierId, leadId, email, nom, alreadySent, isDeleted }: Props) {
   const toast = useToast();
   const router = useRouter();
   const [sending, setSending] = useState(false);
@@ -29,19 +38,11 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   const [purging, setPurging] = useState(false);
 
   function preview() {
-    try {
-      const filteredProducts = products.filter((p) => productIds.includes(p.id));
-      const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, { logoDataUri, locale: 'ca-ES' });
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
-    } catch (err) {
-      console.error('[DossierListActions] preview error:', err);
-      toast.error('No he pogut obrir la previsualització.');
-    }
+    window.open(buildDossierStoredPreviewHref(dossierId), '_blank', 'noopener,noreferrer');
   }
 
   function openCompositePdf() {
-    window.open(`/api/admin/dossiers/${dossierId}/composite`, '_blank', 'noopener,noreferrer');
+    window.open(buildDossierCompositePdfHref(dossierId), '_blank', 'noopener,noreferrer');
   }
 
   async function send() {
@@ -50,8 +51,7 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
     try {
       const res = await fetchWithCsrf(`/api/admin/dossiers/${dossierId}/send`, { method: 'POST' });
       if (!res.ok) {
-        const data = await res.json() as { error?: string };
-        throw new Error(data.error || 'Error enviant');
+        throw new Error(await readDossierListActionError(res, 'Error enviant el dossier'));
       }
       toast.success(`Dossier enviat a ${email}`);
       router.refresh();
@@ -66,12 +66,13 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   async function moveToTrash() {
     setDeleting(true);
     try {
-      await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, { method: 'DELETE' });
+      const res = await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(await readDossierListActionError(res, 'Error movent el dossier a la paperera'));
       toast.success('Dossier mogut a la paperera (30 dies per restaurar)');
       router.refresh();
     } catch (err) {
       console.error('[DossierListActions] delete error:', err);
-      toast.error('Error movent el dossier a la paperera');
+      toast.error(err instanceof Error ? err.message : 'Error movent el dossier a la paperera');
     } finally {
       setDeleting(false);
     }
@@ -80,16 +81,17 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   async function restore() {
     setRestoring(true);
     try {
-      await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
+      const res = await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'restore' }),
       });
+      if (!res.ok) throw new Error(await readDossierListActionError(res, 'Error restaurant el dossier'));
       toast.success('Dossier restaurat');
       router.refresh();
     } catch (err) {
       console.error('[DossierListActions] restore error:', err);
-      toast.error('Error restaurant el dossier');
+      toast.error(err instanceof Error ? err.message : 'Error restaurant el dossier');
     } finally {
       setRestoring(false);
     }
@@ -98,16 +100,17 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   async function purge() {
     setPurging(true);
     try {
-      await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
+      const res = await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'purge' }),
       });
+      if (!res.ok) throw new Error(await readDossierListActionError(res, 'Error eliminant el dossier'));
       toast.success('Dossier eliminat permanentment');
       router.refresh();
     } catch (err) {
       console.error('[DossierListActions] purge error:', err);
-      toast.error('Error eliminant el dossier');
+      toast.error(err instanceof Error ? err.message : 'Error eliminant el dossier');
     } finally {
       setPurging(false);
     }
@@ -115,29 +118,35 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
 
   if (isDeleted) {
     return (
-      <div className="dg__list-acts">
-        <button type="button" onClick={preview} className="dg__btn dg__btn--preview" title="Previsualitzar">
+      <div className={ACTIONS_WRAP}>
+        <button type="button" onClick={preview} className={ACTION_BTN} title="Previsualitzar">
+          <Eye className={ACTION_ICON} aria-hidden="true" />
           Vista
         </button>
-        <button type="button" onClick={openCompositePdf} className="dg__btn dg__btn--pdf" title="Obrir dossier + fitxes en un sol PDF">
+        <button type="button" onClick={openCompositePdf} className={`${ACTION_BTN} ap-btn--primary`} title="Obrir dossier + fitxes en un sol PDF">
+          <FileText className={ACTION_ICON} aria-hidden="true" />
           PDF complet
         </button>
-        <button type="button" onClick={restore} disabled={restoring} className="dg__btn dg__btn--save" title="Restaurar de la paperera">
-          {restoring ? '…' : '↩ Restaurar'}
+        <button type="button" onClick={restore} disabled={restoring} className={ACTION_BTN} title="Restaurar de la paperera">
+          <RotateCcw className={ACTION_ICON} aria-hidden="true" />
+          {restoring ? '…' : 'Restaurar'}
         </button>
-        <button type="button" onClick={purge} disabled={purging} className="dg__btn dg__btn--danger" aria-label={`Eliminar permanentment dossier de ${nom}`} title="Eliminar permanentment">
-          {purging ? '…' : '✕ Eliminar'}
+        <button type="button" onClick={purge} disabled={purging} className={`${ACTION_BTN} ap-btn--danger`} aria-label={`Eliminar permanentment dossier de ${nom}`} title="Eliminar permanentment">
+          <XCircle className={ACTION_ICON} aria-hidden="true" />
+          {purging ? '…' : 'Eliminar'}
         </button>
       </div>
     );
   }
 
   return (
-    <div className="dg__list-acts">
-      <button type="button" onClick={preview} className="dg__btn dg__btn--preview" title="Previsualitzar">
+    <div className={ACTIONS_WRAP}>
+      <button type="button" onClick={preview} className={ACTION_BTN} title="Previsualitzar">
+        <Eye className={ACTION_ICON} aria-hidden="true" />
         Vista
       </button>
-      <button type="button" onClick={openCompositePdf} className="dg__btn dg__btn--pdf" title="Obrir dossier + fitxes en un sol PDF">
+      <button type="button" onClick={openCompositePdf} className={`${ACTION_BTN} ap-btn--primary`} title="Obrir dossier + fitxes en un sol PDF">
+        <FileText className={ACTION_ICON} aria-hidden="true" />
         PDF complet
       </button>
       {email && (
@@ -145,9 +154,10 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
           type="button"
           onClick={send}
           disabled={sending}
-          className="dg__btn dg__btn--save"
+          className={ACTION_BTN}
           title={alreadySent ? 'Reenviar' : 'Enviar per email'}
         >
+          <Send className={ACTION_ICON} aria-hidden="true" />
           {sending ? '…' : alreadySent ? 'Reenviar' : 'Enviar'}
         </button>
       )}
@@ -155,11 +165,12 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
         type="button"
         onClick={moveToTrash}
         disabled={deleting}
-        className="dg__btn dg__btn--danger"
+        className={`${ACTION_BTN} ap-btn--danger`}
         aria-label={`Mou a la paperera dossier de ${nom}`}
         title="Moure a la paperera (30 dies per restaurar)"
       >
-        {deleting ? '…' : '🗑'}
+        <Trash2 className={ACTION_ICON} aria-hidden="true" />
+        {deleting ? '…' : 'Paperera'}
       </button>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import PublicPageHeader from '@/app/components/public/PublicPageHeader';
 
 export default function AvisoLegalClient() {
   const t = useTranslations('legal.avisoLegal');
@@ -10,7 +11,7 @@ export default function AvisoLegalClient() {
   return (
     <main className="min-h-screen bg-bg-main py-20 relative">
       <div className="container mx-auto px-4 max-w-4xl">
-        <h1 className="text-4xl font-bold text-white mb-8">{t('title')}</h1>
+        <PublicPageHeader title={t('title')} align="left" spacing="compact" />
 
         <div className="prose prose-invert prose-gold max-w-none space-y-8 text-white/80">
           <section>

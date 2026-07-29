@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { generateDailyBrief, parseBudgetValue, type DailyBriefInput, type SocialBriefContent } from '@/lib/services/dailyBriefService';
+import {
+  countPendingPaymentBookings,
+  generateDailyBrief,
+  parseBudgetValue,
+  type DailyBriefInput,
+  type SocialBriefContent,
+} from '@/lib/services/dailyBriefService';
 
 const NOW = new Date('2026-04-10T09:00:00Z');
 
@@ -87,6 +93,16 @@ describe('generateDailyBrief', () => {
     const alert = brief.alerts.find((a) => a.icon === '😴');
     expect(alert).toBeDefined();
     expect(alert!.href).toContain('reactivation');
+  });
+
+  it('genera alerta post-event amb copy de review/testimoni, no feedback generic', () => {
+    const brief = generateDailyBrief(makeInput({ postEventPending: 2 }));
+    const alert = brief.alerts.find((a) => a.href === '/admin/post-event');
+
+    expect(alert).toBeDefined();
+    expect(alert!.title).toContain('2 post-events pendents');
+    expect(alert!.detail).toBe('Envia correus de seguiment i demana review o testimoni.');
+    expect(alert!.detail).not.toContain('feedback');
   });
 
   it('genera alerta WARNING per clients en risc', () => {
@@ -322,6 +338,40 @@ describe('generateDailyBrief', () => {
     const action = brief.actions.find((a) => a.label.includes('Iniciar canal social'));
     expect(action).toBeDefined();
     expect(action!.href).toBe('/admin/social');
+  });
+});
+
+describe('countPendingPaymentBookings', () => {
+  it('no compta com a pendent una reserva coberta en efectiu', () => {
+    expect(countPendingPaymentBookings([{
+      total: 500,
+      depositAmount: 100,
+      remainingAmount: 400,
+      depositPaid: false,
+      remainingPaid: false,
+      cashAmount: 500,
+    }])).toBe(0);
+  });
+
+  it('compta només reserves amb pendent real després de restar efectiu', () => {
+    expect(countPendingPaymentBookings([
+      {
+        total: 500,
+        depositAmount: 100,
+        remainingAmount: 400,
+        depositPaid: false,
+        remainingPaid: false,
+        cashAmount: 200,
+      },
+      {
+        total: 300,
+        depositAmount: 100,
+        remainingAmount: 200,
+        depositPaid: true,
+        remainingPaid: true,
+        cashAmount: null,
+      },
+    ])).toBe(1);
   });
 });
 

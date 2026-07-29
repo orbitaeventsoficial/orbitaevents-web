@@ -9,7 +9,7 @@ export default function CostCalculatorPage() {
   return (
     <AdminPage
       title="Calculadora de costos"
-      subtitle="Construeix pressupostos personalitzats arrossegant components"
+      subtitle="Simula costos interns; els pressupostos client-facing viuen a Pressupostos"
     >
       <CostCalculatorClient />
     </AdminPage>

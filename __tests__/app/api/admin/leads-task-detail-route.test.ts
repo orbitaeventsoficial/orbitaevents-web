@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockUpdateTask, mockDeleteTask } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockUpdateTask, mockDeleteTask } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockUpdateTask: vi.fn(),
   mockDeleteTask: vi.fn(),
 }));
@@ -17,6 +18,8 @@ vi.mock('@/lib/services/leadScopedTaskRouteService', () => ({
 vi.mock('@/lib/logger', () => ({
   log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { PATCH, DELETE } from '@/app/api/admin/leads/[id]/tasks/[taskId]/route';
 
@@ -41,7 +44,7 @@ function makeDeleteReq(id = 'lead-1', taskId = 'task-1') {
 describe('PATCH /api/admin/leads/[id]/tasks/[taskId]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockUpdateTask.mockResolvedValue({ id: 'task-1', status: 'DONE' });
   });
 
@@ -85,7 +88,7 @@ describe('PATCH /api/admin/leads/[id]/tasks/[taskId]', () => {
 describe('DELETE /api/admin/leads/[id]/tasks/[taskId]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockDeleteTask.mockResolvedValue({ ok: true });
   });
 

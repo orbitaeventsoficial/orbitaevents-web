@@ -32,32 +32,6 @@ describe('CSRF Protection', () => {
     });
   });
 
-  describe('shouldEnforceCsrf', () => {
-    it('should enforce CSRF for admin routes', async () => {
-      const { shouldEnforceCsrf } = await import('@/lib/csrf');
-
-      const mockRequest = {
-        nextUrl: { pathname: '/api/admin/settings' },
-      } as any;
-
-      expect(shouldEnforceCsrf(mockRequest)).toBe(true);
-    });
-
-    it('should skip CSRF for public routes', async () => {
-      const { shouldEnforceCsrf } = await import('@/lib/csrf');
-
-      const publicPaths = ['/api/health', '/api/contact', '/api/google-reviews'];
-
-      for (const path of publicPaths) {
-        const mockRequest = {
-          nextUrl: { pathname: path },
-        } as any;
-
-        expect(shouldEnforceCsrf(mockRequest)).toBe(false);
-      }
-    });
-  });
-
   describe('CSRF_SECRET validation', () => {
     it('should reject short secrets', async () => {
       vi.stubEnv('CSRF_SECRET', 'short');

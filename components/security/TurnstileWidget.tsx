@@ -37,13 +37,13 @@ export default function TurnstileWidget({
     // En desarrollo sin Turnstile configurado, mostrar placeholder
     if (process.env.NODE_ENV === 'development') {
       return (
-        <div className="p-4 border border-yellow-500/30 bg-yellow-500/10 rounded-xl text-yellow-400 text-sm">
+        <div className="p-4 border border-[color-mix(in_oklab,var(--oe-amber)_30%,transparent)] bg-[color-mix(in_oklab,var(--oe-amber)_10%,transparent)] rounded-xl text-[var(--oe-amber)] text-sm">
           ⚠️ Turnstile desactivado en local (dev mode)
           <br />
           <button
             type="button"
             onClick={() => onSuccess('dev-mode-bypass-token')}
-            className="mt-2 px-3 py-1 bg-yellow-500/20 rounded text-xs"
+            className="mt-2 px-3 py-1 bg-[color-mix(in_oklab,var(--oe-amber)_20%,transparent)] rounded text-xs"
           >
             Bypass CAPTCHA (dev only)
           </button>

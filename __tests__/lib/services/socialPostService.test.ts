@@ -48,6 +48,9 @@ beforeEach(() => {
     scheduledAt: null,
     publishedAt: null,
     bookingId: null,
+    originType: 'MANUAL',
+    originId: null,
+    originLabel: null,
     caption: null,
     notes: null,
     createdAt: new Date(),
@@ -138,6 +141,8 @@ describe('createSocialPost', () => {
         status: 'IDEA',
         contentType: 'IMAGE',
         platforms: ['INSTAGRAM'],
+        originType: 'MANUAL',
+        originId: null,
       }),
     });
     expect(result.id).toBe('sp-1');
@@ -159,8 +164,36 @@ describe('createSocialPost', () => {
     expect(mockPrisma.socialPost.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         booking: { connect: { id: 'booking-1' } },
+        originType: 'BOOKING',
+        originId: 'booking-1',
       }),
     });
+  });
+
+  it('crea post derivat de testimoni amb origen canonic', async () => {
+    await createSocialPost({
+      title: 'Testimoni Anna',
+      platforms: ['INSTAGRAM'],
+      originType: 'TESTIMONIAL',
+      originId: 'testimonial-1',
+      originLabel: 'Anna Garcia',
+    });
+    expect(mockPrisma.socialPost.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        originType: 'TESTIMONIAL',
+        originId: 'testimonial-1',
+        originLabel: 'Anna Garcia',
+      }),
+    });
+  });
+
+  it('rebutja origen derivat sense originId', async () => {
+    await expect(createSocialPost({
+      title: 'Testimoni sense id',
+      platforms: ['INSTAGRAM'],
+      originType: 'TESTIMONIAL',
+    })).rejects.toThrow('originId');
+    expect(mockPrisma.socialPost.create).not.toHaveBeenCalled();
   });
 
   it('converteix scheduledAt a Date', async () => {
@@ -172,6 +205,19 @@ describe('createSocialPost', () => {
     });
     const call = mockPrisma.socialPost.create.mock.calls[0][0];
     expect(call.data.scheduledAt).toBeInstanceOf(Date);
+  });
+
+  it('bloqueja programar post-event pendent de revisio al servei', async () => {
+    await expect(createSocialPost({
+      title: 'Post-event pendent',
+      platforms: ['INSTAGRAM'],
+      status: 'SCHEDULED',
+      scheduledAt: '2026-05-01T10:00:00Z',
+      bookingId: 'booking-1',
+      category: 'EVENT_SHOWCASE',
+      notes: 'Revisar consentiment, imatges i dades personals abans de publicar. No publicat automaticament.',
+    })).rejects.toThrow('Revisa consentiment');
+    expect(mockPrisma.socialPost.create).not.toHaveBeenCalled();
   });
 
   it("peta si l'input és invàlid", async () => {
@@ -257,6 +303,9 @@ describe('updateSocialPost', () => {
     hashtags: [],
     mediaUrls: [],
     bookingId: null,
+    originType: 'MANUAL',
+    originId: null,
+    originLabel: null,
     notes: null,
   };
 
@@ -284,6 +333,18 @@ describe('updateSocialPost', () => {
     expect(call.data.publishedAt).toBeInstanceOf(Date);
   });
 
+  it('bloqueja publicar post-event pendent de revisio al servei', async () => {
+    mockPrisma.socialPost.findUnique.mockResolvedValue({
+      ...existingPost,
+      bookingId: 'booking-1',
+      category: 'EVENT_SHOWCASE',
+      notes: 'Creat des del playbook. Revisar consentiment, imatges i dades personals abans de publicar. No publicat automaticament.',
+    });
+
+    await expect(updateSocialPost('sp-1', { status: 'PUBLISHED' })).rejects.toThrow('Revisa consentiment');
+    expect(mockPrisma.socialPost.update).not.toHaveBeenCalled();
+  });
+
   it('no sobrescriu publishedAt existent', async () => {
     const fixedDate = new Date('2026-01-01');
     mockPrisma.socialPost.findUnique.mockResolvedValue({
@@ -303,11 +364,52 @@ describe('updateSocialPost', () => {
     });
   });
 
+  it('desconnecta origen booking quan es treu la reserva', async () => {
+    mockPrisma.socialPost.findUnique.mockResolvedValue({
+      ...existingPost,
+      bookingId: 'booking-1',
+      originType: 'BOOKING',
+      originId: 'booking-1',
+      originLabel: 'OE-2026-001',
+    });
+    await updateSocialPost('sp-1', { bookingId: null });
+    expect(mockPrisma.socialPost.update).toHaveBeenCalledWith({
+      where: { id: 'sp-1' },
+      data: {
+        originType: 'MANUAL',
+        originId: null,
+        originLabel: null,
+        booking: { disconnect: true },
+      },
+    });
+  });
+
   it('connect booking si bookingId string', async () => {
     await updateSocialPost('sp-1', { bookingId: 'booking-2' });
     expect(mockPrisma.socialPost.update).toHaveBeenCalledWith({
       where: { id: 'sp-1' },
-      data: { booking: { connect: { id: 'booking-2' } } },
+      data: {
+        originType: 'BOOKING',
+        originId: 'booking-2',
+        originLabel: null,
+        booking: { connect: { id: 'booking-2' } },
+      },
+    });
+  });
+
+  it('actualitza origen no booking sense connectar reserva', async () => {
+    await updateSocialPost('sp-1', {
+      originType: 'PORTFOLIO',
+      originId: 'portfolio-1',
+      originLabel: 'Casament a Girona',
+    });
+    expect(mockPrisma.socialPost.update).toHaveBeenCalledWith({
+      where: { id: 'sp-1' },
+      data: {
+        originType: 'PORTFOLIO',
+        originId: 'portfolio-1',
+        originLabel: 'Casament a Girona',
+      },
     });
   });
 

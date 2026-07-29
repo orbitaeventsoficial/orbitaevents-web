@@ -7,6 +7,7 @@ import {
   drawAllPageFooters,
 } from '@/lib/pdf-header';
 import { toIntlLocale } from '@/lib/constants';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 
 type jsPDFType = import('jspdf').jsPDF;
 
@@ -60,10 +61,24 @@ export interface InvoicePdfData {
   remainingAmount: number;
   remainingPaid: boolean;
   remainingPaidAt?: Date | null;
+  cashAmount?: number | null;
 
   // Notes opcionals
   notes?: string;
 }
+
+export type InvoicePaymentRows = {
+  deposit: {
+    amount: number;
+    paid: boolean;
+    paidAt: Date | null;
+  };
+  remaining: {
+    amount: number;
+    paid: boolean;
+    paidAt: Date | null;
+  };
+};
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -84,6 +99,27 @@ function fmtDate(d: Date | string, locale = 'ca'): string {
 function statusDot(paid: boolean): [number, number, number] {
   // Pagat → or de marca · Pendent → gris neutre (mai vermell d'alarma)
   return paid ? COLORS.gold : COLORS.grayLight;
+}
+
+export function resolveInvoicePaymentRows(data: Pick<InvoicePdfData,
+  'total' | 'depositAmount' | 'depositPaid' | 'depositPaidAt' | 'remainingAmount' | 'remainingPaid' | 'remainingPaidAt' | 'cashAmount'
+>): InvoicePaymentRows {
+  const outstanding = bookingOutstandingBreakdown(data);
+  const depositPaid = outstanding.depositAmount <= 0;
+  const remainingPaid = outstanding.remainingAmount <= 0;
+
+  return {
+    deposit: {
+      amount: depositPaid ? Math.max(0, data.depositAmount) : outstanding.depositAmount,
+      paid: depositPaid,
+      paidAt: data.depositPaidAt ?? null,
+    },
+    remaining: {
+      amount: remainingPaid ? Math.max(0, data.remainingAmount) : outstanding.remainingAmount,
+      paid: remainingPaid,
+      paidAt: data.remainingPaidAt ?? null,
+    },
+  };
 }
 
 // ── Generador ────────────────────────────────────────────────────────────────
@@ -306,8 +342,9 @@ export async function generateInvoicePDF(
   // ── Pagaments ─────────────────────────────────────────────────────────────
   y += PDF_DESIGN.blockGap;
   y = drawCanonicalSectionTitle(doc, y, T.payments);
+  const paymentRows = resolveInvoicePaymentRows(data);
 
-  const drawPaymentRow = (label: string, amount: number, paid: boolean, paidAt?: Date | null) => {
+  const drawPaymentRow = (label: string, amount: number, paid: boolean, paidLabel: string, pendingLabel: string, paidAt?: Date | null) => {
     const color = statusDot(paid);
     doc.setFillColor(...color);
     doc.circle(left + 3, y + 3.5, 2.5, 'F');
@@ -317,8 +354,8 @@ export async function generateInvoicePDF(
     doc.text(formatPdfMoney(amount, locale), left + 80, y + 5);
     setStyleMuted(doc);
     const statusText = paid
-      ? `${T.depositPaid}${paidAt ? ` · ${fmtDate(paidAt, locale)}` : ''}`
-      : (label.includes(T.deposit.split(' ')[0]) ? T.depositPending : T.remainingPending);
+      ? `${paidLabel}${paidAt ? ` · ${fmtDate(paidAt, locale)}` : ''}`
+      : pendingLabel;
     doc.text(statusText, left + 115, y + 5);
     doc.setDrawColor(...COLORS.grayLight);
     doc.setLineWidth(0.1);
@@ -326,8 +363,8 @@ export async function generateInvoicePDF(
     y += 9;
   };
 
-  drawPaymentRow(T.deposit, data.depositAmount, data.depositPaid, data.depositPaidAt);
-  drawPaymentRow(T.remaining, data.remainingAmount, data.remainingPaid, data.remainingPaidAt);
+  drawPaymentRow(T.deposit, paymentRows.deposit.amount, paymentRows.deposit.paid, T.depositPaid, T.depositPending, paymentRows.deposit.paidAt);
+  drawPaymentRow(T.remaining, paymentRows.remaining.amount, paymentRows.remaining.paid, T.remainingPaid, T.remainingPending, paymentRows.remaining.paidAt);
 
   // IBAN
   y += 2;

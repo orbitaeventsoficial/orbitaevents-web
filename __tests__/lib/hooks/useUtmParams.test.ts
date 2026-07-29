@@ -19,13 +19,20 @@ describe('useUtmParams', () => {
       utmMedium: 'cpc',
       utmCampaign: 'summer',
       landingPage: '/ca/serveis',
+      locale: 'ca',
     });
   });
 
   it('retorna landingPage sense UTMs si no hi ha paràmetres', () => {
     window.history.pushState({}, '', '/ca');
     const { result } = renderHook(() => useUtmParams());
-    expect(result.current).toEqual({ landingPage: '/ca' });
+    expect(result.current).toEqual({ landingPage: '/ca', locale: 'ca' });
+  });
+
+  it('no inventa locale si la ruta no comença per idioma públic', () => {
+    window.history.pushState({}, '', '/contacto');
+    const { result } = renderHook(() => useUtmParams());
+    expect(result.current).toEqual({ landingPage: '/contacto' });
   });
 
   it('retalla utm_source llarg a 200 caràcters', () => {

@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockList, mockCreate } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockList, mockCreate } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockList: vi.fn(),
   mockCreate: vi.fn(),
 }));
@@ -14,10 +15,12 @@ vi.mock('@/lib/services/inventoryAdminService', () => ({
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn() } }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { GET, POST } from '@/app/api/admin/inventory/route';
 
 describe('GET /api/admin/inventory', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockList.mockResolvedValue({ items: [], total: 0 }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockList.mockResolvedValue({ items: [], total: 0 }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response('{}', { status: 401 }));
@@ -41,7 +44,7 @@ describe('GET /api/admin/inventory', () => {
 });
 
 describe('POST /api/admin/inventory', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockCreate.mockResolvedValue({ status: 201, body: { id: 'i1' } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockCreate.mockResolvedValue({ status: 201, body: { id: 'i1' } }); });
 
   it('crea element', async () => {
     const req = new NextRequest('http://localhost/x', { method: 'POST', body: JSON.stringify({ name: 'Micro SM58', category: 'SOUND', value: 100 }), headers: { 'Content-Type': 'application/json' } });

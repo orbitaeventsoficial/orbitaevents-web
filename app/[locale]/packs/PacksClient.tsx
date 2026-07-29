@@ -202,7 +202,7 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
               href="/configurador"
               className="inline-flex w-full items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-black font-bold transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] hover:shadow-[0_8px_32px_rgba(251,191,36,0.3)] sm:w-auto"
             >
-              {t('configurePack')}
+              {t('configureCustom')}
             </Link>
             <Link
               href="/contacto"

@@ -1,13 +1,30 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import {
+  ArrowRight,
+  Banknote,
+  BarChart3,
+  ChartBar,
+  Clock3,
+  LayoutDashboard,
+  Settings,
+  ShieldAlert,
+  TrendingDown,
+  TrendingUp,
+  TriangleAlert,
+  Trophy,
+  WalletCards,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { ADMIN_ECONOMY_HELP, helpAttrs } from '../components/adminHelpContent';
 import PaymentToggleButton from './PaymentToggleButton';
 import PaymentReminderActions from './PaymentReminderActions';
+import MarketingSpendPanel from './MarketingSpendPanel';
 import { formatDateSimple, formatDateFull } from '@/lib/constants';
 import ExportCsvButton from '../components/ExportCsvButton';
 import ProfitabilityConfigEditor from './ProfitabilityConfigEditor';
@@ -23,11 +40,182 @@ import {
 } from './economia-components';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
+import { RECOMMENDED_SELLING_PRICE_STEP } from '@/lib/constants/pricing';
 
 
+
+const VALID_TABS: Tab[] = ['resum', 'cobraments', 'rendibilitat', 'tresoreria', 'previsions', 'config'];
+
+type ExecutiveTone = 'success' | 'warning' | 'danger';
+
+const EXECUTIVE_ICON = 'h-4 w-4 shrink-0';
+const TAB_ICON = 'h-4 w-4 shrink-0';
+const CARD_ICON = 'h-4 w-4 shrink-0';
+const ALERT_CARD_ICON = 'h-5 w-5 shrink-0';
+const PROFITABILITY_EVENT_TITLE = 'text-sm font-semibold leading-snug break-words transition-colors sm:truncate';
+const TAB_ICON_MAP: Record<(typeof TABS)[number]['icon'], LucideIcon> = {
+  dashboard: LayoutDashboard,
+  banknote: Banknote,
+  trend: TrendingUp,
+  wallet: WalletCards,
+  forecast: BarChart3,
+  settings: Settings,
+};
+
+function executiveToneClass(tone: ExecutiveTone) {
+  if (tone === 'danger') return 'admin-tone-border-danger';
+  if (tone === 'warning') return 'admin-tone-border-warning';
+  return 'admin-tone-border-success';
+}
+
+function ExecutiveMetric({ label, value, hint, tone = 'success' }: {
+  label: string;
+  value: string | number;
+  hint?: string;
+  tone?: ExecutiveTone;
+}) {
+  const valueClass = tone === 'danger'
+    ? 'admin-tone-text-danger'
+    : tone === 'warning'
+      ? 'admin-tone-text-warning'
+      : 'text-[var(--t)]';
+
+  return (
+    <div className="min-w-0 border-l border-[var(--line)] pl-3 first:border-l-0 first:pl-0">
+      <dt className="text-xs font-semibold uppercase text-[var(--t3)]">{label}</dt>
+      <dd className={`mt-1 font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none ${valueClass}`}>{value}</dd>
+      {hint ? <dd className="mt-1 text-xs text-[var(--t3)]">{hint}</dd> : null}
+    </div>
+  );
+}
+
+function EconomyExecutiveStrip({
+  props,
+  setActiveTab,
+}: {
+  props: EconomiaClientProps;
+  setActiveTab: (tab: Tab) => void;
+}) {
+  const cashMonth = props.cashFlow?.[0] ?? null;
+  const targetPackMargin = props.packPricingConfig.marginTargetPct;
+  const packNeedsReview = props.packPricingRows.find((row) => row.marginPct < targetPackMargin);
+
+  let action: {
+    tone: ExecutiveTone;
+    title: string;
+    description: string;
+    tab: Tab;
+    label: string;
+    Icon: typeof Banknote;
+  };
+
+  if (props.overdueTotal > 0) {
+    action = {
+      tone: 'danger',
+      title: 'Cobrar abans de vendre més',
+      description: `${money(props.overdueTotal)} fora de termini. Ataca primer bestretes i restes vençudes: és caixa real i baixa risc operatiu.`,
+      tab: 'cobraments',
+      label: 'Obrir cobraments',
+      Icon: Banknote,
+    };
+  } else if (props.dueSoonTotal > 0) {
+    action = {
+      tone: 'warning',
+      title: 'Blindar els pròxims venciments',
+      description: `${money(props.dueSoonTotal)} vencen en 7 dies. Prepara recordatoris abans que es converteixin en problema.`,
+      tab: 'cobraments',
+      label: 'Veure venciments',
+      Icon: WalletCards,
+    };
+  } else if (props.riskProfitability.length > 0) {
+    action = {
+      tone: 'danger',
+      title: 'Tallafoc de marge baix',
+      description: `${props.riskProfitability.length} bolos estan en risc de marge. Revisa preu, desplaçament, extres i cost abans de repetir aquesta venda.`,
+      tab: 'rendibilitat',
+      label: 'Auditar marge',
+      Icon: TrendingUp,
+    };
+  } else if (props.packPricingSummary.critical > 0) {
+    action = {
+      tone: 'danger',
+      title: 'No vendre packs crítics sense revisar',
+      description: `${props.packPricingSummary.critical} packs queden per sota del model. El primer és ${packNeedsReview?.name ?? 'un pack actiu'}: puja PVP, ajusta cost o canvia paquetització.`,
+      tab: 'config',
+      label: 'Revisar packs',
+      Icon: ShieldAlert,
+    };
+  } else if (cashMonth && cashMonth.netFlow < 0) {
+    action = {
+      tone: 'warning',
+      title: 'Protegir caixa del mes',
+      description: `${cashMonth.month} projecta ${money(cashMonth.netFlow)} de flux net. Mira quin cobrament o cost mou més l'acumulat.`,
+      tab: 'tresoreria',
+      label: 'Veure tresoreria',
+      Icon: WalletCards,
+    };
+  } else {
+    action = {
+      tone: 'success',
+      title: 'Buscar venda millor, no més soroll',
+      description: 'La foto immediata no crema. El següent salt és mirar previsió, CAC i packs per decidir on pujar preu amb disciplina.',
+      tab: 'previsions',
+      label: 'Veure previsió',
+      Icon: BarChart3,
+    };
+  }
+
+  const actionToneClass = executiveToneClass(action.tone);
+
+  return (
+    <section className="grid gap-3 lg:grid-cols-[1fr_1fr_1.1fr]" aria-label="Lectura executiva d'economia">
+      <article className="ap-card p-5">
+        <div className="flex items-center gap-2 text-[var(--t3)]">
+          <WalletCards className={EXECUTIVE_ICON} aria-hidden="true" />
+          <p className="text-xs font-semibold uppercase">Caixa i cobrament</p>
+        </div>
+        <h2 className="mt-2 ap-h2">Què entra i què falta cobrar</h2>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+          <ExecutiveMetric label="Pendent" value={money(props.outstandingTotal)} hint="total per cobrar" tone={props.outstandingTotal > 0 ? 'warning' : 'success'} />
+          <ExecutiveMetric label="Vençut" value={money(props.overdueTotal)} hint={`${props.atRiskRows.length} casos`} tone={props.overdueTotal > 0 ? 'danger' : 'success'} />
+          <ExecutiveMetric label="7 dies" value={money(props.dueSoonTotal)} hint={`${props.upcomingDueRows.length} pròxims`} tone={props.dueSoonTotal > 0 ? 'warning' : 'success'} />
+        </dl>
+      </article>
+
+      <article className="ap-card p-5">
+        <div className="flex items-center gap-2 text-[var(--t3)]">
+          <TrendingUp className={EXECUTIVE_ICON} aria-hidden="true" />
+          <p className="text-xs font-semibold uppercase">Marge i preu</p>
+        </div>
+        <h2 className="mt-2 ap-h2">Si vens, que respiri marge</h2>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+          <ExecutiveMetric label="Realitzat" value={pct(props.realized.avgMarginPct)} hint={money(props.realized.netMargin)} tone={props.realized.avgMarginPct < 0.15 ? 'danger' : props.realized.avgMarginPct < 0.3 ? 'warning' : 'success'} />
+          <ExecutiveMetric label="Previst" value={pct(props.forecast.avgMarginPct)} hint={`${props.forecast.bookings} bolos`} tone={props.forecast.avgMarginPct < 0.15 ? 'danger' : props.forecast.avgMarginPct < 0.3 ? 'warning' : 'success'} />
+          <ExecutiveMetric label="Packs crítics" value={props.packPricingSummary.critical} hint={`${props.packPricingSummary.warning} a vigilar`} tone={props.packPricingSummary.critical > 0 ? 'danger' : props.packPricingSummary.warning > 0 ? 'warning' : 'success'} />
+        </dl>
+      </article>
+
+      <article className={`ap-card border-l-2 p-5 ${actionToneClass}`}>
+        <div className="flex items-center gap-2 text-[var(--t3)]">
+          <action.Icon className={EXECUTIVE_ICON} aria-hidden="true" />
+          <p className="text-xs font-semibold uppercase">Decisió recomanada</p>
+        </div>
+        <h2 className="mt-2 ap-h2">{action.title}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--t2)]">{action.description}</p>
+        <button type="button" onClick={() => setActiveTab(action.tab)} className="ap-btn ap-btn--primary mt-4 justify-center gap-2 text-sm">
+          {action.label}
+          <ArrowRight className={EXECUTIVE_ICON} aria-hidden="true" />
+        </button>
+      </article>
+    </section>
+  );
+}
 
 export default function EconomiaClient(props: EconomiaClientProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('resum');
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get('tab');
+  const initialTab: Tab = tabParam && VALID_TABS.includes(tabParam as Tab) ? (tabParam as Tab) : 'resum';
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const totalAlerts = useMemo(() =>
     props.atRiskRows.length + props.riskProfitability.length,
@@ -49,22 +237,6 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     () => props.upcomingDueRows.filter((row) => row.dueSoonRemaining).length,
     [props.upcomingDueRows]
   );
-  const cashFlowRows = props.cashFlow ?? [];
-  const forecastRows = props.forecast_pipeline ?? [];
-  const nextStepTitle = props.overdueTotal > 0
-    ? 'Atacar primer els cobraments fora de termini'
-    : props.riskProfitability.length > 0
-      ? 'Revisar els marges que ja cauen en risc'
-      : activeTab === 'config'
-        ? 'Ajustar models i costos amb el focus correcte'
-        : 'Mantenir caixa i marge sota govern';
-  const nextStepDetail = props.overdueTotal > 0
-    ? `Hi ha ${money(props.overdueTotal)} fora de termini i ${props.atRiskRows.length} cobraments amb tensió real.`
-    : props.riskProfitability.length > 0
-      ? `${props.riskProfitability.length} esdeveniments estan per sota del marge sa i convé entrar per rendibilitat.`
-      : activeTab === 'config'
-        ? 'La configuració és el front actiu: revisa el model abans de tocar més pantalles operatives.'
-        : 'Amb el primer nivell estable, el següent pas bo és seguir tresoreria, previsió i marge des del mateix cockpit.';
 
   return (
     <AdminPage
@@ -93,74 +265,26 @@ export default function EconomiaClient(props: EconomiaClientProps) {
         </div>
       }
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema a l’economia',
-          tone: props.hasReport ? 'info' : 'warning',
-          items: [
-            `${money(props.outstandingTotal)} pendents, ${money(props.monthCollected)} cobrats aquest mes i ${money(props.dueSoonTotal)} vencen en 7 dies.`,
-            props.hasReport
-              ? `${money(props.realized.netMargin)} de marge realitzat i ${money(props.forecast.netMargin)} de marge previst.`
-              : 'L’informe de rendibilitat encara no està disponible ara mateix.',
-            cashFlowRows.length > 0
-              ? `${cashFlowRows.length} mesos de tresoreria previstos i ${forecastRows.length} mesos de forecast comercial.`
-              : 'Sense previsió de tresoreria visible al primer nivell.',
-          ],
-          emptyText: 'Sense dades econòmiques no hi ha lectura automàtica del cockpit.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: props.overdueTotal > 0 || props.riskProfitability.length > 0 ? 'warning' : 'success',
-          items: [
-            props.overdueTotal > 0
-              ? `${overdueDepositCount} dipòsits i ${overdueRemainingCount} restes estan fora de termini.`
-              : 'No hi ha cobrament vençut al primer nivell.',
-            props.riskProfitability.length > 0
-              ? `${props.riskProfitability.length} esdeveniments cauen en marge baix.`
-              : 'No hi ha alertes de marge crític al primer nivell.',
-            activeTab === 'config'
-              ? 'La pestanya activa és configuració i concentra els ajustos sensibles de model.'
-              : `La pestanya activa és ${TABS.find((tab) => tab.id === activeTab)?.label || activeTab}.`,
-          ],
-          emptyText: 'No hi ha coll manual evident al primer nivell.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          title: nextStepTitle,
-          detail: nextStepDetail,
-          href: '/admin/economia',
-          ctaLabel:
-            props.overdueTotal > 0
-              ? 'Revisar cobraments'
-              : props.riskProfitability.length > 0
-                ? 'Revisar rendibilitat'
-                : 'Obrir economia',
-          secondaryAction:
-            activeTab !== 'resum'
-              ? { href: '/admin/economia', label: 'Tornar al resum' }
-              : undefined,
-        }}
-      />
 
+      <EconomyExecutiveStrip props={props} setActiveTab={setActiveTab} />
 
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
-      <nav role="tablist" aria-label="Seccions d'economia" className="admin-economia-tabs flex gap-1 ap-card p-1" {...helpAttrs(ADMIN_ECONOMY_HELP.tabs)}>
+      <nav role="tablist" aria-label="Seccions d'economia" className="ap-tabs grid grid-cols-3 gap-1 ap-card p-1 sm:flex" {...helpAttrs(ADMIN_ECONOMY_HELP.tabs)}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === 'cobraments' && props.atRiskRows.length > 0;
+          const TabIcon = TAB_ICON_MAP[tab.icon];
           return (
             <button
               key={tab.id}
               role="tab"
               aria-selected={isActive}
               onClick={() => setActiveTab(tab.id)}
-              className={`admin-economia-tab relative flex-1 rounded-[var(--o-r-sm)] px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                isActive ? 'admin-economia-tab--active' : 'admin-economia-tab--idle'
+              className={`ap-tab relative flex min-w-0 items-center justify-center gap-1 rounded-[var(--o-r-sm)] px-3 py-2.5 text-sm font-semibold transition-all duration-200 sm:flex-1 ${
+                isActive ? 'ap-tab--active' : 'ap-tab--idle'
               }`}
             >
-              <span className="mr-1">{tab.icon}</span>
+              <TabIcon className={TAB_ICON} aria-hidden="true" />
               <span className="hidden sm:inline">{tab.label}</span>
               <span className="sm:hidden">{tab.mobileLabel}</span>
               {showBadge && (
@@ -200,7 +324,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <KpiCard
                     label="Total pendent de cobrar"
                     value={money(props.outstandingTotal)}
-                    color="text-white/90"
+                    color="text-[var(--t)]"
                   />
                   <KpiCard
                     label="Pendent fora de termini"
@@ -234,7 +358,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     label="Ingressos realitzats"
                     value={money(props.realized.revenue)}
                     sub={`${props.realized.bookings} completats`}
-                    color="text-white/90"
+                    color="text-[var(--t)]"
                   />
                   <KpiCard
                     label="Marge net realitzat"
@@ -246,7 +370,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     label="Ingressos previstos"
                     value={money(props.forecast.revenue)}
                     sub={`${props.forecast.bookings} en pipeline`}
-                    color="text-white/90"
+                    color="text-[var(--t)]"
                   />
                   <KpiCard
                     label="Marge previst"
@@ -315,7 +439,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     >
                       <div className="flex items-start gap-3">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg">
-                          ⚠️
+                          <TriangleAlert className={ALERT_CARD_ICON} aria-hidden="true" />
                         </span>
                         <div className="flex-1">
                           <h2 className="text-base font-bold">Cobraments vençuts</h2>
@@ -341,7 +465,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     >
                       <div className="flex items-start gap-3">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg">
-                          📉
+                          <TrendingDown className={ALERT_CARD_ICON} aria-hidden="true" />
                         </span>
                         <div className="flex-1">
                           <h2 className="text-base font-bold">Esdeveniments amb marge baix</h2>
@@ -383,13 +507,13 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       <Link
                         key={row.id}
                         href={buildBookingHref(row.id)}
-                        className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
+                        className="flex items-center gap-3 rounded-xl border border-[var(--line)] p-3 hover:bg-[var(--raised)] transition-colors group"
                       >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm font-black">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm font-bold">
                           {i + 1}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold truncate transition-colors">
+                          <p className={PROFITABILITY_EVENT_TITLE}>
                             {row.reference} &middot; {row.clientName}
                           </p>
                           <p className="text-xs">
@@ -416,7 +540,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {activeTab === 'cobraments' && (
             <>
               <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
-                <KpiCard label="Total pendent de cobrar" value={money(props.outstandingTotal)} color="text-white/90" />
+                <KpiCard label="Total pendent de cobrar" value={money(props.outstandingTotal)} color="text-[var(--t)]" />
                 <KpiCard label="Pendent fora de termini" value={money(props.overdueTotal)} color="admin-tone-text-danger" />
                 <KpiCard label="Vencen en 7 dies" value={money(props.dueSoonTotal)} color="admin-tone-text-warning" />
                 <KpiCard label="Cobrat aquest mes" value={money(props.monthCollected)} color="admin-tone-text-success" />
@@ -435,7 +559,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               <section className="ap-card p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⚠️</span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                      <TriangleAlert className={CARD_ICON} aria-hidden="true" />
+                    </span>
                     <h2 className="ap-h2">Fora de termini</h2>
                     {props.atRiskRows.length > 0 && (
                       <span className="rounded-full px-2 py-0.5 text-xs font-bold">
@@ -449,7 +575,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
                 <div className="grid gap-2 lg:grid-cols-2">
                   {props.atRiskRows.length === 0 ? (
-                    <div className="rounded-xl border p-6 text-center">
+                    <div className="ap-card p-6 text-center">
                       <p className="font-semibold">Tot al dia!</p>
                       <p className="text-sm mt-1">
                         No hi ha cap cobrament pendent amb data de venciment passada.
@@ -461,7 +587,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         key={row.id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="group rounded-xl border border-white/10 p-3 transition-colors"
+                        className="group rounded-xl border border-[var(--line)] p-3 transition-colors"
                       >
                         <summary className="list-none cursor-pointer">
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -470,24 +596,24 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               <p className="mt-0.5 text-xs">
                                 {formatDateFull(row.eventDate)}
                                 &nbsp;·&nbsp;
-                                <span className="rounded bg-white/10 px-1.5 py-0.5 text-xs font-semibold uppercase">{row.status}</span>
+                                <span className="rounded bg-[var(--raised)] px-1.5 py-0.5 text-xs font-semibold uppercase">{row.status}</span>
                               </p>
                             </div>
                             <div className="flex flex-wrap items-center justify-end gap-2">
-                              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.depositPaid)}`}>
-                                Bestreta {row.depositPaid ? 'pagada' : 'pendent'}
+                              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.depositSettled)}`}>
+                                Bestreta {row.depositSettled ? 'coberta' : 'pendent'}
                               </span>
-                              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.remainingPaid)}`}>
-                                Saldo {row.remainingPaid ? 'pagat' : 'pendent'}
+                              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.remainingSettled)}`}>
+                                Saldo {row.remainingSettled ? 'cobert' : 'pendent'}
                               </span>
-                              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs font-semibold">
+                              <span className="ap-badge">
                                 Veure detall
                               </span>
                             </div>
                           </div>
                         </summary>
 
-                        <div className="mt-3 border-t border-white/10 pt-3">
+                        <div className="mt-3 border-t border-[var(--line)] pt-3">
                           <div className="mb-3 flex items-center justify-between gap-2">
                             <p className="text-xs">Codi reserva: {row.reference}</p>
                             <Link href={buildBookingHref(row.id)} className="ap-btn ap-btn--xs shrink-0">
@@ -495,20 +621,20 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             </Link>
                           </div>
                           <div className="mb-3 grid gap-2 sm:grid-cols-2">
-                            <div className={`rounded-xl border p-3 ${row.depositPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
+                            <div className={`ap-card p-3 ${row.depositSettled ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
                               <div className="flex items-center justify-between mb-1">
-                                <p className={`text-xs font-semibold ${row.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Bestreta</p>
-                                <p className={`text-sm font-bold ${row.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.depositAmount)}</p>
+                                <p className={`text-xs font-semibold ${row.depositSettled ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Bestreta pendent</p>
+                                <p className={`text-sm font-bold ${row.depositSettled ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.depositOutstandingAmount)}</p>
                               </div>
                               <p className="text-xs mb-2">
                                 Venciment: {formatDateSimple(row.depositDueAt)}
                               </p>
                               <PaymentToggleButton bookingId={row.id} field="depositPaid" currentValue={row.depositPaid} />
                             </div>
-                            <div className={`rounded-xl border p-3 ${row.remainingPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
+                            <div className={`ap-card p-3 ${row.remainingSettled ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
                               <div className="flex items-center justify-between mb-1">
-                                <p className={`text-xs font-semibold ${row.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Saldo restant</p>
-                                <p className={`text-sm font-bold ${row.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.remainingAmount)}</p>
+                                <p className={`text-xs font-semibold ${row.remainingSettled ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Saldo pendent</p>
+                                <p className={`text-sm font-bold ${row.remainingSettled ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.remainingOutstandingAmount)}</p>
                               </div>
                               <p className="text-xs mb-2">
                                 Venciment: {formatDateSimple(row.remainingDueAt)}
@@ -522,7 +648,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           <PaymentReminderActions
                             bookingId={row.id}
                             phone={row.clientPhone}
-                            message={`Hola ${row.clientName}, et recordem el cobrament pendent del teu esdeveniment ${row.reference}. Gràcies.`}
+                            message={`Hola ${row.clientName}, et recordem el cobrament pendent (${money(row.outstandingAmount)}) del teu esdeveniment ${row.reference}. Gràcies.`}
                           />
                         </div>
                       </motion.details>
@@ -534,7 +660,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               {/* Pròxims */}
               <section className="ap-card p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⏰</span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                    <Clock3 className={CARD_ICON} aria-hidden="true" />
+                  </span>
                   <h2 className="ap-h2">Venciments en 7 dies</h2>
                   {props.upcomingDueRows.length > 0 && (
                     <span className="rounded-full px-2 py-0.5 text-xs font-bold">
@@ -544,7 +672,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
                 <div className="space-y-2">
                   {props.upcomingDueRows.length === 0 ? (
-                    <div className="rounded-xl border border-white/10 p-4 text-center">
+                    <div className="rounded-xl border border-[var(--line)] p-4 text-center">
                       <p className="text-sm font-semibold">Cap venciment en 7 dies.</p>
                       <p className="mt-1 text-xs">
                         No tens cap cobrament pendent que caduqui entre avui i els pròxims 7 dies.
@@ -552,14 +680,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     </div>
                   ) : (
                     props.upcomingDueRows.map((row) => (
-                      <div key={row.id} className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors">
+                      <div key={row.id} className="flex items-center gap-3 rounded-xl border border-[var(--line)] p-3 hover:bg-[var(--raised)] transition-colors">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold truncate">{row.reference} &middot; {row.clientName}</p>
                           <p className="text-xs">{formatDateSimple(row.eventDate)}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          {row.dueSoonDeposit && <p className="text-xs">Bestreta: {money(row.depositAmount)}</p>}
-                          {row.dueSoonRemaining && <p className="text-xs">Saldo: {money(row.remainingAmount)}</p>}
+                          {row.dueSoonDeposit && <p className="text-xs">Bestreta: {money(row.depositOutstandingAmount)}</p>}
+                          {row.dueSoonRemaining && <p className="text-xs">Saldo: {money(row.remainingOutstandingAmount)}</p>}
                         </div>
                         <Link href={buildBookingHref(row.id)} className="shrink-0 text-xs">
                           &rarr;
@@ -589,9 +717,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               {props.hasReport && (
                 <>
                   <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
-                    <KpiCard label="Ingressos realitzats" value={money(props.realized.revenue)} sub={`${props.realized.bookings} completats`} color="text-white/90" />
+                    <KpiCard label="Ingressos realitzats" value={money(props.realized.revenue)} sub={`${props.realized.bookings} completats`} color="text-[var(--t)]" />
                     <KpiCard label="Marge net realitzat" value={money(props.realized.netMargin)} sub={`Mitjà ${pct(props.realized.avgMarginPct)}`} color="admin-tone-text-success" />
-                    <KpiCard label="Previsió d'ingressos" value={money(props.forecast.revenue)} sub={`${props.forecast.bookings} en pipeline`} color="text-white/90" />
+                    <KpiCard label="Previsió d'ingressos" value={money(props.forecast.revenue)} sub={`${props.forecast.bookings} en pipeline`} color="text-[var(--t)]" />
                     <KpiCard label="Previsió de marge" value={money(props.forecast.netMargin)} sub={`Mitjà ${pct(props.forecast.avgMarginPct)}`} color="admin-tone-text-warning" />
                   </div>
 
@@ -599,7 +727,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <div className="grid gap-5 xl:grid-cols-2">
                     <section className="ap-card p-5" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">🏆</span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                          <Trophy className={CARD_ICON} aria-hidden="true" />
+                        </span>
                         <h2 className="text-base font-bold">Top esdeveniments per marge</h2>
                       </div>
                       <div className="space-y-2">
@@ -610,13 +740,13 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             <Link
                               key={row.id}
                               href={buildBookingHref(row.id)}
-                              className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
+                              className="flex items-center gap-3 rounded-xl border border-[var(--line)] p-3 hover:bg-[var(--raised)] transition-colors group"
                             >
-                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-black">
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-bold">
                                 {i + 1}
                               </span>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold truncate transition-colors">
+                                <p className={PROFITABILITY_EVENT_TITLE}>
                                   {row.reference} &middot; {row.clientName}
                                 </p>
                                 <p className="text-xs">{formatDateSimple(row.eventDate)} &middot; {row.source}</p>
@@ -624,7 +754,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               <div className="text-right shrink-0">
                                 <p className={`text-sm font-bold ${marginColor(row.marginPct)}`}>{money(row.netMargin)}</p>
                                 <div className="flex items-center gap-1.5 justify-end mt-1">
-                                  <div className="h-1.5 w-12 rounded-full bg-white/5 overflow-hidden">
+                                  <div className="h-1.5 w-12 rounded-full bg-[var(--raised)] overflow-hidden">
                                     <div className={`h-full rounded-full ${marginBg(row.marginPct)}`} style={{ width: `${Math.min(row.marginPct * 100, 100)}%` }} />
                                   </div>
                                   <span className={`text-xs font-semibold ${marginColor(row.marginPct)}`}>{pct(row.marginPct)}</span>
@@ -638,7 +768,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
                     <section className="ap-card p-5" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⚠️</span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                          <TriangleAlert className={CARD_ICON} aria-hidden="true" />
+                        </span>
                         <h2 className="text-base font-bold">Esdeveniments en risc</h2>
                         {props.riskProfitability.length > 0 && (
                           <span className="rounded-full px-2 py-0.5 text-xs font-bold">
@@ -648,7 +780,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       </div>
                       <div className="space-y-2">
                         {props.riskProfitability.length === 0 ? (
-                          <div className="rounded-xl border p-6 text-center">
+                          <div className="ap-card p-6 text-center">
                             <p className="font-semibold">Sense alertes!</p>
                             <p className="text-sm mt-1">Tots els marges són saludables.</p>
                           </div>
@@ -657,11 +789,13 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             <Link
                               key={row.id}
                               href={buildBookingHref(row.id)}
-                              className="flex items-center gap-3 rounded-xl border p-3 transition-colors group"
+                              className="flex items-center gap-3 ap-card p-3 transition-colors group"
                             >
-                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs">📉</span>
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs">
+                                <TrendingDown className={CARD_ICON} aria-hidden="true" />
+                              </span>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold truncate transition-colors">
+                                <p className={PROFITABILITY_EVENT_TITLE}>
                                   {row.reference} &middot; {row.clientName}
                                 </p>
                                 <p className="text-xs">{formatDateSimple(row.eventDate)} &middot; {row.source}</p>
@@ -680,13 +814,50 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   {/* Taula per canal */}
                   <section className="ap-card p-5" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}>
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">📊</span>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">
+                        <ChartBar className={CARD_ICON} aria-hidden="true" />
+                      </span>
                       <h2 className="text-base font-bold">Rendibilitat per canal d&apos;adquisició</h2>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="grid gap-2 md:hidden">
+                      {props.bySource.map((row) => (
+                        <div key={row.source} className="rounded-xl border border-[var(--line)] p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-xs uppercase tracking-wider">Canal</p>
+                              <p className="text-sm font-bold break-words">{row.source}</p>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <p className={`text-lg font-bold ${marginColor(row.avgMarginPct)}`}>
+                                {pct(row.avgMarginPct)}
+                              </p>
+                              <p className="text-xs uppercase tracking-wider">marge</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                              <p className="uppercase tracking-wider">Bolos</p>
+                              <p className="mt-1 font-bold">{row.bookings}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Ingressos</p>
+                              <p className="mt-1 font-bold">{money(row.revenue)}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Marge net</p>
+                              <p className="mt-1 font-bold">{money(row.netMargin)}</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 h-1.5 w-full rounded-full bg-[var(--raised)] overflow-hidden">
+                            <div className={`h-full rounded-full ${marginBg(row.avgMarginPct)}`} style={{ width: `${Math.min(row.avgMarginPct * 100, 100)}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="hidden overflow-x-auto md:block">
                       <table className="min-w-full text-sm" aria-label="Rendibilitat per canal">
                         <thead>
-                          <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wider">
+                          <tr className="border-b border-[var(--line)] text-left text-xs uppercase tracking-wider">
                             <th scope="col" className="py-3 pr-4">Canal</th>
                             <th scope="col" className="py-3 pr-4">Esdeveniments</th>
                             <th scope="col" className="py-3 pr-4">Ingressos</th>
@@ -696,14 +867,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         </thead>
                         <tbody>
                           {props.bySource.map((row) => (
-                            <tr key={row.source} className="border-b border-white/5 adm-row-hover transition-colors">
+                            <tr key={row.source} className="border-b border-[var(--line)] adm-row-hover transition-colors">
                               <td className="py-3 pr-4 font-semibold">{row.source}</td>
                               <td className="py-3 pr-4">{row.bookings}</td>
                               <td className="py-3 pr-4">{money(row.revenue)}</td>
                               <td className="py-3 pr-4">{money(row.netMargin)}</td>
                               <td className="py-3">
                                 <div className="flex items-center gap-2">
-                                  <div className="h-1.5 w-16 rounded-full bg-white/5 overflow-hidden">
+                                  <div className="h-1.5 w-16 rounded-full bg-[var(--raised)] overflow-hidden">
                                     <div className={`h-full rounded-full ${marginBg(row.avgMarginPct)}`} style={{ width: `${Math.min(row.avgMarginPct * 100, 100)}%` }} />
                                   </div>
                                   <span className={`text-xs font-semibold ${marginColor(row.avgMarginPct)}`}>{pct(row.avgMarginPct)}</span>
@@ -728,33 +899,69 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <p className="text-xs mb-4">Projecció mensual d'ingressos i costos basada en reserves confirmades.</p>
 
                 {props.cashFlow && props.cashFlow.length > 0 ? (
-                  <div className="overflow-x-auto rounded-xl border border-white/10">
-                    <table className="min-w-[700px] w-full text-sm" aria-label="Projecció de tresoreria">
-                      <thead>
-                        <tr className="text-left text-xs uppercase tracking-wider">
-                          <th scope="col" className="px-3 py-2">Mes</th>
-                          <th scope="col" className="px-3 py-2 text-right">Ingressos previstos</th>
-                          <th scope="col" className="px-3 py-2 text-right">Costos estimats</th>
-                          <th scope="col" className="px-3 py-2 text-right">Flux net</th>
-                          <th scope="col" className="px-3 py-2 text-right">Acumulat</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/10">
-                        {props.cashFlow.map((row) => (
-                          <tr key={row.month} className="adm-row-hover">
-                            <td className="px-3 py-2 font-medium">{row.month}</td>
-                            <td className="px-3 py-2 text-right">{money(row.income)}</td>
-                            <td className="px-3 py-2 text-right">{money(row.costs)}</td>
-                            <td className={`px-3 py-2 text-right font-semibold ${row.netFlow >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
-                              {money(row.netFlow)}
-                            </td>
-                            <td className={`px-3 py-2 text-right font-bold ${row.cumulative >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
-                              {money(row.cumulative)}
-                            </td>
+                  <div>
+                    <div className="grid gap-2 md:hidden" aria-label="Projecció de tresoreria en format mòbil">
+                      {props.cashFlow.map((row) => (
+                        <div key={row.month} className="rounded-xl border border-[var(--line)] p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-xs uppercase tracking-wider">Mes</p>
+                              <p className="text-sm font-bold">{row.month}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs uppercase tracking-wider">Acumulat</p>
+                              <p className={`text-sm font-bold ${row.cumulative >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                                {money(row.cumulative)}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                              <p className="uppercase tracking-wider">Ingressos</p>
+                              <p className="mt-1 font-bold">{money(row.income)}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Costos</p>
+                              <p className="mt-1 font-bold">{money(row.costs)}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Flux net</p>
+                              <p className={`mt-1 font-bold ${row.netFlow >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                                {money(row.netFlow)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="hidden overflow-x-auto rounded-xl border border-[var(--line)] md:block">
+                      <table className="min-w-[700px] w-full text-sm" aria-label="Projecció de tresoreria">
+                        <thead>
+                          <tr className="text-left text-xs uppercase tracking-wider">
+                            <th scope="col" className="px-3 py-2">Mes</th>
+                            <th scope="col" className="px-3 py-2 text-right">Ingressos previstos</th>
+                            <th scope="col" className="px-3 py-2 text-right">Costos estimats</th>
+                            <th scope="col" className="px-3 py-2 text-right">Flux net</th>
+                            <th scope="col" className="px-3 py-2 text-right">Acumulat</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/10">
+                          {props.cashFlow.map((row) => (
+                            <tr key={row.month} className="adm-row-hover">
+                              <td className="px-3 py-2 font-medium">{row.month}</td>
+                              <td className="px-3 py-2 text-right">{money(row.income)}</td>
+                              <td className="px-3 py-2 text-right">{money(row.costs)}</td>
+                              <td className={`px-3 py-2 text-right font-semibold ${row.netFlow >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                                {money(row.netFlow)}
+                              </td>
+                              <td className={`px-3 py-2 text-right font-bold ${row.cumulative >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                                {money(row.cumulative)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 ) : (
                   <p className="text-sm">Sense dades de tresoreria. Les reserves confirmades amb dates futures apareixeran aquí.</p>
@@ -776,78 +983,153 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </p>
 
                 {props.forecast_pipeline && props.forecast_pipeline.length > 0 ? (
-                  <div className="overflow-x-auto rounded-xl border border-white/10">
-                    <table className="min-w-[1080px] w-full text-sm" aria-label="Previsió de vendes">
-                      <thead>
-                        <tr className="text-left text-xs uppercase tracking-wider">
-                          <th scope="col" className="px-3 py-2">Mes</th>
-                          <th scope="col" className="px-3 py-2 text-right">Mitjana històrica</th>
-                          <th scope="col" className="px-3 py-2 text-right">Pipeline ponderat</th>
-                          <th scope="col" className="px-3 py-2 text-right">Previsió combinada</th>
-                          <th scope="col" className="px-3 py-2 text-right">Rang ±1σ</th>
-                          <th scope="col" className="px-3 py-2 text-right">YoY (any anterior)</th>
-                          <th scope="col" className="px-3 py-2 text-right">Confirmades</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/10">
-                        {props.forecast_pipeline.map((row) => {
-                          const hasBand = row.combinedHigh > row.combinedLow;
-                          const yoyDelta = row.previousYearActual > 0
-                            ? (row.combined - row.previousYearActual) / row.previousYearActual
-                            : null;
-                          const yoyToneClass = yoyDelta == null
-                            ? 'opacity-50'
-                            : yoyDelta >= 0.1
-                              ? 'admin-tone-text-success'
-                              : yoyDelta <= -0.1
-                                ? 'admin-tone-text-danger'
-                                : 'opacity-70';
-                          return (
-                            <tr key={row.month} className="adm-row-hover">
-                              <td className="px-3 py-2 font-medium">{row.month}</td>
-                              <td className="px-3 py-2 text-right">{money(row.historicalAvg)}</td>
-                              <td className="px-3 py-2 text-right">{money(row.pipeline)}</td>
-                              <td className="px-3 py-2 text-right font-bold">{money(row.combined)}</td>
-                              <td className="px-3 py-2 text-right text-xs">
-                                {hasBand ? (
-                                  <span className="font-mono">{money(row.combinedLow)} – {money(row.combinedHigh)}</span>
-                                ) : (
-                                  <span className="opacity-50">—</span>
-                                )}
-                              </td>
-                              <td className={`px-3 py-2 text-right text-xs ${yoyToneClass}`}>
-                                {row.previousYearActual > 0 ? (
-                                  <span className="font-mono">
-                                    {money(row.previousYearActual)}
-                                    {yoyDelta != null && (
-                                      <span className="ml-1">
-                                        ({yoyDelta >= 0 ? '+' : ''}{Math.round(yoyDelta * 100)}%)
-                                      </span>
-                                    )}
-                                  </span>
-                                ) : (
-                                  <span>—</span>
-                                )}
-                              </td>
-                              <td className="px-3 py-2 text-right text-xs">
-                                {row.confirmedBookings > 0 ? (
-                                  <span className="font-mono">
-                                    {row.confirmedBookings} · {money(row.confirmedRevenue)}
-                                  </span>
-                                ) : (
-                                  <span className="opacity-50">—</span>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                  <div>
+                    <div className="grid gap-2 md:hidden" aria-label="Previsió de vendes en format mòbil">
+                      {props.forecast_pipeline.map((row) => {
+                        const hasBand = row.combinedHigh > row.combinedLow;
+                        const yoyDelta = row.previousYearActual > 0
+                          ? (row.combined - row.previousYearActual) / row.previousYearActual
+                          : null;
+                        const yoyToneClass = yoyDelta == null
+                          ? 'opacity-50'
+                          : yoyDelta >= 0.1
+                            ? 'admin-tone-text-success'
+                            : yoyDelta <= -0.1
+                              ? 'admin-tone-text-danger'
+                              : 'opacity-70';
+                        return (
+                          <div key={row.month} className="rounded-xl border border-[var(--line)] p-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="text-xs uppercase tracking-wider">Mes</p>
+                                <p className="text-sm font-bold">{row.month}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-xs uppercase tracking-wider">Combinada</p>
+                                <p className="text-sm font-bold">{money(row.combined)}</p>
+                              </div>
+                            </div>
+                            <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <p className="uppercase tracking-wider">Històrica</p>
+                                <p className="mt-1 font-bold">{money(row.historicalAvg)}</p>
+                              </div>
+                              <div>
+                                <p className="uppercase tracking-wider">Pipeline</p>
+                                <p className="mt-1 font-bold">{money(row.pipeline)}</p>
+                              </div>
+                              <div>
+                                <p className="uppercase tracking-wider">Rang ±1σ</p>
+                                <p className="mt-1 font-mono font-bold">
+                                  {hasBand ? `${money(row.combinedLow)} – ${money(row.combinedHigh)}` : '—'}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="uppercase tracking-wider">YoY</p>
+                                <p className={`mt-1 font-mono font-bold ${yoyToneClass}`}>
+                                  {row.previousYearActual > 0 ? (
+                                    <>
+                                      {money(row.previousYearActual)}
+                                      {yoyDelta != null && (
+                                        <span className="ml-1">
+                                          ({yoyDelta >= 0 ? '+' : ''}{Math.round(yoyDelta * 100)}%)
+                                        </span>
+                                      )}
+                                    </>
+                                  ) : (
+                                    '—'
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="mt-3 text-xs">
+                              Confirmades:{' '}
+                              <span className="font-mono font-bold">
+                                {row.confirmedBookings > 0
+                                  ? `${row.confirmedBookings} · ${money(row.confirmedRevenue)}`
+                                  : '—'}
+                              </span>
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="hidden overflow-x-auto rounded-xl border border-[var(--line)] md:block">
+                      <table className="min-w-[1080px] w-full text-sm" aria-label="Previsió de vendes">
+                        <thead>
+                          <tr className="text-left text-xs uppercase tracking-wider">
+                            <th scope="col" className="px-3 py-2">Mes</th>
+                            <th scope="col" className="px-3 py-2 text-right">Mitjana històrica</th>
+                            <th scope="col" className="px-3 py-2 text-right">Pipeline ponderat</th>
+                            <th scope="col" className="px-3 py-2 text-right">Previsió combinada</th>
+                            <th scope="col" className="px-3 py-2 text-right">Rang ±1σ</th>
+                            <th scope="col" className="px-3 py-2 text-right">YoY (any anterior)</th>
+                            <th scope="col" className="px-3 py-2 text-right">Confirmades</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/10">
+                          {props.forecast_pipeline.map((row) => {
+                            const hasBand = row.combinedHigh > row.combinedLow;
+                            const yoyDelta = row.previousYearActual > 0
+                              ? (row.combined - row.previousYearActual) / row.previousYearActual
+                              : null;
+                            const yoyToneClass = yoyDelta == null
+                              ? 'opacity-50'
+                              : yoyDelta >= 0.1
+                                ? 'admin-tone-text-success'
+                                : yoyDelta <= -0.1
+                                  ? 'admin-tone-text-danger'
+                                  : 'opacity-70';
+                            return (
+                              <tr key={row.month} className="adm-row-hover">
+                                <td className="px-3 py-2 font-medium">{row.month}</td>
+                                <td className="px-3 py-2 text-right">{money(row.historicalAvg)}</td>
+                                <td className="px-3 py-2 text-right">{money(row.pipeline)}</td>
+                                <td className="px-3 py-2 text-right font-bold">{money(row.combined)}</td>
+                                <td className="px-3 py-2 text-right text-xs">
+                                  {hasBand ? (
+                                    <span className="font-mono">{money(row.combinedLow)} – {money(row.combinedHigh)}</span>
+                                  ) : (
+                                    <span className="opacity-50">—</span>
+                                  )}
+                                </td>
+                                <td className={`px-3 py-2 text-right text-xs ${yoyToneClass}`}>
+                                  {row.previousYearActual > 0 ? (
+                                    <span className="font-mono">
+                                      {money(row.previousYearActual)}
+                                      {yoyDelta != null && (
+                                        <span className="ml-1">
+                                          ({yoyDelta >= 0 ? '+' : ''}{Math.round(yoyDelta * 100)}%)
+                                        </span>
+                                      )}
+                                    </span>
+                                  ) : (
+                                    <span>—</span>
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 text-right text-xs">
+                                  {row.confirmedBookings > 0 ? (
+                                    <span className="font-mono">
+                                      {row.confirmedBookings} · {money(row.confirmedRevenue)}
+                                    </span>
+                                  ) : (
+                                    <span className="opacity-50">—</span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 ) : (
                   <p className="text-sm">Sense dades de previsió. Necessitem leads actius i/o reserves passades per generar previsions.</p>
                 )}
               </section>
+
+              {/* Despesa de màrqueting (base del CAC real) */}
+              <MarketingSpendPanel />
 
               {/* CAC per canal */}
               {props.cacByChannel && props.cacByChannel.length > 0 && (
@@ -855,33 +1137,79 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <h2 className="ap-h2 mb-1">CAC per canal</h2>
                   <p className="text-xs mb-4">Cost d'adquisició de client real vs estimat, derivat de dades.</p>
 
-                  <div className="overflow-x-auto rounded-xl border border-white/10">
-                    <table className="min-w-[600px] w-full text-sm" aria-label="CAC per canal">
-                      <thead>
-                        <tr className="text-left text-xs uppercase tracking-wider">
-                          <th scope="col" className="px-3 py-2">Canal</th>
-                          <th scope="col" className="px-3 py-2 text-right">Leads</th>
-                          <th scope="col" className="px-3 py-2 text-right">Guanyats</th>
-                          <th scope="col" className="px-3 py-2 text-right">Conversió</th>
-                          <th scope="col" className="px-3 py-2 text-right">CAC estimat</th>
-                          <th scope="col" className="px-3 py-2 text-right">CAC real</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/10">
-                        {props.cacByChannel.map((row) => (
-                          <tr key={row.channel} className="adm-row-hover">
-                            <td className="px-3 py-2 font-medium">{row.channel}</td>
-                            <td className="px-3 py-2 text-right">{row.totalLeads}</td>
-                            <td className="px-3 py-2 text-right">{row.wonLeads}</td>
-                            <td className="px-3 py-2 text-right">{(row.conversionRate * 100).toFixed(1)}%</td>
-                            <td className="px-3 py-2 text-right">{money(row.estimatedCac)}</td>
-                            <td className="px-3 py-2 text-right font-semibold">
-                              {row.realCac !== null ? money(row.realCac) : '—'}
-                            </td>
+                  <div>
+                    <div className="grid gap-2 md:hidden" aria-label="CAC per canal en format mòbil">
+                      {props.cacByChannel.map((row) => (
+                        <div key={row.channel} className="rounded-xl border border-[var(--line)] p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-xs uppercase tracking-wider">Canal</p>
+                              <p className="text-sm font-bold break-words">{row.channel}</p>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <p className="text-xs uppercase tracking-wider">Conversió</p>
+                              <p className="text-sm font-bold">{(row.conversionRate * 100).toFixed(1)}%</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                              <p className="uppercase tracking-wider">Leads</p>
+                              <p className="mt-1 font-bold">{row.totalLeads}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Guanyats</p>
+                              <p className="mt-1 font-bold">{row.wonLeads}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">Despesa</p>
+                              <p className="mt-1 font-bold">{row.realSpend !== null ? money(row.realSpend) : '—'}</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                              <p className="uppercase tracking-wider">CAC estimat</p>
+                              <p className="mt-1 font-bold">{money(row.estimatedCac)}</p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-wider">CAC real</p>
+                              <p className="mt-1 font-bold">
+                                {row.realCac !== null ? money(row.realCac) : <span title="Carrega despesa del canal per veure el CAC real">est.</span>}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="hidden overflow-x-auto rounded-xl border border-[var(--line)] md:block">
+                      <table className="min-w-[600px] w-full text-sm" aria-label="CAC per canal">
+                        <thead>
+                          <tr className="text-left text-xs uppercase tracking-wider">
+                            <th scope="col" className="px-3 py-2">Canal</th>
+                            <th scope="col" className="px-3 py-2 text-right">Leads</th>
+                            <th scope="col" className="px-3 py-2 text-right">Guanyats</th>
+                            <th scope="col" className="px-3 py-2 text-right">Conversió</th>
+                            <th scope="col" className="px-3 py-2 text-right">Despesa</th>
+                            <th scope="col" className="px-3 py-2 text-right">CAC estimat</th>
+                            <th scope="col" className="px-3 py-2 text-right">CAC real</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/10">
+                          {props.cacByChannel.map((row) => (
+                            <tr key={row.channel} className="adm-row-hover">
+                              <td className="px-3 py-2 font-medium">{row.channel}</td>
+                              <td className="px-3 py-2 text-right">{row.totalLeads}</td>
+                              <td className="px-3 py-2 text-right">{row.wonLeads}</td>
+                              <td className="px-3 py-2 text-right">{(row.conversionRate * 100).toFixed(1)}%</td>
+                              <td className="px-3 py-2 text-right">{row.realSpend !== null ? money(row.realSpend) : '—'}</td>
+                              <td className="px-3 py-2 text-right">{money(row.estimatedCac)}</td>
+                              <td className="px-3 py-2 text-right font-semibold">
+                                {row.realCac !== null ? money(row.realCac) : <span title="Carrega despesa del canal per veure el CAC real">est.</span>}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </section>
               )}
@@ -896,7 +1224,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <div>
                     <h2 className="ap-h2">Semàfor de packs (clar)</h2>
                     <p className="text-xs">
-                      Mostra PVP, hora extra, cost estimat i benefici real estimat per pack.
+                      Mostra PVP actual, PVP recomanat arrodonit amunt a {RECOMMENDED_SELLING_PRICE_STEP} €, hora extra, cost estimat i benefici real estimat per pack.
                     </p>
                   </div>
                   <p className="text-xs">
@@ -905,31 +1233,93 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
 
                 <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                  <article className="rounded-xl border p-3">
+                  <article className="ap-card p-3">
                     <p className="text-xs">Sa</p>
-                    <p className="text-xl font-black">{props.packPricingSummary.healthy}</p>
+                    <p className="text-xl font-bold">{props.packPricingSummary.healthy}</p>
                   </article>
-                  <article className="rounded-xl border p-3">
+                  <article className="ap-card p-3">
                     <p className="text-xs">Vigilar</p>
-                    <p className="text-xl font-black">{props.packPricingSummary.warning}</p>
+                    <p className="text-xl font-bold">{props.packPricingSummary.warning}</p>
                   </article>
-                  <article className="rounded-xl border p-3">
+                  <article className="ap-card p-3">
                     <p className="text-xs">Crític</p>
-                    <p className="text-xl font-black">{props.packPricingSummary.critical}</p>
+                    <p className="text-xl font-bold">{props.packPricingSummary.critical}</p>
                   </article>
                 </div>
 
-                <div className="mt-4 overflow-x-auto rounded-xl border border-white/10">
-                  <table className="min-w-[1250px] w-full text-sm" aria-label="Rendibilitat per pack">
+                <div className="mt-4 grid gap-2 xl:grid-cols-2 2xl:hidden" aria-label="Rendibilitat per pack en format compacte">
+                  {props.packPricingRows.map((row) => {
+                    const badge = packMarginBadge(row.marginPct, props.packPricingConfig.marginTargetPct);
+                    return (
+                      <article key={row.id} className="rounded-xl border border-[var(--line)] p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <Link href={buildPackHref(row.id)} className="text-sm font-bold leading-snug break-words">
+                              {row.name}
+                            </Link>
+                            <p className="text-xs">{row.slug} · {row.service}</p>
+                          </div>
+                          <span className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${badge.cls}`}>
+                            <span className={`inline-block h-2 w-2 rounded-full ${badge.dot}`} />
+                            {badge.label}
+                          </span>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                          <div>
+                            <p className="uppercase tracking-wider">PVP</p>
+                            <p className="mt-1 font-bold">{money(row.price)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Recomanat</p>
+                            <p className="mt-1 font-bold">{money(row.recommendedPrice)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Cost</p>
+                            <p className="mt-1 font-bold">{money(row.directCost)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Marge</p>
+                            <p className="mt-1 font-bold">{pct(row.marginPct)}</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-2 border-t border-[var(--line)] pt-3 text-xs sm:grid-cols-4">
+                          <div>
+                            <p className="uppercase tracking-wider">Benefici</p>
+                            <p className={`mt-1 font-bold ${row.profit >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                              {money(row.profit)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Hora extra</p>
+                            <p className="mt-1 font-bold">{money(row.extraHourPrice)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">H. extra recom.</p>
+                            <p className="mt-1 font-bold">{money(row.recommendedExtraHourPrice)}</p>
+                          </div>
+                          <div>
+                            <p className="uppercase tracking-wider">Marge h extra</p>
+                            <p className="mt-1 font-bold">{pct(row.extraHourMarginPct)}</p>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 hidden overflow-x-auto rounded-xl border border-[var(--line)] 2xl:block">
+                  <table className="min-w-[1450px] w-full text-sm" aria-label="Rendibilitat per pack">
                     <thead className="">
                       <tr className="text-left text-xs uppercase tracking-wider">
                         <th scope="col" className="px-3 py-2">Pack</th>
                         <th scope="col" className="px-3 py-2">Semàfor</th>
                         <th scope="col" className="px-3 py-2 text-right">PVP</th>
+                        <th scope="col" className="px-3 py-2 text-right">PVP recomanat</th>
                         <th scope="col" className="px-3 py-2 text-right">Cost estimat</th>
                         <th scope="col" className="px-3 py-2 text-right">Benefici</th>
                         <th scope="col" className="px-3 py-2 text-right">Marge</th>
                         <th scope="col" className="px-3 py-2 text-right">Hora extra</th>
+                        <th scope="col" className="px-3 py-2 text-right">H. extra recom.</th>
                         <th scope="col" className="px-3 py-2 text-right">Cost/h extra</th>
                         <th scope="col" className="px-3 py-2 text-right">Benefici/h extra</th>
                         <th scope="col" className="px-3 py-2 text-right">Marge h extra</th>
@@ -953,10 +1343,12 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               </span>
                             </td>
                             <td className="px-3 py-2 text-right">{money(row.price)}</td>
+                            <td className="px-3 py-2 text-right font-semibold">{money(row.recommendedPrice)}</td>
                             <td className="px-3 py-2 text-right">{money(row.directCost)}</td>
                             <td className={`px-3 py-2 text-right font-semibold ${row.profit >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.profit)}</td>
                             <td className="px-3 py-2 text-right">{pct(row.marginPct)}</td>
                             <td className="px-3 py-2 text-right">{money(row.extraHourPrice)}</td>
+                            <td className="px-3 py-2 text-right font-semibold">{money(row.recommendedExtraHourPrice)}</td>
                             <td className="px-3 py-2 text-right">{money(row.extraHourCostEstimated)}</td>
                             <td className={`px-3 py-2 text-right font-semibold ${row.extraHourProfit >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.extraHourProfit)}</td>
                             <td className="px-3 py-2 text-right">{pct(row.extraHourMarginPct)}</td>
@@ -977,7 +1369,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     Cost per km derivat del preu MITECO + manteniment. Actualitzat automàticament.
                   </p>
                   <div className="grid gap-3 sm:grid-cols-4">
-                    <div className="rounded-xl border border-white/10 p-3">
+                    <div className="rounded-xl border border-[var(--line)] p-3">
                       <p className="text-xs uppercase tracking-wide">Preu combustible</p>
                       <p className="text-lg font-bold">
                         {props.vehicleConfig.fuelPricePerLiter > 0
@@ -985,15 +1377,15 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           : 'Sense dada MITECO'}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-white/10 p-3">
+                    <div className="rounded-xl border border-[var(--line)] p-3">
                       <p className="text-xs uppercase tracking-wide">Consum vehicle</p>
                       <p className="text-lg font-bold">{props.vehicleConfig.consumptionL100.toFixed(1)} L/100km</p>
                     </div>
-                    <div className="rounded-xl border border-white/10 p-3">
+                    <div className="rounded-xl border border-[var(--line)] p-3">
                       <p className="text-xs uppercase tracking-wide">Manteniment</p>
                       <p className="text-lg font-bold">{props.vehicleConfig.maintenanceCostPerKm.toFixed(2)} €/km</p>
                     </div>
-                    <div className="rounded-xl border p-3">
+                    <div className="ap-card p-3">
                       <p className="text-xs uppercase tracking-wide">Cost efectiu per km</p>
                       <p className="text-lg font-bold">{props.vehicleConfig.effectiveCostPerKm.toFixed(3)} €/km</p>
                       {props.vehicleConfig.updatedAt && (

@@ -45,7 +45,7 @@ export default function AiCopySuggestionsInline({ type, context, onApply, label 
           type="button"
           onClick={handleGenerate}
           disabled={loading || !context.trim()}
-          className="flex items-center gap-1.5 rounded-lg border border-[var(--hair-gold)] bg-[var(--panel)] px-3 py-1.5 text-xs font-medium text-[var(--gold)] transition-colors hover:bg-[var(--raised)] disabled:opacity-40"
+          className="ap-btn ap-btn--xs flex items-center gap-1.5 disabled:opacity-40"
         >
           {loading ? (
             <span className="inline-block h-3 w-3 animate-spin rounded-full border border-[var(--gold)] border-t-transparent" />
@@ -65,7 +65,7 @@ export default function AiCopySuggestionsInline({ type, context, onApply, label 
             <button
               type="button"
               onClick={() => { setSuggestions([]); setFetched(false); }}
-              className="text-xs text-white/30 hover:text-white/60"
+              className="text-xs text-[var(--t3)] hover:text-[var(--t2)]"
             >
               ✕
             </button>
@@ -87,7 +87,7 @@ export default function AiCopySuggestionsInline({ type, context, onApply, label 
       )}
 
       {fetched && suggestions.length === 0 && (
-        <p className="mt-1 text-xs text-white/30">Sense suggeriments disponibles.</p>
+        <p className="mt-1 text-xs text-[var(--t3)]">Sense suggeriments disponibles.</p>
       )}
     </div>
   );

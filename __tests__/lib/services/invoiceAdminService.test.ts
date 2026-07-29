@@ -44,6 +44,29 @@ describe('listAdminInvoices', () => {
     expect(result.invoices).toEqual([]);
     expect(result.pagination).toEqual({ page: 1, limit: 50, total: 0, pages: 1 });
   });
+
+  it('normalitza paginació a enters finits i limita el take', async () => {
+    await listAdminInvoices({ page: 2.9, limit: Number.NaN });
+
+    expect(mockPrisma.invoice.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 50,
+        take: 50,
+      })
+    );
+
+    vi.clearAllMocks();
+    mockPrisma.invoice.findMany.mockResolvedValue([]);
+    mockPrisma.invoice.count.mockResolvedValue(0);
+    await listAdminInvoices({ page: 4.2, limit: 999.9 });
+
+    expect(mockPrisma.invoice.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 600,
+        take: 200,
+      })
+    );
+  });
 });
 
 describe('createAdminInvoiceFromBooking', () => {

@@ -11,6 +11,8 @@ import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import type { ProfitabilityConfig } from './profitabilityService';
 import { calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM } from './travelCost';
 import { getMarginTone, type MarginTone } from '@/lib/margin-utils';
+import { isIncludedSoundTechSettlementLine } from '@/lib/services/serviceLineCostRules';
+import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -22,14 +24,22 @@ interface BookingCostInput {
   extraHourPrice: number;
   distanceKm: number;
   vehicleCostPerKm?: number | null;
+  /** Ingrés/càrrec de transport repercutit al client, separat del total global. */
+  travelRevenue?: number | null;
   travelCost?: number | null;
   source?: string | null;
   /** Cost real del pack calculat des d'inventari (amortització + labor) */
   inventoryCostReal?: number | null;
   /** Ingrés explícit de línies del bolo quan la reserva es construeix per línies. */
   serviceLinesRevenue?: number | null;
-  /** Cost explícit de línies del bolo. No duplicar amb CollaboratorBooking. */
+  /** Cost explícit de línies del bolo (cost real de col·laborador subcontractat). */
   serviceLinesCost?: number | null;
+  /** Línies del bolo/reserva. Si existeixen, el motor en calcula ingrés, cost i lectures comercials. */
+  serviceLines?: ServiceLineLike[] | null;
+  /** Ràtio de cost per línies pròpies sense cost explícit quan `serviceLines` ve definit. */
+  serviceLinesOwnCostRatio?: number | null;
+  /** Ajustos de cost que pertanyen a les línies però no són una línia visible (p.ex. recollida de material llogat). */
+  serviceLinesCostAdjustment?: number | null;
 }
 
 interface BookingFinancialSummary {
@@ -49,6 +59,10 @@ interface BookingFinancialSummary {
   netMargin: number;
   marginPct: number;
   marginTone: MarginTone;
+  ownServiceMargin: MarginBucket;
+  subcontractedMarkup: SubcontractedMarkupSummary;
+  transportMargin: MarginBucket;
+  orbitaTechIncome: number;
   // Ingrés
   total: number;
 }
@@ -59,13 +73,44 @@ export interface ServiceLineLike {
   costAmount?: number | null;
   quantity?: number | null;
   collaboratorId?: string | null;
+  kind?: string | null;
+  label?: string | null;
+  notes?: string | null;
 }
+
+export const SUBCONTRACTED_MARKUP_TARGET_PCT = 20;
+
+export type SubcontractedMarkupSummary = {
+  revenue: number;
+  cost: number;
+  markupAmount: number;
+  markupPct: number;
+  targetPct: number;
+  ok: boolean;
+};
+
+export type MarginBucket = {
+  revenue: number;
+  cost: number;
+  marginAmount: number;
+  marginPct: number;
+};
+
+export type ServiceLineEconomics = {
+  revenue: number;
+  cost: number;
+  ownServiceMargin: MarginBucket;
+  subcontractedMarkup: SubcontractedMarkupSummary;
+  orbitaTechIncome: number;
+};
 
 // ─── Agregació de línies ──────────────────────────────────────────────────────
 
 /**
  * Suma l'ingrés i el cost d'un conjunt de línies de servei.
  * Font ÚNICA de la regla de cost per línia (no duplicar inline):
+ * - les línies `[travel-cost]` són atribució de repartiment; el seu cost econòmic
+ *   viu a `booking.travelCost`/`travelCost` per no duplicar ruta;
  * - cost explícit si la línia en porta (partners → costAmount del catàleg) o té
  *   `collaboratorId` (el cost es gestiona a la seva fitxa, mai imputat);
  * - si és una línia pròpia d'Òrbita sense cost, s'imputa cost intern via
@@ -75,16 +120,101 @@ export function aggregateServiceLines(
   lines: ServiceLineLike[],
   ownCostRatio: number = PROFITABILITY_MODEL_DEFAULTS.orbitaServiceCostRatio,
 ): { revenue: number; cost: number } {
+  const { revenue, cost } = computeServiceLineEconomics(lines, ownCostRatio);
+  return { revenue, cost };
+}
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function quantityOf(line: ServiceLineLike): number {
+  return typeof line.quantity === 'number' && Number.isFinite(line.quantity) && line.quantity > 0
+    ? line.quantity
+    : 1;
+}
+
+function isTravelCostLine(line: ServiceLineLike): boolean {
+  return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
+}
+
+function emptySubcontractedMarkup(): SubcontractedMarkupSummary {
+  return {
+    revenue: 0,
+    cost: 0,
+    markupAmount: 0,
+    markupPct: 0,
+    targetPct: SUBCONTRACTED_MARKUP_TARGET_PCT,
+    ok: true,
+  };
+}
+
+function marginBucket(revenue: number, cost: number): MarginBucket {
+  const roundedRevenue = round2(revenue);
+  const roundedCost = round2(cost);
+  const marginAmount = round2(roundedRevenue - roundedCost);
+  return {
+    revenue: roundedRevenue,
+    cost: roundedCost,
+    marginAmount,
+    marginPct: roundedRevenue > 0 ? round2((marginAmount / roundedRevenue) * 100) : 0,
+  };
+}
+
+export function computeServiceLineEconomics(
+  lines: ServiceLineLike[],
+  ownCostRatio: number = PROFITABILITY_MODEL_DEFAULTS.orbitaServiceCostRatio,
+): ServiceLineEconomics {
   let revenue = 0;
   let cost = 0;
-  for (const l of lines) {
-    const qty = l.quantity || 1;
-    const rev = (l.revenueAmount || 0) * qty;
+  let subcontractedRevenue = 0;
+  let subcontractedCost = 0;
+  let ownRevenue = 0;
+  let ownCost = 0;
+  let orbitaTechIncome = 0;
+
+  for (const line of lines) {
+    if (isTravelCostLine(line)) continue;
+    const qty = quantityOf(line);
+    const rev = (line.revenueAmount || 0) * qty;
     revenue += rev;
-    const explicit = (l.costAmount || 0) * qty;
-    cost += explicit > 0 || l.collaboratorId ? explicit : rev * ownCostRatio;
+    const explicit = (line.costAmount || 0) * qty;
+    const lineCost = explicit > 0 || line.collaboratorId ? explicit : rev * ownCostRatio;
+    cost += lineCost;
+
+    if (explicit < 0 && isIncludedSoundTechSettlementLine(line)) {
+      orbitaTechIncome += Math.abs(explicit);
+      continue;
+    }
+    if (!line.collaboratorId && rev > 0) {
+      ownRevenue += rev;
+      ownCost += lineCost;
+    }
+    if (line.kind !== 'PROVIDER_SERVICE' || !line.collaboratorId || explicit <= 0 || rev <= 0) {
+      continue;
+    }
+    subcontractedCost += explicit;
+    subcontractedRevenue += rev;
   }
-  return { revenue, cost };
+
+  const markupAmount = round2(subcontractedRevenue - subcontractedCost);
+  const markupPct = subcontractedCost > 0 ? round2((markupAmount / subcontractedCost) * 100) : 0;
+  return {
+    revenue: round2(revenue),
+    cost: round2(cost),
+    ownServiceMargin: marginBucket(ownRevenue, ownCost),
+    subcontractedMarkup: subcontractedCost > 0
+      ? {
+          revenue: round2(subcontractedRevenue),
+          cost: round2(subcontractedCost),
+          markupAmount,
+          markupPct,
+          targetPct: SUBCONTRACTED_MARKUP_TARGET_PCT,
+          ok: markupPct >= SUBCONTRACTED_MARKUP_TARGET_PCT,
+        }
+      : emptySubcontractedMarkup(),
+    orbitaTechIncome: round2(orbitaTechIncome),
+  };
 }
 
 /** Línia mínima per classificar el tipus de cost operatiu que genera. */
@@ -117,17 +247,6 @@ export function classifyBoloLines(lines: BoloLineLike[]): {
   return { hasOwnEquipment, hasEquipmentRental };
 }
 
-/**
- * Km de desplaçament que el marge del bolo pot assumir abans de deixar de
- * guanyar (net = 0). El desplaçament va EN CONTRA del marge a `costPerKm` real
- * (benzina MITECO + consum + manteniment). Retorna km totals (anada+tornada).
- */
-export function computeSupportableTravelKm(netMargin: number, costPerKm: number): number {
-  const rate = costPerKm > 0 ? costPerKm : DEFAULT_VEHICLE_COST_PER_KM;
-  if (netMargin <= 0) return 0;
-  return Math.floor(netMargin / rate);
-}
-
 // ─── Core ───────────────────────────────────────────────────────────────────
 
 /**
@@ -142,8 +261,13 @@ export interface DirectCostBreakdown {
   extraHoursCost: number;
   fixedOperationalCost: number;
   travelCost: number;
+  travelRevenue: number;
+  transportMargin: MarginBucket;
   serviceLinesRevenue: number;
   serviceLinesCost: number;
+  ownServiceMargin: MarginBucket;
+  subcontractedMarkup: SubcontractedMarkupSummary;
+  orbitaTechIncome: number;
   directCost: number;
 }
 
@@ -176,22 +300,46 @@ export function computeDirectCostBreakdown(
     typeof input.travelCost === 'number' && input.travelCost > 0
       ? input.travelCost
       : calculateTravelCost(input.distanceKm, effectiveVehicleCostPerKm);
+  const travelRevenue =
+    typeof input.travelRevenue === 'number' && Number.isFinite(input.travelRevenue)
+      ? input.travelRevenue
+      : 0;
+  const transportMargin = marginBucket(travelRevenue, travelCost);
 
-  const serviceLinesRevenue =
-    typeof input.serviceLinesRevenue === 'number' && input.serviceLinesRevenue > 0
+  const lineEconomics = Array.isArray(input.serviceLines)
+    ? computeServiceLineEconomics(
+        input.serviceLines,
+        typeof input.serviceLinesOwnCostRatio === 'number' && Number.isFinite(input.serviceLinesOwnCostRatio)
+          ? input.serviceLinesOwnCostRatio
+          : PROFITABILITY_MODEL_DEFAULTS.orbitaServiceCostRatio,
+      )
+    : null;
+  const serviceLinesRevenue = lineEconomics
+    ? lineEconomics.revenue
+    : typeof input.serviceLinesRevenue === 'number' && input.serviceLinesRevenue > 0
       ? input.serviceLinesRevenue
       : 0;
-  const serviceLinesCost =
-    typeof input.serviceLinesCost === 'number' && input.serviceLinesCost > 0
+  const serviceLinesCostBase = lineEconomics
+    ? lineEconomics.cost
+    : typeof input.serviceLinesCost === 'number' && Number.isFinite(input.serviceLinesCost)
       ? input.serviceLinesCost
       : 0;
+  const serviceLinesCostAdjustment =
+    typeof input.serviceLinesCostAdjustment === 'number' && Number.isFinite(input.serviceLinesCostAdjustment)
+      ? input.serviceLinesCostAdjustment
+      : 0;
+  const serviceLinesCost = serviceLinesCostBase + serviceLinesCostAdjustment;
+  const subcontractedMarkup = lineEconomics?.subcontractedMarkup ?? emptySubcontractedMarkup();
+  const ownServiceMargin = lineEconomics?.ownServiceMargin ?? marginBucket(0, 0);
+  const orbitaTechIncome = lineEconomics?.orbitaTechIncome ?? 0;
 
   const directCost =
     packCost + extrasCost + extraHoursCost + fixedOperationalCost + travelCost + serviceLinesCost;
 
   return {
     packCost, packCostIsReal, extrasCost, extraHoursCost, fixedOperationalCost,
-    travelCost, serviceLinesRevenue, serviceLinesCost, directCost,
+    travelCost, travelRevenue, transportMargin, serviceLinesRevenue, serviceLinesCost,
+    ownServiceMargin, subcontractedMarkup, orbitaTechIncome, directCost,
   };
 }
 
@@ -201,7 +349,8 @@ export function computeBookingFinancialSummary(
 ): BookingFinancialSummary {
   const {
     packCost, packCostIsReal, extrasCost, extraHoursCost, fixedOperationalCost,
-    travelCost, serviceLinesRevenue, serviceLinesCost, directCost,
+    travelCost, travelRevenue, transportMargin, serviceLinesRevenue, serviceLinesCost,
+    ownServiceMargin, subcontractedMarkup, orbitaTechIncome, directCost,
   } = computeDirectCostBreakdown(input, config);
 
   // CAC
@@ -229,6 +378,10 @@ export function computeBookingFinancialSummary(
     netMargin,
     marginPct,
     marginTone,
+    ownServiceMargin,
+    subcontractedMarkup,
+    transportMargin,
+    orbitaTechIncome,
     total,
   };
 }
@@ -248,36 +401,3 @@ export function computeSimpleMarginPct(
 }
 
 // ─── Col·laboradors ────────────────────────────────────────────────────────
-
-interface CollaboratorCostInput {
-  commissionPct: number;
-  pricingModel: 'NET_PLUS_COMMISSION' | 'DISCOUNT';
-}
-
-/**
- * Calcula el marge NET d'una reserva amb col·laborador.
- * Descompta la comissió del col·laborador del marge.
- */
-export function computeCollaboratorNetMargin(
-  summary: BookingFinancialSummary,
-  collaborator: CollaboratorCostInput,
-): { netMarginAfterCommission: number; commissionAmount: number; collaboratorPrice: number; marginPctAfterCommission: number } {
-  const commissionAmount =
-    collaborator.pricingModel === 'DISCOUNT'
-      ? Math.round(summary.total * (collaborator.commissionPct / 100))
-      : Math.round(summary.total * (collaborator.commissionPct / 100));
-
-  const collaboratorPrice =
-    collaborator.pricingModel === 'DISCOUNT'
-      ? summary.total - commissionAmount
-      : summary.total; // en model NET, el col·lab rep el preu net
-
-  const netMarginAfterCommission = summary.netMargin - commissionAmount;
-  const marginPctAfterCommission =
-    summary.total > 0 ? (netMarginAfterCommission / summary.total) * 100 : 0;
-
-  return { netMarginAfterCommission, commissionAmount, collaboratorPrice, marginPctAfterCommission };
-}
-
-
-

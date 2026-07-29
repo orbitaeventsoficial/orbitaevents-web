@@ -43,6 +43,20 @@ html.admin-mode [class*="text-[11.8px]"] {
 
 /* text-xs (0.75rem = 12px) és el mínim acceptable — no s'escala */
 
+/* ── Vora canònica per defecte: cap `border` pelat de Tailwind (que cauria al gris
+   fred #e5e7eb del preflight) dins l'admin. `:where()` manté l'especificitat a (0,1,1):
+   venç el default universal del preflight però PERD contra qualsevol color de vora
+   intencional (utilitats `border-<x>` o classes d'estat com `.ap-kpi--*`), que queden
+   intactes. El `:not([class*="border-…-"])` exclou les que ja porten color.
+   Cobreix vora completa + direccionals pelades. Una veritat, un CSS.            ── */
+html.admin-mode :where([class~="border"]:not([class*="border-"]))   { border-color: var(--line); }
+html.admin-mode :where([class~="border-t"]:not([class*="border-t-"])) { border-top-color: var(--line); }
+html.admin-mode :where([class~="border-b"]:not([class*="border-b-"])) { border-bottom-color: var(--line); }
+html.admin-mode :where([class~="border-l"]:not([class*="border-l-"])) { border-left-color: var(--line); }
+html.admin-mode :where([class~="border-r"]:not([class*="border-r-"])) { border-right-color: var(--line); }
+html.admin-mode :where([class~="border-x"]:not([class*="border-x-"])) { border-left-color: var(--line); border-right-color: var(--line); }
+html.admin-mode :where([class~="border-y"]:not([class*="border-y-"])) { border-top-color: var(--line); border-bottom-color: var(--line); }
+
 /* ── Radis normalitzats: HIPERSEMBLANÇA entre pàgines («sèrie, mateix dissenyador»).
    El repo tenia radis dispersos (rounded-xl 12px / 2xl 16px / 3xl 24px barrejats).
    Aquesta capa única els convergeix al radi de card canònic (--o-r-md, 10px) perquè
@@ -96,7 +110,7 @@ html.admin-mode .cdh {
   color: var(--ax-t);
 }
 
-html.admin-mode .cdh__head {
+html.admin-mode .ap-dochist-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -104,20 +118,20 @@ html.admin-mode .cdh__head {
   margin-bottom: .85rem;
 }
 
-html.admin-mode .cdh__title {
+html.admin-mode .ap-dochist-title {
   margin: 0;
   font-size: var(--o-text-base);
   font-weight: var(--o-fw-bold);
   letter-spacing: 0;
 }
 
-html.admin-mode .cdh__subtitle {
+html.admin-mode .ap-dochist-subtitle {
   margin: .2rem 0 0;
   color: var(--ax-t3);
   font-size: var(--o-text-xs);
 }
 
-html.admin-mode .cdh__count {
+html.admin-mode .ap-dochist-count {
   display: inline-flex;
   min-width: 2rem;
   justify-content: center;
@@ -128,7 +142,7 @@ html.admin-mode .cdh__count {
   font-size: var(--o-text-xs);
 }
 
-html.admin-mode .cdh__empty {
+html.admin-mode .ap-dochist-empty {
   margin: 0;
   border: 1px dashed var(--ax-line2);
   border-radius: var(--o-r-sm);
@@ -137,12 +151,12 @@ html.admin-mode .cdh__empty {
   font-size: var(--o-text-sm);
 }
 
-html.admin-mode .cdh__list {
+html.admin-mode .ap-dochist-list {
   display: grid;
   gap: .5rem;
 }
 
-html.admin-mode .cdh__item {
+html.admin-mode .ap-dochist-item {
   display: grid;
   grid-template-columns: minmax(6.5rem, .6fr) minmax(0, 1.35fr) minmax(7rem, auto);
   gap: .75rem;
@@ -155,62 +169,62 @@ html.admin-mode .cdh__item {
   color: inherit;
 }
 
-html.admin-mode .cdh__item--link:hover {
+html.admin-mode .ap-dochist-item--link:hover {
   border-color: var(--ax-hair-gold);
   background: color-mix(in oklab, var(--ax-gold) 7%, var(--ax-sunk));
 }
 
-html.admin-mode .cdh__kind {
+html.admin-mode .ap-dochist-kind {
   color: var(--ax-gold-bright);
   font-size: var(--o-text-xs);
   font-weight: var(--o-fw-bold);
 }
 
-html.admin-mode .cdh__main {
+html.admin-mode .ap-dochist-main {
   min-width: 0;
   display: grid;
   gap: .1rem;
 }
 
-html.admin-mode .cdh__main strong,
-html.admin-mode .cdh__main span {
+html.admin-mode .ap-dochist-main strong,
+html.admin-mode .ap-dochist-main span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-html.admin-mode .cdh__main span,
-html.admin-mode .cdh__meta,
-html.admin-mode .cdh__side em {
+html.admin-mode .ap-dochist-main span,
+html.admin-mode .ap-dochist-meta,
+html.admin-mode .ap-dochist-side em {
   color: var(--ax-t3);
   font-size: var(--o-text-xs);
   font-style: normal;
 }
 
-html.admin-mode .cdh__side {
+html.admin-mode .ap-dochist-side {
   display: grid;
   justify-items: end;
   gap: .1rem;
 }
 
-html.admin-mode .cdh__side strong {
+html.admin-mode .ap-dochist-side strong {
   color: var(--ax-gold-bright);
 }
 
-html.admin-mode .cdh__meta {
+html.admin-mode .ap-dochist-meta {
   grid-column: 2 / -1;
 }
 
 @media (max-width: 760px) {
-  html.admin-mode .cdh__item {
+  html.admin-mode .ap-dochist-item {
     grid-template-columns: 1fr;
   }
 
-  html.admin-mode .cdh__side {
+  html.admin-mode .ap-dochist-side {
     justify-items: start;
   }
 
-  html.admin-mode .cdh__meta {
+  html.admin-mode .ap-dochist-meta {
     grid-column: auto;
   }
 }
@@ -220,7 +234,7 @@ html.admin-mode .ax__error {
   min-height: 60vh;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: var(--o-space-6);
   color: var(--ax-t);
   font-family: var(--ui);
 }
@@ -251,7 +265,7 @@ html.admin-mode .ax__erroricon {
 html.admin-mode .ax__erroricon svg { width: 28px; height: 28px; }
 
 html.admin-mode .ax__errortitle {
-  margin: 0 0 8px;
+  margin: 0 0 var(--o-space-2);
   font-family: var(--display);
   font-size: 24px;
   font-weight: 800;
@@ -267,7 +281,7 @@ html.admin-mode .ax__errortext {
 
 html.admin-mode .ax__errordebug {
   margin: 0 0 22px;
-  padding: 13px 14px;
+  padding: 13px var(--o-space-35);
   border: 1px solid var(--ax-line2);
   border-radius: 12px;
   background: var(--ax-sunk);
@@ -283,7 +297,7 @@ html.admin-mode .ax__errordebug p {
 }
 
 html.admin-mode .ax__errordigest {
-  margin-top: 8px !important;
+  margin-top: var(--o-space-2) !important;
   color: var(--ax-t3);
   font-size: 11px !important;
 }
@@ -291,7 +305,7 @@ html.admin-mode .ax__errordigest {
 html.admin-mode .ax__erroractions {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: var(--o-space-25);
   flex-wrap: wrap;
 }
 
@@ -336,7 +350,7 @@ html.admin-mode .ax--side .ax__workspace { min-width: 0; margin-left: 236px; }
 html.admin-mode .ax__side {
   position: fixed; inset: 0 auto 0 0; z-index: 40;
   width: 236px; display: flex; flex-direction: column; gap: 17px;
-  padding: 16px 14px;
+  padding: var(--o-space-4) var(--o-space-35);
   border-right: 1px solid var(--ax-line);
   background: linear-gradient(
     180deg,
@@ -349,18 +363,18 @@ html.admin-mode .ax__side {
 /* ── Marca ────────────────────────────────────────────────────────────────── */
 html.admin-mode .ax__brand {
   flex: none; display: flex; align-items: center;
-  height: 52px; padding: 0 0 16px;
+  height: 52px; padding: 0 0 var(--o-space-4);
   border-bottom: 1px solid var(--ax-hair-gold);
 }
 html.admin-mode .ax__logo {
-  display: block; width: 140px; height: 46px;
+  display: block; width: 140px; height: auto;
   object-fit: contain; object-position: left center;
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.42));
 }
 
 /* ── Navegació lateral ────────────────────────────────────────────────────── */
 html.admin-mode .ax__sidenav {
-  display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 0;
+  display: flex; flex-direction: column; gap: var(--o-space-15); flex: 1; min-height: 0;
   overflow-y: auto; scrollbar-width: none;
 }
 html.admin-mode .ax__sidenav::-webkit-scrollbar { display: none; }
@@ -393,12 +407,12 @@ html.admin-mode .ax__sidegroup.is-active > .ax__sideitem::before {
 }
 
 html.admin-mode .ax__sidesub {
-  display: flex; flex-direction: column; gap: 2px;
+  display: flex; flex-direction: column; gap: var(--o-space-05);
   padding: 3px 0 7px 26px;
 }
 html.admin-mode .ax__sidesub a,
 html.admin-mode .ax__sidesub button {
-  display: flex; align-items: center; min-height: 33px; padding: 0 10px;
+  display: flex; align-items: center; min-height: 33px; padding: 0 var(--o-space-25);
   border: 0; border-radius: 9px;
   background: transparent; color: var(--ax-t3);
   font: inherit; font-size: var(--o-text-sm, 13px); font-weight: 650; text-align: left;
@@ -415,8 +429,8 @@ html.admin-mode .ax__sidesub button.is-on {
 
 /* ── Accions primàries al capdamunt del sidebar ───────────────────────────── */
 html.admin-mode .ax__sidetop {
-  display: flex; flex-direction: row; gap: 6px;
-  padding-bottom: 12px; border-bottom: 1px solid var(--ax-line);
+  display: flex; flex-direction: row; gap: var(--o-space-15);
+  padding-bottom: var(--o-space-3); border-bottom: 1px solid var(--ax-line);
 }
 
 /* ── Items secundaris al submenú ──────────────────────────────────────────── */
@@ -438,9 +452,9 @@ html.admin-mode .ax__sidesub a.is-secondary.is-on {
 
 /* Botó d'acció primària: vora de llautó, fons fosc amb sheen */
 html.admin-mode .ax__add {
-  flex: 1; min-width: 0;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 8px 10px; border-radius: 10px;
+  flex: 1.25 1 0; min-width: 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--o-space-15);
+  padding: var(--o-space-2) var(--o-space-25); border-radius: var(--o-space-25);
   border: 1px solid var(--ax-hair-gold);
   background: linear-gradient(
     180deg,
@@ -467,9 +481,9 @@ html.admin-mode .ax__add:active { transform: translateY(0); }
 
 /* Botó d'accés directe a la safata d'entrada — posició primària al capdamunt */
 html.admin-mode .ax__inbox {
-  flex: 1; min-width: 0;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 8px 10px; border-radius: 10px;
+  flex: .75 1 0; min-width: 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--o-space-15);
+  padding: var(--o-space-2) var(--o-space-25); border-radius: var(--o-space-25);
   border: 1px solid var(--ax-hair-gold);
   background: linear-gradient(
     180deg,
@@ -504,7 +518,7 @@ html.admin-mode .ax__inbox.is-on {
 /* ── Peu de la sidebar ────────────────────────────────────────────────────── */
 html.admin-mode .ax__sidefoot {
   margin-top: auto; display: flex; align-items: center; gap: 9px;
-  padding-top: 14px; border-top: 1px solid var(--ax-line);
+  padding-top: var(--o-space-35); border-top: 1px solid var(--ax-line);
   color: var(--ax-t3); font-size: 13px; font-weight: 650;
 }
 html.admin-mode .ax__sidefootname {
@@ -538,12 +552,21 @@ html.admin-mode .ax__page { animation: none; }
   html.admin-mode .ax__side {
     position: relative; width: auto; min-height: 0;
     flex-direction: row; flex-wrap: wrap; align-items: center;
-    padding: 10px 14px; gap: 10px;
+    padding: var(--o-space-25) var(--o-space-35); gap: var(--o-space-2);
     border-right: 0; border-bottom: 1px solid var(--ax-line);
   }
   html.admin-mode .ax__brand { height: auto; padding: 0; border-bottom: 0; }
-  html.admin-mode .ax__logo { width: 118px; height: 38px; }
-  html.admin-mode .ax__sidenav { flex-direction: row; overflow-x: auto; flex: 1; min-height: 0; min-width: 0; }
+  html.admin-mode .ax__logo { width: 118px; height: auto; }
+  html.admin-mode .ax__sidenav {
+    flex: 1 0 100%;
+    width: 100%;
+    flex-direction: row;
+    gap: var(--o-space-1);
+    overflow-x: auto;
+    min-height: 0;
+    min-width: 0;
+    padding-bottom: 1px;
+  }
   html.admin-mode .ax__sidegroup { flex: 0 0 auto; }
   html.admin-mode .ax__sidegroup.is-active > .ax__sideitem::before {
     left: 10px; right: 10px; top: auto; bottom: -1px;
@@ -552,7 +575,7 @@ html.admin-mode .ax__page { animation: none; }
   html.admin-mode .ax__sidesub { display: none; }
   html.admin-mode .ax__sidetop,
   html.admin-mode .ax__sidefoot { display: none; }
-  html.admin-mode .ax__sideitem { min-height: 38px; font-size: 13.5px; }
+  html.admin-mode .ax__sideitem { min-height: 36px; padding-inline: var(--o-space-25); font-size: var(--o-text-sm); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -584,7 +607,7 @@ html.admin-mode .ax__page { animation: none; }
        [<nav className="ap-detail-secnav">]  ← nav seccions opcional
      </div>
 
-   NO usar position:sticky inline, ni bd__header per a pàgines noves.
+   NO usar position:sticky inline, ni .ap-detail-header per a pàgines noves.
    ════════════════════════════════════════════════════════════════════════════ */
 html.admin-mode .ap-sticky-header {
   position: sticky;
@@ -599,11 +622,11 @@ html.admin-mode .ap-sticky-header {
 html.admin-mode .ap-detail-bar {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 8px 20px;
+  gap: var(--o-space-2);
+  padding: var(--o-space-2) var(--o-space-5);
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
@@ -611,7 +634,8 @@ html.admin-mode .ap-detail-bar {
 html.admin-mode .ap-detail-bar-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: var(--o-space-15);
   height: 32px;
   padding: 0 13px;
   border: 1px solid var(--ax-line2, rgba(255,255,255,0.18));
@@ -623,6 +647,7 @@ html.admin-mode .ap-detail-bar-btn {
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
+  max-width: 100%;
   transition: background 0.12s, color 0.12s, border-color 0.12s;
 }
 html.admin-mode .ap-detail-bar-btn:hover {
@@ -648,20 +673,25 @@ html.admin-mode .ap-detail-bar-actions {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
+  gap: var(--o-space-15);
+  flex: 0 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 html.admin-mode .ap-detail-hero {
-  padding: 12px 20px 10px;
-  border-bottom: 1px solid var(--ax-line, rgba(255,255,255,0.1));
+  /* Header canònic: consumeix els tokens de Studio (--head-*). */
+  padding: var(--head-pad);
+  border-bottom: var(--head-border);
+  background: var(--head-bg);
 }
 
 html.admin-mode .ap-detail-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: var(--o-space-2);
+  margin-bottom: var(--o-space-2);
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 700;
@@ -678,14 +708,15 @@ html.admin-mode .ap-detail-title {
   letter-spacing: -0.018em;
   line-height: 1;
   color: var(--t);
+  overflow-wrap: anywhere;
 }
 
 html.admin-mode .ap-detail-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  gap: var(--o-space-2);
+  margin-top: var(--o-space-25);
 }
 
 /* ── KPI cells (stats) ── */
@@ -699,10 +730,56 @@ html.admin-mode .ap-detail-stats {
   html.admin-mode .ap-detail-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
+@media (max-width: 560px) {
+  html.admin-mode .ap-detail-bar {
+    align-items: stretch;
+    padding-inline: 0.875rem;
+  }
+
+  html.admin-mode .ap-detail-bar > *,
+  html.admin-mode .ap-detail-bar-actions {
+    width: 100%;
+  }
+
+  html.admin-mode .ap-detail-bar-actions {
+    justify-content: flex-start;
+  }
+
+  html.admin-mode .ap-detail-bar-btn,
+  html.admin-mode .ap-detail-bar-actions > * {
+    flex: 1 1 min(100%, 9rem);
+  }
+
+  html.admin-mode .ap-detail-hero {
+    padding-inline: 0.875rem;
+  }
+
+  html.admin-mode .ap-detail-title {
+    font-size: var(--o-text-xl);
+    line-height: 1.08;
+  }
+
+  html.admin-mode .ap-detail-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html.admin-mode .ap-detail-stats-cell {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-inline: 0.875rem;
+  }
+
+  html.admin-mode .ap-detail-stats-label {
+    max-width: 100%;
+    white-space: normal;
+  }
+}
+
 /* Cel·la: label + valor en la mateixa línia (baseline) */
 html.admin-mode .ap-detail-stats-cell {
   min-width: 0;
-  padding: 8px 14px;
+  padding: var(--o-space-2) var(--o-space-35);
   border-right: 1px solid var(--ax-line, rgba(255,255,255,0.1));
   display: flex;
   align-items: baseline;
@@ -762,14 +839,14 @@ html.admin-mode .ap-detail-secnav::-webkit-scrollbar { display: none; }
 html.admin-mode .ap-detail-secnav-list {
   display: flex;
   justify-content: center;
-  gap: 4px;
-  padding: 6px 24px;
+  gap: var(--o-space-1);
+  padding: var(--o-space-15) var(--o-space-6);
   min-width: max-content;
   width: 100%;
 }
 html.admin-mode .ap-detail-secbtn {
   height: 38px;
-  padding: 0 16px;
+  padding: 0 var(--o-space-4);
   border: 0;
   border-radius: 8px;
   background: transparent;
@@ -791,18 +868,13 @@ html.admin-mode .ap-detail-secbtn--on {
 }
 
 /* ── Input de formulari canònic de l'admin (#961) ──────────────────────────
-   Font única. Abans la definició vivia a inbox.css com `.ix__forminput`, cosa
-   que creava una dependència creuada: /admin/dossiers consumeix la classe però
-   no carrega inbox.css → inputs sense estil garantit en càrrega directa.
-   Ara viu a la capa compartida (admin-shell, sempre carregada via layout).
-   `.ix__forminput` es manté com a àlies perquè els consumidors existents
-   funcionin sense tocar-los; NOU codi ha d'usar `.adm-input`. */
+   Font única a la capa compartida (admin-shell, sempre carregada via layout).
+   Codi nou ha d'usar `.adm-input`. */
 /* `.ap-input` (104 usos a l'admin) NO estava definida → els inputs queien al fons
    gris/blanc per defecte del navegador, desentonant del carbó. S'afegeix com a àlies
    del canònic perquè tot el repo consumeixi el mateix input de la sèrie (monocapa). */
 html.admin-mode .adm-input,
-html.admin-mode .ap-input,
-html.admin-mode .ix__forminput {
+html.admin-mode .ap-input {
   width: 100%;
   border: 1px solid var(--ax-line);
   border-radius: var(--o-r-md);
@@ -812,12 +884,15 @@ html.admin-mode .ix__forminput {
   font-size: var(--o-text-base);
   font-family: inherit;
   transition: border-color 140ms ease;
+  /* Target tàctil canònic (UX): input pitjable, ≥40px. Un sol lloc → tots els
+     inputs de l'admin. Evita també el zoom automàtic iOS (font-size ≥16px via token). */
+  min-height: 2.5rem;
 }
 html.admin-mode .adm-input--textarea,
-html.admin-mode .ix__forminput--textarea { resize: vertical; line-height: 1.6; }
+html.admin-mode textarea.adm-input { min-height: 4rem; }
+html.admin-mode .adm-input--textarea { resize: vertical; line-height: 1.6; }
 html.admin-mode .adm-input:focus,
-html.admin-mode .ap-input:focus,
-html.admin-mode .ix__forminput:focus { outline: none; border-color: var(--ax-hair-gold); }
+html.admin-mode .ap-input:focus { outline: none; border-color: var(--ax-hair-gold); }
 
 /* ── Hover canònic de fila/ítem interactiu (font única — hipersemblança):
    tota fila de taula, ítem de llista o card clicable de l'admin ressalta
@@ -826,21 +901,3255 @@ html.admin-mode .ix__forminput:focus { outline: none; border-color: var(--ax-hai
 html.admin-mode .adm-row-hover { transition: background-color .15s ease; }
 html.admin-mode .adm-row-hover:hover { background: var(--o-admin-hover); }
 
-/* ── Selector segmentat d'economia — estil canònic de Cristina (`.fx__view`):
+/* ── Selector segmentat d'economia — estil canònic de Cristina (`.ap-leads-view`):
    actiu = NEUTRE carbó elevat (no or, no blanc), idle = text apagat. Abans
    `admin-economia-tab--active/--idle` no existien → la pestanya activa sortia
    blanc absolut. ───────────────────────────────────────────────────────────── */
-html.admin-mode .admin-economia-tab {
-  border: 1px solid transparent;
+
+/* ── Semàfor de marge canònic (4 bandes, font única getMarginBand) ──────────
+   Excel·lent (verd) · Acceptable (ambre) · Vigilar (taronja) · Crític (vermell).
+   Consumit via getMarginTextClass()/getMarginBarClass() de lib/margin-utils. */
+html.admin-mode .o-margin-text--excellent { color: var(--o-success); }
+html.admin-mode .o-margin-text--acceptable { color: var(--o-warning); }
+html.admin-mode .o-margin-text--watch { color: var(--o-stage-new); }
+html.admin-mode .o-margin-text--critical { color: var(--o-danger); }
+html.admin-mode .o-margin-bar--excellent { background: var(--o-success); }
+html.admin-mode .o-margin-bar--acceptable { background: var(--o-warning); }
+html.admin-mode .o-margin-bar--watch { background: var(--o-stage-new); }
+html.admin-mode .o-margin-bar--critical { background: var(--o-danger); }
+
+/* ============================================================================
+   CANÒNIC — Sistema Lead Detail (.ap-ledger-*) i Leads Season (.ap-leads-*)
+   Migrats des de leads-design.css (canonització de prefixos de pàgina).
+   Reprodueixen l'aspecte EXACTE; consumeixen tokens d'orbita-tokens.css.
+============================================================================ */
+
+
+/* semàfor de cobrament — norma canònica CLAUDE.md */
+html.admin-mode .ap-leads-pay { flex: none; display: inline-block; vertical-align: middle; width: 9px; height: 9px; border-radius: 50%; background: var(--paycol); box-shadow: 0 0 0 2px color-mix(in oklab, var(--paycol) 20%, transparent); position: relative; cursor: default; }
+html.admin-mode .ap-leads-pay[data-pay="full"] { --paycol: var(--o-stage-won-strong); }
+html.admin-mode .ap-leads-pay[data-pay="part"] { --paycol: var(--gold); }
+html.admin-mode .ap-leads-pay[data-pay="none"] { --paycol: var(--o-stage-lost); }
+
+html.admin-mode .ap-leads-lostprompt-title { color: var(--t); }
+html.admin-mode .ap-leads-lostprompt-label { color: var(--t2); }
+
+/* ── PEÇA 1: Capçalera ─────────────────────────────────────────────────── */
+
+html.admin-mode .ap-leads-page { position: relative; z-index: 1; min-width: 0; }
+
+
+html.admin-mode .ap-leads-pagehead {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  /* Header canònic: consumeix els tokens de Studio (--head-*), com .ap-header
+     i .ap-detail-hero. Abans tenia padding/border/fons propis (no canònic). */
+  gap: var(--head-gap);
+  padding: var(--head-pad);
+  border-bottom: var(--head-border);
+  background: var(--head-bg);
+}
+html.admin-mode .ap-leads-tt { display: flex; flex-direction: column; gap: 3px; }
+/* eyebrow = coordenada de temporada */
+html.admin-mode .ap-leads-eyebrow {
+  font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi);
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--t3);
+}
+html.admin-mode .ap-leads-h1 {
+  margin: 0; font-family: var(--display); font-size: var(--o-text-2xl);
+  font-weight: var(--o-fw-xbold); letter-spacing: -0.018em; line-height: 1; color: var(--t);
+}
+html.admin-mode .ap-leads-charlie {
+  display: inline-block; vertical-align: middle; margin-left: var(--o-space-25);
+  padding: var(--o-space-05) var(--o-space-2); border-radius: 999px;
+  border: 1px solid var(--hair-gold); color: var(--gold);
+  background: color-mix(in oklab, var(--gold) 8%, transparent);
+  font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold);
+  letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
+}
+html.admin-mode .ap-leads-sub { font-family: var(--mono); font-size: var(--o-text-sm); color: var(--t3); letter-spacing: 0.015em; }
+html.admin-mode .ap-leads-headright { display: flex; align-items: center; gap: var(--o-space-3); flex-wrap: wrap; justify-content: flex-end; }
+
+html.admin-mode .ap-leads-add {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--o-space-2);
+  padding: var(--o-space-25) 15px; border-radius: var(--o-r-sm-2);
+  border: 1px solid var(--hair-gold);
   background: transparent;
-  color: var(--ax-t3);
+  color: var(--gold); font: inherit; font-size: var(--o-text-sm); font-weight: var(--o-fw-bold);
+  letter-spacing: 0.01em; cursor: pointer; text-decoration: none;
+  box-shadow: none;
+  transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
 }
-html.admin-mode .admin-economia-tab--idle:hover {
-  color: var(--ax-t);
-  background: color-mix(in oklab, var(--ax-t) 4%, transparent);
+html.admin-mode .ap-leads-add:hover {
+  transform: translateY(-1px); border-color: var(--gold);
+  background: color-mix(in oklab, var(--gold) 7%, transparent);
 }
-html.admin-mode .admin-economia-tab--active {
-  background: var(--ax-raised);
-  color: var(--ax-t);
-  box-shadow: inset 0 0 0 1px var(--ax-line2);
+html.admin-mode .ap-leads-add:active { transform: translateY(0); }
+html.admin-mode .ap-leads-addic { display: grid; place-items: center; color: currentColor; }
+html.admin-mode .ap-leads-addic svg { width: 15px; height: 15px; }
+
+/* segmented control = navegació neutra, sense or (or és per diners/accions) */
+html.admin-mode .ap-leads-cell:focus-visible,
+html.admin-mode .ap-leads-pipelead:focus-visible {
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  html.admin-mode .ap-leads-pagehead { align-items: flex-start; flex-direction: column; padding: var(--head-pad); }
+  html.admin-mode .ap-leads-h1 { font-size: var(--o-text-2xl); }
+  html.admin-mode .ap-leads-headright { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+}
+
+/* ── PEÇA 2: Zona Focus ──────────────────────────────────────────────────
+   La peça més important: "ara toca això". Surfície elevada, accent d'estat a
+   l'esquerra, label d'acció que crida abans que el nom.
+─────────────────────────────────────────────────────────────────────────── */
+
+html.admin-mode .ap-leads-focus {
+  margin: var(--o-space-2) var(--gutter) 0;
+  display: flex; align-items: stretch; gap: 0;
+  border: 1px solid var(--line2);
+  border-left: 3px solid var(--c);
+  border-radius: var(--o-r-md);
+  background: var(--panel);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+html.admin-mode .ap-leads-focusrow {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: var(--o-space-4);
+  padding: 5px var(--o-space-4);
+  border: 0; background: transparent; text-align: left; cursor: pointer; font: inherit;
+  transition: background 140ms ease;
+}
+html.admin-mode .ap-leads-focusrow:hover { background: var(--raised); }
+html.admin-mode .ap-leads-focusrow--empty { cursor: default; }
+html.admin-mode .ap-leads-focusrow--empty:hover { background: transparent; }
+
+html.admin-mode .ap-leads-dot {
+  flex: none; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c);
+  box-shadow: none;
+  position: relative; cursor: default;
+}
+
+/* Tooltips dins el calendari: surten cap avall per no quedar tallats pel scroll */
+html.admin-mode .ap-leads-grid [data-tip]::after {
+  bottom: auto; top: calc(100% + 6px);
+  transform: translateX(-50%) translateY(-3px);
+}
+html.admin-mode .ap-leads-grid [data-tip]:hover::after { transform: translateX(-50%) translateY(0); }
+
+html.admin-mode .ap-leads-focustext { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+
+/* label d'acció = senyal operatiu, en color d'estat */
+html.admin-mode .ap-leads-focusaction {
+  font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold);
+  letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.2;
+  color: var(--c);
+}
+
+/* nom del lead = protagonista */
+html.admin-mode .ap-leads-focusname {
+  font-family: var(--display); font-size: var(--o-text-md-2); font-weight: var(--o-fw-semi);
+  letter-spacing: 0.005em; line-height: 1.25; color: var(--t);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color 140ms ease;
+}
+html.admin-mode .ap-leads-focusrow:hover .ap-leads-focusname { color: var(--t); }
+
+/* meta = context retirat, una sola línia tènue */
+html.admin-mode .ap-leads-focusmeta {
+  font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3);
+  letter-spacing: 0.02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* valor = diners d'aquest bolo: l'or identifica, no crida. */
+html.admin-mode .ap-leads-focusval {
+  flex: none; align-self: center; padding: 0 18px 0 var(--o-space-15);
+  font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold);
+  color: var(--gold); letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+
+html.admin-mode .ap-leads-focuscycle {
+  flex: none; display: flex; align-items: stretch; gap: 0;
+  border-left: 1px solid var(--line);
+  background: color-mix(in oklab, var(--sunk) 50%, transparent);
+}
+html.admin-mode .ap-leads-focuscycle button {
+  display: grid; place-items: center; width: 36px; min-height: 52px;
+  border: 0; background: transparent; color: var(--t3); cursor: pointer;
+  transition: background 130ms ease, color 130ms ease;
+}
+html.admin-mode .ap-leads-focuscycle button:hover { background: color-mix(in oklab, var(--t) 6%, transparent); color: var(--t); }
+html.admin-mode .ap-leads-focuscycle button:active { background: color-mix(in oklab, var(--t) 10%, transparent); }
+html.admin-mode .ap-leads-focuscycle button svg { width: 15px; height: 15px; }
+html.admin-mode .ap-leads-focuscycle span {
+  display: grid; place-items: center; min-width: 38px;
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); color: var(--t3);
+  border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+  padding: 0 var(--o-space-1); line-height: 1; letter-spacing: 0.04em;
+}
+
+@media (max-width: 900px) {
+  html.admin-mode .ap-leads-focus { margin: var(--o-space-35) var(--o-space-4) 0; }
+  html.admin-mode .ap-leads-focusname { font-size: var(--o-text-lg); }
+  html.admin-mode .ap-leads-focusval { font-size: var(--o-text-md-2); padding: 0 var(--o-space-35); }
+}
+
+/* ── PEÇA 3: Mètriques ───────────────────────────────────────────────────
+   Stat → label sobre xifra. Tres mètriques neutres + la xifra que mana
+   (Temporada) destacada en or amb separador propi.
+─────────────────────────────────────────────────────────────────────────── */
+
+html.admin-mode .ap-leads-metrics {
+  display: flex; align-items: stretch;
+  margin: var(--o-space-25) var(--gutter) 0;
+  border: 1px solid var(--line);
+  border-radius: 0; overflow: hidden;
+  background: var(--panel);
+}
+html.admin-mode .ap-leads-metric {
+  flex: 1; min-width: 0;
+  display: flex; align-items: baseline; gap: var(--o-space-2);
+  padding: var(--o-space-15) var(--o-space-35);
+  border-right: 1px solid var(--line);
+}
+html.admin-mode .ap-leads-metric:last-child { border-right: 0; }
+
+html.admin-mode .ap-leads-metric span {
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-semi);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--t3); white-space: nowrap; flex: none;
+}
+html.admin-mode .ap-leads-metric b {
+  font-family: var(--display); font-size: var(--o-text-md-2); font-weight: var(--o-fw-bold);
+  color: var(--t); letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums; line-height: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* la xifra que mana — valor total de temporada: or + caixa pròpia */
+html.admin-mode .ap-leads-metric:last-child {
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+}
+html.admin-mode .ap-leads-metric:last-child span { color: var(--t3); }
+html.admin-mode .ap-leads-metric:last-child b {
+  color: var(--gold); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold);
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 900px) {
+  html.admin-mode .ap-leads-metrics { flex-wrap: wrap; margin: var(--o-space-25) var(--o-space-4) 0; }
+  html.admin-mode .ap-leads-metric { flex: 1 0 45%; border-bottom: 1px solid var(--line); }
+  html.admin-mode .ap-leads-metric:nth-child(even) { border-right: 0; }
+  html.admin-mode .ap-leads-metric:nth-last-child(-n+2) { border-bottom: 0; }
+}
+@media (max-width: 480px) {
+  html.admin-mode .ap-leads-metric { flex: 1 0 100%; border-right: 0; border-bottom: 1px solid var(--line); }
+  html.admin-mode .ap-leads-metric:last-child { border-bottom: 0; }
+}
+
+/* ── PEÇA 4: Calendari ─────────────────────────────────────────────────── */
+
+html.admin-mode .ap-leads-content { padding: var(--o-space-25) var(--gutter) 0; flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+/* Barra de mesos */
+html.admin-mode .ap-leads-calbar { display: flex; align-items: center; gap: var(--o-space-2); margin-bottom: var(--o-space-25); margin-top: 0; }
+html.admin-mode .ap-leads-calnav {
+  flex: none; display: grid; place-items: center; width: 38px; height: 38px;
+  border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
+  background: var(--panel);
+  color: var(--t2); cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease, transform 110ms ease;
+}
+html.admin-mode .ap-leads-calnav:hover:not(:disabled) { border-color: var(--line2); color: var(--t); }
+html.admin-mode .ap-leads-calnav:active:not(:disabled) { transform: translateY(1px); }
+html.admin-mode .ap-leads-calnav:disabled { opacity: 0.25; cursor: not-allowed; }
+html.admin-mode .ap-leads-calnav svg { width: 16px; height: 16px; }
+html.admin-mode .ap-leads-calmonths {
+  flex: 1; display: flex; align-items: center; gap: var(--o-space-05);
+  padding: var(--o-space-1); border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
+  background: var(--panel); overflow-x: auto; scrollbar-width: none;
+}
+html.admin-mode .ap-leads-calmonths::-webkit-scrollbar { display: none; }
+html.admin-mode .ap-leads-calchip {
+  flex: 1 0 auto; min-width: var(--o-space-12); padding: 7px var(--o-space-25);
+  border: 0; border-radius: var(--o-r-sm); background: transparent;
+  color: var(--t3); font: inherit; font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold);
+  text-transform: capitalize; cursor: pointer;
+  transition: background 130ms ease, color 130ms ease;
+}
+html.admin-mode .ap-leads-calchip:hover { color: var(--t2); background: var(--raised); }
+/* mes seleccionat dins la finestra: neutre destacat, NO or */
+html.admin-mode .ap-leads-calchip.is-on {
+  color: var(--t); background: var(--raised);
+  box-shadow: inset 0 0 0 1px var(--line2);
+}
+
+/* Grid de mesos */
+html.admin-mode .ap-leads-cal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--o-space-3); align-items: start; }
+/* El mes és un panell enfonsat i tancat: una superfície contenidora amb cantonada
+   visible, perquè les cel·les ocupades hi flotin clarament per damunt. */
+html.admin-mode .ap-leads-mon {
+  display: flex; flex-direction: column; gap: var(--o-space-2);
+  padding: var(--o-space-25) var(--o-space-25) var(--o-space-3);
+  border: 1px solid var(--line); border-radius: var(--o-r-md);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--panel) 82%, var(--sunk)) 0%, var(--sunk) 100%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--t) 4%, transparent),
+    0 1px 1px var(--ax-overlay-lg);
+}
+/* primer mes de la finestra = el més imminent */
+html.admin-mode .ap-leads-mon:first-child {
+  border-top-color: color-mix(in oklab, var(--gold) 42%, var(--line2));
+  box-shadow:
+    inset 0 1px 0 var(--gold),
+    inset 0 2px 0 color-mix(in oklab, var(--t) 3%, transparent),
+    0 1px 1px var(--ax-overlay-lg);
+}
+html.admin-mode .ap-leads-mon.is-future {
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--gold) 20%, transparent),
+    inset 0 2px 0 color-mix(in oklab, var(--t) 3%, transparent),
+    0 1px 1px var(--ax-overlay-lg);
+}
+html.admin-mode .ap-leads-monhead { display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-2); padding-bottom: var(--o-space-2); border-bottom: 1px solid var(--line2); }
+html.admin-mode .ap-leads-monhead h2 { margin: 0; font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-bold); letter-spacing: -0.006em; color: var(--t); }
+html.admin-mode .ap-leads-monmeta { flex: none; display: inline-flex; align-items: baseline; gap: var(--o-space-2); }
+html.admin-mode .ap-leads-moncount {
+  padding: var(--o-space-05) 7px;
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-pill);
+  background: color-mix(in oklab, var(--raised) 42%, transparent);
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--t3);
+}
+html.admin-mode .ap-leads-futurebadge {
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); padding: var(--o-space-05) 7px; border-radius: var(--o-r-xs);
+  background: color-mix(in oklab, var(--gold) 6%, transparent);
+  border: 1px solid color-mix(in oklab, var(--gold) 18%, transparent);
+  color: var(--t3); letter-spacing: 0.06em; text-transform: uppercase;
+}
+html.admin-mode .ap-leads-weekhead {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px;
+  padding: 0; border: 1px solid color-mix(in oklab, var(--line) 68%, transparent); border-bottom: 0;
+  border-radius: var(--o-r-sm-2) 8px 0 0; overflow: hidden;
+  background: color-mix(in oklab, var(--line) 68%, transparent);
+}
+html.admin-mode .ap-leads-gh {
+  padding: var(--o-space-15) var(--o-space-2);
+  background: color-mix(in oklab, var(--raised) 28%, var(--sunk));
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--t3); text-align: left;
+}
+/* La graella dibuixa explícitament les línies de calendari: les cel·les respiren
+   menys com a targetes i més com a dies dins d'una taula. */
+html.admin-mode .ap-leads-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(72px, auto);
+  gap: 1px; border: 1px solid color-mix(in oklab, var(--line) 68%, transparent); border-radius: 0 0 var(--o-space-2) var(--o-space-2);
+  overflow: visible; background: color-mix(in oklab, var(--line) 58%, transparent);
+}
+
+/* Cel·la de dia feiner — ocupa les 3 columnes del grid, intercalada cronològicament */
+html.admin-mode .ap-leads-cell--wd {
+  grid-column: 1 / -1;
+  min-height: 72px;
+  border-left: 3px solid color-mix(in oklab, var(--cell-t, var(--t)) 40%, transparent);
+  max-width: 360px;
+}
+
+/* Cel·la */
+html.admin-mode .ap-leads-cell { position: relative; display: flex; flex-direction: column; gap: 0; padding: var(--o-space-15) var(--o-space-2) 7px; border-radius: 0; text-align: left; font: inherit; }
+html.admin-mode .ap-leads-celltop { display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-1); }
+html.admin-mode .ap-leads-cellmeta { display: inline-flex; align-items: center; gap: var(--o-space-15); }
+/* dia = coordenada estructural, no informació: mono, petit, retirat */
+html.admin-mode .ap-leads-day { font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); letter-spacing: 0.01em; color: var(--t3); font-variant-numeric: tabular-nums; }
+html.admin-mode .ap-leads-cell.is-lead .ap-leads-day { color: color-mix(in oklab, var(--cell-t) 70%, transparent); }
+html.admin-mode .ap-leads-cell.is-out { opacity: 0.3; }
+
+/* lliure — un forat de veritat: cap vora pròpia, deixa veure el fons enfonsat del
+   mes. Només el número, retirat. El buit ha de SER buit. */
+html.admin-mode .ap-leads-cell.is-free {
+  border: 0;
+  background: color-mix(in oklab, var(--sunk) 91%, var(--panel));
+  transition: background 150ms ease;
+}
+html.admin-mode .ap-leads-cell.is-free .ap-leads-day { color: var(--t3); opacity: 0.48; }
+html.admin-mode .ap-leads-cell.is-free:hover { background: color-mix(in oklab, var(--t) 6%, transparent); }
+html.admin-mode .ap-leads-cell.is-free:hover .ap-leads-day { opacity: 0.7; }
+html.admin-mode .ap-leads-freelabel { display: none; }
+
+/* ocupada — superfície neutra; l'estat queda reduït a una nansa lateral llegible. */
+html.admin-mode .ap-leads-cell.is-lead { --cell-t: var(--t); }
+html.admin-mode .ap-leads-cell.is-lead {
+  min-width: 0;
+  margin: 1px;
+  padding: var(--o-space-15) var(--o-space-2) 7px var(--o-space-25);
+  border: 1px solid var(--line2);
+  border-left: 0;
+  border-radius: var(--o-r-sm-2);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--raised) 92%, var(--panel)) 0%,
+      var(--panel) 100%
+    );
+  box-shadow:
+    inset 4px 0 0 color-mix(in oklab, var(--c) 78%, var(--line2)),
+    inset 0 1px 0 color-mix(in oklab, var(--t) 6%, transparent),
+    0 6px 16px -12px var(--ax-overlay-md);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+html.admin-mode .ap-leads-cell.is-lead:hover {
+  z-index: 10;
+  transform: translateY(-1px);
+  background: var(--raised);
+  border-color: var(--line2);
+  box-shadow:
+    inset 4px 0 0 var(--c),
+    inset 0 1px 0 color-mix(in oklab, var(--t) 8%, transparent),
+    0 10px 22px -16px var(--ax-overlay-xl);
+}
+html.admin-mode .ap-leads-cell.is-lead.is-active {
+  border-color: color-mix(in oklab, var(--gold) 55%, var(--line2));
+  box-shadow:
+    inset 4px 0 0 var(--gold),
+    inset 0 1px 0 color-mix(in oklab, var(--t) 12%, transparent),
+    0 0 0 1px var(--gold),
+    0 8px 18px -6px var(--ax-overlay-xl);
+}
+/* Cel·la feiner activa — ring or sense extensió a tot l'ample */
+html.admin-mode .ap-leads-cell--wd.is-lead.is-active {
+  box-shadow:
+    inset 4px 0 0 var(--gold),
+    inset 0 1px 0 color-mix(in oklab, var(--t) 12%, transparent),
+    0 4px 14px -6px var(--ax-overlay-xl);
+}
+html.admin-mode .ap-leads-cell.is-reserva {
+  box-shadow:
+    inset 4px 0 0 var(--gold),
+    inset 0 1px 0 color-mix(in oklab, var(--t) 6%, transparent),
+    0 6px 16px -12px var(--ax-overlay-md);
+}
+html.admin-mode .ap-leads-cell--multi {
+  gap: 5px;
+  padding: 5px var(--o-space-15) var(--o-space-15) var(--o-space-25);
+}
+html.admin-mode .ap-leads-multiday {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-15);
+  min-width: 0;
+}
+html.admin-mode .ap-leads-multicount {
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+  color: color-mix(in oklab, var(--gold) 68%, var(--t2));
+  white-space: nowrap;
+}
+html.admin-mode .ap-leads-multiparts {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px;
+  min-width: 0;
+}
+html.admin-mode .ap-leads-cellpart {
+  display: flex; flex-direction: column; justify-content: center; gap: 1px;
+  min-width: 0; min-height: 32px;
+  padding: 3px 5px;
+  border: 1px solid color-mix(in oklab, var(--line2) 78%, transparent);
+  border-radius: var(--o-r-xs);
+  background: color-mix(in oklab, var(--raised) 78%, var(--panel));
+  text-align: left; cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+  border-left: 3px solid var(--c, var(--line2));
+}
+html.admin-mode .ap-leads-cellpart:hover,
+html.admin-mode .ap-leads-cellpart.is-active {
+  background: color-mix(in oklab, var(--t) 6%, var(--raised));
+  border-color: color-mix(in oklab, var(--gold) 45%, var(--line2));
+}
+html.admin-mode .ap-leads-partmain {
+  display: flex; align-items: center; justify-content: space-between; gap: 5px;
+  min-width: 0;
+}
+html.admin-mode .ap-leads-cellpart .ap-leads-lname {
+  flex: 1 1 auto; display: block;
+  font-size: var(--o-text-xs); font-weight: var(--o-fw-semi);
+  line-height: 1.15;
+}
+html.admin-mode .ap-leads-cellpart .ap-leads-cellfoot {
+  margin-top: 0; font-size: var(--o-text-micro); line-height: 1.15;
+}
+
+/* tipus — fora, el lloc és més útil */
+html.admin-mode .ap-leads-celltype { display: none; }
+/* nom = l'única info que importa: gran i llegible */
+html.admin-mode .ap-leads-lname { flex: 1; display: flex; align-items: center; font-family: var(--ui); font-size: var(--o-text-sm); font-weight: var(--o-fw-book); letter-spacing: 0.01em; line-height: 1.3; color: var(--t); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* peu = hora · lloc */
+html.admin-mode .ap-leads-cellfoot { margin-top: auto; font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi); color: var(--t2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html.admin-mode .ap-leads-nohour { color: color-mix(in oklab, var(--o-danger) 55%, var(--t3)); font-weight: var(--o-fw-book); font-style: italic; }
+
+html.admin-mode .ap-leads-placeholder { color: var(--t3); font-family: var(--mono); font-size: var(--o-text-sm); padding: 40px 0; }
+
+/* Empty state global del calendari — cap lead a tota la temporada */
+html.admin-mode .ap-leads-calempty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.5rem; text-align: center;
+  margin-bottom: 0.75rem; padding: clamp(1.5rem, 5vi, 2.75rem) 1rem;
+  border: 1px dashed var(--line2); border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--sunk) 45%, transparent);
+}
+html.admin-mode .ap-leads-calempty-tx {
+  font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold);
+  letter-spacing: -0.01em; color: var(--t2);
+}
+html.admin-mode .ap-leads-calempty-sub {
+  font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3);
+  margin-bottom: 0.35rem;
+}
+
+/* Valor € a la targeta del calendari — al celltop, sempre visible */
+html.admin-mode .ap-leads-cval { font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); color: color-mix(in oklab, var(--gold) 65%, var(--t2)); white-space: nowrap; flex: none; font-variant-numeric: tabular-nums; }
+
+/* Safata leads sense data — franja horitzontal compacta */
+html.admin-mode .ap-leads-nodate {
+  display: flex; align-items: center; gap: 0;
+  margin: var(--o-space-15) var(--gutter) 0;
+  border: 1px solid var(--line2);
+  border-radius: var(--o-r-sm-2); overflow: hidden;
+  background: var(--raised);
+}
+html.admin-mode .ap-leads-nodatehead {
+  display: flex; align-items: center; gap: var(--o-space-15); flex-shrink: 0;
+  padding: var(--o-space-15) var(--o-space-3); border-right: 1px solid var(--line2);
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-xbold);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--t2); white-space: nowrap;
+}
+html.admin-mode .ap-leads-nodatecount {
+  padding: 1px 5px; border-radius: var(--o-r-xs);
+  background: color-mix(in oklab, var(--t) 12%, transparent);
+  color: var(--t); font-size: var(--o-text-micro); font-weight: var(--o-fw-xbold);
+}
+html.admin-mode .ap-leads-nodatelist { display: flex; flex-direction: row; flex-wrap: wrap; flex: 1; }
+html.admin-mode .ap-leads-nodaterow {
+  display: flex; align-items: center; gap: var(--o-space-2);
+  padding: var(--o-space-15) var(--o-space-4); text-align: left; font: inherit;
+  border-right: 1px solid color-mix(in oklab, var(--o-stage-new) 15%, var(--line));
+  cursor: pointer; transition: background 120ms ease;
+}
+html.admin-mode .ap-leads-nodaterow:last-child { border-right: 0; }
+html.admin-mode .ap-leads-nodaterow:hover { background: color-mix(in oklab, var(--o-stage-new) 8%, transparent); }
+html.admin-mode .ap-leads-nodatename { font-family: var(--ui); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t); }
+html.admin-mode .ap-leads-nodatemeta { font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t2); }
+html.admin-mode .ap-leads-nodaterow .ap-leads-cval { font-size: var(--o-text-xs); margin-left: auto; }
+
+/* ── Anàlisi econòmica (fitxa completa del lead) ── */
+html.admin-mode .ap-ledger-econo {
+  margin: 0 var(--o-space-35) var(--o-space-35);
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-sm-2);
+  overflow: hidden;
+}
+html.admin-mode .ap-ledger-econohead {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--o-space-1) var(--o-space-25);
+  padding: var(--o-space-25) var(--o-space-35);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--ui); font-size: var(--o-text-md-2); font-weight: var(--o-fw-bold);
+  letter-spacing: 0; color: var(--t);
+}
+/* El títol no es trenca en columna estreta (#1752): si la nota no hi cap al
+   costat, salta SENCERA a la línia de sota (flex-wrap), no esmicola el títol. */
+html.admin-mode .ap-ledger-econohead > span:first-child { white-space: nowrap; }
+html.admin-mode .ap-ledger-econobadge {
+  padding: 0.0625rem 0.375rem; border-radius: var(--o-r-xs);
+  background: color-mix(in oklab, var(--gold) 12%, transparent);
+  color: var(--gold); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+}
+html.admin-mode .ap-ledger-econonote { font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t3); font-weight: var(--o-fw-normal); }
+/* Transport en viu al bolo del lead (#1345): tira compacta única — inputs km/integrants,
+   desglòs inline (vehicle/conductor/passatgers) i cost de ruta destacat. Compacta perquè
+   la fitxa càpiga a pantalla (#1346): tot en una fila, no 4 KPIs alts. */
+html.admin-mode .ap-ledger-travelbar {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--o-space-3);
+  padding: var(--o-space-25) var(--o-space-35);
+}
+html.admin-mode .ap-ledger-travel-field { display: flex; flex-direction: column; gap: var(--o-space-1); width: 5.5rem; }
+html.admin-mode .ap-ledger-travel-field > span { font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); }
+html.admin-mode .ap-ledger-travel-breakdown {
+  display: flex; flex-direction: column; gap: var(--o-space-1);
+  font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3);
+}
+html.admin-mode .ap-ledger-travel-breakdown strong { color: var(--t); font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-ledger-travel-total {
+  margin-left: auto; display: flex; flex-direction: column; align-items: flex-end;
+  padding-left: var(--o-space-3); border-left: 0.1875rem solid var(--o-stage-won-strong);
+}
+html.admin-mode .ap-ledger-travel-total[data-level="warn"] { border-left-color: var(--gold); }
+html.admin-mode .ap-ledger-travel-total[data-level="gold"] { border-left-color: var(--gold); }
+html.admin-mode .ap-ledger-travel-total[data-level="gold"] strong { color: var(--gold); }
+html.admin-mode .ap-ledger-travel-total strong { font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold); color: var(--t); }
+html.admin-mode .ap-ledger-travel-total-lbl { font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); }
+html.admin-mode .ap-ledger-travel-total-sub { font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
+html.admin-mode .ap-ledger-travel-note { font-size: var(--o-text-micro); color: var(--gold); max-width: 16rem; }
+/* Resum del pressupost (#1348/#1751): desplaçament + total en una mateixa banda.
+   Canon del lead: molta informació, però distribuïda per decisió i no per apilament. */
+html.admin-mode .ap-ledger-budget {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 19rem);
+  align-items: start;
+  gap: var(--o-space-3);
+  margin-top: var(--o-space-3); padding: var(--o-space-3) var(--o-space-3) 0;
+  border-top: 1px solid var(--line);
+}
+html.admin-mode .ap-ledger-budget--repartiment {
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  width: min(100%, 32rem);
+  padding-bottom: var(--o-space-3);
+  border: 1px solid color-mix(in oklab, var(--gold) 24%, var(--line));
+  border-radius: var(--o-r-md);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 5%, transparent), transparent 40%),
+    color-mix(in oklab, var(--panel) 88%, transparent);
+}
+html.admin-mode .ap-ledger-decision-row {
+  display: grid;
+  grid-template-columns: minmax(0, 32rem) minmax(15rem, 1fr);
+  align-items: center;
+  justify-content: center;
+  gap: var(--o-space-3);
+  margin: var(--o-space-3) var(--o-space-3) 0;
+}
+html.admin-mode .ap-ledger-decision-row:not([data-has-collaborator="true"]) {
+  grid-template-columns: minmax(0, 1fr);
+}
+html.admin-mode .ap-ledger-decision-row > .ap-ledger-budget--repartiment {
+  width: 100%;
+  margin-top: 0;
+  align-self: stretch;
+}
+
+/* ── DESPLAÇAMENT: peça de logística neta (rediseny #1377) ── */
+html.admin-mode .ap-ledger-trip {
+  display: flex; flex-direction: column; gap: var(--o-space-25);
+  min-width: 0;
+  padding: var(--o-space-25);
+  border: 1px solid var(--line2); border-radius: var(--o-r-md);
+  background: var(--panel);
+}
+html.admin-mode .ap-ledger-trip-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding-bottom: var(--o-space-2); border-bottom: 1px solid var(--line);
+}
+html.admin-mode .ap-ledger-trip-title {
+  font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-semi); color: var(--t);
+}
+html.admin-mode .ap-ledger-trip-badge {
+  font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3);
+  padding: 0.1rem var(--o-space-15); border-radius: 999px; border: 1px solid var(--line2);
+  background: var(--raised); white-space: nowrap;
+}
+/* Els grups (Ruta / Equip) s'adapten a l'amplada disponible sense allargar la fitxa. */
+html.admin-mode .ap-ledger-trip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--o-space-2) var(--o-space-3);
+}
+html.admin-mode .ap-ledger-trip-group { min-width: 0; }
+html.admin-mode .ap-ledger-trip-grouplbl {
+  display: block; margin-bottom: var(--o-space-15);
+  font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold);
+  text-transform: uppercase; letter-spacing: 0.09em; color: var(--gold);
+}
+html.admin-mode .ap-ledger-trip-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--o-space-2);
+}
+html.admin-mode .ap-ledger-trip-field { display: flex; flex-direction: column; gap: var(--o-space-1); min-width: 0; }
+html.admin-mode .ap-ledger-trip-field--wide { grid-column: 1 / -1; }
+html.admin-mode .ap-ledger-trip-field > span {
+  font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3);
+}
+/* Inputs amb fons propi que RESSALTA sobre el panell (abans es fonien). */
+html.admin-mode .ap-ledger-trip .adm-input {
+  background: var(--o-admin-canvas); border: 1px solid var(--line2);
+}
+html.admin-mode .ap-ledger-trip .adm-input:focus { border-color: var(--gold); }
+/* Camp en LECTURA (reserva): mateix aspecte que l'input però sense edició (heretat del lead). */
+html.admin-mode .ap-ledger-trip-ro {
+  display: flex; align-items: center;
+  min-height: var(--o-row-h); padding: var(--o-space-1) var(--o-space-2);
+  border: 1px solid var(--line2); border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--o-admin-canvas) 70%, transparent);
+  font-family: var(--ui); font-size: var(--o-text-sm); color: var(--ax-t);
+}
+html.admin-mode .ap-ledger-trip-ro[data-alarm="true"] {
+  border-color: color-mix(in oklab, var(--o-danger) 55%, var(--line));
+  color: var(--o-danger); font-weight: var(--o-fw-bold);
+}
+html.admin-mode .ap-ledger-trip-note {
+  margin: 0; font-family: var(--ui); font-size: var(--o-text-xs); color: var(--t3); line-height: 1.45;
+}
+html.admin-mode .ap-ledger-trip-controls {
+  border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--raised) 24%, transparent);
+  overflow: hidden;
+}
+html.admin-mode .ap-ledger-trip-controls-summary {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-15) var(--o-space-2);
+  cursor: pointer; list-style: none;
+  font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2);
+}
+html.admin-mode .ap-ledger-trip-controls-summary::-webkit-details-marker { display: none; }
+html.admin-mode .ap-ledger-trip-controls-summary::after {
+  content: '+'; color: var(--t3); font-family: var(--mono); font-size: var(--o-text-xs);
+}
+html.admin-mode .ap-ledger-trip-controls[open] .ap-ledger-trip-controls-summary::after { content: '-'; }
+html.admin-mode .ap-ledger-trip-controls[data-always-visible="true"] .ap-ledger-trip-controls-summary::after { content: none; }
+html.admin-mode .ap-ledger-trip-controls[data-always-visible="true"] .ap-ledger-trip-controls-summary { cursor: default; }
+html.admin-mode .ap-ledger-trip-controls-summary > span { margin-right: auto; font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-ledger-trip-controls-summary > strong {
+  font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); font-weight: var(--o-fw-semi);
+}
+html.admin-mode .ap-ledger-trip-controls .ap-ledger-trip-grid {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  padding: 0 var(--o-space-2) var(--o-space-2);
+}
+html.admin-mode .ap-ledger-trip-formula {
+  display: grid;
+  gap: var(--o-space-1);
+  padding: var(--o-space-2);
+  border: 1px solid color-mix(in oklab, var(--gold) 16%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--gold) 4%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  line-height: 1.45;
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-trip-formula > span { min-width: 0; overflow-wrap: anywhere; }
+html.admin-mode .ap-ledger-trip-formula--settlement { grid-column: 1 / -1; }
+html.admin-mode .ap-ledger-route-compact {
+  display: grid;
+  gap: var(--o-space-15);
+  padding: var(--o-space-25);
+  border: 1px solid color-mix(in oklab, var(--gold) 20%, var(--line));
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--gold) 5%, var(--panel));
+}
+html.admin-mode .ap-ledger-route-compact-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--o-space-3);
+}
+html.admin-mode .ap-ledger-route-compact-head > span {
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+html.admin-mode .ap-ledger-route-compact-head > strong {
+  font-family: var(--display);
+  font-size: var(--o-text-xl);
+  color: var(--gold);
+}
+html.admin-mode .ap-ledger-route-compact > p {
+  margin: 0;
+  font-family: var(--ui);
+  font-size: var(--o-text-xs);
+  color: var(--t2);
+}
+html.admin-mode .ap-ledger-route-compact-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--o-space-1);
+}
+html.admin-mode .ap-ledger-route-compact-items > span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--o-space-1);
+  padding: 0.18rem var(--o-space-15);
+  border: 1px solid color-mix(in oklab, var(--line) 72%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--raised) 50%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-route-compact-items strong { color: var(--t); font-weight: var(--o-fw-semi); }
+/* Alarma de transport (#1377): més de 2 persones viatjant → vermell + avís. */
+html.admin-mode .ap-ledger-trip-badge[data-alarm="true"] {
+  color: var(--o-danger); border-color: color-mix(in oklab, var(--o-danger) 45%, var(--line));
+  background: color-mix(in oklab, var(--o-danger) 12%, var(--panel)); font-weight: var(--o-fw-semi);
+}
+html.admin-mode .ap-ledger-trip-field .adm-input[data-alarm="true"] {
+  border-color: color-mix(in oklab, var(--o-danger) 55%, var(--line));
+  color: var(--o-danger); font-weight: var(--o-fw-bold);
+}
+html.admin-mode .ap-ledger-trip-alarm {
+  margin: 0; display: flex; align-items: flex-start; gap: var(--o-space-1);
+  padding: var(--o-space-15) var(--o-space-2);
+  border: 1px solid color-mix(in oklab, var(--o-danger) 40%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--o-danger) 10%, transparent);
+  font-family: var(--ui); font-size: var(--o-text-micro); line-height: 1.5;
+  color: color-mix(in oklab, var(--o-danger) 85%, var(--t));
+}
+/* La suma = panell destacat (or subtil): és la sortida clau del bolo abans de contractar. */
+html.admin-mode .ap-ledger-budget-sum {
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) auto minmax(0, 1.14fr);
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--o-space-15) var(--o-space-2);
+  align-self: start;
+  min-width: 0;
+  padding: var(--o-space-25);
+  border: 1px solid color-mix(in oklab, var(--gold) 26%, var(--line));
+  border-radius: var(--o-r-md);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 8%, transparent), transparent 55%),
+    color-mix(in oklab, var(--gold) 5%, var(--panel));
+}
+html.admin-mode .ap-ledger-budget-op {
+  display: inline-grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  place-items: center;
+  justify-self: center;
+  align-self: center;
+  border: 1px solid color-mix(in oklab, var(--gold) 34%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--gold) 8%, transparent);
+  color: var(--gold);
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-bold);
+  line-height: 1;
+}
+html.admin-mode .ap-ledger-budget-op--equals {
+  display: none;
+  color: var(--t2);
+}
+html.admin-mode .ap-ledger-budget-row {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.08rem;
+  padding: 0;
+  text-align: center;
+  font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t2);
+}
+html.admin-mode .ap-ledger-budget-row > span { display: flex; flex-direction: column; align-items: center; gap: 0.05rem; font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2); }
+html.admin-mode .ap-ledger-budget-row > span > em { font-style: normal; color: var(--t3); font-size: var(--o-text-micro); font-family: var(--mono); }
+html.admin-mode .ap-ledger-budget-row--travel > span > em { white-space: nowrap; }
+/* Diners a dalt: l'import mana i l'etiqueta queda a sota, com una mètrica compacta. */
+html.admin-mode .ap-ledger-budget-row > strong { order: -1; flex: 0 0 auto; min-width: 0; text-align: center; color: var(--t); font-weight: var(--o-fw-bold); font-family: var(--ui); font-size: var(--o-text-lg); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+html.admin-mode .ap-ledger-budget-row--total {
+    grid-column: 1 / -1;
+    padding-top: var(--o-space-2);
+    border-top: 1px solid color-mix(in oklab, var(--gold) 22%, var(--line));
+  }
+html.admin-mode .ap-ledger-budget-row--total > span { font-family: var(--ui); font-size: var(--o-text-md); font-weight: var(--o-fw-semi); color: var(--t); }
+html.admin-mode .ap-ledger-budget-row--total > strong { font-size: var(--o-text-2xl); font-weight: var(--o-fw-xbold); color: var(--gold); line-height: 1; }
+html.admin-mode .ap-ledger-budget-row--travel > strong { color: var(--gold); }
+  /* ── REPARTIMENT de la ruta: <details> plegable i discret (rediseny #1377) ── */
+html.admin-mode .ap-ledger-route-settlement {
+  grid-column: 1 / -1;
+  padding: 0;
+  border: 1px solid color-mix(in oklab, var(--line) 75%, transparent);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--raised) 40%, transparent);
+  overflow: hidden;
+}
+html.admin-mode .ap-ledger-route-settlement-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--o-space-3);
+  padding: var(--o-space-15) var(--o-space-3);
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
+  color: var(--t2);
+  transition: color 130ms ease, background 130ms ease;
+}
+html.admin-mode .ap-ledger-route-settlement-head::-webkit-details-marker { display: none; }
+html.admin-mode .ap-ledger-route-settlement-head::after {
+  content: '▾'; margin-left: var(--o-space-1); color: var(--t3); font-size: var(--o-text-xs);
+  transition: transform 130ms ease;
+}
+html.admin-mode .ap-ledger-route-settlement[open] .ap-ledger-route-settlement-head::after { transform: rotate(180deg); }
+html.admin-mode .ap-ledger-route-settlement-head:hover { color: var(--t); background: color-mix(in oklab, var(--raised) 30%, transparent); }
+html.admin-mode .ap-ledger-route-settlement-head > span { margin-right: auto; }
+html.admin-mode .ap-ledger-route-settlement-head > strong {
+  color: var(--gold);
+  font-family: var(--display);
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+html.admin-mode .ap-ledger-route-settlement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--o-space-15);
+  padding: 0 var(--o-space-3) var(--o-space-25);
+}
+html.admin-mode .ap-ledger-route-settlement-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--o-space-2);
+  min-width: 0;
+  padding: var(--o-space-15) var(--o-space-2);
+  border-top: 1px solid color-mix(in oklab, var(--line) 58%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+}
+html.admin-mode .ap-ledger-route-settlement-row > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.08rem;
+  color: var(--t2);
+}
+html.admin-mode .ap-ledger-route-settlement-row > span > em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-style: normal;
+  color: var(--t3);
+  font-size: var(--o-text-micro);
+}
+html.admin-mode .ap-ledger-route-settlement-row > strong {
+  flex: 0 0 auto;
+  color: var(--t);
+  font-weight: var(--o-fw-semi);
+}
+html.admin-mode .ap-ledger-bolo-actions--full { display: flex; flex-wrap: wrap; align-items: center; gap: var(--o-space-25); padding: var(--o-space-35); }
+html.admin-mode .ap-ledger-decision-row .ap-ledger-bolo-actions--full {
+  margin: 0;
+  padding: var(--o-space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--raised) 36%, transparent);
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+}
+html.admin-mode .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-btn {
+  justify-content: center;
+}
+html.admin-mode .ap-ledger-bolo-next {
+  display: flex;
+  flex: 1 1 16rem;
+  min-width: min(100%, 14rem);
+  flex-direction: column;
+  gap: 0.12rem;
+  color: var(--t2);
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
+  line-height: var(--o-lh-snug);
+}
+html.admin-mode .ap-ledger-bolo-next strong {
+  color: var(--t);
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0;
+  text-transform: none;
+}
+html.admin-mode .ap-ledger-bolo-next em {
+  color: var(--t2);
+  font-style: normal;
+}
+@media (max-width: 720px) {
+  html.admin-mode .ap-ledger-budget { grid-template-columns: minmax(0, 1fr); }
+  html.admin-mode .ap-ledger-budget-sum { grid-template-columns: minmax(0, 0.86fr) auto minmax(0, 1.14fr); }
+  html.admin-mode .ap-ledger-decision-row { grid-template-columns: minmax(0, 1fr); }
+  html.admin-mode .ap-ledger-decision-row > .ap-ledger-budget--repartiment { align-self: start; }
+  html.admin-mode .ap-ledger-decision-row .ap-ledger-bolo-actions--full { justify-content: flex-start; }
+  html.admin-mode .ap-ledger-trip-controls .ap-ledger-trip-grid { grid-template-columns: minmax(0, 1fr); }
+  html.admin-mode .ap-ledger-bolo-actions--full .ap-btn { flex: 1 1 100%; justify-content: center; }
+}
+
+/* Panell «Repartiment del bolo» a la fitxa de reserva (#1355): qui cobra què,
+   per persona + element a element. Presentació del motor `computeBoloRepartiment`. */
+html.admin-mode .ap-rep { display: flex; flex-direction: column; gap: var(--o-space-3); font-family: var(--ui); }
+html.admin-mode .ap-ledger-budget--repartiment .ap-rep,
+html.admin-mode .ap-ledger-budget--repartiment .ap-rep-partner { width: 100%; }
+html.admin-mode .ap-rep-purpose {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: var(--o-space-2);
+  padding: var(--o-space-2) var(--o-space-25);
+  border: 1px solid color-mix(in oklab, var(--gold) 18%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--gold) 5%, transparent);
+  font-family: var(--ui); font-size: var(--o-text-xs); color: var(--t2);
+}
+html.admin-mode .ap-rep-purpose strong {
+  color: var(--gold); font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+html.admin-mode .ap-rep-people { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--o-space-2); }
+html.admin-mode .ap-rep-person {
+  display: flex; flex-direction: column; gap: var(--o-space-05);
+  padding: var(--o-space-2) var(--o-space-25);
+  border: 1px solid var(--line); border-radius: var(--o-r-md); background: var(--panel);
+}
+html.admin-mode .ap-rep-person[data-owner="true"] {
+  border-color: color-mix(in oklab, var(--gold) 30%, var(--line));
+  background: color-mix(in oklab, var(--gold) 6%, var(--panel));
+}
+html.admin-mode .ap-rep-person-name { font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); }
+html.admin-mode .ap-rep-person-amount { font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-xbold); color: var(--t); }
+html.admin-mode .ap-rep-person[data-owner="true"] .ap-rep-person-amount { color: var(--gold); }
+html.admin-mode .ap-rep-person-sub { font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
+html.admin-mode .ap-rep-partner { display: flex; flex-direction: column; gap: var(--o-space-2); }
+html.admin-mode .ap-ledger-budget--repartiment .ap-rep-partner-card { width: 100%; }
+html.admin-mode .ap-rep-formula-details {
+  border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--raised) 20%, transparent);
+  overflow: hidden;
+}
+html.admin-mode .ap-rep-formula-summary {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-15) var(--o-space-2);
+  cursor: pointer; list-style: none;
+  font-family: var(--ui); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t2);
+}
+html.admin-mode .ap-rep-formula-summary::-webkit-details-marker { display: none; }
+html.admin-mode .ap-rep-formula-summary::after { content: '+'; color: var(--t3); font-family: var(--mono); }
+html.admin-mode .ap-rep-formula-details[open] .ap-rep-formula-summary::after { content: '-'; }
+html.admin-mode .ap-rep-formula-details .ap-rep-formula {
+  margin: 0 var(--o-space-2) var(--o-space-2);
+}
+html.admin-mode .ap-rep-formula {
+  display: grid;
+  gap: var(--o-space-1);
+  padding: var(--o-space-2);
+  border: 1px solid color-mix(in oklab, var(--gold) 16%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--gold) 4%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  line-height: 1.45;
+  color: var(--t3);
+}
+html.admin-mode .ap-rep-formula > span { min-width: 0; overflow-wrap: anywhere; }
+html.admin-mode .ap-rep-partner-card {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--raised) 46%, transparent);
+  padding: 0;
+  overflow: hidden;
+}
+html.admin-mode .ap-rep-partner-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-3);
+  padding: var(--o-space-3) var(--o-space-35);
+  cursor: pointer; list-style: none;
+}
+html.admin-mode .ap-rep-partner-head::-webkit-details-marker { display: none; }
+html.admin-mode .ap-rep-partner-head::after {
+  content: '+'; color: var(--t3); font-family: var(--mono); font-size: var(--o-text-xs);
+}
+html.admin-mode .ap-rep-partner-card[open] .ap-rep-partner-head::after { content: '-'; }
+html.admin-mode .ap-rep--preproposal .ap-rep-partner-head::after {
+  content: '';
+  display: none;
+}
+html.admin-mode .ap-rep-partner-line {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+}
+html.admin-mode .ap-rep-partner-head > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.16rem;
+  font-family: var(--ui); font-size: var(--o-text-md-2); font-weight: var(--o-fw-bold); color: var(--t);
+  letter-spacing: 0;
+  line-height: var(--o-lh-tight);
+}
+html.admin-mode .ap-rep-partner-head > span > em {
+  font-style: normal;
+  color: var(--t2);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
+  text-transform: none;
+  letter-spacing: 0;
+}
+html.admin-mode .ap-rep-partner-head > strong {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.08rem;
+  font-family: var(--ui); font-size: var(--o-text-xl-2); font-weight: var(--o-fw-bold); color: var(--t);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+html.admin-mode .ap-rep-partner-head > strong > em {
+  font-style: normal;
+  color: var(--t2);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
+  line-height: var(--o-lh-tight);
+}
+html.admin-mode .ap-rep-partner-lines { display: grid; gap: var(--o-space-15); padding: 0 var(--o-space-35) var(--o-space-35); }
+html.admin-mode .ap-rep-partner-line {
+  padding-top: var(--o-space-2);
+  border-top: 1px solid color-mix(in oklab, var(--line) 64%, transparent);
+  font-family: var(--ui); font-size: var(--o-text-md);
+  line-height: var(--o-lh-snug);
+}
+html.admin-mode .ap-rep-partner-line > span {
+  display: flex; min-width: 0; flex-direction: column; gap: 0.12rem; color: var(--t);
+  font-weight: var(--o-fw-semi);
+}
+html.admin-mode .ap-rep-partner-line > span > em {
+  font-style: normal; color: var(--t2); font-size: var(--o-text-sm); font-weight: var(--o-fw-normal);
+}
+html.admin-mode .ap-rep-partner-line > strong {
+  flex: 0 0 auto; font-size: var(--o-text-lg); font-weight: var(--o-fw-bold); color: var(--t);
+}
+html.admin-mode .ap-rep-partner-line[data-settlement="true"] > strong { color: var(--gold); }
+html.admin-mode .ap-rep-detail {
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--raised) 35%, transparent);
+  overflow: hidden;
+}
+html.admin-mode .ap-rep-detail-summary {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-2) var(--o-space-25);
+  cursor: pointer; list-style: none;
+  font-family: var(--ui); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t2);
+}
+html.admin-mode .ap-rep-detail-summary::-webkit-details-marker { display: none; }
+html.admin-mode .ap-rep-detail-summary::after {
+  content: '+'; color: var(--gold); font-family: var(--mono); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold);
+}
+html.admin-mode .ap-rep-detail[open] .ap-rep-detail-summary::after { content: '-'; }
+html.admin-mode .ap-rep-detail-summary > span { margin-right: auto; }
+html.admin-mode .ap-rep-detail-summary > strong {
+  color: var(--t3); font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+html.admin-mode .ap-rep-detail-body {
+  display: flex; flex-direction: column; gap: var(--o-space-3);
+  padding: 0 var(--o-space-25) var(--o-space-25);
+}
+html.admin-mode .ap-rep-table { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--o-r-md); overflow: hidden; }
+html.admin-mode .ap-rep-row {
+  display: grid; grid-template-columns: minmax(0, 2fr) repeat(5, minmax(4rem, 1fr));
+  gap: var(--o-space-2); align-items: baseline;
+  padding: var(--o-space-15) var(--o-space-25);
+  border-top: 1px solid color-mix(in oklab, var(--line) 55%, transparent);
+  font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t2);
+}
+html.admin-mode .ap-rep-row > span:not(.ap-rep-cell-label) { text-align: right; }
+html.admin-mode .ap-rep-row--head { border-top: 0; background: var(--raised); color: var(--t3); font-size: var(--o-text-micro); text-transform: uppercase; letter-spacing: 0.08em; }
+html.admin-mode .ap-rep-cell-label { color: var(--t); font-family: var(--ui); }
+html.admin-mode .ap-rep-row [data-owner="true"] { color: var(--gold); }
+html.admin-mode .ap-rep-cell-liquidacio { color: var(--gold); }
+html.admin-mode .ap-rep-cell-marge { color: var(--t); font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-rep-totals { display: flex; flex-wrap: wrap; gap: var(--o-space-4); justify-content: flex-end; padding-top: var(--o-space-2); border-top: 1px solid var(--line); }
+html.admin-mode .ap-rep-totals > div { display: flex; flex-direction: column; align-items: flex-end; gap: var(--o-space-05); font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); }
+html.admin-mode .ap-rep-totals > div > strong { font-family: var(--display); font-size: var(--o-text-md); color: var(--t); }
+html.admin-mode .ap-rep-totals--orbita > strong { color: var(--gold); font-size: var(--o-text-lg); }
+@media (max-width: 640px) {
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: var(--o-space-25);
+    border-top-color: color-mix(in oklab, var(--line) 72%, transparent);
+  }
+  html.admin-mode .ap-rep-row--head { display: none; }
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) > span {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--o-space-3);
+    min-width: 0;
+    padding-block: 0.18rem;
+    text-align: right;
+  }
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) > span::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    max-width: 45%;
+    font-family: var(--mono);
+    font-size: var(--o-text-micro);
+    color: var(--t3);
+    text-align: left;
+  }
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) > .ap-rep-cell-label {
+    display: block;
+    margin-bottom: var(--o-space-05);
+    padding-bottom: var(--o-space-15);
+    border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent);
+    text-align: left;
+    white-space: normal;
+  }
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) > .ap-rep-cell-label::before {
+    display: block;
+    max-width: none;
+    margin-bottom: 0.08rem;
+  }
+  html.admin-mode .ap-rep-totals {
+    justify-content: stretch;
+    gap: var(--o-space-2);
+  }
+  html.admin-mode .ap-rep-totals > div {
+    flex: 1 1 8rem;
+    align-items: flex-start;
+  }
+}
+
+html.admin-mode .ap-ledger-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.625rem, 1fr));
+}
+html.admin-mode .ap-ledger-kpi {
+  min-height: 6.5rem;
+  padding: 1rem 1.125rem;
+  border-right: thin solid var(--line);
+  border-bottom: thin solid var(--line);
+  border-left: 0.1875rem solid transparent;
+}
+html.admin-mode .ap-ledger-kpi:last-child { border-right: 0; }
+html.admin-mode .ap-ledger-kpi[data-level="critical"] { border-left-color: var(--o-danger); background: color-mix(in oklab, var(--o-danger) 6%, transparent); }
+html.admin-mode .ap-ledger-kpi[data-level="warn"]     { border-left-color: var(--gold); }
+html.admin-mode .ap-ledger-kpi[data-level="ok"]       { border-left-color: var(--o-stage-won-strong); }
+html.admin-mode .ap-ledger-kpi[data-level="gold"]     { border-left-color: var(--gold); background: linear-gradient(90deg, color-mix(in oklab, var(--gold) 10%, transparent), transparent 78%); }
+html.admin-mode .ap-ledger-kpi[data-level="info"]     { border-left-color: var(--line2); }
+html.admin-mode .ap-ledger-kpi[style*="--fxd-kpi-hue"] {
+  border-left-color: hsl(var(--fxd-kpi-hue) 86% 57%);
+  background:
+    linear-gradient(90deg, hsl(var(--fxd-kpi-hue) 86% 57% / 0.16), transparent 78%),
+    color-mix(in oklab, var(--panel) 92%, transparent);
+}
+html.admin-mode .ap-ledger-kpi-val {
+  font-family: var(--display); font-size: var(--o-text-xl-2); font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.02em; line-height: 1; color: var(--t);
+}
+html.admin-mode .ap-ledger-kpi[data-level="critical"] .ap-ledger-kpi-val { color: var(--o-danger); }
+html.admin-mode .ap-ledger-kpi[data-level="warn"]     .ap-ledger-kpi-val { color: var(--gold); }
+html.admin-mode .ap-ledger-kpi[data-level="ok"]       .ap-ledger-kpi-val { color: var(--o-stage-won-strong); }
+html.admin-mode .ap-ledger-kpi[data-level="gold"]     .ap-ledger-kpi-val { color: var(--gold); }
+html.admin-mode .ap-ledger-kpi[style*="--fxd-kpi-hue"] .ap-ledger-kpi-val { color: hsl(var(--fxd-kpi-hue) 90% 62%); }
+html.admin-mode .ap-ledger-kpi-lbl { margin-top: 0.4375rem; font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi); letter-spacing: 0; color: var(--t2); }
+html.admin-mode .ap-ledger-kpi-sub { margin-top: 0.25rem; font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); line-height: 1.35; }
+
+/* Indicador de preu — semàfor €/h vs. mercat */
+html.admin-mode .ap-ledger-pricehint {
+  display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap;
+  padding: var(--o-space-15) var(--o-space-35); border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi);
+  background: transparent;
+}
+html.admin-mode .ap-ledger-pricehint[data-level="critical"] { color: var(--o-danger); background: color-mix(in oklab, var(--o-danger) 8%, transparent); }
+html.admin-mode .ap-ledger-pricehint[data-level="warn"]     { color: var(--gold); }
+html.admin-mode .ap-ledger-pricehint[data-level="ok"]       { color: color-mix(in oklab, var(--o-stage-won-strong) 80%, var(--t2)); }
+html.admin-mode .ap-ledger-ph-rate { font-size: var(--o-text-sm); }
+html.admin-mode .ap-ledger-ph-dev  { opacity: 0.85; }
+html.admin-mode .ap-ledger-ph-rec  { opacity: 0.55; margin-left: auto; }
+
+/* Meteo hero — línia data + badge a la fitxa ràpida */
+
+/* ── PEÇA 5: Pipeline ──────────────────────────────────────────────────── */
+
+html.admin-mode .ap-leads-pipeline { display: grid; grid-template-columns: repeat(4, minmax(230px, 1fr)); gap: var(--o-space-3); align-items: start; }
+
+html.admin-mode .ap-leads-lane {
+  display: flex; flex-direction: column; gap: 0; min-height: 200px;
+  padding: 0; border: 1px solid var(--line);
+  border-radius: var(--o-r-md); overflow: hidden;
+  background: var(--panel);
+  transition: background 150ms ease, border-color 150ms ease;
+}
+html.admin-mode .ap-leads-lane.is-drop { border-color: var(--gold); background: color-mix(in oklab, var(--gold) 4%, var(--panel)); }
+html.admin-mode .ap-leads-lanehead { display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-3); padding: var(--o-space-3) var(--o-space-35) var(--o-space-25); border-bottom: 1px solid var(--line); }
+html.admin-mode .ap-leads-lanetitle { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+/* la capçalera de columna porta el seu propi punt d'estat: identifica la fase abans de llegir res */
+html.admin-mode .ap-leads-lanehead h2 { margin: 0; font-family: var(--mono); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold); letter-spacing: 0.1em; text-transform: uppercase; color: var(--t2); display: inline-flex; align-items: center; gap: var(--o-space-2); }
+html.admin-mode .ap-leads-lanehead h2::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+html.admin-mode .ap-leads-lanetitle small { font-family: var(--display); font-size: var(--o-text-xl); font-weight: var(--o-fw-bold); line-height: 1; color: color-mix(in oklab, var(--gold) 72%, var(--t)); letter-spacing: -0.012em; font-variant-numeric: tabular-nums; }
+html.admin-mode .ap-leads-lanehead > span {
+  min-width: var(--o-space-6); padding: var(--o-space-05) var(--o-space-15);
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-pill);
+  background: color-mix(in oklab, var(--raised) 42%, transparent);
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+  color: var(--t3); text-align: center; font-variant-numeric: tabular-nums;
+}
+html.admin-mode .ap-leads-lanecards { display: flex; flex-direction: column; gap: var(--o-space-15); padding: 7px; }
+html.admin-mode .ap-leads-lanecards .ap-leads-laneempty { margin: 0; }
+
+/* EMPTY STATE de lane — una columna buida no és una caixa morta.
+   "Nou" buit = crida a l'acció en or. Les altres = una nota tènue i retirada. */
+html.admin-mode .ap-leads-laneempty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--o-space-1);
+  min-height: 96px; margin: var(--o-space-25); padding: 18px var(--o-space-3);
+  border: 1px dashed var(--line2); border-radius: var(--o-r-sm-2);
+  background: color-mix(in oklab, var(--sunk) 40%, transparent);
+  text-align: center; text-decoration: none;
+}
+html.admin-mode .ap-leads-laneemptytx { font-family: var(--mono); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--t3); }
+html.admin-mode .ap-leads-laneemptysub { font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); letter-spacing: 0.03em; color: var(--t3); opacity: 0.75; }
+html.admin-mode .ap-leads-laneemptyic { display: grid; place-items: center; width: 30px; height: 30px; margin-bottom: var(--o-space-05); border-radius: 50%; border: 1px solid var(--hair-gold); color: var(--gold); transition: transform 140ms ease, background 140ms ease, border-color 140ms ease; }
+html.admin-mode .ap-leads-laneemptyic svg { width: 15px; height: 15px; }
+
+/* "Nou" buit = CTA viva: vora d'or, hover que s'encén */
+html.admin-mode .ap-leads-laneempty--cta {
+  border-color: var(--hair-gold);
+  background: color-mix(in oklab, var(--gold) 4%, var(--sunk));
+  cursor: pointer; transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+html.admin-mode .ap-leads-laneempty--cta .ap-leads-laneemptytx { color: color-mix(in oklab, var(--gold) 55%, var(--t)); }
+html.admin-mode .ap-leads-laneempty--cta:hover { border-color: var(--gold); background: color-mix(in oklab, var(--gold) 8%, var(--sunk)); transform: translateY(-1px); }
+html.admin-mode .ap-leads-laneempty--cta:hover .ap-leads-laneemptyic { transform: rotate(90deg); background: color-mix(in oklab, var(--gold) 12%, transparent); border-color: var(--gold); }
+
+/* CARD — prima, 2 línies, info essencial */
+html.admin-mode .ap-leads-pipelead {
+  display: flex; flex-direction: column; gap: 5px;
+  padding: var(--o-space-25) var(--o-space-3) var(--o-space-25) var(--o-space-35);
+  border: 1px solid var(--line);
+  border-left: 0;
+  border-radius: var(--o-r-md);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--raised) 64%, var(--panel)) 0%, var(--panel) 100%);
+  color: var(--t2); font: inherit; text-align: left; cursor: pointer;
+  box-shadow:
+    inset 4px 0 0 color-mix(in oklab, var(--c) 78%, var(--line2)),
+    inset 0 1px 0 color-mix(in oklab, var(--t) 5%, transparent),
+    0 5px 14px -13px var(--ax-overlay-xl);
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+html.admin-mode .ap-leads-pipelead:first-child { border-top: 1px solid var(--line); }
+html.admin-mode .ap-leads-pipelead:hover {
+  transform: translateY(-1px);
+  background: var(--raised);
+  border-color: var(--line2);
+  box-shadow:
+    inset 4px 0 0 var(--c),
+    inset 0 1px 0 color-mix(in oklab, var(--t) 7%, transparent),
+    0 10px 24px -18px var(--ax-overlay-xl);
+}
+html.admin-mode .ap-leads-pipelead.is-active {
+  background: color-mix(in oklab, var(--gold) 5%, var(--raised));
+  border-color: color-mix(in oklab, var(--gold) 45%, var(--line2));
+  box-shadow:
+    inset 4px 0 0 var(--gold),
+    inset 0 1px 0 color-mix(in oklab, var(--t) 7%, transparent),
+    0 10px 24px -18px var(--ax-overlay-xl);
+}
+html.admin-mode .ap-leads-pipelead.is-dragging { opacity: 0.4; cursor: grabbing; }
+html.admin-mode .ap-leads-pipelead.is-pending { opacity: 0.5; pointer-events: none; }
+html.admin-mode .ap-leads-pipelead[draggable="true"] { cursor: grab; }
+html.admin-mode .ap-leads-pipelead:last-child { border-bottom: 1px solid var(--line); }
+
+/* línia 1: nom + valor */
+html.admin-mode .ap-leads-leadtop { display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2); }
+html.admin-mode .ap-leads-pipelead b {
+  min-width: 0; flex: 1;
+  font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-bold); letter-spacing: 0;
+  color: var(--t); line-height: 1.2;
+  display: flex; align-items: center; gap: var(--o-space-15);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+html.admin-mode .ap-leads-pipelead b .ap-leads-pay { flex: none; }
+html.admin-mode .ap-leads-leadtop strong {
+  flex: none; font-family: var(--display); font-size: var(--o-text-base); font-weight: var(--o-fw-bold);
+  color: var(--gold); font-variant-numeric: tabular-nums; white-space: nowrap;
+  letter-spacing: 0;
+}
+
+/* línia 2: data · lloc */
+html.admin-mode .ap-leads-leadwhen {
+  font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-book);
+  color: var(--t3); letter-spacing: 0.01em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* kicker — visible però petit */
+html.admin-mode .ap-leads-leadkicker {
+  display: flex; align-items: center; gap: 5px;
+  font-size: var(--o-text-micro); font-weight: var(--o-fw-semi); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--t3); margin-bottom: 3px;
+}
+html.admin-mode .ap-leads-leadmeta { display: none; }
+
+/* icona de prioritat dins el kicker */
+html.admin-mode .ap-leads-pri { font-style: normal; font-size: var(--o-text-xs); line-height: 1; }
+html.admin-mode .ap-leads-pri[data-pri="URGENT"] { color: var(--o-danger, var(--o-danger)); }
+html.admin-mode .ap-leads-pri[data-pri="HIGH"]   { color: var(--o-stage-new); }
+
+/* accent lateral per prioritat HIGH/URGENT */
+html.admin-mode .ap-leads-pipelead[data-priority="HIGH"]   { box-shadow: inset 3px 0 0 var(--o-stage-new); }
+html.admin-mode .ap-leads-pipelead[data-priority="URGENT"] { box-shadow: inset 3px 0 0 var(--o-danger, var(--o-danger)); }
+html.admin-mode .ap-leads-pipelead[data-priority="HIGH"].is-active,
+html.admin-mode .ap-leads-pipelead[data-priority="URGENT"].is-active { box-shadow: inset 3px 0 0 var(--c), inset 4px 0 0 var(--c); }
+
+/* label de pagament a les targetes */
+html.admin-mode .ap-leads-paylabel {
+  display: inline-block; margin-top: 5px;
+  font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 1px var(--o-space-15); border-radius: var(--o-r-xs);
+}
+html.admin-mode .ap-leads-paylabel[data-pay="full"] { color: var(--o-success); background: color-mix(in oklab, var(--o-success) 12%, transparent); }
+html.admin-mode .ap-leads-paylabel[data-pay="part"] { color: var(--o-stage-new); background: color-mix(in oklab, var(--o-stage-new) 12%, transparent); }
+html.admin-mode .ap-leads-paylabel[data-pay="none"] { color: var(--o-danger, var(--o-danger)); background: color-mix(in oklab, var(--o-danger, var(--o-danger)) 10%, transparent); }
+
+/* perdut — retirat */
+html.admin-mode .ap-leads-pipelead[data-stage="perdut"] { opacity: 0.56; }
+html.admin-mode .ap-leads-pipelead[data-stage="perdut"]:hover { opacity: 0.85; }
+
+/* ── PEÇA 5b: Llista ───────────────────────────────────────────────────── */
+
+html.admin-mode .ap-leads-list { border: 1px solid var(--line); border-radius: var(--o-r-sm); overflow-x: auto; overflow-y: hidden; background: var(--panel); -webkit-overflow-scrolling: touch; }
+html.admin-mode .ap-leads-listtbl { width: 100%; min-width: 760px; border-collapse: collapse; font-size: var(--o-text-sm); }
+html.admin-mode .ap-leads-listtbl thead th { padding: var(--o-space-3) var(--o-space-4); text-align: left; font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.14em; text-transform: uppercase; color: var(--t3); border-bottom: 1px solid var(--line2); }
+html.admin-mode .ap-leads-listtbl thead th.ap-leads-listnum { text-align: right; }
+html.admin-mode .ap-leads-listrow { cursor: pointer; border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent); transition: background 120ms ease; }
+html.admin-mode .ap-leads-listrow:last-child { border-bottom: 0; }
+html.admin-mode .ap-leads-listrow:hover { background: var(--raised); }
+html.admin-mode .ap-leads-listrow td { padding: 13px var(--o-space-4); color: var(--t); vertical-align: middle; }
+/* nansa cromàtica esquerra — la fila parla el mateix idioma que focus/cel·la/card */
+html.admin-mode .ap-leads-listrow td:first-child { box-shadow: inset 3px 0 0 color-mix(in oklab, var(--c) 55%, transparent); }
+html.admin-mode .ap-leads-listrow:hover td:first-child { box-shadow: inset 3px 0 0 color-mix(in oklab, var(--c) 82%, transparent); }
+html.admin-mode .ap-leads-listrow td em { color: var(--t3); font-style: italic; }
+html.admin-mode .ap-leads-listdate { font-family: var(--mono); font-size: var(--o-text-2xs); color: var(--t2); white-space: nowrap; }
+html.admin-mode .ap-leads-listname { font-family: var(--display); font-weight: var(--o-fw-bold); letter-spacing: -0.01em; display: flex; align-items: center; gap: var(--o-space-2); }
+html.admin-mode .ap-leads-listname .ap-leads-dot, html.admin-mode .ap-leads-listname .ap-leads-pay { width: 8px; height: 8px; flex: none; }
+html.admin-mode .ap-leads-listphase { font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); display: flex; align-items: center; gap: var(--o-space-15); }
+html.admin-mode .ap-leads-listphase[data-pay="full"] { color: var(--o-success); }
+html.admin-mode .ap-leads-listphase[data-pay="part"] { color: var(--o-stage-new); }
+html.admin-mode .ap-leads-listphase[data-pay="none"] { color: var(--o-danger, var(--o-danger)); }
+html.admin-mode .ap-leads-listnum { text-align: right; font-family: var(--mono); font-weight: var(--o-fw-bold); color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
+html.admin-mode .ap-ledger-shade { position: absolute; inset: 0; background: var(--ax-overlay-xl); backdrop-filter: blur(3px); animation: fx-fade 120ms ease both; }
+html.admin-mode .ap-ledger-sheet {
+  --ap-ledger-drawer-gutter: var(--o-space-5);
+  --ap-ledger-drawer-band-y: var(--o-space-25);
+  --ap-ledger-drawer-section-gap: var(--o-space-15);
+  --ap-ledger-drawer-title-gap: var(--o-space-2);
+  position: relative; z-index: 1;
+  width: min(780px, calc(100vw - 28px)); height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column;
+  border-left: 1px solid var(--line2);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--c) 7%, var(--panel)) 0%, var(--canvas) 360px);
+  box-shadow: -28px 0 80px -40px var(--ax-overlay-xl);
+  animation: fx-slide 160ms ease both;
+}
+html.admin-mode .ap-ledger-bar {
+  position: sticky; top: 0; z-index: 2; flex-shrink: 0;
+  display: flex; align-items: center; gap: var(--o-space-25);
+  padding: var(--o-space-2) var(--o-space-35);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--canvas) 90%, transparent);
+  backdrop-filter: blur(10px);
+}
+html.admin-mode .ap-ledger-back,
+html.admin-mode .ap-ledger-close,
+html.admin-mode .ap-ledger-full {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 34px; padding: 0 var(--o-space-3);
+  border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
+  background: var(--panel); color: var(--t2);
+  font: inherit; font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); text-decoration: none; cursor: pointer;
+  transition: border-color 130ms ease, color 130ms ease, background 130ms ease;
+}
+html.admin-mode .ap-ledger-back:hover,
+html.admin-mode .ap-ledger-close:hover,
+html.admin-mode .ap-ledger-full:hover { border-color: var(--line2); color: var(--t); background: var(--raised); }
+html.admin-mode .ap-ledger-back span,
+html.admin-mode .ap-ledger-close svg,
+html.admin-mode .ap-ledger-full svg,
+html.admin-mode .ap-ledger-btn svg { width: 14px; height: 14px; }
+html.admin-mode .ap-ledger-full { margin-left: auto; }
+html.admin-mode .ap-ledger-close { width: 34px; padding: 0; }
+
+html.admin-mode .ap-ledger-hero {
+  padding: 11px var(--o-space-5) 9px; border-bottom: 1px solid var(--line);
+  overflow: hidden; flex-shrink: 0;
+  max-width: 100%;
+}
+html.admin-mode .ap-ledger-kicker {
+  display: inline-flex; align-items: center; gap: var(--o-space-2);
+  margin-bottom: var(--o-space-15);
+  font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold);
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--c);
+}
+html.admin-mode .ap-ledger-kicker::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+html.admin-mode .ap-ledger-hero-main {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--o-space-3);
+  min-width: 0;
+}
+html.admin-mode .ap-ledger-hero h2 {
+  margin: 0; max-width: 100%; min-width: 0;
+  font-family: var(--display); font-size: var(--o-text-2xl); font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.022em; line-height: 1; color: var(--t);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+html.admin-mode .ap-ledger-hero-meta {
+  display: block;
+  margin-top: var(--o-space-1);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  color: var(--t3);
+  text-transform: uppercase;
+}
+html.admin-mode .ap-ledger-hero p {
+  display: block; margin: 3px 0 0; width: 100%; max-width: 100%;
+  font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); line-height: 1.3;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ap-ledger-lost / ap-ledger-wxrow / ap-ledger-wxdate — usats per LeadsSeasonClient (no pel header de la fitxa) */
+html.admin-mode .ap-ledger-wxrow { display: flex; align-items: center; gap: 0.44rem; margin-top: 0.3rem; }
+html.admin-mode .ap-ledger-wxdate { font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi); color: var(--t3); }
+html.admin-mode .ap-ledger-lost {
+  display: inline-flex; margin-top: var(--o-space-3); padding: 5px 9px;
+  border: 1px solid color-mix(in oklab, var(--c) 34%, var(--line));
+  border-radius: var(--o-r-pill);
+  background: color-mix(in oklab, var(--c) 10%, transparent);
+  font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold);
+  color: var(--t2);
+}
+
+html.admin-mode .ap-ledger-stats {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--panel) 60%, transparent);
+  flex-shrink: 0;
+}
+html.admin-mode .ap-ledger-stats div {
+  min-width: 0; padding: var(--o-space-2) var(--o-space-3); border-right: 1px solid var(--line);
+  display: flex; align-items: baseline; gap: 7px;
+}
+html.admin-mode .ap-ledger-stats div:last-child { border-right: 0; }
+html.admin-mode .ap-ledger-stats span {
+  flex: none; display: block; margin-bottom: 0;
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--t3);
+}
+html.admin-mode .ap-ledger-stats b {
+  min-width: 0; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: var(--display); font-size: var(--o-text-md-2); font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.015em; color: var(--t);
+}
+html.admin-mode .ap-ledger-stats div:first-child b { color: var(--gold); }
+
+html.admin-mode .ap-ledger-grid {
+  flex: 1 1 0; min-height: 0;
+  display: grid; grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, .82fr) minmax(0, 1.08fr) auto;
+  gap: var(--o-space-2); padding: var(--o-space-3) var(--o-space-35); overflow: visible;
+}
+html.admin-mode .ap-ledger-panel {
+  position: relative; z-index: 1;
+  min-width: 0; min-height: 0; padding: var(--o-space-3) var(--o-space-35); overflow: hidden;
+  border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
+  background: var(--panel);
+  display: flex; flex-direction: column; gap: var(--o-space-15);
+}
+html.admin-mode .ap-ledger-panel:focus-within { z-index: 10; overflow: visible; }
+html.admin-mode .ap-ledger-panel .ap-ledger-rows {
+  overflow: hidden; flex: 1 1 auto; min-height: 0;
+}
+html.admin-mode .ap-ledger-panel .ap-ledger-rows::-webkit-scrollbar { width: 3px; }
+html.admin-mode .ap-ledger-panel .ap-ledger-rows::-webkit-scrollbar-thumb { background: var(--line2); border-radius: var(--o-r-xs); }
+html.admin-mode .ap-ledger-panel--wide { grid-column: span 2; }
+html.admin-mode .ap-ledger-footer {
+  border-top: 1px solid var(--line);
+  padding: var(--o-space-25) var(--o-space-35);
+  flex-shrink: 0;
+}
+
+/* Panell dividit en 2 meitats */
+html.admin-mode .ap-ledger-panel--split {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  padding: 0;
+}
+html.admin-mode .ap-ledger-split-col {
+  flex: 1; min-width: 0;
+  padding: var(--o-space-35);
+  display: flex; flex-direction: column;
+}
+html.admin-mode .ap-ledger-split-col--sep {
+  border-left: 1px solid var(--line);
+}
+
+/* Stagepick en columna vertical */
+html.admin-mode .ap-ledger-stagepick--col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--o-space-1);
+  margin-top: var(--o-space-1);
+}
+html.admin-mode .ap-ledger-panel--booking {
+  grid-column: 1 / -1;
+  border-color: color-mix(in oklab, var(--gold) 24%, var(--line));
+  background: color-mix(in oklab, var(--gold) 5%, var(--panel));
+}
+html.admin-mode .ap-ledger-panelhead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-25); margin-bottom: 7px; }
+html.admin-mode .ap-ledger-panelhead span {
+  font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold);
+  letter-spacing: -0.01em; line-height: 1.1; color: var(--t);
+}
+html.admin-mode .ap-ledger-panelhead strong {
+  font-family: var(--display); font-size: var(--o-text-md-2); font-weight: var(--o-fw-xbold);
+  color: var(--gold); letter-spacing: -0.01em;
+}
+html.admin-mode .ap-ledger-summary { margin: 0; color: var(--t2); font-size: var(--o-text-sm); line-height: 1.42; }
+
+html.admin-mode .ap-ledger-rows { display: grid; gap: 0; margin: 0; }
+html.admin-mode .ap-ledger-rows div { display: flex; justify-content: space-between; gap: var(--o-space-2); padding: var(--o-space-1) 0; border-bottom: 1px solid var(--line); min-width: 0; overflow: hidden; }
+html.admin-mode .ap-ledger-rows div:has(.ap-ledger-editinput) { overflow: visible; }
+html.admin-mode .ap-ledger-rows div:last-child { border-bottom: 0; }
+html.admin-mode .ap-ledger-rows dt {
+  flex: none; font-family: var(--ui); font-size: var(--o-text-xs); font-weight: var(--o-fw-normal);
+  letter-spacing: 0; color: var(--t3); white-space: nowrap;
+}
+html.admin-mode .ap-ledger-rows dd {
+  min-width: 0; margin: 0; text-align: right;
+  color: var(--t); font-size: var(--o-text-md); font-weight: var(--o-fw-semi);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+html.admin-mode .ap-ledger-rows dd:has(.ap-ledger-editinput) { overflow: visible; }
+
+html.admin-mode .ap-ledger-actions { display: flex; flex-wrap: wrap; gap: var(--o-space-2); margin-top: 13px; }
+html.admin-mode .ap-ledger-sheet .ap-ledger-actions--contact .ap-ledger-btn,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-actions--contact .ap-ledger-btn { flex: 1 1 132px; }
+html.admin-mode .ap-ledger-sheet .ap-ledger-actions--contact,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-actions--contact {
+  gap: 7px;
+  margin-top: 7px;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-actions--contact .ap-ledger-btn,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-actions--contact .ap-ledger-btn {
+  min-height: 32px;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows div,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows div {
+  align-items: flex-start;
+  gap: var(--o-space-25);
+  overflow: hidden;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows div:has(.ap-ledger-editinput),
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows div:has(.ap-ledger-editinput) {
+  overflow: visible;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows dd,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows dd {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows dd:has(.ap-ledger-editinput),
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows dd:has(.ap-ledger-editinput) {
+  overflow: visible;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact,
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--event,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--contact,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--event {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--o-space-15) var(--o-space-25);
+  flex: 0 0 auto;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact div,
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--event div,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--contact div,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--event div {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--o-space-05);
+  padding: 0 0 5px;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact dt,
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--event dt,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--contact dt,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--event dt {
+  font-family: var(--ui); font-size: var(--o-text-xs); font-weight: var(--o-fw-normal); color: var(--t3);
+  line-height: 1.1;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact dd,
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--event dd,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--contact dd,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--event dd {
+  text-align: left;
+  font-family: var(--ui); font-size: var(--o-text-base); font-weight: var(--o-fw-semi);
+  color: var(--t); line-height: 1.25;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows .ap-ledger-row--long,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows .ap-ledger-row--long {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--o-space-1);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--event .ap-ledger-row--long,
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact .ap-ledger-row--long,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--event .ap-ledger-row--long,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--contact .ap-ledger-row--long { grid-column: 1 / -1; }
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows .ap-ledger-row--long dd,
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows .ap-ledger-row--long dd {
+  text-align: left;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+html.admin-mode .ap-ledger-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 36px; padding: 0 var(--o-space-3);
+  border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
+  background: var(--raised); color: var(--t2);
+  font: inherit; font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); text-decoration: none; cursor: pointer;
+  transition: border-color 130ms ease, color 130ms ease, background 130ms ease, transform 120ms ease;
+}
+html.admin-mode .ap-ledger-btn:hover:not(:disabled) { border-color: var(--line2); color: var(--t); transform: translateY(-1px); }
+html.admin-mode .ap-ledger-btn:disabled { opacity: .45; cursor: not-allowed; }
+html.admin-mode .ap-ledger-btn--danger {
+  border-color: color-mix(in oklab, var(--o-stage-lost) 45%, var(--line));
+  color: var(--o-stage-lost);
+  background: color-mix(in oklab, var(--o-stage-lost) 8%, var(--raised));
+}
+html.admin-mode .ap-ledger-btn--danger:hover:not(:disabled) { border-color: var(--o-stage-lost); color: var(--o-stage-lost); background: color-mix(in oklab, var(--o-stage-lost) 14%, var(--raised)); }
+html.admin-mode .ap-ledger-btn--primary {
+  border-color: var(--hair-gold);
+  background: color-mix(in oklab, var(--gold) 10%, var(--raised));
+  color: var(--gold);
+}
+html.admin-mode .ap-ledger-btn--primary:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+html.admin-mode .ap-ledger-btn--ghost { background: transparent; }
+html.admin-mode .ap-ledger-btn--whatsapp {
+  border-color: color-mix(in oklab, var(--o-success) 44%, var(--line));
+  background: color-mix(in oklab, var(--o-success) 12%, var(--raised));
+  color: var(--o-success);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--o-success) 9%, transparent);
+}
+html.admin-mode .ap-ledger-btn--whatsapp:hover:not(:disabled) {
+  border-color: var(--o-success);
+  color: var(--o-success);
+  background: color-mix(in oklab, var(--o-success) 16%, var(--raised));
+}
+/* Drawer lead: contacte amb codis d'acció reconeixibles.
+   WhatsApp verd; Correu blau d'acció admin. */
+html.admin-mode .ap-ledger-btn--mail {
+  border-color: color-mix(in oklab, var(--o-info) 44%, var(--line));
+  background: color-mix(in oklab, var(--o-info) 12%, var(--raised));
+  color: var(--o-info);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--o-info) 9%, transparent);
+}
+html.admin-mode .ap-ledger-btn--mail:hover:not(:disabled) {
+  border-color: var(--o-info);
+  color: var(--o-info);
+  background: color-mix(in oklab, var(--o-info) 16%, var(--raised));
+}
+
+html.admin-mode .ap-ledger-sheet {
+  overflow-y: auto;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-bar {
+  min-height: 34px;
+  padding: var(--o-space-1) var(--o-space-3);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-back,
+html.admin-mode .ap-ledger-sheet .ap-ledger-close,
+html.admin-mode .ap-ledger-sheet .ap-ledger-full {
+  min-height: 28px;
+  padding-inline: var(--o-space-2);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-close {
+  width: 30px;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-hero {
+  padding: var(--o-space-25) var(--o-space-35) var(--o-space-15);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-kicker {
+  margin-bottom: var(--o-space-05);
+  font-size: var(--o-text-micro);
+}
+html.admin-mode .ap-ledger-stage-selectwrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  min-width: 8.25rem;
+  max-width: 10rem;
+  border: 1px solid var(--line2);
+  border-radius: var(--o-r-pill);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--t) 8%, transparent), transparent),
+    color-mix(in oklab, var(--raised) 92%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--t) 6%, transparent),
+    0 var(--o-space-05) var(--o-space-2) color-mix(in oklab, var(--ax-overlay-xl) 18%, transparent);
+  transition: border-color 130ms ease, background 130ms ease, box-shadow 130ms ease;
+}
+html.admin-mode .ap-ledger-stage-selectwrap::after {
+  content: "";
+  position: absolute;
+  right: 0.55rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-right: 1px solid var(--t2);
+  border-bottom: 1px solid var(--t2);
+  transform: rotate(45deg) translateY(-0.12rem);
+  pointer-events: none;
+  opacity: 0.95;
+}
+html.admin-mode .ap-ledger-stage-select {
+  appearance: none;
+  width: 100%;
+  min-height: 1.65rem;
+  padding: 0 1.5rem 0 var(--o-space-3);
+  border: 0;
+  border-radius: var(--o-r-pill);
+  background: transparent;
+  color: var(--t);
+  font: inherit;
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+html.admin-mode .ap-ledger-stage-selectwrap:hover {
+  border-color: color-mix(in oklab, var(--gold) 42%, var(--line2));
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 8%, transparent), transparent),
+    color-mix(in oklab, var(--raised) 94%, transparent);
+}
+html.admin-mode .ap-ledger-stage-select:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+html.admin-mode .ap-ledger-stage-select:focus-visible {
+  outline: none;
+}
+html.admin-mode .ap-ledger-stage-selectwrap:focus-within {
+  border-color: color-mix(in oklab, var(--gold) 56%, var(--line2));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--gold) 9%, transparent),
+    0 0 0 2px color-mix(in oklab, var(--gold) 16%, transparent);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-hero h2 {
+  font-size: var(--o-text-xl-2);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div {
+  padding: var(--o-space-15) var(--o-space-25);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats b {
+  font-size: var(--o-text-md);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div:nth-child(1) b,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div:nth-child(2) b,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div:nth-child(3) b {
+  color: var(--gold);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div:nth-child(1) {
+  background: color-mix(in oklab, var(--gold) 7%, transparent);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-grid {
+  flex: 0 0 auto;
+  grid-template-rows: none;
+  gap: var(--o-space-25);
+  padding: var(--o-space-3) var(--o-space-35) var(--o-space-4);
+}
+html.admin-mode .ap-ledger-ops {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--o-space-2);
+  padding: var(--o-space-3) var(--o-space-35) var(--o-space-1);
+}
+html.admin-mode .ap-ledger-ops > div {
+  min-width: 0;
+  min-height: 92px;
+  padding: var(--o-space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-sm-2);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 6%, transparent), transparent),
+    var(--panel);
+}
+html.admin-mode .ap-ledger-ops span,
+html.admin-mode .ap-ledger-ops em {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  font-style: normal;
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-ops span {
+  margin-bottom: var(--o-space-1);
+  font-weight: var(--o-fw-bold);
+  text-transform: uppercase;
+}
+html.admin-mode .ap-ledger-ops strong {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--display);
+  font-size: var(--o-text-md);
+  font-weight: var(--o-fw-bold);
+  line-height: 1.1;
+  color: var(--t);
+}
+html.admin-mode .ap-ledger-ops > div:first-child strong,
+html.admin-mode .ap-ledger-ops > div:nth-child(4) strong {
+  color: var(--gold);
+}
+html.admin-mode .ap-ledger-contract-list {
+  display: grid;
+  gap: var(--o-space-15);
+}
+html.admin-mode .ap-ledger-contract-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--o-space-2);
+  min-width: 0;
+  padding-bottom: var(--o-space-15);
+  border-bottom: 1px solid var(--line);
+}
+html.admin-mode .ap-ledger-contract-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+html.admin-mode .ap-ledger-contract-row span,
+html.admin-mode .ap-ledger-contract-row strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html.admin-mode .ap-ledger-contract-row span {
+  color: var(--t);
+  font-weight: var(--o-fw-semi);
+}
+html.admin-mode .ap-ledger-contract-row strong {
+  flex: 0 1 auto;
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  color: var(--gold);
+}
+html.admin-mode .ap-ledger-contract-more {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel {
+  padding: var(--o-space-35) var(--o-space-4);
+  gap: var(--o-space-2);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panelhead {
+  margin-bottom: var(--o-space-1);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panelhead span {
+  font-size: var(--o-text-sm);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--o-space-05) var(--o-space-1);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact {
+  grid-column: 1 / -1;
+  padding-block: var(--o-space-3);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-panelhead {
+  display: none;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-rows--contact dd {
+  font-size: var(--o-text-sm);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-rows--contact dt {
+  font-size: var(--o-text-micro);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-actions--contact {
+  margin-top: var(--o-space-2);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-actions--contact .ap-btn {
+  min-height: 26px;
+  padding-inline: var(--o-space-2);
+}
+
+html.admin-mode .ap-ledger-stagepick { display: grid; grid-template-columns: 1fr 1fr; gap: var(--o-space-2); }
+html.admin-mode .ap-ledger-stagepick button {
+  display: inline-flex; align-items: center; gap: var(--o-space-2);
+  min-height: 36px; padding: 0 var(--o-space-25);
+  border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
+  background: var(--raised); color: var(--t2);
+  font: inherit; font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); cursor: pointer;
+}
+html.admin-mode .ap-ledger-stagepick button.is-on {
+  border-color: color-mix(in oklab, var(--o-success) 52%, var(--line2));
+  color: var(--t);
+  background: color-mix(in oklab, var(--panel) 82%, var(--raised));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--o-success) 12%, transparent);
+}
+html.admin-mode .ap-ledger-stagepick button:disabled { opacity: .52; cursor: not-allowed; }
+html.admin-mode .ap-ledger-stagepick button.is-on:disabled {
+  opacity: 1;
+  cursor: default;
+}
+html.admin-mode .ap-ledger-stagepick button.is-on .ap-leads-dot {
+  background: var(--o-success);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--o-success) 18%, transparent);
+}
+html.admin-mode .ap-ledger-stageactions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--o-space-2);
+  margin: -var(--o-space-2) 0 var(--o-space-25);
+  flex: 0 0 auto;
+}
+html.admin-mode .ap-ledger-stageactions .ap-ledger-btn {
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+html.admin-mode .ap-ledger-bookingstate {
+  display: inline-flex; align-items: center; gap: var(--o-space-2);
+  color: var(--t); font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-xbold);
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+
+/* Modal LOST global (drag a perdut) */
+html.admin-mode .ap-leads-lostmodal {
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  padding: var(--o-space-6);
+  background: var(--ax-overlay-md);
+  backdrop-filter: blur(4px);
+}
+html.admin-mode .ap-leads-lostmodal-card {
+  width: 100%; max-width: 480px;
+  padding: 22px 22px var(--o-space-4);
+  border: 1px solid var(--line2);
+  border-radius: var(--o-r-md);
+  background: var(--panel);
+  box-shadow: 0 28px 70px -32px var(--ax-overlay-xl);
+}
+html.admin-mode .ap-leads-lostmodal-h {
+  margin: 0 0 var(--o-space-3);
+  font-family: var(--display); font-size: var(--o-text-md-2); font-weight: var(--o-fw-xbold);
+  color: var(--t);
+}
+
+@media (max-width: 900px) {
+  html.admin-mode .ap-leads-pipeline { grid-template-columns: 1fr; }
+  html.admin-mode .ap-leads-content { padding: var(--o-space-4) var(--o-space-4) 36px; }
+  html.admin-mode .ap-leads-cal { grid-template-columns: 1fr; }
+  html.admin-mode .ap-ledger-sheet { width: 100vw; }
+  html.admin-mode .ap-ledger-hero h2 { font-size: var(--o-text-2xl); }
+  html.admin-mode .ap-ledger-stats { grid-template-columns: 1fr 1fr; }
+  html.admin-mode .ap-ledger-stats div:nth-child(even) { border-right: 0; }
+  html.admin-mode .ap-ledger-stats div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  html.admin-mode .ap-ledger-ops { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-inline: var(--o-space-3); }
+  html.admin-mode .ap-ledger-phase-strip { padding-inline: var(--o-space-3); }
+  html.admin-mode .ap-ledger-grid { grid-template-columns: 1fr; padding: var(--o-space-3); }
+}
+@media (max-width: 520px) {
+  html.admin-mode .ap-ledger-ops { grid-template-columns: 1fr; }
+  html.admin-mode .ap-ledger-contract-row { align-items: flex-start; flex-direction: column; }
+}
+html.admin-mode .ap-ledger-fullpage[data-stage="contactat"] { --c: var(--o-stage-contacted); --strong: var(--o-stage-contacted-strong, var(--o-stage-contacted)); }
+html.admin-mode .ap-ledger-fullpage[data-stage="guanyat"]   { --c: var(--o-stage-won);       --strong: var(--o-stage-won-strong,       var(--o-stage-won)); }
+html.admin-mode .ap-ledger-fullpage[data-stage="perdut"]    { --c: var(--o-stage-lost);      --strong: var(--o-stage-lost-strong,      var(--o-stage-lost)); }
+
+html.admin-mode .ap-ledger-fullpage {
+  display: flex; flex-direction: column;
+  min-height: 100dvh;
+  /* Pantalla negra: fonts noves consumides des dels tokens (monocapa), scope fitxa.
+     --ui = Manrope (cos) · --mono = JetBrains Mono (dades) · --heading = Bricolage (títols). */
+  --ui: var(--o-font-body-admin);
+  --mono: var(--o-font-mono);
+  --heading: var(--o-font-heading);
+  font-family: var(--ui);
+}
+
+/* Command bar més baixa (scoped a la fitxa, no afecta altres pàgines de detall) */
+html.admin-mode .ap-ledger-fullpage .ap-detail-bar { padding-block: 0.3rem; }
+html.admin-mode .ap-ledger-fullpage .ap-detail-bar-btn { min-height: 1.75rem; }
+
+/* ═══ BAND 1 · Identitat (pantalla negra) — nom+stats | NET del bolo ═══ */
+html.admin-mode .ap-ledger-btn--sm { min-height: 1.85rem; padding: 0 0.7rem; font-size: var(--o-text-sm); }
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-bar {
+  padding: 0.45rem 0.9rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-hero {
+  padding: 0.55rem 1.25rem 0.5rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-hero h2 {
+  font-size: var(--o-text-xl-2);
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-stats div {
+  padding: 0.45rem 0.75rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-grid {
+  flex: 0 0 auto; min-height: 0;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  align-items: start;
+  align-content: start;
+  overflow: visible;
+  gap: 0.45rem;
+  padding: 0.65rem 0.9rem 0.5rem;
+}
+
+/* ── Àrea de treball: info (esquerra) + bolo (dreta) en 2 columnes ──
+   Redistribució #920 perquè la fitxa càpiga a una sola pantalla. */
+html.admin-mode .ap-ledger-fullpage .ap-ledger-work {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns:
+    minmax(min(100%, 18rem), 0.72fr)
+    minmax(0, 1.72fr);
+  align-items: start;
+  gap: 0.55rem;
+  padding: 0.45rem 0.75rem;
+}
+/* Economia + tarifa al footer (tot l'ample, en fila). */
+html.admin-mode .ap-ledger-fullpage .ap-ledger-econofooter {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  align-items: start;
+  gap: 0.55rem;
+  padding: 0.4rem 0.75rem 0.5rem;
+  border-top: 1px solid var(--line);
+  margin-top: 0.15rem;
+}
+/* BAND 2 · les dades viuen en un aside estret (1 columna): el bolo és el
+   protagonista ample. Cada panell apilat, llegible. */
+html.admin-mode .ap-ledger-fullpage .ap-ledger-work > .ap-ledger-grid {
+  grid-template-columns: 1fr;
+  padding: 0;
+  gap: 0.35rem;
+}
+/* Columna dreta: bolo + economia apilats. */
+html.admin-mode .ap-ledger-boloside {
+  display: flex; flex-direction: column; gap: 0.45rem; min-width: 0;
+}
+/* Contacte va a mitja columna (no és --wide): apila les seves dades en 1 columna
+   perquè email i etiquetes (ÚLTIM CONTACTE) no es tallin a sub-cel·les estretes. */
+html.admin-mode .ap-ledger-fullpage .ap-ledger-work > .ap-ledger-grid > .ap-ledger-panel:not(.ap-ledger-panel--wide) .ap-ledger-rows--contact {
+  grid-template-columns: 1fr;
+}
+/* El bolo encastat ja té el títol del panell «El bolo»: amaga l'eyebrow intern
+   duplicat del configurador (es conserva el total). */
+/* Files amb select i pista llarga (Responsable intern, Bolo passat per): el select
+   ocupa tot l'ample sota l'etiqueta perquè el text de l'opció no es talli. */
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows .ap-ledger-row--long select.ap-ledger-editinput { width: 100%; }
+/* Enllaç a la fitxa d'un pressupost/dossier des de la llista de Rendibilitat. */
+html.admin-mode .ap-ledger-doclink { cursor: pointer; transition: color 120ms ease; }
+html.admin-mode .ap-ledger-docgroup {
+  grid-column: 1 / -1;
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line);
+}
+html.admin-mode .ap-ledger-docgroup-title { margin-bottom: 0.25rem; }
+html.admin-mode .ap-ledger-docitem { padding-block: 0.125rem; }
+html.admin-mode .ap-ledger-doclink--row {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+  font-size: var(--o-text-xs); color: var(--t2);
+}
+html.admin-mode .ap-ledger-doclink:hover { color: var(--t); }
+html.admin-mode .ap-ledger-doclink:hover > span:first-child { text-decoration: underline; text-underline-offset: 2px; }
+html.admin-mode .ap-ledger-payment-note {
+  margin: 0.5rem 0 0;
+  font-size: var(--o-text-xs);
+  color: var(--t3);
+}
+/* El catàleg del bolo scrolleja internament perquè no estiri el panell. */
+
+@media (max-width: 68.75rem) {
+  html.admin-mode .ap-ledger-fullpage .ap-ledger-work { grid-template-columns: 1fr; }
+  html.admin-mode .ap-ledger-fullpage .ap-ledger-work > .ap-ledger-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 42.5rem) {
+  html.admin-mode .ap-ledger-fullpage .ap-ledger-work > .ap-ledger-grid { grid-template-columns: 1fr; }
+  }
+html.admin-mode .ap-ledger-fullpage .ap-ledger-panel {
+  padding: 0.45rem 0.65rem;
+  gap: 0.25rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-panelhead {
+  margin-bottom: 0.25rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows div {
+  padding: 0.12rem 0;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--contact {
+  gap: 0.45rem 0.65rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--contact dd {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-actions--contact {
+  margin-top: 0.4rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-econo {
+  margin: 0.4rem 0.9rem 0.65rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-econohead {
+  padding: 0.45rem 0.8rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-kpi {
+  min-height: 6rem;
+  padding: 0.9rem 1rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-kpi-val {
+  font-size: var(--o-text-xl-2);
+}
+
+html.admin-mode .ap-ledger-stage-create { margin-top: 0.5rem; }
+
+/* Configurador encastat a fitxa lead: compactació proporcional, no maquetada a píxel. */
+@media (min-width: 68.751rem) {
+      }
+@media (max-width: 68.75rem) {
+  }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Fitxa lead zenit — reconstrucció en una sola pantalla desktop
+   esquerra: govern · centre: bolo · dreta: economia/documents
+   ══════════════════════════════════════════════════════════════════════════ */
+html.admin-mode .ap-ledger-fullpage {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--c) 6%, transparent) 0, transparent 8rem),
+    var(--canvas);
+}
+html.admin-mode .ap-ledger-fullpage .ap-detail-bar {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.7rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-detail-bar-btn {
+  min-height: 1.65rem;
+  padding-inline: 0.65rem;
+  font-size: var(--o-text-2xs);
+}
+/* ── BAND 1 · Header refet (#925) — nom protagonista sol + rail de fets ──
+   Concepte: dues bandes horitzontals. A dalt, identitat (nom gran = únic focus)
+   amb el contacte discret a la dreta. A baix, un rail ledger d'una línia amb
+   tots els fets del bolo en columnes separades per hairline. Valor a l'extrem
+   dret amb pes propi però SENSE or (l'or queda reservat al resultat del footer). */
+html.admin-mode .ap-ledger-hd {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  /* Header canònic: consumeix els tokens de Studio (--head-*). Leads és la
+     referència del header, però els paràmetres viuen a Studio, no aquí. */
+  gap: var(--head-gap);
+  padding: var(--head-pad);
+  border-bottom: var(--head-border);
+  background: var(--head-bg);
+}
+/* Banda superior: identitat | contacte */
+html.admin-mode .ap-ledger-hd-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.6rem 1.5rem;
+}
+html.admin-mode .ap-ledger-hd-ident {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+html.admin-mode .ap-ledger-hd-eyebrow {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-hd-name {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--o-text-2xl);
+  font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.018em;
+  line-height: 1;
+  color: var(--t);
+}
+/* Següent pas recomanat — guia accionable per a l'operador (consumeix leadSummary) */
+html.admin-mode .ap-ledger-hd-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0.55rem 0 0;
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-normal);
+  line-height: 1.45;
+  color: var(--t2);
+}
+/* Etiqueta neta, sense caixa: or discret com a eyebrow de secció. */
+html.admin-mode .ap-ledger-hd-next-tag {
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-semi);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  white-space: nowrap;
+}
+/* Contacte discret a la dreta, alineat a la base del nom */
+html.admin-mode .ap-ledger-hd-reach {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  min-width: 0;
+}
+html.admin-mode .ap-ledger-hd-reachedit { flex: 1 1 14rem; min-width: 0; }
+html.admin-mode .ap-ledger-hd-reachitem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-width: 0;
+  max-width: min(100%, 22rem);
+  padding: 0.42rem 0.78rem;
+  border: thin solid var(--line);
+  border-radius: var(--o-r-sm-2);
+  background: color-mix(in oklab, var(--panel) 45%, transparent);
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
+  color: var(--t2);
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+html.admin-mode .ap-ledger-hd-reachitem:hover {
+  border-color: var(--line2);
+  color: var(--t);
+  background: color-mix(in oklab, var(--panel) 70%, transparent);
+}
+html.admin-mode .ap-ledger-hd-reachlbl {
+  font-family: var(--ui);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
+  letter-spacing: 0.02em;
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-hd-reachval {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--o-text-md);
+  font-weight: var(--o-fw-semi);
+  letter-spacing: 0;
+  color: var(--t);
+}
+html.admin-mode .ap-ledger-hd-reachbtns {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-inline-start: 0.15rem;
+}
+html.admin-mode .ap-ledger-hd-reachbtns .ap-btn {
+  min-height: 2.15rem;
+  padding-inline: 0.75rem;
+  font-family: var(--ui);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
+}
+
+/* Banda inferior: rail ledger — columnes separades per hairline intern */
+html.admin-mode .ap-ledger-hd-rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  border: thin solid color-mix(in oklab, var(--line) 80%, transparent);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--panel) 30%, transparent);
+  overflow: hidden;
+}
+html.admin-mode .ap-ledger-fact {
+  flex: 1 1 auto;
+  min-width: max-content;
+  display: flex;
+  flex-direction: column;
+  gap: 0.06rem;
+  padding: 0.24rem clamp(0.48rem, 1.2vi, 0.82rem);
+  border-inline-start: thin solid color-mix(in oklab, var(--line) 55%, transparent);
+}
+html.admin-mode .ap-ledger-fact:first-child { border-inline-start: 0; }
+html.admin-mode .ap-ledger-fact-lbl {
+  font-family: var(--ui);
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-fact-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--display);
+  font-size: var(--o-text-base);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: -0.01em;
+  color: var(--t);
+  text-align: start;
+  white-space: nowrap;
+}
+html.admin-mode button.ap-ledger-fact-val { cursor: pointer; transition: color 120ms ease; }
+html.admin-mode button.ap-ledger-fact-val:hover { color: var(--o-warning); }
+html.admin-mode .ap-ledger-fact-val--ro { cursor: default; }
+/* Valor: empès a la dreta, pes propi, però sense or (or = resultat footer) */
+html.admin-mode .ap-ledger-fact--value {
+  margin-inline-start: auto;
+  background: color-mix(in oklab, var(--raised) 50%, transparent);
+}
+html.admin-mode .ap-ledger-fact-val--big {
+  font-family: var(--display);
+  font-size: var(--o-text-xl);
+  font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.02em;
+}
+html.admin-mode .ap-ledger-fact-wx { gap: 0.4rem; }
+html.admin-mode .ap-ledger-fact-wxdate {
+  font-family: var(--mono);
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+  color: var(--t3);
+}
+/* Motiu de pèrdua — avís carbassa, ample complet sota el rail */
+html.admin-mode .ap-ledger-hd-lost {
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border: thin solid color-mix(in oklab, var(--o-warning) 40%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--o-warning) 9%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
+  color: var(--o-warning);
+}
+html.admin-mode .ap-ledger-phasebar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.38rem 0.5rem;
+  border: thin solid color-mix(in oklab, var(--line) 62%, transparent);
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--panel) 28%, transparent);
+}
+html.admin-mode .ap-ledger-phasebar .ap-ledger-stagepick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+html.admin-mode .ap-ledger-phasebar .ap-ledger-stagepick button {
+  min-height: 1.9rem;
+  justify-content: flex-start;
+  padding-inline: 0.75rem;
+}
+/* Govern (Responsable / Derivat per) a la dreta de la fila d'estats:
+   així la barra de marge cau a una sola línia (es guanya una línia vertical). */
+html.admin-mode .ap-ledger-phaseright {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+html.admin-mode .ap-ledger-profitbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.42rem 0.5rem;
+  border: thin solid color-mix(in oklab, var(--line) 58%, transparent);
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--panel) 24%, transparent);
+}
+html.admin-mode .ap-ledger-profitbar-title {
+  margin-right: 0.12rem;
+  font-family: var(--ui);
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-bold);
+  color: var(--t);
+}
+html.admin-mode .ap-ledger-profitpill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  min-height: 1.75rem;
+  padding: 0.2rem 0.55rem;
+  border: thin solid color-mix(in oklab, var(--line) 68%, transparent);
+  border-radius: var(--o-r-sm-2);
+  background: color-mix(in oklab, var(--raised) 52%, transparent);
+}
+html.admin-mode .ap-ledger-profitpill > span {
+  font-family: var(--ui);
+  font-size: var(--o-text-2xs);
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-profitpill > strong {
+  font-family: var(--display);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-xbold);
+  color: var(--t);
+}
+html.admin-mode .ap-ledger-profitpill[data-tone="amber"] > strong {
+  color: var(--o-warning);
+}
+html.admin-mode .ap-ledger-profitpill[data-tone="orange"] > strong {
+  color: var(--o-stage-new);
+}
+html.admin-mode .ap-ledger-profitpill[data-tone="rose"] > strong {
+  color: var(--o-danger);
+}
+html.admin-mode .ap-ledger-profitmanage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+html.admin-mode .ap-ledger-profitfield {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+}
+html.admin-mode .ap-ledger-profitfield > span {
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-profitfield .ap-ledger-editinput {
+  min-height: 1.75rem;
+  width: clamp(8rem, 12vi, 11rem);
+  padding-block: 0.18rem;
+  font-size: var(--o-text-2xs);
+}
+html.admin-mode .ap-ledger-historybar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.42rem;
+  margin: 0 1rem 0.32rem;
+  padding: 0.45rem 0.55rem;
+  border: thin solid color-mix(in oklab, var(--line) 58%, transparent);
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--panel) 28%, transparent);
+}
+html.admin-mode .ap-ledger-historybar-title {
+  margin-right: 0.1rem;
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-bold);
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-historylink {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.32rem;
+  min-width: 0;
+  max-width: 21rem;
+  padding: 0.22rem 0.5rem;
+  border: thin solid color-mix(in oklab, var(--line) 65%, transparent);
+  border-radius: var(--o-r-sm-2);
+  background: color-mix(in oklab, var(--raised) 38%, transparent);
+  color: var(--t2);
+  text-decoration: none;
+}
+html.admin-mode .ap-ledger-historylink:hover {
+  border-color: color-mix(in oklab, var(--gold) 42%, var(--line));
+  color: var(--t);
+}
+html.admin-mode .ap-ledger-historylink > span {
+  flex: none;
+  font-size: var(--o-text-2xs);
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-historylink > strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+}
+html.admin-mode .ap-ledger-historylink > em {
+  flex: none;
+  font-style: normal;
+  font-size: var(--o-text-2xs);
+  color: var(--gold);
+}
+/* Mòbil: rail a graella de 2 columnes, valor a tot l'ample */
+@media (max-width: 40rem) {
+  html.admin-mode .ap-ledger-hd-top { align-items: flex-start; }
+  html.admin-mode .ap-ledger-hd-rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  html.admin-mode .ap-ledger-fact {
+    min-width: 0;
+    border-block-start: thin solid color-mix(in oklab, var(--line) 45%, transparent);
+  }
+  html.admin-mode .ap-ledger-fact:nth-child(-n+2) { border-block-start: 0; }
+  html.admin-mode .ap-ledger-fact:nth-child(odd) { border-inline-start: 0; }
+  html.admin-mode .ap-ledger-fact--value {
+    grid-column: 1 / -1;
+    margin-inline-start: 0;
+  }
+  html.admin-mode .ap-ledger-fact-val { white-space: normal; }
+}
+html.admin-mode .ap-ledger-btn--sm {
+  min-height: 1.95rem;
+  padding-inline: 0.7rem;
+}
+
+html.admin-mode .ap-ledger-zenith {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns:
+    minmax(13.5rem, 0.27fr)
+    minmax(42rem, 1fr);
+  grid-template-rows: minmax(min-content, 1fr);
+  align-items: stretch;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem 0.45rem;
+  overflow: visible;
+}
+html.admin-mode .ap-ledger-zenith--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+/* Zenit reconstruït (#1348): bolo (main, esq.) + rail de resum financer (dret, sticky).
+   Aprofita l'espai mort de desktop; a mòbil el rail cau sota el bolo. */
+html.admin-mode .ap-ledger-zenith--railed {
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 17.5rem);
+  align-items: start;
+}
+html.admin-mode .ap-ledger-rail--summary {
+  position: sticky;
+  top: var(--o-space-3);
+  align-self: start;
+}
+html.admin-mode .ap-ledger-summary {
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--panel) 92%, var(--raised));
+  overflow: hidden;
+}
+html.admin-mode .ap-ledger-summary-head {
+  padding: var(--o-space-3) var(--o-space-35);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--ui); font-size: var(--o-text-base); font-weight: var(--o-fw-bold);
+  color: var(--t);
+}
+html.admin-mode .ap-ledger-summary-net {
+  display: flex; flex-direction: column; gap: var(--o-space-1);
+  padding: var(--o-space-35) var(--o-space-35);
+  border-left: 0.1875rem solid var(--o-stage-won-strong);
+}
+html.admin-mode .ap-ledger-summary-net[data-tone="amber"]  { border-left-color: var(--o-warning); }
+html.admin-mode .ap-ledger-summary-net[data-tone="orange"] { border-left-color: var(--o-stage-new); }
+html.admin-mode .ap-ledger-summary-net[data-tone="rose"]   { border-left-color: var(--o-danger); }
+html.admin-mode .ap-ledger-summary-net-lbl { font-family: var(--ui); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t2); }
+html.admin-mode .ap-ledger-summary-net-val { font-family: var(--ui); font-size: var(--o-text-2xl); font-weight: var(--o-fw-bold); line-height: 1; color: var(--t); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+html.admin-mode .ap-ledger-summary-net[data-tone="rose"]  .ap-ledger-summary-net-val { color: var(--o-danger); }
+html.admin-mode .ap-ledger-summary-net[data-tone="amber"] .ap-ledger-summary-net-val { color: var(--o-warning); }
+html.admin-mode .ap-ledger-summary-net[data-tone="orange"] .ap-ledger-summary-net-val { color: var(--o-stage-new); }
+html.admin-mode .ap-ledger-summary-net-pct { font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2); line-height: var(--o-lh-snug); }
+html.admin-mode .ap-ledger-summary-net[data-tone="amber"] .ap-ledger-summary-net-pct { color: var(--o-warning); }
+html.admin-mode .ap-ledger-summary-net[data-tone="orange"] .ap-ledger-summary-net-pct { color: var(--o-stage-new); }
+html.admin-mode .ap-ledger-summary-net[data-tone="rose"] .ap-ledger-summary-net-pct { color: var(--o-danger); }
+html.admin-mode .ap-ledger-summary-rows { display: flex; flex-direction: column; }
+html.admin-mode .ap-ledger-summary-rows > div {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-25) var(--o-space-35);
+  border-top: 1px solid color-mix(in oklab, var(--line) 60%, transparent);
+  font-family: var(--ui); font-size: var(--o-text-sm);
+}
+html.admin-mode .ap-ledger-summary-rows > div > span { color: var(--t2); }
+html.admin-mode .ap-ledger-summary-rows > div > strong { color: var(--t); font-size: var(--o-text-base); font-weight: var(--o-fw-semi); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+html.admin-mode .ap-ledger-summary-jump {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--o-space-2);
+  padding: var(--o-space-3) var(--o-space-35);
+  border-top: 1px solid color-mix(in oklab, var(--gold) 26%, var(--line));
+  color: var(--gold);
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
+  text-decoration: none;
+}
+html.admin-mode .ap-ledger-summary-jump::after {
+  content: '↓';
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-summary-jump:hover {
+  background: color-mix(in oklab, var(--gold) 9%, transparent);
+  color: var(--gold-bright);
+}
+@media (max-width: 900px) {
+  html.admin-mode .ap-ledger-zenith--railed {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: start;
+  }
+  /* Mòbil = pantalla de DECISIÓ (#1752, Manolo): el marge és el número que decideix
+     si el bolo val la pena; puja davant del configurador, no enterrat al final. */
+  html.admin-mode .ap-ledger-rail--summary { position: static; order: -1; }
+}
+/* Mòbil: pipeline i govern (responsable/derivat) NO poden solapar-se — apilats (#1348). */
+@media (max-width: 640px) {
+  html.admin-mode .ap-ledger-phasebar { grid-template-columns: minmax(0, 1fr); }
+  html.admin-mode .ap-ledger-phaseright { justify-content: flex-start; }
+  html.admin-mode .ap-ledger-profitmanage { width: 100%; margin-left: 0; }
+  html.admin-mode .ap-ledger-profitfield { flex: 1 1 8rem; }
+  html.admin-mode .ap-ledger-profitfield select { width: 100%; }
+}
+
+html.admin-mode .ap-ledger-rail,
+html.admin-mode .ap-ledger-zenith-main {
+  min-width: 0;
+  min-height: 0;
+}
+/* Govern (esquerra): Fase i Rendibilitat queden a mà; el bolo absorbeix la resta. */
+html.admin-mode .ap-ledger-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 0;
+  overflow: visible;
+}
+html.admin-mode .ap-ledger-rail--left { padding-right: 0.12rem; }
+html.admin-mode .ap-ledger-rail > .ap-ledger-panel { flex: 0 0 auto; min-width: 0; }
+html.admin-mode .ap-ledger-rail > .ap-ledger-panel--wide {
+  display: flex;
+  flex-direction: column;
+}
+html.admin-mode .ap-ledger-stagepanel .ap-ledger-panelhead {
+  margin-bottom: 0.4rem;
+}
+html.admin-mode .ap-ledger-zenith-main {
+  display: flex;
+  align-self: stretch;
+  align-items: stretch;
+  min-height: 0;
+  overflow: visible;
+  padding: 0;
+}
+html.admin-mode .ap-ledger-zenith-main > .ap-ledger-boloside {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+html.admin-mode .ap-ledger-zenith-main > .ap-ledger-boloside > .ap-ledger-panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  border-color: color-mix(in oklab, var(--gold) 22%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--panel) 96%, transparent), color-mix(in oklab, var(--canvas) 82%, transparent)),
+    var(--panel);
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-panel {
+  padding: 0.72rem;
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-panelhead {
+  flex: 0 0 auto;
+  margin-bottom: 0.48rem;
+}
+/* Semàfor del «Net» a la graella de marge del govern: el «critical»/«ok» segueix
+   el to; el to «warn» (just) és carbassa (--o-warning), no daurat. */
+html.admin-mode .ap-ledger-rail--left > .ap-ledger-panel--margin .ap-ledger-kpi[data-level="critical"] .ap-ledger-kpi-sub { color: var(--o-danger); }
+html.admin-mode .ap-ledger-rail--left > .ap-ledger-panel--margin .ap-ledger-kpi[data-level="warn"] .ap-ledger-kpi-sub { color: var(--o-warning); }
+html.admin-mode .ap-ledger-rail--left > .ap-ledger-panel--margin .ap-ledger-kpi[data-level="ok"] .ap-ledger-kpi-sub { color: var(--o-stage-won-strong); }
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-bolo-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+}
+html.admin-mode .ap-ledger-bolo-footer {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.7rem;
+  border-top: thin solid color-mix(in oklab, var(--line) 68%, transparent);
+}
+html.admin-mode .ap-ledger-bolo-total {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  min-height: 2.35rem;
+  padding: 0.34rem 0.82rem;
+  border: thin solid color-mix(in oklab, var(--gold) 42%, var(--line));
+  border-radius: var(--o-r-sm);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 8%, transparent), transparent),
+    color-mix(in oklab, var(--raised) 60%, transparent);
+}
+html.admin-mode .ap-ledger-bolo-total > span {
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-bolo-total > strong {
+  font-family: var(--display);
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-xbold);
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-panel {
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--panel) 76%, transparent);
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-panelhead {
+  margin-bottom: 0.18rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-panelhead span {
+  font-size: var(--o-text-sm);
+  letter-spacing: -0.01em;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows {
+  font-size: var(--o-text-2xs);
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows div {
+  padding-block: 0.08rem;
+  gap: 0.45rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows dt {
+  font-size: var(--o-text-2xs);
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-rows dd {
+  font-size: var(--o-text-2xs);
+}
+html.admin-mode .ap-ledger-stageactions {
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+  margin: 0 0 0.45rem;
+}
+html.admin-mode .ap-ledger-stagepick {
+  grid-template-columns: 1fr;
+  gap: 0.28rem;
+}
+html.admin-mode .ap-ledger-stagepick button {
+  min-height: 1.82rem;
+  padding-inline: 0.55rem;
+}
+html.admin-mode .ap-ledger-actions {
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+}
+html.admin-mode .ap-ledger-fullpage .ap-ledger-btn {
+  min-height: 1.75rem;
+  padding-inline: 0.55rem;
+  font-size: var(--o-text-2xs);
+}
+
+html.admin-mode .ap-ledger-docgroup {
+  margin-top: 0.12rem;
+  padding-top: 0.25rem;
+}
+html.admin-mode .ap-ledger-docitem {
+  padding-block: 0.05rem;
+}
+html.admin-mode .ap-ledger-doclink--row {
+  font-size: var(--o-text-2xs);
+  gap: 0.35rem;
+}
+
+/* ── Històric comercial: lectura normal al peu de la fitxa del lead ─────────
+   Scoped a `.ap-ledger-document-history`: no altera el component compartit. */
+html.admin-mode .ap-ledger-document-history {
+  margin: 0.6rem 1rem 0.85rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--ax-line);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--ax-panel) 82%, var(--ax-canvas));
+}
+html.admin-mode .ap-ledger-document-history .ap-dochist-head {
+  margin-bottom: 0.55rem;
+  align-items: center;
+}
+html.admin-mode .ap-ledger-document-history .ap-dochist-title { font-size: var(--o-text-base); }
+html.admin-mode .ap-ledger-document-history .ap-dochist-count { font-size: var(--o-text-xs); }
+html.admin-mode .ap-ledger-document-history .ap-dochist-subtitle { display: none; }
+html.admin-mode .ap-ledger-document-history .ap-dochist-list { gap: 0.45rem; }
+html.admin-mode .ap-ledger-document-history .ap-dochist-item {
+  min-height: 2.55rem;
+  padding: 0.48rem 0.65rem;
+  gap: 0.7rem;
+  background: color-mix(in oklab, var(--ax-panel) 92%, var(--ax-canvas));
+  border-color: var(--ax-line2);
+}
+/* Una sola línia per document: la data/enviament queda al document obert. */
+html.admin-mode .ap-ledger-document-history .ap-dochist-meta { display: none; }
+
+@media (max-width: 80rem) {
+  html.admin-mode .ap-ledger-zenith {
+    grid-template-columns: minmax(13rem, 0.3fr) minmax(0, 1fr);
+  }
+}
+@media (max-width: 68.75rem) {
+  html.admin-mode .ap-ledger-fullpage {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  html.admin-mode .ap-ledger-zenith {
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+  html.admin-mode .ap-ledger-rail,
+  html.admin-mode .ap-ledger-zenith-main {
+    overflow: visible;
+  }
+  /* En apilat, el govern torna a una sola columna (panells llegibles a mòbil). */
+  html.admin-mode .ap-ledger-rail--left {
+    grid-template-columns: 1fr;
+  }
+  html.admin-mode .ap-ledger-zenith-main > .ap-ledger-boloside > .ap-ledger-panel {
+    height: auto;
+  }
+}
+
+/* Adaptacions ap-ledger- per a pàgina completa (sense overlay) */
+html.admin-mode .ap-ledger-page {
+  min-height: 100vh;
+  background: var(--canvas, var(--ax-canvas));
+  color: var(--t2, var(--ax-t2));
+}
+html.admin-mode .ap-ledger-bar--page {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-bottom: thin solid var(--line, var(--ax-fill-5));
+  backdrop-filter: blur(1.125rem);
+  background: var(--ax-overlay-md);
+  max-width: 100%;
+}
+html.admin-mode .ap-ledger-bar-title {
+  font-size: var(--o-text-base);
+  font-weight: var(--o-fw-semi);
+  color: var(--t, var(--ax-t));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+html.admin-mode .ap-ledger-h1 {
+  font-size: var(--o-text-xl-2);
+  font-weight: var(--o-fw-bold);
+  color: var(--t, var(--ax-t));
+  margin: 0.25rem 0 0;
+  letter-spacing: -0.01em;
+}
+html.admin-mode .ap-ledger-grid--page {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: thin;
+  padding: 0 0 3rem;
+}
+@media (min-width: 40rem) {
+  html.admin-mode .ap-ledger-grid--page { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 64rem) {
+  html.admin-mode .ap-ledger-grid--page { grid-template-columns: repeat(3, 1fr); }
+}
+html.admin-mode .ap-ledger-panel--full {
+  grid-column: 1 / -1;
+}
+html.admin-mode .ap-ledger-ok   { color: var(--o-success); font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-ledger-pend { color: var(--o-stage-new); font-weight: var(--o-fw-semi); }
+
+/* Semàfor prioritat */
+html.admin-mode .ap-ledger-pri--urgent { color: var(--o-danger, var(--o-danger)); font-weight: var(--o-fw-bold); }
+html.admin-mode .ap-ledger-pri--high   { color: var(--o-stage-new); font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-ledger-pri--medium { color: var(--gold, var(--ax-gold)); }
+html.admin-mode .ap-ledger-pri--low    { color: var(--t3, var(--ax-t3)); }
+
+/* Semàfor cobrament */
+html.admin-mode .ap-ledger-pay--full { color: var(--o-success); font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-ledger-pay--part { color: var(--o-stage-new); font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-ledger-pay--none { color: var(--o-danger, var(--o-danger)); font-weight: var(--o-fw-semi); }
+
+/* Valors econòmics */
+html.admin-mode .ap-ledger-val--gold    { color: var(--gold, var(--ax-gold)); font-weight: var(--o-fw-bold); }
+html.admin-mode .ap-ledger-val--danger  { color: var(--o-danger, var(--o-danger)); font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-ledger-val--muted   { color: var(--t3, var(--ax-t3)); font-size: var(--o-text-micro); }
+html.admin-mode .ap-ledger-status--sent     { color: var(--o-info, var(--o-info)); }
+html.admin-mode .ap-ledger-status--accepted { color: var(--o-success); }
+html.admin-mode .ap-ledger-status--draft    { color: var(--t3, var(--ax-t3)); }
+
+/* Edició inline */
+html.admin-mode .ap-ledger-editval {
+  background: none; border: none; cursor: pointer;
+  color: var(--t, var(--ax-t)); font: inherit; font-size: var(--o-text-2xs);
+  padding: 0; text-align: left;
+  border-bottom: 1px dashed var(--ax-fill-bright);
+  transition: border-color 0.15s;
+}
+html.admin-mode .ap-ledger-editval:hover { border-bottom-color: var(--ax-fill-bright); }
+html.admin-mode .ap-ledger-empty { font-style: italic; color: var(--t3, var(--ax-t3)); font-size: var(--o-text-xs); }
+html.admin-mode .ap-ledger-editrow { display: flex; align-items: center; gap: var(--o-space-1); }
+html.admin-mode .ap-ledger-editinput {
+  position: relative;
+  z-index: 20;
+  top: -3px;
+  background: var(--ax-fill-3);
+  border: 1px solid var(--ax-fill-bright);
+  border-radius: var(--o-r-xs);
+  color: var(--t, var(--ax-t));
+  font: inherit; font-size: var(--o-text-2xs);
+  padding: var(--o-space-05) var(--o-space-15);
+  outline: none;
+  min-width: 0; flex: 1;
+}
+html.admin-mode .ap-ledger-editinput:focus { border-color: var(--ax-fill-bright); }
+html.admin-mode .ap-ledger-checkrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+html.admin-mode .ap-ledger-editunit {
+  font-size: var(--o-text-xs);
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-savebtn {
+  background: var(--ax-success-bg); border: 1px solid var(--ax-success-border);
+  color: var(--o-success); border-radius: var(--o-r-xs); padding: var(--o-space-05) var(--o-space-15); cursor: pointer; font-size: var(--o-text-xs);
+}
+html.admin-mode .ap-ledger-cancelbtn {
+  background: transparent; border: none; color: var(--t3, var(--ax-t3));
+  cursor: pointer; font-size: var(--o-text-xs); padding: var(--o-space-05) var(--o-space-1);
+}
+html.admin-mode .ap-ledger-budget-editable {
+  border-bottom: 1px dashed var(--t3);
+}
+
+/* ── Post-event ── */
+
+/* ── Booking actions ── */
+
+/* ── Tones ── */
+
+/* ── Rows (dl) ── */
+
+/* ── Misc ── */
+
+/* Pista inline als labels de relació (responsable intern / bolo passat per) */
+html.admin-mode .ap-ledger-hint-inline { display: block; font-family: var(--ui); font-style: italic; font-weight: var(--o-fw-normal); font-size: var(--o-text-2xs); letter-spacing: 0; text-transform: none; color: var(--t3); margin-top: 1px; }
+
+/* Barra d'accions del bolo (crear dossier / pressupost / reserva) */
+html.admin-mode .ap-ledger-bolo-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions.ap-ledger-bolo-actions--full {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--o-space-2);
+  align-self: center;
+  margin: 0;
+  padding: var(--o-space-3);
+  border: 1px solid color-mix(in oklab, var(--gold) 30%, var(--line));
+  border-radius: var(--o-r-md);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 5%, transparent), transparent 46%),
+    color-mix(in oklab, var(--raised) 38%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--gold) 16%, transparent);
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-ledger-bolo-next {
+  flex: 0 0 auto;
+  min-width: 0;
+  align-items: center;
+  text-align: center;
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-ledger-bolo-next strong {
+  font-size: var(--o-text-md);
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-ledger-bolo-next em {
+  max-width: 16.5rem;
+  font-size: var(--o-text-sm);
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-btn {
+  width: min(100%, 20rem);
+  min-height: 2.45rem;
+  align-self: center;
+  justify-content: center;
+}
+@media (max-width: 720px) {
+  html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions.ap-ledger-bolo-actions--full {
+    padding: var(--o-space-25);
+    align-items: stretch;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-ledger-bolo-next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-btn {
+    width: 100%;
+  }
+}
+
+/* Forecast ponderat (Fase 1B) — «el pipeline ÉS el forecast». Diners ponderats en or. */
+html.admin-mode .ap-leads-metric b.ap-leads-metric-forecast { color: var(--gold); }
+html.admin-mode .ap-leads-lanetitle small.ap-leads-lane-forecast { display: block; color: var(--gold); font-weight: var(--o-fw-semi); margin-top: 1px; }
+
+/* Navegació Waze des de la fitxa del calendari (eina de camp) */
+html.admin-mode .ap-ledger-navlink { color: var(--gold); font-weight: var(--o-fw-semi); white-space: nowrap; }
+html.admin-mode .ap-ledger-departtime { font-weight: var(--o-fw-bold); color: var(--gold); }
+html.admin-mode .ap-ledger-departhint { font-size: var(--o-text-2xs); color: var(--t3); }
+
+/* Drawer ràpid de leads: un sol gutter de component, derivat dels tokens globals. */
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-hero,
+html.admin-mode .ap-ledger-sheet .ap-ledger-hero {
+  padding: var(--o-space-4) var(--ap-ledger-drawer-gutter) var(--ap-ledger-drawer-band-y);
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-kicker,
+html.admin-mode .ap-ledger-sheet .ap-ledger-kicker {
+  margin-bottom: var(--ap-ledger-drawer-title-gap);
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-kicker--stage,
+html.admin-mode .ap-ledger-sheet .ap-ledger-kicker--stage {
+  margin-bottom: 0;
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-kicker--stage::before,
+html.admin-mode .ap-ledger-sheet .ap-ledger-kicker--stage::before {
+  content: none;
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-stats div,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div {
+  padding-block: var(--ap-ledger-drawer-band-y);
+  padding-inline: var(--ap-ledger-drawer-gutter);
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-stats,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats {
+  margin: var(--ap-ledger-drawer-section-gap) var(--ap-ledger-drawer-gutter) 0;
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-sm-2);
+  overflow: hidden;
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-stats div,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div {
+  padding-inline: var(--o-space-3);
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-ops,
+html.admin-mode .ap-ledger-sheet .ap-ledger-ops {
+  padding-inline: var(--ap-ledger-drawer-gutter);
+}
+
+html.admin-mode .fxd > .ap-ledger-sheet > .ap-ledger-grid--drawer {
+  gap: var(--o-space-25);
+  padding: var(--o-space-3) var(--ap-ledger-drawer-gutter) var(--o-space-4);
+}
+
+/* ── Ticker de màximes d'Economia (#1392): frase ESTÀTICA + fosa lenta (no distreu). Carbó +
+   or, sobri; sense moviment de translació — només crossfade d'opacitat molt progressiu. ── */
+html.admin-mode .ap-maxims {
+  position: relative;
+  display: flex; align-items: center;
+  padding: var(--o-space-2) var(--o-space-6);
+  border: 1px solid var(--line2); border-radius: var(--o-r-md);
+  background: var(--raised);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--o-admin-light) 4%, transparent);
+}
+/* Al shell (#1391) viu com a primer fill de .ax__page, que no té gap → separa'l del contingut. */
+html.admin-mode .ax__page > .ap-maxims { margin-bottom: var(--o-space-3); }
+/* Segells daurats simètrics: un a cada extrem (absoluts, fixos) enmarquen la frase centrada
+   → la barra queda equilibrada i el conjunt se sent centrat. No es mouen mai. */
+html.admin-mode .ap-maxims-mark {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  color: var(--gold); font-size: var(--o-text-sm); line-height: 1; opacity: 0.7;
+}
+html.admin-mode .ap-maxims-mark--left { left: var(--o-space-35); }
+html.admin-mode .ap-maxims-mark--right { right: var(--o-space-35); }
+html.admin-mode .ap-maxims-viewport {
+  position: relative; flex: 1 1 auto; min-width: 0;
+  display: grid; align-items: center; justify-items: center; min-height: 1.5rem;
+}
+/* Graella d'una cel·la: la frase sortint i l'entrant comparteixen la MATEIXA cel·la
+   (grid-area 1/1) → crossfade solapat real (mai queda buit), però la cel·la creix amb la
+   frase més alta. Així una màxima que ajusta a 2 línies a mòbil eixampla la barra en comptes
+   de desbordar per sota i solapar-se amb el contingut del dashboard (#1398). El patró absolut
+   anterior no feia créixer el viewport (min-height 1 línia) i la 2a línia se sortia. */
+html.admin-mode .ap-maxims-item {
+  grid-area: 1 / 1; max-width: 100%; text-align: center;
+  font-family: var(--display); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi);
+  color: var(--ax-t); line-height: 1.35;
+}
+@media (max-width: 30rem) {
+  html.admin-mode .ap-maxims-item { font-size: var(--o-text-xs); }
 }

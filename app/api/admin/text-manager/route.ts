@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { requireAuth, requirePermission } from '@/lib/auth';
+import { getAdminRole, requireAuth, requirePermission } from '@/lib/auth';
+import { canManageContent } from '@/lib/admin-role';
 import { verifyCsrf } from '@/lib/csrf';
 import { getTextManagerPayload, runTextManagerAction, saveTextManagerModifications } from '@/lib/services/textManagerService';
 
@@ -9,6 +10,12 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  if (!canManageContent(getAdminRole(req))) {
+    return NextResponse.json(
+      { ok: false, error: 'No tens permisos per llegir Textos PRO' },
+      { status: 403 }
+    );
+  }
   try {
     return NextResponse.json(await getTextManagerPayload());
   } catch (error) {

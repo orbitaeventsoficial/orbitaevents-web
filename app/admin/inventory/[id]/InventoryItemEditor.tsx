@@ -24,6 +24,8 @@ interface ItemData {
   notes: string | null;
   purchaseDate: string | Date | null;
   purchasePrice: number | null;
+  purchasePriceSource: string | null;
+  purchaseUrl: string | null;
   expectedLifeHours: number | null;
   isConsumable: boolean;
   stockQuantity: number | null;
@@ -73,6 +75,8 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
       ? new Date(item.purchaseDate).toISOString().split('T')[0]
       : '',
     purchasePrice: item?.purchasePrice?.toString() || '',
+    purchasePriceSource: item?.purchasePriceSource || '',
+    purchaseUrl: item?.purchaseUrl || '',
     expectedLifeHours: (item?.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS).toString(),
     isConsumable: item?.isConsumable || false,
     stockQuantity: item?.stockQuantity?.toString() || '',
@@ -118,6 +122,10 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
       setError('Nom i valor són obligatoris');
       return;
     }
+    if (form.purchasePrice && !form.purchasePriceSource.trim()) {
+      setError('Si informes un preu de compra o reposició, cal indicar la font del preu');
+      return;
+    }
 
     setSaving(true);
     setError(null);
@@ -138,6 +146,8 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
         minStock: form.minStock ? parseInt(form.minStock, 10) : null,
         purchaseDate: form.purchaseDate || null,
         purchasePrice: form.purchasePrice ? parseFloat(form.purchasePrice) : null,
+        purchasePriceSource: form.purchasePrice ? form.purchasePriceSource.trim() : null,
+        purchaseUrl: form.purchaseUrl.trim() || null,
         expectedLifeHours: form.expectedLifeHours ? parseFloat(form.expectedLifeHours) : null,
       };
 
@@ -197,7 +207,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
 
   return (
     <div className="space-y-4">
-      <section className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-5 sm:p-6">
+      <section className="ap-card p-5 sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -205,22 +215,22 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                 {mode === 'create' ? 'Nou element' : 'Fitxa inventari'}
               </span>
               {statusMeta && (
-                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_TONE[form.status] || 'border-white/10 bg-white/5 text-white/80'}`}>
+                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_TONE[form.status] || 'border-[var(--line)] bg-[var(--raised)] text-[var(--t2)]'}`}>
                   {statusMeta.label}
                 </span>
               )}
               {conditionMeta && (
-                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${CONDITION_TONE[form.condition] || 'border-white/10 bg-white/5 text-white/80'}`}>
+                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${CONDITION_TONE[form.condition] || 'border-[var(--line)] bg-[var(--raised)] text-[var(--t2)]'}`}>
                   {conditionMeta.label}
                 </span>
               )}
             </div>
 
             <div>
-              <h1 className="text-2xl font-semibold text-white">
+              <h1 className="ap-title">
                 {form.name.trim() || (mode === 'create' ? 'Element nou sense nom encara' : 'Element sense nom')}
               </h1>
-              <p className="mt-1 max-w-3xl text-sm text-white/70">
+              <p className="ap-subtitle mt-1 max-w-3xl">
                 {form.description.trim() || 'Defineix bé el material perquè packs, costos i operativa entenguin la mateixa veritat.'}
               </p>
             </div>
@@ -228,16 +238,16 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
 
           <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[28rem]">
             <div className="ap-card p-4">
-              <p className="text-xs uppercase tracking-wide text-white/45">Categoria</p>
-              <p className="mt-2 text-sm font-semibold text-white">{categoryMeta ? `${categoryMeta.icon} ${categoryMeta.label}` : form.category}</p>
+              <p className="text-xs uppercase tracking-wide text-[var(--t3)]">Categoria</p>
+              <p className="mt-2 text-sm font-semibold text-[var(--t)]">{categoryMeta ? `${categoryMeta.icon} ${categoryMeta.label}` : form.category}</p>
             </div>
             <div className="ap-card p-4">
-              <p className="text-xs uppercase tracking-wide text-white/45">Valor actual</p>
-              <p className="mt-2 text-sm font-semibold text-white">{currentValue > 0 ? formatEuro(currentValue) : 'Per definir'}</p>
+              <p className="text-xs uppercase tracking-wide text-[var(--t3)]">Valor actual</p>
+              <p className="mt-2 text-sm font-semibold text-[var(--t)]">{currentValue > 0 ? formatEuro(currentValue) : 'Per definir'}</p>
             </div>
             <div className="ap-card p-4">
-              <p className="text-xs uppercase tracking-wide text-white/45">{form.isConsumable ? 'Estoc' : 'Cost/hora'}</p>
-              <p className="mt-2 text-sm font-semibold text-white">
+              <p className="text-xs uppercase tracking-wide text-[var(--t3)]">{form.isConsumable ? 'Estoc' : 'Cost/hora'}</p>
+              <p className="mt-2 text-sm font-semibold text-[var(--t)]">
                 {form.isConsumable ? stockSummary : hourlyCost > 0 ? `${hourlyCost.toFixed(2)}€/h` : 'Sense amortització'}
               </p>
             </div>
@@ -261,11 +271,11 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           <section className="ap-card p-5 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-sm font-semibold text-white">{mode === 'create' ? 'Identitat de l’element' : 'Dades principals'}</h2>
-                <p className="mt-1 text-xs text-white/55">Això és el que consumirà la resta del sistema quan aquest material entri a packs o càlculs.</p>
+                <h2 className="text-sm font-semibold text-[var(--t)]">{mode === 'create' ? 'Identitat de l’element' : 'Dades principals'}</h2>
+                <p className="mt-1 text-xs text-[var(--t2)]">Això és el que consumirà la resta del sistema quan aquest material entri a packs o càlculs.</p>
               </div>
               {categoryMeta && (
-                <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-1 text-xs text-white/70">
+                <span className="ap-badge">
                   {categoryMeta.icon} {categoryMeta.label}
                 </span>
               )}
@@ -290,11 +300,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                       key={status.value}
                       type="button"
                       onClick={() => updateField('status', status.value)}
-                      className={`rounded-xl border px-2 py-1.5 text-xs font-medium transition-all ${
-                        form.status === status.value
-                          ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
-                          : 'border-white/10 text-white/40 hover:bg-white/5'
-                      }`}
+                      className={`ap-tab ${form.status === status.value ? 'ap-tab--active' : 'ap-tab--idle'}`}
                     >
                       {status.label}
                     </button>
@@ -341,7 +347,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                       className={`flex-1 rounded-xl border px-2 py-1.5 text-xs font-medium transition-all ${
                         form.condition === condition.value
                           ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
-                          : 'border-white/10 text-white/40 hover:bg-white/5'
+                          : 'border-[var(--line)] text-[var(--t3)] hover:bg-[var(--raised)]'
                       }`}
                     >
                       {condition.label}
@@ -380,10 +386,10 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           <section className="ap-card p-5 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-sm font-semibold text-white">Estoc i consum</h2>
-                <p className="mt-1 text-xs text-white/55">Només activa aquesta part quan realment controles unitats fungibles o reposició.</p>
+                <h2 className="text-sm font-semibold text-[var(--t)]">Estoc i consum</h2>
+                <p className="mt-1 text-xs text-[var(--t2)]">Només activa aquesta part quan realment controles unitats fungibles o reposició.</p>
               </div>
-              <label className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-2 text-sm text-white/85">
+              <label className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-2 text-sm text-[var(--t2)]">
                 <input
                   type="checkbox"
                   checked={form.isConsumable}
@@ -420,7 +426,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                 </div>
               </div>
             ) : (
-              <div className="rounded-2xl border border-dashed border-[var(--line)] bg-[var(--panel)] p-4 text-sm text-white/60">
+              <div className="rounded-2xl border border-dashed border-[var(--line)] bg-[var(--panel)] p-4 text-sm text-[var(--t2)]">
                 Aquest element no es controla per estoc. Si és reposició, consumible o material fungible, activa el toggle.
               </div>
             )}
@@ -428,8 +434,8 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
 
           <section className="ap-card p-5 space-y-4">
             <div>
-              <h2 className="text-sm font-semibold text-white">Amortització i cost</h2>
-              <p className="mt-1 text-xs text-white/55">La compra i la vida útil defineixen el cost/hora que després llegeixen els packs.</p>
+              <h2 className="text-sm font-semibold text-[var(--t)]">Amortització i cost</h2>
+              <p className="mt-1 text-xs text-[var(--t2)]">La compra i la vida útil defineixen el cost/hora que després llegeixen els packs.</p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
@@ -444,6 +450,44 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                   className={inputClass}
                 />
               </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="inv-purchase-source" className="text-xs">Font del preu *</label>
+                <input
+                  id="inv-purchase-source"
+                  type="text"
+                  value={form.purchasePriceSource}
+                  onChange={(e) => updateField('purchasePriceSource', e.target.value)}
+                  placeholder="Factura, web o cost indicat pel propietari"
+                  className={inputClass}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="inv-purchase-url" className="text-xs">Enllaç de compra / reposició</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="inv-purchase-url"
+                    type="url"
+                    value={form.purchaseUrl}
+                    onChange={(e) => updateField('purchaseUrl', e.target.value)}
+                    placeholder="https://djmania.es/buscar?..."
+                    className={inputClass}
+                  />
+                  {form.purchaseUrl.trim() && (
+                    <a
+                      href={form.purchaseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ap-btn ap-btn--xs shrink-0"
+                      aria-label="Obrir enllaç de reposició en una pestanya nova"
+                    >
+                      Comprar reposició ↗
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="inv-purchase-date" className="text-xs">Data compra</label>
                 <input
@@ -482,26 +526,26 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
 
         <aside className="space-y-4">
           <section className="ap-card p-5">
-            <h2 className="text-sm font-semibold text-white">Lectura ràpida</h2>
+            <h2 className="text-sm font-semibold text-[var(--t)]">Lectura ràpida</h2>
             <div className="mt-4 space-y-3">
               <div className="ap-card p-4">
-                <p className="text-xs uppercase tracking-wide text-white/45">Cost per hora estimat</p>
-                <p className="mt-2 text-lg font-semibold text-white">{hourlyCost > 0 ? `${hourlyCost.toFixed(2)}€/h` : 'No calculable'}</p>
-                <p className="mt-1 text-xs text-white/55">Compra ÷ vida útil. Si queda buit, el marge dels packs serà menys fiable.</p>
+                <p className="text-xs uppercase tracking-wide text-[var(--t3)]">Cost per hora estimat</p>
+                <p className="mt-2 text-lg font-semibold text-[var(--t)]">{hourlyCost > 0 ? `${hourlyCost.toFixed(2)}€/h` : 'No calculable'}</p>
+                <p className="mt-1 text-xs text-[var(--t2)]">Compra ÷ vida útil. Si queda buit, el marge dels packs serà menys fiable.</p>
               </div>
               <div className="ap-card p-4">
-                <p className="text-xs uppercase tracking-wide text-white/45">Consum i estoc</p>
-                <p className="mt-2 text-lg font-semibold text-white">{stockSummary}</p>
-                <p className="mt-1 text-xs text-white/55">
+                <p className="text-xs uppercase tracking-wide text-[var(--t3)]">Consum i estoc</p>
+                <p className="mt-2 text-lg font-semibold text-[var(--t)]">{stockSummary}</p>
+                <p className="mt-1 text-xs text-[var(--t2)]">
                   {form.isConsumable
                     ? `Estoc actual ${stockQuantity || 0} · mínim ${minStock || 0}.`
                     : 'Sense control d’estoc perquè aquest element no és consumible.'}
                 </p>
               </div>
               <div className="ap-card p-4">
-                <p className="text-xs uppercase tracking-wide text-white/45">Categoria i estat</p>
-                <p className="mt-2 text-sm font-semibold text-white">{categoryMeta ? `${categoryMeta.icon} ${categoryMeta.label}` : form.category}</p>
-                <p className="mt-1 text-xs text-white/55">
+                <p className="text-xs uppercase tracking-wide text-[var(--t3)]">Categoria i estat</p>
+                <p className="mt-2 text-sm font-semibold text-[var(--t)]">{categoryMeta ? `${categoryMeta.icon} ${categoryMeta.label}` : form.category}</p>
+                <p className="mt-1 text-xs text-[var(--t2)]">
                   {statusMeta?.label || form.status} · {conditionMeta?.label || form.condition}
                 </p>
               </div>
@@ -509,8 +553,8 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           </section>
 
           <section className="rounded-2xl border admin-tone-border-cyan admin-tone-bg-info p-5">
-            <h2 className="text-sm font-semibold text-white">Checklist d’edició</h2>
-            <ul className="mt-3 space-y-2 text-sm text-white/75">
+            <h2 className="text-sm font-semibold text-[var(--t)]">Checklist d’edició</h2>
+            <ul className="mt-3 space-y-2 text-sm text-[var(--t)]/75">
               <li>Nom i descripció prou clars per identificar el material sense obrir cap altra pantalla.</li>
               <li>Estat i condició alineats amb la realitat física, no amb el que voldríem que fos.</li>
               <li>Compra, vida útil i valor revisats si l’element entra a packs o càlculs econòmics.</li>
@@ -520,12 +564,12 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
         </aside>
       </div>
 
-      <div className="sticky bottom-2 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 admin-sticky-bar-bg p-3 backdrop-blur">
+      <div className="sticky bottom-2 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--line)] admin-sticky-bar-bg p-3 backdrop-blur">
         <button
           type="button"
           onClick={handleSave}
           disabled={saving || !form.name || !form.value}
-          className="rounded-xl bg-[var(--o-info)] px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="ap-btn disabled:opacity-50"
         >
           {saving ? 'Desant...' : mode === 'create' ? 'Crear element' : 'Desar canvis'}
         </button>
@@ -534,7 +578,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           <button
             type="button"
             onClick={handleDelete}
-            className="rounded-xl border admin-tone-border-danger px-4 py-3 text-sm admin-tone-text-danger transition-colors hover:bg-white/5"
+            className="ap-btn"
           >
             Eliminar
           </button>
@@ -544,7 +588,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           <button
             type="button"
             onClick={() => router.push('/admin/inventory')}
-            className="rounded-xl border border-white/10 px-4 py-3 text-sm text-white/80 transition-colors hover:bg-white/5"
+            className="rounded-xl border border-[var(--line)] px-4 py-3 text-sm text-[var(--t)]/80 transition-colors hover:bg-[var(--raised)]"
           >
             Cancel·lar
           </button>

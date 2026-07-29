@@ -2,7 +2,7 @@
 // API unificada per gestionar preus i veure dades vinculades
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { getPricingAdminData, normalizePricingLocale, updateExtraPrice } from '@/lib/services/pricingAdminService';
 
@@ -11,6 +11,8 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'read');
+  if (permissionError) return permissionError;
   try {
     const { searchParams } = new URL(req.url);
     const locale = normalizePricingLocale(searchParams.get('locale'));
@@ -28,6 +30,8 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
   try {

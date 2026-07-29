@@ -4,8 +4,12 @@ vi.mock('@/lib/logo-lockup-light-base64', () => ({
   ORBITA_LOGO_LOCKUP_LIGHT_BASE64: 'data:image/png;base64,fake',
 }));
 
-import { exportExecutiveReportPdf } from '@/lib/services/executiveReportPdfService';
+import { buildExecutiveReportPdfDecision, exportExecutiveReportPdf } from '@/lib/services/executiveReportPdfService';
 import type { ExecutiveReport } from '@/lib/services/executiveReportService';
+
+function pdfBufferText(buffer: ArrayBuffer): string {
+  return new TextDecoder('latin1').decode(new Uint8Array(buffer));
+}
 
 function makeReport(overrides: Partial<ExecutiveReport> = {}): ExecutiveReport {
   return {
@@ -89,6 +93,51 @@ describe('exportExecutiveReportPdf', () => {
     expect(result).toBeInstanceOf(ArrayBuffer);
     const header = new Uint8Array(result.slice(0, 5));
     expect(String.fromCharCode(...header)).toBe('%PDF-');
+  });
+
+  it('obre amb una decisió recomanada derivada dels insights de reporting', async () => {
+    const report = makeReport();
+    const decision = buildExecutiveReportPdfDecision(report);
+
+    expect(decision).toMatchObject({
+      area: 'Operatiu',
+      headline: '2 SLA trencats contaminen el reporting',
+      ctaLabel: 'Obrir leads',
+    });
+
+    const result = await exportExecutiveReportPdf(report);
+    const text = pdfBufferText(result);
+    expect(text).toContain('SLA trencats contaminen el reporting');
+    expect(text).toContain('Acció: Obrir leads');
+  });
+
+  it('manté una decisió de seguiment quan no hi ha insights prioritaris', () => {
+    const decision = buildExecutiveReportPdfDecision(makeReport({
+      headline: {
+        customers: 12,
+        openLeads: 4,
+        bookingsClosed: 3,
+        revenueClosed: 9000,
+        pipelineRaw: 12000,
+        forecastWeighted: 7000,
+        slaBroken: 0,
+      },
+      recurrence: { totalCustomers: 12, returning: 6, returningRate: 0.5, avgEventsPerCustomer: 1.8 },
+      margin: { totalRevenue: 9000, totalCost: 2500, grossMargin: 6500, marginRate: 0.72 },
+      monthlyTrend: [
+        { month: '2026-02', leads: 5, bookings: 1, revenue: 2500 },
+        { month: '2026-03', leads: 7, bookings: 2, revenue: 3000 },
+        { month: '2026-04', leads: 8, bookings: 3, revenue: 3500 },
+      ],
+      funnel: { NEW: 2, CONTACTED: 1, QUOTE_SENT: 1, NEGOTIATING: 1, WON: 3, LOST: 1 },
+      topRiskLeads: [],
+      conversionBySource: [
+        { source: 'WEB', total: 2, won: 1, winRate: 0.5, avgRevenue: 3000 },
+      ],
+    }));
+
+    expect(decision.headline).toBe('Cap bloqueig crític detectat');
+    expect(decision.ctaLabel).toBe('Mantenir revisió');
   });
 
   it('handles zero values without errors', async () => {

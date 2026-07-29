@@ -1,6 +1,6 @@
 ﻿// app/api/admin/extras/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import {
   getExtrasConfiguratorConfig,
@@ -10,6 +10,8 @@ import {
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'read');
+  if (permissionError) return permissionError;
 
   const { config, isDefault } = await getExtrasConfiguratorConfig();
   return NextResponse.json({ ok: true, config, isDefault });
@@ -18,6 +20,8 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
 
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;

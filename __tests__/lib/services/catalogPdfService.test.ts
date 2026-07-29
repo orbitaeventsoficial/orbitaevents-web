@@ -6,6 +6,10 @@ vi.mock('@/lib/logo-lockup-light-base64', () => ({
 
 import { generateServiceBrochure, generateFullCatalogPDF } from '@/lib/services/catalogPdfService';
 
+function pdfText(doc: Awaited<ReturnType<typeof generateServiceBrochure>>): string {
+  return String((doc as unknown as { internal: { pages: unknown[][] } }).internal.pages.flat().join('\n'));
+}
+
 describe('generateServiceBrochure', () => {
   it('retorna un doc jsPDF vàlid per al servei bodas en català', async () => {
     const doc = await generateServiceBrochure('bodas', 'ca');
@@ -36,6 +40,24 @@ describe('generateServiceBrochure', () => {
     const output = doc.output('arraybuffer');
     expect(output).toBeInstanceOf(ArrayBuffer);
     expect(output.byteLength).toBeGreaterThan(500);
+  });
+
+  it('tanca amb una CTA de decisió en lloc de dubtes sense compromís', async () => {
+    const doc = await generateServiceBrochure('bodas', 'ca');
+    const text = pdfText(doc);
+
+    expect(text).toContain('Quan tingueu clara la direcció, ajustem proposta, data i detalls.');
+    expect(text).not.toContain('Tens dubtes? Escriu-nos sense compromís!');
+  });
+
+  it('manté la CTA de decisió en castellà i anglès', async () => {
+    const esDoc = await generateServiceBrochure('fiestas', 'es');
+    const enDoc = await generateServiceBrochure('discomovil', 'en');
+
+    expect(pdfText(esDoc)).toContain('Cuando tengáis clara la dirección, ajustamos propuesta, fecha y detalles.');
+    expect(pdfText(esDoc)).not.toContain('¿Tienes dudas? ¡Escríbenos sin compromiso!');
+    expect(pdfText(enDoc)).toContain('When the direction is clear, we tailor the proposal, date, and details.');
+    expect(pdfText(enDoc)).not.toContain('Have questions? Contact us with no obligation!');
   });
 });
 

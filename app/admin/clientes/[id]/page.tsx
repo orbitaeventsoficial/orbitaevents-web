@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { fetchCustomerHub } from '@/lib/customer-hub/fetchCustomerHub';
 import CustomerHubClient from './_components/CustomerHubClient';
 import { log } from '@/lib/logger';
-import './customer-hub.css';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // METADATA
@@ -62,26 +61,26 @@ async function CustomerHubLoader({ id }: { id: string }) {
 
 function CustomerHubSkeleton() {
   return (
-    <div className="ch__root">
-      <div className="ch__skeleton-header">
-        <div className="ch__skeleton-header-bar" />
-        <div className="ch__skeleton-header-bar" />
-        <div className="ch__skeleton-header-bar" />
+    <div className="min-h-screen">
+      <div className="flex flex-col gap-3 border-b border-[var(--o-admin-line)] px-4 py-5">
+        <div className="skeleton h-3.5 w-[30%] rounded-[var(--o-r-sm)]" />
+        <div className="skeleton h-3.5 w-[55%] rounded-[var(--o-r-sm)]" />
+        <div className="skeleton h-3.5 w-[80%] rounded-[var(--o-r-sm)]" />
       </div>
-      <div className="ch__grid">
-        <div className="ch__main">
-          <div className="ch__skeleton">
-            <div className="ch__skeleton-bar" />
-            <div className="ch__skeleton-bar" />
-            <div className="ch__skeleton-bar" />
-            <div className="ch__skeleton-bar" />
+      <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-4 p-4 pb-10 lg:grid-cols-[1fr_360px]">
+        <div className="min-w-0">
+          <div className="rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-1)] p-5">
+            <div className="skeleton mb-2 h-3 w-full rounded-[var(--o-r-sm)]" />
+            <div className="skeleton mb-2 h-3 w-[72%] rounded-[var(--o-r-sm)]" />
+            <div className="skeleton mb-2 h-3 w-[48%] rounded-[var(--o-r-sm)]" />
+            <div className="skeleton h-3 w-[65%] rounded-[var(--o-r-sm)]" />
           </div>
         </div>
-        <div className="ch__aside">
-          <div className="ch__skeleton">
-            <div className="ch__skeleton-bar" />
-            <div className="ch__skeleton-bar" />
-            <div className="ch__skeleton-bar" />
+        <div className="min-w-0">
+          <div className="rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-1)] p-5">
+            <div className="skeleton mb-2 h-3 w-full rounded-[var(--o-r-sm)]" />
+            <div className="skeleton mb-2 h-3 w-[72%] rounded-[var(--o-r-sm)]" />
+            <div className="skeleton h-3 w-[48%] rounded-[var(--o-r-sm)]" />
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@
  */
 import { prisma } from '@/lib/prisma';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
 
 export const DOSSIER_COLLABORATOR_PRODUCT_PREFIX = 'collab:';
 
@@ -20,6 +21,8 @@ export type CollaboratorProductInput = {
   includes?: string | null;
   sortOrder?: number | string | null;
   isActive?: boolean | null;
+  visibleInDossier?: boolean | null;
+  visibleInBooking?: boolean | null;
 };
 
 type CollaboratorProductForDossier = {
@@ -30,10 +33,13 @@ type CollaboratorProductForDossier = {
   category: string | null;
   crew: string | null;
   durationLabel: string | null;
+  costPrice: number;
   sellPrice: number;
   imageUrl: string | null;
   includes: string | null;
   sortOrder: number;
+  visibleInDossier?: boolean;
+  visibleInBooking?: boolean;
   collaborator: {
     name: string;
     company: string | null;
@@ -51,19 +57,45 @@ export type DossierCollaboratorProduct = {
   descripcio: string[];
   inclou: string[];
   sellPrice: number;
+  costPrice: number;
   imageUrl?: string;
+  dossierSortOrder?: number;
 };
 
-/** Profit net (€) i markup d'un producte. % calculat sobre el cost del col·laborador. */
-export function computeProductMargin(costPrice: number, sellPrice: number) {
-  const marginNet = sellPrice - costPrice;
-  const marginPct = costPrice > 0 ? (marginNet / costPrice) * 100 : 0;
-  return { marginNet, marginPct };
+const DOSSIER_LEGACY_COLLABORATOR_ALIASES: ReadonlyArray<{ legacyId: string; name: string }> = [
+  { legacyId: 'bingo-musical', name: 'Bingo Musical' },
+  { legacyId: 'batalla-musical', name: 'Batalla Musical' },
+];
+
+const LEGACY_COLLABORATOR_ALIAS_BY_ID = new Map(
+  DOSSIER_LEGACY_COLLABORATOR_ALIASES.map((alias) => [alias.legacyId, alias.name]),
+);
+
+const LEGACY_COLLABORATOR_ALIAS_BY_NAME = new Map(
+  DOSSIER_LEGACY_COLLABORATOR_ALIASES.map((alias) => [alias.name.toLowerCase(), alias.legacyId]),
+);
+
+export function legacyDossierCollaboratorProductIdFor(product: Pick<DossierCollaboratorProduct, 'nom'>): string | null {
+  return LEGACY_COLLABORATOR_ALIAS_BY_NAME.get(product.nom.trim().toLowerCase()) ?? null;
 }
 
 function clean(value?: string | null): string | null {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;
+}
+
+function roundMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function parseNonNegativeMoney(value: number | string | null | undefined): number | null {
+  const amount = Number(value);
+  return Number.isFinite(amount) && amount >= 0 ? roundMoney(amount) : null;
+}
+
+function sanitizeSortOrder(value: number | string | null | undefined): number {
+  const amount = Number(value) || 0;
+  return Math.max(0, Math.round(amount));
 }
 
 function splitIncludes(value?: string | null): string[] {
@@ -73,13 +105,9 @@ function splitIncludes(value?: string | null): string[] {
     .filter(Boolean);
 }
 
-function normalizeCatalogName(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
+function isIncludedSoundRentalCatalogProduct(product: { collaboratorId?: string | null; name?: string | null }): boolean {
+  const normalizedName = product.name?.toLowerCase() || '';
+  return product.collaboratorId === SOUND_RENTAL.collaboratorId && /so|altaveu|speaker/.test(normalizedName);
 }
 
 /**
@@ -110,29 +138,6 @@ export function stripProviderBrand(text: string): string {
     .replace(/^\s*\u00b7\s*/, '')
     .replace(/\s*\u00b7\s*$/, '')
     .trim();
-}
-
-function isMasqueradeProduct(product: CollaboratorProductForDossier): boolean {
-  const collaboratorName = product.collaborator.company || product.collaborator.name;
-  return normalizeCatalogName(collaboratorName).includes('masquerade');
-}
-
-function shouldShowDossierCollaboratorProduct(product: CollaboratorProductForDossier): boolean {
-  if (!isMasqueradeProduct(product)) return true;
-  // Productes de Masquerade ofertables al dossier (noms canònics). Inclou els
-  // extres (pintacares, globoflèxia): ara són seleccionables al generador i entren
-  // al pressupost desglossat com a línia.
-  const name = normalizeCatalogName(product.name);
-  return [
-    'animacio tematica',
-    'animacio amb personatge',
-    'el secret dels pirates',
-    'animacio adults 1h',
-    'bingo musical',
-    'batalla musical',
-    'pintacares professional',
-    'globoflexia',
-  ].includes(name);
 }
 
 function dossierProductDisplayName(product: CollaboratorProductForDossier): string {
@@ -175,7 +180,9 @@ export function collaboratorProductToDossierProduct(product: CollaboratorProduct
     descripcio: description ? [description] : ['Proposta seleccionada i gestionada per Òrbita Events.'],
     inclou: includes.length > 0 ? includes : ['Servei gestionat per Òrbita Events'],
     sellPrice: product.sellPrice,
+    costPrice: product.costPrice,
     imageUrl: product.imageUrl || undefined,
+    dossierSortOrder: product.sortOrder,
   };
 }
 
@@ -193,6 +200,8 @@ export function collaboratorProductToAnimacioProduct(product: DossierCollaborato
     sourceProviderName: product.colaborador,
     sourceProviderId: product.sourceProviderId,
     sourceProductId: product.sourceProductId,
+    sourceCostPrice: product.costPrice,
+    dossierSortOrder: product.dossierSortOrder,
   };
 }
 
@@ -207,6 +216,7 @@ export async function listDossierCollaboratorProducts(): Promise<DossierCollabor
   const products = await prisma.collaboratorProduct.findMany({
     where: {
       isActive: true,
+      visibleInDossier: true,
       collaborator: { isActive: true },
     },
     include: {
@@ -220,18 +230,18 @@ export async function listDossierCollaboratorProducts(): Promise<DossierCollabor
   });
 
   return products
-    .filter(shouldShowDossierCollaboratorProduct)
+    .filter((p) => !isIncludedSoundRentalCatalogProduct(p))
     .map(collaboratorProductToDossierProduct);
 }
 
 /** Productes actius de partners actius, format pla per a l'editor de línies de reserva. */
 export async function listActiveCollaboratorProductsForBooking() {
   const products = await prisma.collaboratorProduct.findMany({
-    where: { isActive: true, collaborator: { isActive: true } },
+    where: { isActive: true, visibleInBooking: true, collaborator: { isActive: true } },
     include: { collaborator: { select: { name: true, company: true, roles: true } } },
     orderBy: [{ collaborator: { company: 'asc' } }, { sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
-  return products.map((p) => ({
+  return products.filter((p) => !isIncludedSoundRentalCatalogProduct(p)).map((p) => ({
     id: p.id,
     name: p.name,
     category: p.category,
@@ -241,6 +251,8 @@ export async function listActiveCollaboratorProductsForBooking() {
     collaboratorId: p.collaboratorId,
     collaboratorName: p.collaborator.company || p.collaborator.name,
     roles: p.collaborator.roles,
+    visibleInDossier: p.visibleInDossier,
+    visibleInBooking: p.visibleInBooking,
   }));
 }
 
@@ -248,35 +260,57 @@ export async function getDossierCollaboratorProductsByIds(productIds: string[]):
   const ids = productIds
     .map(parseDossierCollaboratorProductId)
     .filter((id): id is string => Boolean(id));
-  if (ids.length === 0) return [];
+  const legacyNames = productIds
+    .map((id) => LEGACY_COLLABORATOR_ALIAS_BY_ID.get(id))
+    .filter((name): name is string => Boolean(name));
+  if (ids.length === 0 && legacyNames.length === 0) return [];
+
+  const orFilters = [
+    ...(ids.length > 0 ? [{ id: { in: ids } }] : []),
+    ...legacyNames.map((name) => ({ name: { equals: name, mode: 'insensitive' as const } })),
+  ];
 
   const products = await prisma.collaboratorProduct.findMany({
     where: {
-      id: { in: ids },
+      OR: orFilters,
       isActive: true,
+      visibleInDossier: true,
       collaborator: { isActive: true },
     },
     include: {
       collaborator: { select: { name: true, company: true } },
     },
   });
-  const byId = new Map(products.map((product) => [product.id, collaboratorProductToDossierProduct(product)]));
+  const byId = new Map(products
+    .filter((product) => !isIncludedSoundRentalCatalogProduct(product))
+    .map((product) => [product.id, collaboratorProductToDossierProduct(product)]));
+  const byLegacyId = new Map(
+    Array.from(byId.values())
+      .map((product) => [legacyDossierCollaboratorProductIdFor(product), product] as const)
+      .filter((entry): entry is readonly [string, DossierCollaboratorProduct] => Boolean(entry[0])),
+  );
 
-  return ids
-    .map((id) => byId.get(id))
+  const ordered = productIds
+    .map((productId) => {
+      const directId = parseDossierCollaboratorProductId(productId);
+      if (directId) return byId.get(directId);
+      return byLegacyId.get(productId);
+    })
     .filter((product): product is DossierCollaboratorProduct => Boolean(product));
+
+  return Array.from(new Map(ordered.map((product) => [product.id, product])).values());
 }
 
 export async function createCollaboratorProduct(collaboratorId: string, input: CollaboratorProductInput) {
   if (!input.name?.trim()) {
     return { status: 400, body: { error: 'El nom del producte és obligatori' } };
   }
-  const costPrice = Number(input.costPrice);
-  const sellPrice = Number(input.sellPrice);
-  if (!Number.isFinite(costPrice) || costPrice < 0) {
+  const costPrice = parseNonNegativeMoney(input.costPrice);
+  const sellPrice = parseNonNegativeMoney(input.sellPrice);
+  if (costPrice == null) {
     return { status: 400, body: { error: 'El cost ha de ser un número positiu' } };
   }
-  if (!Number.isFinite(sellPrice) || sellPrice < 0) {
+  if (sellPrice == null) {
     return { status: 400, body: { error: 'El PVP ha de ser un número positiu' } };
   }
 
@@ -297,7 +331,10 @@ export async function createCollaboratorProduct(collaboratorId: string, input: C
       sellPrice,
       imageUrl: clean(input.imageUrl),
       includes: clean(input.includes),
-      sortOrder: Number(input.sortOrder) || 0,
+      sortOrder: sanitizeSortOrder(input.sortOrder),
+      isActive: input.isActive ?? true,
+      visibleInDossier: input.visibleInDossier ?? true,
+      visibleInBooking: input.visibleInBooking ?? true,
     },
   });
 
@@ -306,14 +343,12 @@ export async function createCollaboratorProduct(collaboratorId: string, input: C
 
 export async function updateCollaboratorProduct(productId: string, input: CollaboratorProductInput) {
   if (input.costPrice !== undefined && input.costPrice !== null && input.costPrice !== '') {
-    const costPrice = Number(input.costPrice);
-    if (!Number.isFinite(costPrice) || costPrice < 0) {
+    if (parseNonNegativeMoney(input.costPrice) == null) {
       return { status: 400, body: { error: 'El cost ha de ser un número positiu' } };
     }
   }
   if (input.sellPrice !== undefined && input.sellPrice !== null && input.sellPrice !== '') {
-    const sellPrice = Number(input.sellPrice);
-    if (!Number.isFinite(sellPrice) || sellPrice < 0) {
+    if (parseNonNegativeMoney(input.sellPrice) == null) {
       return { status: 400, body: { error: 'El PVP ha de ser un número positiu' } };
     }
   }
@@ -326,12 +361,14 @@ export async function updateCollaboratorProduct(productId: string, input: Collab
       ...(input.category !== undefined && { category: clean(input.category) }),
       ...(input.crew !== undefined && { crew: clean(input.crew) }),
       ...(input.durationLabel !== undefined && { durationLabel: clean(input.durationLabel) }),
-      ...(input.costPrice !== undefined && { costPrice: Number(input.costPrice) }),
-      ...(input.sellPrice !== undefined && { sellPrice: Number(input.sellPrice) }),
+      ...(input.costPrice !== undefined && { costPrice: parseNonNegativeMoney(input.costPrice) ?? 0 }),
+      ...(input.sellPrice !== undefined && { sellPrice: parseNonNegativeMoney(input.sellPrice) ?? 0 }),
       ...(input.imageUrl !== undefined && { imageUrl: clean(input.imageUrl) }),
       ...(input.includes !== undefined && { includes: clean(input.includes) }),
-      ...(input.sortOrder !== undefined && { sortOrder: Number(input.sortOrder) || 0 }),
+      ...(input.sortOrder !== undefined && { sortOrder: sanitizeSortOrder(input.sortOrder) }),
       ...(input.isActive !== undefined && { isActive: Boolean(input.isActive) }),
+      ...(input.visibleInDossier !== undefined && { visibleInDossier: Boolean(input.visibleInDossier) }),
+      ...(input.visibleInBooking !== undefined && { visibleInBooking: Boolean(input.visibleInBooking) }),
     },
   });
 
@@ -339,6 +376,55 @@ export async function updateCollaboratorProduct(productId: string, input: Collab
 }
 
 export async function deleteCollaboratorProduct(productId: string) {
+  const product = await prisma.collaboratorProduct.findUnique({
+    where: { id: productId },
+    select: {
+      id: true,
+      name: true,
+      isActive: true,
+      visibleInDossier: true,
+      visibleInBooking: true,
+    },
+  });
+  if (!product) {
+    return { status: 404, body: { error: 'Producte no trobat' } };
+  }
+
+  const dossierRef = toDossierCollaboratorProductId(productId);
+  let dossierCount: number;
+  try {
+    dossierCount = await prisma.dossier.count({ where: { productIds: { has: dossierRef } } });
+  } catch {
+    return {
+      status: 409,
+      body: {
+        error: 'No s’han pogut verificar els dossiers vinculats a aquest producte. No s’elimina res fins que la base de dades respongui correctament.',
+        impact: {
+          isActive: product.isActive,
+          visibleInDossier: product.visibleInDossier,
+          visibleInBooking: product.visibleInBooking,
+          verificationFailed: ['dossierRefs'],
+        },
+      },
+    };
+  }
+  if (product.isActive || dossierCount > 0) {
+    return {
+      status: 409,
+      body: {
+        error: dossierCount > 0
+          ? 'Aquest producte encara apareix en dossiers guardats. Desactiva’l; no l’eliminis del tot.'
+          : 'Aquest producte encara és actiu. Desactiva’l abans d’eliminar-lo.',
+        impact: {
+          isActive: product.isActive,
+          visibleInDossier: product.visibleInDossier,
+          visibleInBooking: product.visibleInBooking,
+          dossierRefs: dossierCount,
+        },
+      },
+    };
+  }
+
   await prisma.collaboratorProduct.delete({ where: { id: productId } });
   return { status: 200, body: { ok: true } };
 }

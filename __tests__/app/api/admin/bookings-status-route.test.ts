@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockRequirePermission, mockChangeStatus } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockRequirePermission, mockChangeStatus } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockRequirePermission: vi.fn(),
   mockChangeStatus: vi.fn(),
 }));
@@ -13,6 +14,8 @@ vi.mock('@/lib/constants', () => ({
   BOOKING_STATUS_VALUES: ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED'],
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { PATCH } from '@/app/api/admin/bookings/[id]/status/route';
 
@@ -28,7 +31,7 @@ function makePatchReq(id: string, body: Record<string, unknown>) {
 describe('PATCH /api/admin/bookings/[id]/status', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockChangeStatus.mockResolvedValue({ status: 200, body: { ok: true } });
   });

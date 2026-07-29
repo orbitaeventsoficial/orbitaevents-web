@@ -140,7 +140,7 @@ export function AddCustomerModal({
       initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="cl__modal-backdrop"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl bg-[color-mix(in_oklab,var(--canvas)_72%,transparent)]"
       onClick={onClose}
       role="presentation"
     >
@@ -152,13 +152,13 @@ export function AddCustomerModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-contact-title"
-        className="border rounded-2xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--panel)] p-6 sm:p-8"
       >
         <h2 id="add-contact-title" className="text-2xl font-bold mb-6">Afegir Client</h2>
 
         {/* Duplicate warnings */}
         {duplicateWarnings.length > 0 && (
-          <div className="mb-5 rounded-xl border p-4">
+          <div className="mb-5 ap-card p-4">
             <p className="text-sm font-semibold mb-2">
               Possibles duplicats detectats
             </p>
@@ -176,7 +176,7 @@ export function AddCustomerModal({
                   <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                     dup.matchScore >= 80 ? 'admin-tone-soft-danger' :
                     dup.matchScore >= 50 ? 'admin-tone-bg-warning admin-tone-text-warning' :
-                    'cl__duplicate-score-low'
+                    'admin-tone-bg-neutral admin-tone-text-neutral'
                   }`}>
                     {dup.matchScore}%
                   </span>
@@ -378,7 +378,7 @@ export function StartProcessModal({
       initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="cl__modal-backdrop"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl bg-[color-mix(in_oklab,var(--canvas)_72%,transparent)]"
       onClick={onClose}
       role="presentation"
     >
@@ -390,7 +390,7 @@ export function StartProcessModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="start-process-title"
-        className="border rounded-2xl p-6 sm:p-8 max-w-md w-full"
+        className="w-full max-w-md rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--panel)] p-6 sm:p-8"
       >
         <h2 id="start-process-title" className="text-2xl font-bold mb-2">Iniciar Procés</h2>
         <p className="mb-6">
@@ -421,7 +421,7 @@ export function StartProcessModal({
         <button
           onClick={onClose}
           type="button"
-          className="w-full mt-6 py-3 border rounded-xl transition-all"
+          className="ap-btn w-full mt-6"
         >
           Cancel·lar
         </button>

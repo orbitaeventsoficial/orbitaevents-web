@@ -562,6 +562,7 @@ describe('recordLeadCommercialSequenceStepSent', () => {
       templateSlug: 'follow-up-2',
       locale: 'ca',
       delayHours: 72,
+      emailSendId: 'email-send-sequence-1',
     });
 
     expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
@@ -578,6 +579,7 @@ describe('recordLeadCommercialSequenceStepSent', () => {
           channel: 'email',
           locale: 'ca',
           delayHours: 72,
+          emailSendId: 'email-send-sequence-1',
         },
       },
     });

@@ -42,23 +42,26 @@ enum SettingType {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model InventoryItem {
-  id                String            @id @default(cuid())
-  code              String            @unique // "ALT-001", "FUM-001"
-  name              String
-  description       String?
-  category          InventoryCategory
-  watts             Int?
-  value             Float
-  status            ItemStatus        @default(AVAILABLE)
-  condition         ItemCondition     @default(GOOD)
-  isConsumable      Boolean           @default(false)
-  stockQuantity     Int?
-  minStock          Int?
-  purchaseDate      DateTime?
-  purchasePrice     Float?
-  expectedLifeHours Float?            @default(2000)
-  imageUrl          String?
-  notes             String?
+  id                           String            @id @default(cuid())
+  code                         String            @unique // "ALT-001", "FUM-001"
+  name                         String
+  description                  String?
+  category                     InventoryCategory
+  watts                        Int?
+  value                        Float
+  status                       ItemStatus        @default(AVAILABLE)
+  condition                    ItemCondition     @default(GOOD)
+  isConsumable                 Boolean           @default(false)
+  stockQuantity                Int?
+  minStock                     Int?
+  purchaseDate                 DateTime?
+  purchasePrice                Float?
+  purchasePriceSource          String?           @db.Text
+  purchasePriceSourceCheckedAt DateTime?
+  purchaseUrl                  String?           @db.Text
+  expectedLifeHours            Float?            @default(2000)
+  imageUrl                     String?
+  notes                        String?
 
   packItems    PackInventory[]
   extraItems   ExtraInventory[]
@@ -286,6 +289,7 @@ model Customer {
   bookings       Booking[]
   proposals      Proposal[]
   invoices       Invoice[]
+  deliveryNotes  DeliveryNote[]
   tasks          Task[]
   testimonials   CustomerTestimonial[]
   discountCodes  CustomerDiscountCode[]
@@ -310,7 +314,7 @@ model Customer {
 }
 
 model CustomerContact {
-  id         String  @id @default(cuid())
+  id         String   @id @default(cuid())
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   name       String
@@ -318,7 +322,7 @@ model CustomerContact {
   email      String?
   phone      String?
   notes      String?
-  isPrimary  Boolean @default(false)
+  isPrimary  Boolean  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -429,41 +433,42 @@ model Lead {
   customerId String?
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 
-  name             String
-  email            String
-  phone            String?
-  dni              String?
-  eventType        EventType
-  eventDate        DateTime?
-  eventStartTime   String?   // "13:00"
-  eventEndTime     String?   // "16:00"
-  eventSchedule    String?
-  eventLocation    String?
-  guestCount       Int?
-  budget           String?
-  message          String?    @db.Text
-  interestedPackId String?
-  interestedExtras String[]
-  source           LeadSource @default(WEBSITE)
+  name                 String
+  email                String
+  phone                String?
+  dni                  String?
+  eventType            EventType
+  eventDate            DateTime?
+  eventStartTime       String? // "13:00"
+  eventEndTime         String? // "16:00"
+  eventSchedule        String?
+  eventLocation        String?
+  guestCount           Int?
+  budget               String?
+  message              String?       @db.Text
+  interestedPackId     String?
+  interestedExtras     String[]
+  source               LeadSource    @default(WEBSITE)
   sourceCollaboratorId String?
   sourceCollaborator   Collaborator? @relation("LeadSourceCollaborator", fields: [sourceCollaboratorId], references: [id], onDelete: SetNull)
-  landingPage      String?
-  utmSource        String?
-  utmMedium        String?
-  utmCampaign      String?
-  status           LeadStatus @default(NEW)
-  priority         Priority   @default(MEDIUM)
-  assignedTo       String?
-  preferredLocale  String     @default("es") // Idioma preferit del client (es, ca, en, ar, fr, zh)
+  landingPage          String?
+  utmSource            String?
+  utmMedium            String?
+  utmCampaign          String?
+  status               LeadStatus    @default(NEW)
+  priority             Priority      @default(MEDIUM)
+  assignedTo           String?
+  preferredLocale      String        @default("es") // Idioma preferit del client (es, ca, en, ar, fr, zh)
 
-  notes          LeadNote[]
-  booking        Booking?
-  proposals      Proposal[]
-  activities     LeadActivity[]
-  universalTasks Task[]
-  documents      LeadDocument[]
-  dossiers       Dossier[]
-  serviceLines   LeadServiceLine[]
+  notes                LeadNote[]
+  booking              Booking?
+  proposals            Proposal[]
+  activities           LeadActivity[]
+  universalTasks       Task[]
+  documents            LeadDocument[]
+  dossiers             Dossier[]
+  serviceLines         LeadServiceLine[]
+  collaboratorPayments CollaboratorPayment[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -473,6 +478,8 @@ model Lead {
   // Contacte específic de l'esdeveniment (pot diferir del client)
   eventPhone   String? // telèfon de contacte el dia del bolo
   eventAddress String? // adreça de l'event (venue, domicili, etc.)
+  distanceKm   Float? // km anada+tornada des de Granollers (mirall de Booking.distanceKm; #1345)
+  tollsEur     Float? // peatges de la ruta (manual; no deriva dels km) — cost real de transport (#1364)
 
   // Audit trail de pèrdua: per què i quan s'ha marcat el lead com LOST
   lostReason String?
@@ -505,20 +512,20 @@ model Lead {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model Dossier {
-  id          String    @id @default(cuid())
-  leadId      String?
-  lead        Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  id     String  @id @default(cuid())
+  leadId String?
+  lead   Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
 
   // Dades del client al moment de la generació
-  nom         String
-  empresa     String?
-  telefon     String?
-  email       String?
-  eventDesc   String?
-  salutacio   String?   @db.Text
+  nom       String
+  empresa   String?
+  telefon   String?
+  email     String?
+  eventDesc String?
+  salutacio String? @db.Text
 
   // Productes seleccionats (array d'IDs: 'bingo-musical', 'batalla-musical', 'dj')
-  productIds  String[]
+  productIds String[]
 
   // Foto del bolo en el moment de generar (línies + preus acordats). Coherent amb
   // "cada document = foto del bolo". JSON perquè el bolo viu pot canviar després.
@@ -527,14 +534,14 @@ model Dossier {
   mode         String?
 
   // Estat d'enviament
-  sentAt      DateTime?
-  sentTo      String?   // email al qual es va enviar
+  sentAt DateTime?
+  sentTo String? // email al qual es va enviar
 
   // Paperera de reciclatge (30 dies)
-  deletedAt   DateTime?
+  deletedAt DateTime?
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([leadId])
   @@index([createdAt])
@@ -547,8 +554,8 @@ model Dossier {
 // `leadRouteService.deleteLeadIfAllowed` (delete manual). El registre original
 // de `leads` desapareix; aquest arxiu queda per a stats històriques.
 model LeadArchive {
-  id        String @id @default(cuid())
-  leadId    String // id original del lead a la taula `leads` (referència, no FK)
+  id     String @id @default(cuid())
+  leadId String // id original del lead a la taula `leads` (referència, no FK)
 
   // Snapshot dels camps clau del lead al moment de la purga
   name           String
@@ -716,12 +723,12 @@ model LeadDocument {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model Booking {
-  id         String    @id @default(cuid())
-  reference  String    @unique // "OE-2024-001"
-  leadId     String?   @unique
-  lead       Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
-  customerId String?
-  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  id                   String        @id @default(cuid())
+  reference            String        @unique // "OE-2024-001"
+  leadId               String?       @unique
+  lead                 Lead?         @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  customerId           String?
+  customer             Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
   sourceCollaboratorId String?
   sourceCollaborator   Collaborator? @relation("BookingSourceCollaborator", fields: [sourceCollaboratorId], references: [id], onDelete: SetNull)
   billedCollaboratorId String?
@@ -758,13 +765,13 @@ model Booking {
   total        Float
 
   // Payments
-  depositAmount   Float
-  depositPaid     Boolean   @default(false)
-  depositPaidAt   DateTime?
-  depositPaymentUrl String?
-  remainingAmount Float
-  remainingPaid   Boolean   @default(false)
-  remainingPaidAt DateTime?
+  depositAmount       Float
+  depositPaid         Boolean   @default(false)
+  depositPaidAt       DateTime?
+  depositPaymentUrl   String?
+  remainingAmount     Float
+  remainingPaid       Boolean   @default(false)
+  remainingPaidAt     DateTime?
   remainingPaymentUrl String?
 
   // Bizum (client declara pagament; admin confirma)
@@ -777,11 +784,12 @@ model Booking {
 
   // Cobrament i facturació
   paymentMethod   String  @default("INVOICE") // INVOICE | CASH | TRANSFER
-  invoiceRequired Boolean @default(false)      // el client vol factura?
-  cashAmount      Float?                       // import cobrat en efectiu (si paymentMethod=CASH)
+  invoiceRequired Boolean @default(false) // el client vol factura?
+  cashAmount      Float? // import cobrat en efectiu (si paymentMethod=CASH)
 
   // Travel / distance tracking
   distanceKm    Float? // km anada i tornada
+  tollsEur      Float? // peatges de la ruta (manual; no deriva dels km) — cost real de transport (#1364)
   fuelCostPerKm Float? @default(0.15) // cost €/km (gasolina + desgast)
   travelCost    Float? // cost total desplaçament (calculat o manual)
 
@@ -795,10 +803,11 @@ model Booking {
   clientFeedback       ClientFeedback?
   proposals            Proposal[]
   invoices             Invoice[]
+  deliveryNotes        DeliveryNote[]
   tasks                Task[]
   portalAccesses       ClientPortalAccess[]
-  collaboratorBookings CollaboratorBooking[]
   serviceLines         BookingServiceLine[]
+  collaboratorPayments CollaboratorPayment[]
   galleryPhotos        BookingGalleryPhoto[]
   inventoryUsages      InventoryUsage[]
   availability         Availability[]
@@ -814,7 +823,7 @@ model Booking {
   questionnaireResponses QuestionnaireResponse[]
 
   // Gallery share
-  galleryShareToken    String?  @unique
+  galleryShareToken    String? @unique
   gallerySharePassword String?
 
   createdAt DateTime @default(now())
@@ -835,28 +844,28 @@ model Booking {
 }
 
 model QuestionnaireTemplate {
-  id          String    @id @default(cuid())
+  id          String                  @id @default(cuid())
   title       String
   description String?
   questions   Json
-  isActive    Boolean   @default(true)
+  isActive    Boolean                 @default(true)
   responses   QuestionnaireResponse[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
 
   @@map("questionnaire_templates")
 }
 
 model QuestionnaireResponse {
-  id         String                @id @default(cuid())
-  bookingId  String
-  booking    Booking               @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  templateId String
-  template   QuestionnaireTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  answers    Json
+  id          String                @id @default(cuid())
+  bookingId   String
+  booking     Booking               @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  templateId  String
+  template    QuestionnaireTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  answers     Json
   submittedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
 
   @@unique([bookingId, templateId])
   @@index([bookingId])
@@ -958,6 +967,7 @@ model LeadServiceLine {
 enum ProposalStatus {
   DRAFT
   SENT
+  VIEWED
   ACCEPTED
   REJECTED
   EXPIRED
@@ -976,6 +986,13 @@ enum InvoiceStatus {
   SYNCED
   SYNC_ERROR
   PAID
+  CANCELLED
+}
+
+enum DeliveryNoteStatus {
+  DRAFT
+  DELIVERED
+  SIGNED
   CANCELLED
 }
 
@@ -1003,21 +1020,21 @@ model Proposal {
   tasks        Task[]
 
   // Contracte (neix d'una proposta acceptada)
-  contractReference  String?
-  contractStatus     ContractStatus?
-  contractPdfUrl     String?
-  contractPdfKey     String?
-  contractSentAt     DateTime?
-  contractSignedAt     DateTime?
-  contractSignedBy     String?
+  contractReference     String?
+  contractStatus        ContractStatus?
+  contractPdfUrl        String?
+  contractPdfKey        String?
+  contractSentAt        DateTime?
+  contractSignedAt      DateTime?
+  contractSignedBy      String?
   contractSignatureIp   String?
-  contractSignatureUa   String?       @db.Text
-  contractSignatureBlob String?       @db.Text
+  contractSignatureUa   String?         @db.Text
+  contractSignatureBlob String?         @db.Text
   depositAmount         Float?
-  depositDueDate     DateTime?
-  finalPaymentDue    DateTime?
-  cancellationPolicy String?         @db.Text
-  additionalClauses  String?         @db.Text
+  depositDueDate        DateTime?
+  finalPaymentDue       DateTime?
+  cancellationPolicy    String?         @db.Text
+  additionalClauses     String?         @db.Text
 
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -1077,6 +1094,40 @@ model Invoice {
   @@map("invoices")
 }
 
+model DeliveryNote {
+  id         String    @id @default(cuid())
+  reference  String    @unique // ALB-YYYY-NNNN
+  bookingId  String
+  booking    Booking   @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  clientName    String
+  eventDate     DateTime
+  eventLocation String
+  snapshot      Json
+  notes         String? @db.Text
+
+  status      DeliveryNoteStatus @default(DRAFT)
+  deliveredAt DateTime?
+  signedAt    DateTime?
+  signedBy    String?
+  signatureIp String?
+  signatureUa String?            @db.Text
+
+  pdfUrl String?
+  pdfKey String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookingId])
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("delivery_notes")
+}
+
 model Task {
   id               String       @id @default(cuid())
   customerId       String?
@@ -1087,7 +1138,6 @@ model Task {
   booking          Booking?     @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   proposalId       String?
   proposal         Proposal?    @relation(fields: [proposalId], references: [id], onDelete: SetNull)
-  legacyLeadTaskId String?      @unique
   title            String
   description      String?      @db.Text
   dueDate          DateTime?
@@ -1817,20 +1867,20 @@ model EmailTemplate {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model EmailSend {
-  id            String   @id @default(cuid())
-  trackingToken String   @unique @default(cuid())
+  id            String    @id @default(cuid())
+  trackingToken String    @unique @default(cuid())
   templateKey   String? // 'primer-contacte', 'seguiment', etc.
   to            String
   subject       String
-  htmlBody      String?  @db.Text  // Snapshot del HTML enviat (per a previsualització a l'admin)
+  htmlBody      String?   @db.Text // Snapshot del HTML enviat (per a previsualització a l'admin)
   leadId        String?
   customerId    String?
   locale        String?
-  sentAt        DateTime @default(now())
+  sentAt        DateTime  @default(now())
   openedAt      DateTime?
-  openCount     Int      @default(0)
+  openCount     Int       @default(0)
   clickedAt     DateTime?
-  clickCount    Int      @default(0)
+  clickCount    Int       @default(0)
 
   // ── Observabilitat real del canal (no posa la BD al canal: només recull
   //    l'estat del que ha passat al servidor SMTP/IMAP). ────────────────────
@@ -1866,24 +1916,24 @@ model Collaborator {
   company       String?
   email         String?
   phone         String?
-  specialty     String?                  // Especialitat (DJ, Presentador, Tècnic so...)
+  specialty     String? // Especialitat (DJ, Presentador, Tècnic so...)
   roles         String[]                 @default([]) // PROVIDER, REFERRER, EQUIPMENT_RENTAL, CLIENT_PARTNER, CREW
-  commissionPct Float                    @default(0)  // % comissió de vendes (0 si és treballador extern)
+  commissionPct Float                    @default(0) // % comissió de vendes (0 si és treballador extern)
   pricingModel  CollaboratorPricingModel @default(DISCOUNT)
-  costPerHour   Float?                   // Cost que ens cobra per hora (calculadora de costos)
+  costPerHour   Float? // Cost que ens cobra per hora (calculadora de costos)
   notes         String?                  @db.Text
   isActive      Boolean                  @default(true)
   isFavorite    Boolean                  @default(false) // Surt als desplegables ràpids de reserva (origen/facturació)
 
-  bookings CollaboratorBooking[]
-  products CollaboratorProduct[]
-  members CollaboratorMember[]
-  sourcedLeads Lead[] @relation("LeadSourceCollaborator")
-  sourcedBookings Booking[] @relation("BookingSourceCollaborator")
-  billedBookings Booking[] @relation("BookingBilledCollaborator")
+  products            CollaboratorProduct[]
+  members             CollaboratorMember[]
+  sourcedLeads        Lead[]                @relation("LeadSourceCollaborator")
+  sourcedBookings     Booking[]             @relation("BookingSourceCollaborator")
+  billedBookings      Booking[]             @relation("BookingBilledCollaborator")
   bookingServiceLines BookingServiceLine[]
   leadServiceLines    LeadServiceLine[]
   crewBlocks          CrewBlock[]
+  payments            CollaboratorPayment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1938,17 +1988,19 @@ model CollaboratorProduct {
   collaboratorId String
   collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
 
-  name          String
-  description   String? @db.Text
-  category      String? // "Animació infantil", "Musical", "Extra", "Bingo"...
-  crew          String? // "Animador + tècnic de so"
-  durationLabel String? // "1h", "70 min"
-  costPrice     Float // Cost net que ens cobra el col·laborador (sense IVA)
-  sellPrice     Float // El nostre PVP (cost + marge)
-  imageUrl      String?
-  includes      String? @db.Text // Què inclou el producte
-  sortOrder     Int     @default(0)
-  isActive      Boolean @default(true)
+  name             String
+  description      String? @db.Text
+  category         String? // "Animació infantil", "Musical", "Extra", "Bingo"...
+  crew             String? // "Animador + tècnic de so"
+  durationLabel    String? // "1h", "70 min"
+  costPrice        Float // Cost net que ens cobra el col·laborador (sense IVA)
+  sellPrice        Float // El nostre PVP (cost + marge)
+  imageUrl         String?
+  includes         String? @db.Text // Què inclou el producte
+  sortOrder        Int     @default(0)
+  isActive         Boolean @default(true)
+  visibleInDossier Boolean @default(true) // Capítol/oferta client-facing en dossiers
+  visibleInBooking Boolean @default(true) // Línia seleccionable al configurador de bolo
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1957,30 +2009,33 @@ model CollaboratorProduct {
   @@map("collaborator_products")
 }
 
-model CollaboratorBooking {
-  id             String       @id @default(cuid())
-  collaboratorId String
-  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
-  bookingId      String
-  booking        Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-
-  commissionPct     Float // % comissió aplicat
-  commissionAmount  Float // Import comissió en €
-  collaboratorPrice Float? // Preu que veu el col·laborador (si model DISCOUNT)
-  isPaid            Boolean   @default(false)
-  paidAt            DateTime?
-
-  createdAt DateTime @default(now())
-
-  @@unique([collaboratorId, bookingId])
-  @@index([bookingId])
-  @@index([collaboratorId])
-  @@map("collaborator_bookings")
-}
-
 enum CollaboratorPricingModel {
   NET_PLUS_COMMISSION // Preu net: col·lab afegeix la seva comissió
   DISCOUNT // Descompte: col·lab rep preu amb X% menys
+}
+
+// Pagament a un col·laborador per la seva part d'UN bolo (#1364). Normalment el
+// mateix dia en cash. Marca la liquidació d'aquell bolo (reserva o lead pur) com
+// a pagada → separa «entregat» (fet, pendent de pagar) de «pagat». L'import que se
+// li deu es calcula en viu amb `computeBoloRepartiment`; això només registra el pagat.
+model CollaboratorPayment {
+  id             String       @id @default(cuid())
+  collaboratorId String
+  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+  bookingId      String?
+  booking        Booking?     @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  leadId         String?
+  lead           Lead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  amount         Float // import pagat a aquest col·laborador per aquest bolo
+  paidAt         DateTime     @default(now())
+  method         String       @default("CASH") // CASH, TRANSFER, BIZUM
+  notes          String?      @db.Text
+  createdAt      DateTime     @default(now())
+
+  @@index([collaboratorId])
+  @@index([bookingId])
+  @@index([leadId])
+  @@map("collaborator_payments")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1990,25 +2045,25 @@ enum CollaboratorPricingModel {
 /// Singleton: una sola fila (id = "default").
 /// Fallback canònic a lib/constants/pricing-intelligence.ts si la fila no existeix.
 model PricingConfig {
-  id                     String   @id @default("default")
+  id String @id @default("default")
 
   /// % de marge objectiu sobre preu NET (sense IVA)
-  targetMarginPct        Float    @default(40)
+  targetMarginPct Float @default(40)
 
   /// Tarifa €/h per tipus de servei. JSON: { fiesta_privada:{min,recommended,premium}, ... }
-  ourHourlyRateByService Json     @default("{}")
+  ourHourlyRateByService Json @default("{}")
 
   /// % senyal recomanat sobre el total
-  depositPctRecommended  Float    @default(30)
+  depositPctRecommended Float @default(30)
 
   /// Llindars d'alerta. JSON: { priceDeviationAlertPct, priceDeviationCriticalPct, lowMarginPct, criticalMarginPct }
-  alertThresholds        Json     @default("{}")
+  alertThresholds Json @default("{}")
 
   /// Amortització equip per categoria (override del fallback). JSON: { SOUND:{value,lifeHours}, ... }
-  equipmentAmortization  Json?
+  equipmentAmortization Json?
 
-  updatedAt              DateTime @updatedAt
-  createdAt              DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 
   @@map("pricing_config")
 }
@@ -2103,6 +2158,13 @@ model PortfolioMedia {
   @@map("portfolio_media")
 }
 
+enum PortfolioEventOriginType {
+  MANUAL
+  BOOKING_GALLERY
+  POST_EVENT_REPORT
+  TESTIMONIAL
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // PORTFOLIO EVENTS (mini-pàgines per event concret)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2122,12 +2184,20 @@ model PortfolioEvent {
   coverImage   String // URL de la imatge hero
   published    Boolean          @default(false)
   sortOrder    Int              @default(0)
+  originType   PortfolioEventOriginType @default(MANUAL)
+  sourceBookingId     String?
+  sourceGalleryPhotoId String?
+  sourceTestimonialId  String?
+  originLabel          String?
   media        PortfolioMedia[]
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
   @@index([categorySlug, published])
   @@index([published, sortOrder])
+  @@index([originType, sourceBookingId])
+  @@index([sourceGalleryPhotoId])
+  @@index([sourceTestimonialId])
   @@map("portfolio_events")
 }
 
@@ -2193,6 +2263,14 @@ enum SocialCategory {
   COLLAB
 }
 
+enum SocialPostOriginType {
+  MANUAL
+  BOOKING
+  TESTIMONIAL
+  PORTFOLIO
+  UPCOMING_EVENT
+}
+
 model SocialPost {
   id          String            @id @default(cuid())
   title       String
@@ -2214,6 +2292,11 @@ model SocialPost {
   bookingId String?
   booking   Booking? @relation(fields: [bookingId], references: [id])
 
+  // Origen canònic de la peça social
+  originType  SocialPostOriginType @default(MANUAL)
+  originId    String?
+  originLabel String?
+
   // Notes internes
   notes String? @db.Text
 
@@ -2224,5 +2307,23 @@ model SocialPost {
   @@index([scheduledAt])
   @@index([category])
   @@index([bookingId])
+  @@index([originType, originId])
   @@map("social_posts")
+}
+
+/// Despesa de màrqueting real per canal i mes — base del CAC real
+/// (CAC = despesa del canal / clients guanyats del mateix període).
+model MarketingSpend {
+  id        String     @id @default(cuid())
+  channel   LeadSource
+  year      Int
+  month     Int // 1-12
+  amount    Float // euros invertits al canal aquell mes
+  notes     String?    @db.Text
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([channel, year, month])
+  @@index([year, month])
+  @@map("marketing_spend")
 }

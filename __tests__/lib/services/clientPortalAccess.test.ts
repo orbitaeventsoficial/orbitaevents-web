@@ -76,6 +76,11 @@ describe('normalizePortalLocale', () => {
     expect(normalizePortalLocale('CA')).toBe('ca');
     expect(normalizePortalLocale('ES')).toBe('es');
   });
+
+  it('ignora espais accidentals', () => {
+    expect(normalizePortalLocale(' es ')).toBe('es');
+    expect(normalizePortalLocale(' EN ')).toBe('en');
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -145,6 +150,25 @@ describe('issueClientPortalAccess', () => {
         data: expect.objectContaining({ locale: 'en' }),
       })
     );
+  });
+
+  it('clampa caducitat zero a un dia', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+
+    try {
+      await issueClientPortalAccess({ bookingId: 'booking-1', expiresInDays: 0 });
+
+      expect(mockPrisma.clientPortalAccess.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            expiresAt: new Date('2026-01-02T00:00:00.000Z'),
+          }),
+        }),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
@@ -222,6 +246,44 @@ describe('findPortalAccessByRawToken', () => {
     const result = await findPortalAccessByRawToken('a'.repeat(30));
     expect(result).toBeTruthy();
     expect(result!.id).toBe('access-1');
+    expect(mockPrisma.clientPortalAccess.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        include: expect.objectContaining({
+          booking: expect.objectContaining({
+            include: expect.objectContaining({
+              deliveryNotes: expect.objectContaining({
+                select: expect.objectContaining({
+                  reference: true,
+                  status: true,
+                  pdfUrl: true,
+                  signedAt: true,
+                }),
+              }),
+              invoices: expect.objectContaining({
+                select: expect.objectContaining({
+                  reference: true,
+                  status: true,
+                  pdfUrl: true,
+                  createdAt: true,
+                }),
+              }),
+              postEventReport: { select: { id: true } },
+              serviceLines: {
+                select: expect.objectContaining({
+                  kind: true,
+                  label: true,
+                  quantity: true,
+                  notes: true,
+                }),
+              },
+            }),
+          }),
+        }),
+      }),
+    );
+    const bookingInclude = mockPrisma.clientPortalAccess.findUnique.mock.calls[0]?.[0]
+      ?.include?.booking?.include;
+    expect(bookingInclude).not.toHaveProperty('clientFeedback');
   });
 });
 

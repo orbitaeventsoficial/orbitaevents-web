@@ -48,6 +48,8 @@ const validBody = {
   videoUrl: '',
   allowGoogleShare: true,
   consentPhotoPublication: false,
+  token: 'review-token-1',
+  bookingRef: 'OE-2026-001',
 };
 
 describe('/api/testimonials', () => {
@@ -91,7 +93,68 @@ describe('/api/testimonials', () => {
       videoUrl: undefined,
       allowGoogleShare: true,
       consentPhotoPublication: false,
+      token: 'review-token-1',
+      bookingRef: 'OE-2026-001',
     });
+  });
+
+  it('trimmeja camps obligatoris abans de validar i enviar al servei', async () => {
+    const response = await POST(makePostRequest({
+      ...validBody,
+      name: '  Laia Soler  ',
+      email: '  laia@example.com  ',
+      comment: '  Una experiencia molt bona amb tot molt ben preparat.  ',
+    }));
+
+    expect(response.status).toBe(200);
+    expect(mockSubmitPublicTestimonial).toHaveBeenCalledWith(expect.objectContaining({
+      name: 'Laia Soler',
+      email: 'laia@example.com',
+      comment: 'Una experiencia molt bona amb tot molt ben preparat.',
+    }));
+  });
+
+  it('trimmeja URLs opcionals i tracta buits com absents', async () => {
+    const response = await POST(makePostRequest({
+      ...validBody,
+      photoUrl: ' https://example.com/foto.jpg ',
+      videoUrl: '   ',
+    }));
+
+    expect(response.status).toBe(200);
+    expect(mockSubmitPublicTestimonial).toHaveBeenCalledWith(expect.objectContaining({
+      photoUrl: 'https://example.com/foto.jpg',
+      videoUrl: undefined,
+    }));
+  });
+
+  it('rebutja comentaris que nomes tenen espais', async () => {
+    const response = await POST(makePostRequest({ ...validBody, comment: '             ' }));
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.details[0].path).toEqual(['comment']);
+    expect(mockSubmitPublicTestimonial).not.toHaveBeenCalled();
+  });
+
+  it('tolera token i referencia nuls com a context absent', async () => {
+    const response = await POST(makePostRequest({ ...validBody, token: null, bookingRef: null }));
+
+    expect(response.status).toBe(200);
+    expect(mockSubmitPublicTestimonial).toHaveBeenCalledWith(expect.objectContaining({
+      token: undefined,
+      bookingRef: undefined,
+    }));
+  });
+
+  it('trimmeja token i referencia abans del servei', async () => {
+    const response = await POST(makePostRequest({ ...validBody, token: ' tok-1 ', bookingRef: ' OE-2026-001 ' }));
+
+    expect(response.status).toBe(200);
+    expect(mockSubmitPublicTestimonial).toHaveBeenCalledWith(expect.objectContaining({
+      token: 'tok-1',
+      bookingRef: 'OE-2026-001',
+    }));
   });
 
   it('llista testimonis aprovats amb paginació pública', async () => {

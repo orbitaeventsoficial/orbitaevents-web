@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockUpload, mockDeletePhoto } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockUpload, mockDeletePhoto } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockUpload: vi.fn(),
   mockDeletePhoto: vi.fn(),
 }));
@@ -14,12 +15,14 @@ vi.mock('@/lib/services/inventoryAdminService', () => ({
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn() } }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { POST, DELETE } from '@/app/api/admin/inventory/[id]/photo/route';
 
 const ctx = { params: { id: 'i1' } };
 
 describe('POST /api/admin/inventory/[id]/photo', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockUpload.mockResolvedValue({ status: 200, body: { imageUrl: '/uploads/photo.jpg' } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockUpload.mockResolvedValue({ status: 200, body: { imageUrl: '/uploads/photo.jpg' } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response('{}', { status: 401 }));
@@ -48,7 +51,7 @@ describe('POST /api/admin/inventory/[id]/photo', () => {
 });
 
 describe('DELETE /api/admin/inventory/[id]/photo', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockDeletePhoto.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockDeletePhoto.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('elimina foto', async () => {
     expect((await DELETE(new NextRequest('http://localhost/x', { method: 'DELETE' }), ctx)).status).toBe(200);

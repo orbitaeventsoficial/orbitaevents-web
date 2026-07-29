@@ -5,8 +5,25 @@ import { useState, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  AlertTriangle,
+  Banknote,
+  BarChart3,
+  Check,
+  CheckCircle2,
+  Lightbulb,
+  LockKeyhole,
+  Package,
+  Pencil,
+  Sparkles,
+  Star,
+  Target,
+  Trophy,
+  Wrench,
+  XCircle,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { formatCurrency, formatDate, formatNumber, INVENTORY_CATEGORY_OPTIONS } from '@/lib/constants';
 import { ADMIN_PRICING_TABS, type PricingTab } from '@/lib/constants/admin';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -99,6 +116,18 @@ interface StatsData {
 
 type PricingFocus = 'alert' | 'zero-price';
 
+const TAB_ICON = 'h-4 w-4 shrink-0';
+const SECTION_ICON = 'h-5 w-5 shrink-0';
+const STAT_ICON = 'h-7 w-7 shrink-0';
+const INLINE_ICON = 'h-3.5 w-3.5 shrink-0';
+const TAB_ICON_MAP: Record<(typeof ADMIN_PRICING_TABS)[number]['icon'], LucideIcon> = {
+  chart: BarChart3,
+  target: Target,
+  sparkles: Sparkles,
+  package: Package,
+  wrench: Wrench,
+};
+
 function resolvePricingTab(value?: string | null): PricingTab {
   switch (value) {
     case 'tarifes':
@@ -141,8 +170,6 @@ export default function PricingAdminPage() {
   const [editingExtra, setEditingExtra] = useState<string | null>(null);
   const [editPrice, setEditPrice] = useState<number>(0);
   const [saving, setSaving] = useState(false);
-  const [pricingConfig, setPricingConfig] = useState<Record<string, Record<string, number>>>({});
-  const [savingConfig, setSavingConfig] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -248,37 +275,12 @@ export default function PricingAdminPage() {
         alert: 'Packs amb alerta de preu',
       }[activeFocus]
     : null;
-  const zeroPriceExtras = extras.filter((extra) => extra.priceType !== 'ON_REQUEST' && Number(extra.price || 0) <= 0).length;
-  const packAlerts = packs.filter((pack) => pack.editableNote?.toLowerCase().includes('alerta')).length;
-  const inventoryWithUsage = inventory.filter((item) => item.stats.totalEvents > 0).length;
-  const nextStepTitle = !stats
-    ? 'Recuperar la lectura de preus abans d’actuar'
-    : activeFocus === 'zero-price'
-      ? 'Regularitzar els extres a preu 0'
-      : activeFocus === 'alert'
-        ? 'Revisar els packs amb alerta abans de tocar res més'
-        : zeroPriceExtras > 0
-          ? 'Atacar primer els extres sense preu'
-          : packAlerts > 0
-            ? 'Revisar els packs marcats amb alerta'
-            : 'Mantenir el catàleg de preus sota control';
-  const nextStepDetail = !stats
-    ? 'Sense dades de pricing carregades no toca prendre decisions sobre marge, cost o PVP.'
-    : activeFocus === 'zero-price'
-      ? 'Aquest focus ja t’aïlla els extres que encara no tenen preu útil per vendre.'
-      : activeFocus === 'alert'
-        ? 'Aquest focus ja t’aïlla els packs que demanen revisió abans de confiar en la seva lectura econòmica.'
-        : zeroPriceExtras > 0
-          ? 'El retorn més alt ara no és repassar-ho tot, sinó tancar els extres que continuen sense preu vàlid.'
-          : packAlerts > 0
-            ? 'Amb els extres estables, el següent coll és revisar els packs que arrosseguen alerta de preu.'
-            : 'Amb el catàleg estable, el següent pas útil és revisar marge, ús i salut econòmica amb criteri.';
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex items-center justify-center min-h-[60vh]" role="status" aria-live="polite">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[var(--line)] border-t-transparent mx-auto mb-4"></div>
           <p className="font-medium">Carregant dades...</p>
         </div>
       </div>
@@ -287,7 +289,7 @@ export default function PricingAdminPage() {
 
   if (!stats && message?.type === 'error') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4" role="alert" aria-live="assertive">
         <p className="admin-tone-text-warning text-lg font-medium">{message.text}</p>
         <button type="button" onClick={loadData} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
@@ -299,63 +301,11 @@ export default function PricingAdminPage() {
       title="Preus"
       subtitle="Revisa preus, marges i costos dels extres, packs i inventari per saber què renta i què no."
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema al catàleg de preus',
-          tone: stats ? 'info' : 'warning',
-          items: [
-            stats
-              ? `${stats.totalExtras} extres, ${stats.totalPacks} packs i ${stats.totalInventory} ítems d’inventari en lectura econòmica.`
-              : 'Sense stats carregades del catàleg de pricing.',
-            stats
-              ? `${formatCurrency(stats.totalRevenue._sum.total || 0)} d’ingressos i ${stats.completedBookings} esdeveniments completats al resum.`
-              : 'Sense resum d’ingressos disponible ara mateix.',
-            inventoryWithUsage > 0
-              ? `${inventoryWithUsage} ítems d’inventari tenen ús registrat a la vista actual.`
-              : 'Cap ítem d’inventari mostra ús registrat a primer nivell.',
-          ],
-          emptyText: 'Sense dades no hi ha lectura automàtica del catàleg.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: zeroPriceExtras > 0 || packAlerts > 0 || Boolean(message?.type === 'error') ? 'warning' : 'success',
-          items: [
-            zeroPriceExtras > 0
-              ? `${zeroPriceExtras} extres continuen amb preu 0 i demanen revisió.`
-              : 'No hi ha extres a preu 0 al primer nivell.',
-            packAlerts > 0
-              ? `${packAlerts} packs arrosseguen alerta de preu a la seva nota editable.`
-              : 'No hi ha packs marcats amb alerta a primer nivell.',
-            activeFocusLabel
-              ? `Hi ha focus de salut actiu sobre ${activeFocusLabel}.`
-              : `Sense focus actiu: estàs governant la pestanya ${ADMIN_PRICING_TABS.find((tab) => tab.key === activeTab)?.label || activeTab}.`,
-          ],
-          emptyText: 'No hi ha coll manual evident a primer nivell.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          title: nextStepTitle,
-          detail: nextStepDetail,
-          href:
-            activeFocus === 'zero-price'
-              ? '/admin/pricing?tab=extras&focus=zero-price'
-              : activeFocus === 'alert'
-                ? '/admin/pricing?tab=packs&focus=alert'
-                : '/admin/pricing',
-          ctaLabel: activeFocus ? 'Mantenir aquest focus' : 'Revisar pricing',
-          secondaryAction:
-            activeTab !== 'overview'
-              ? { href: '/admin/pricing?tab=overview', label: 'Tornar al resum' }
-              : undefined,
-        }}
-      />
-
       <div className="flex gap-2 flex-wrap">
         {ADMIN_PRICING_TABS.map(tabDef => {
           const badgeCounts: Record<string, number> = { extras: extras.length, packs: packs.length, inventory: inventory.length };
           const tab = { ...tabDef, badge: badgeCounts[tabDef.key] };
+          const TabIcon = TAB_ICON_MAP[tab.icon];
           return (
           <button
             key={tab.key}
@@ -370,12 +320,12 @@ export default function PricingAdminPage() {
               }
             `}
           >
-            <span>{tab.icon}</span>
+            <TabIcon className={TAB_ICON} aria-hidden="true" />
             {tab.label}
             {tab.badge && (
               <span className={`
                 text-xs px-2 py-0.5 rounded-full
-                ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10'}
+                ${activeTab === tab.key ? 'bg-[var(--raised)]' : 'bg-[var(--raised)]'}
               `}>
                 {tab.badge}
               </span>
@@ -412,7 +362,9 @@ export default function PricingAdminPage() {
           aria-live="polite"
         >
           <span className="flex items-center gap-2">
-            {message.type === 'success' ? '✅' : '❌'}
+            {message.type === 'success'
+              ? <CheckCircle2 className={SECTION_ICON} aria-hidden="true" />
+              : <XCircle className={SECTION_ICON} aria-hidden="true" />}
             {message.text}
           </span>
           <button
@@ -437,23 +389,23 @@ export default function PricingAdminPage() {
       {activeTab === 'overview' && stats && (
         <div className="space-y-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard icon="💰" label="Ingressos totals" value={formatCurrency(stats.totalRevenue._sum.total || 0)} sublabel={`${stats.completedBookings} esdeveniments completats`} color="emerald" />
-            <StatCard icon="📦" label="Total packs" value={stats.totalPacks.toString()} sublabel={`${stats.totalBookings} reserves totals`} color="cyan" />
-            <StatCard icon="✨" label="Total Extras" value={stats.totalExtras.toString()} sublabel="disponibles" color="purple" />
-            <StatCard icon="🔧" label="Inventari" value={stats.totalInventory.toString()} sublabel="ítems registrats" color="amber" />
+            <StatCard icon={Banknote} label="Ingressos totals" value={formatCurrency(stats.totalRevenue._sum.total || 0)} sublabel={`${stats.completedBookings} esdeveniments completats`} color="emerald" />
+            <StatCard icon={Package} label="Total packs" value={stats.totalPacks.toString()} sublabel={`${stats.totalBookings} reserves totals`} color="cyan" />
+            <StatCard icon={Sparkles} label="Total Extras" value={stats.totalExtras.toString()} sublabel="disponibles" color="purple" />
+            <StatCard icon={Wrench} label="Inventari" value={stats.totalInventory.toString()} sublabel="ítems registrats" color="amber" />
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="rounded-2xl border admin-card-glass p-6">
+            <div className="ap-card p-6">
               <h3 className="ap-h2 mb-4 flex items-center gap-2">
-                <span className="text-2xl">🏆</span>
+                <Trophy className={SECTION_ICON} aria-hidden="true" />
                 Extras Més Venuts
               </h3>
               <div className="space-y-3">
                 {stats.topExtras.map((extra, i) => (
                   <div key={extra.slug} className="flex items-center justify-between p-3 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[var(--t)] text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
                         {i + 1}
                       </span>
                       <span className="font-medium">{extra.name}</span>
@@ -467,16 +419,16 @@ export default function PricingAdminPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border admin-card-glass p-6">
+            <div className="ap-card p-6">
               <h3 className="ap-h2 mb-4 flex items-center gap-2">
-                <span className="text-2xl">🎯</span>
+                <Target className={SECTION_ICON} aria-hidden="true" />
                 Packs Més Populars
               </h3>
               <div className="space-y-3">
                 {stats.topPacks.map((pack, i) => (
                   <div key={pack.slug} className="flex items-center justify-between p-3 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[var(--t)] text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
                         {i + 1}
                       </span>
                       <span className="font-medium">{pack.name}</span>
@@ -491,9 +443,9 @@ export default function PricingAdminPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border admin-card-glass p-6">
+          <div className="ap-card p-6">
             <h3 className="font-bold mb-3 flex items-center gap-2">
-              <span className="text-xl">💡</span>
+              <Lightbulb className={SECTION_ICON} aria-hidden="true" />
               Com funciona aquesta pàgina
             </h3>
             <div className="grid md:grid-cols-3 gap-4 text-sm">
@@ -532,12 +484,12 @@ export default function PricingAdminPage() {
       {activeTab === 'tarifes' && (
         <div className="space-y-6">
           {/* Tarifes per servei */}
-          <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
+          <div className="ap-card p-6">
             <h3 className="ap-h2 mb-1">Tarifes per servei (€/h facturable)</h3>
             <p className="text-sm opacity-50 mb-5">Mercat DJ professional Barcelona. Hores facturables = inici → fi del bolo.</p>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-[var(--line)]">
                   <th scope="col" className="text-left py-2 opacity-60 font-medium">Servei</th>
                   <th scope="col" className="text-right py-2 opacity-60 font-medium">Mínim</th>
                   <th scope="col" className="text-right py-2 opacity-60 font-medium">Recomanat</th>
@@ -546,9 +498,7 @@ export default function PricingAdminPage() {
               </thead>
               <tbody>
                 {(Object.entries(SERVICE_HOURLY_RATES) as [ServicePricingKey, { min: number; recommended: number; premium: number }][]).map(([key, rates]) => {
-                  const cfg = pricingConfig[key] ?? {};
-                  const recEur = cfg.recommended ?? rates.recommended;
-                  const tone = getMarginColor(recEur >= rates.recommended ? 50 : recEur >= rates.min ? 25 : 10);
+                  const tone = getMarginColor(50);
                   const labels: Record<string, string> = {
                     dj: 'DJ',
                     sonorizacion: 'Sonorització',
@@ -560,7 +510,7 @@ export default function PricingAdminPage() {
                     animacion_infantil: 'Animació infantil', extra_hora: 'Hora addicional',
                   };
                   return (
-                    <tr key={key} className="border-b border-white/5 adm-row-hover">
+                    <tr key={key} className="border-b border-[var(--line)] adm-row-hover">
                       <td className="py-3 flex items-center gap-2">
                         <span className="inline-block w-2 h-2 rounded-full flex-shrink-0" style={{ background: tone.hex }} />
                         {labels[key] ?? key}
@@ -568,7 +518,7 @@ export default function PricingAdminPage() {
                       {(['min', 'recommended', 'premium'] as const).map((field) => (
                         <td key={field} className="py-3 text-right">
                           <span className="font-mono font-semibold">
-                            {cfg[field] ?? (rates as Record<string, number>)[field]}€/h
+                            {rates[field]}€/h
                           </span>
                         </td>
                       ))}
@@ -577,16 +527,16 @@ export default function PricingAdminPage() {
                 })}
               </tbody>
             </table>
-            <p className="text-xs opacity-40 mt-4">Per editar les tarifes, modifica <code>lib/constants/pricing-intelligence.ts</code> → <code>SERVICE_HOURLY_RATES</code>. Aviat: editable des d'aquí.</p>
+            <p className="text-xs opacity-40 mt-4">Tarifes de referència. Per canviar-les, modifica <code>lib/constants/pricing-intelligence.ts</code> → <code>SERVICE_HOURLY_RATES</code>.</p>
           </div>
 
           {/* Gradient de marge */}
-          <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
+          <div className="ap-card p-6">
             <h3 className="ap-h2 mb-1">Escala de marge</h3>
             <p className="text-sm opacity-50 mb-5">A pitjor marge, color més brillant i cridaner.</p>
             <div className="flex gap-2 flex-wrap">
               {MARGIN_TONES.map((t) => (
-                <div key={t.tone.kind} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold border border-white/10"
+                <div key={t.tone.kind} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold border border-[var(--line)]"
                   style={{ borderLeftColor: t.tone.hex, borderLeftWidth: 3, color: t.tone.hex }}>
                   {t.tone.name}
                   {t.min > -Infinity && <span className="opacity-50 font-normal">≥{t.min}%</span>}
@@ -596,12 +546,12 @@ export default function PricingAdminPage() {
           </div>
 
           {/* Cost amortització equip */}
-          <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
+          <div className="ap-card p-6">
             <h3 className="ap-h2 mb-1">Cost real d'amortització per hora</h3>
             <p className="text-sm opacity-50 mb-5">Fallback per categoria. S'usa si l'ítem d'inventari no té dades de compra.</p>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-[var(--line)]">
                   <th scope="col" className="text-left py-2 opacity-60 font-medium">Categoria</th>
                   <th scope="col" className="text-right py-2 opacity-60 font-medium">Cost compra</th>
                   <th scope="col" className="text-right py-2 opacity-60 font-medium">Vida útil (h)</th>
@@ -610,7 +560,7 @@ export default function PricingAdminPage() {
               </thead>
               <tbody>
                 {(Object.entries(EQUIPMENT_AMORTIZATION) as [string, { value: number; lifeHours: number }][]).map(([cat, data]) => (
-                  <tr key={cat} className="border-b border-white/5 adm-row-hover">
+                  <tr key={cat} className="border-b border-[var(--line)] adm-row-hover">
                     <td className="py-3 font-mono text-xs opacity-70">{cat}</td>
                     <td className="py-3 text-right">{formatCurrency(data.value)}</td>
                     <td className="py-3 text-right">{formatNumber(data.lifeHours)}h</td>
@@ -628,7 +578,7 @@ export default function PricingAdminPage() {
       {activeTab === 'extras' && (
         <div className="space-y-4">
           <div className="border rounded-xl p-4 flex items-center gap-3">
-            <span className="text-2xl">✅</span>
+            <CheckCircle2 className={SECTION_ICON} aria-hidden="true" />
             <div>
               <p className="font-semibold">Pots editar els preus!</p>
               <p className="text-sm">Fes clic al preu per modificar-lo. Els canvis s'apliquen a noves reserves.</p>
@@ -639,7 +589,7 @@ export default function PricingAdminPage() {
             {filteredExtras.map(extra => (
               <div
                 key={extra.id}
-                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral admin-tone-bg-neutral admin-card-glass'}`}
+                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral admin-tone-bg-neutral'}`}
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between">
@@ -658,7 +608,8 @@ export default function PricingAdminPage() {
                         <div className="flex flex-wrap gap-2 mb-4">
                           {extra.linkedInventory.map(item => (
                             <span key={item.itemCode} className="px-3 py-1 text-sm rounded-xl flex items-center gap-1 border">
-                              🔧 {item.itemName}
+                              <Wrench className={INLINE_ICON} aria-hidden="true" />
+                              {item.itemName}
                               {item.quantity > 1 && <span className="">×{item.quantity}</span>}
                             </span>
                           ))}
@@ -689,7 +640,10 @@ export default function PricingAdminPage() {
                         )}
                         {extra.costPerUnit == null && extra.price > 0 && (
                           <div>
-                            <span className="admin-tone-text-warning text-xs">⚠ Sense cost definit</span>
+                            <span className="admin-tone-text-warning text-xs inline-flex items-center gap-1">
+                              <AlertTriangle className={INLINE_ICON} aria-hidden="true" />
+                              Sense cost definit
+                            </span>
                           </div>
                         )}
                       </div>
@@ -711,15 +665,23 @@ export default function PricingAdminPage() {
                           </div>
                           <div className="flex gap-2">
                             <button type="button" onClick={() => setEditingExtra(null)} className="px-3 py-1.5 text-sm rounded-xl transition-colors">Cancel·lar</button>
-                            <button type="button" onClick={() => savePrice(extra.id)} disabled={saving} className="ap-btn ap-btn--primary">
-                              {saving ? '...' : '✓ Desar'}
+                            <button type="button" onClick={() => savePrice(extra.id)} disabled={saving} className="ap-btn ap-btn--primary inline-flex items-center gap-1.5">
+                              {saving ? '...' : (
+                                <>
+                                  <Check className={TAB_ICON} aria-hidden="true" />
+                                  Desar
+                                </>
+                              )}
                             </button>
                           </div>
                         </div>
                       ) : (
                         <button type="button" onClick={() => { setEditingExtra(extra.id); setEditPrice(extra.price); }} className="group">
                           <div className="text-3xl font-bold transition-colors">{formatCurrency(extra.price)}</div>
-                          <div className="text-xs mt-1">Clic per editar ✏️</div>
+                          <div className="text-xs mt-1 inline-flex items-center gap-1">
+                            Clic per editar
+                            <Pencil className={INLINE_ICON} aria-hidden="true" />
+                          </div>
                         </button>
                       )}
                     </div>
@@ -742,7 +704,7 @@ export default function PricingAdminPage() {
             ))}
 
             {filteredExtras.length === 0 && (
-              <div className="rounded-2xl border admin-card-glass p-8 text-center text-sm">
+              <div className="ap-card p-8 text-center text-sm">
                 No hi ha extres dins d'aquest focus.
               </div>
             )}
@@ -753,7 +715,7 @@ export default function PricingAdminPage() {
       {activeTab === 'packs' && (
         <div className="space-y-4">
           <div className="border rounded-xl p-4 flex items-center gap-3">
-            <span className="text-2xl">🔒</span>
+            <LockKeyhole className={SECTION_ICON} aria-hidden="true" />
             <div>
               <p className="font-semibold">Només lectura</p>
               <p className="text-sm">
@@ -767,14 +729,17 @@ export default function PricingAdminPage() {
 
           <div className="grid gap-4">
             {filteredPacks.map(pack => (
-              <div key={pack.id} className="rounded-2xl border admin-card-glass overflow-hidden">
+              <div key={pack.id} className="ap-card overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-xl font-bold">{pack.name}</h3>
                         {pack.isFeatured && (
-                          <span className="px-2 py-0.5 text-xs rounded-full font-medium">⭐ Destacat</span>
+                          <span className="px-2 py-0.5 text-xs rounded-full font-medium inline-flex items-center gap-1">
+                            <Star className={INLINE_ICON} aria-hidden="true" />
+                            Destacat
+                          </span>
                         )}
                         {!pack.isActive && (
                           <span className="px-2 py-0.5 text-xs rounded-full">Inactiu</span>
@@ -821,7 +786,10 @@ export default function PricingAdminPage() {
                       {pack.originalPrice && pack.originalPrice > pack.price && (
                         <div className="text-sm line-through">{formatCurrency(pack.originalPrice)}</div>
                       )}
-                      <div className="text-xs mt-2">🔒 No editable aquí</div>
+                      <div className="text-xs mt-2 inline-flex items-center justify-end gap-1">
+                        <LockKeyhole className={INLINE_ICON} aria-hidden="true" />
+                        No editable aquí
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -844,7 +812,7 @@ export default function PricingAdminPage() {
             ))}
 
             {filteredPacks.length === 0 && (
-              <div className="rounded-2xl border admin-card-glass p-8 text-center text-sm">
+              <div className="ap-card p-8 text-center text-sm">
                 No hi ha packs dins d'aquest focus.
               </div>
             )}
@@ -855,7 +823,7 @@ export default function PricingAdminPage() {
       {activeTab === 'inventory' && (
         <div className="space-y-4">
           <div className="border rounded-xl p-4 flex items-center gap-3">
-            <span className="text-2xl">📊</span>
+            <BarChart3 className={SECTION_ICON} aria-hidden="true" />
             <div>
               <p className="font-semibold">Estadístiques d'ús</p>
               <p className="text-sm">
@@ -894,7 +862,7 @@ export default function PricingAdminPage() {
               const statusDisplay = getInventoryStatusDisplay(item.status);
 
               return (
-                <div key={item.id} className="rounded-2xl border admin-card-glass p-4 transition-colors">
+                <div key={item.id} className="ap-card p-4 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 ${categoryTone} rounded-xl flex items-center justify-center text-2xl`}>
@@ -965,7 +933,7 @@ function StatCard({
   sublabel,
   color,
 }: {
-  icon: string;
+  icon: LucideIcon;
   label: string;
   value: string;
   sublabel: string;
@@ -979,11 +947,12 @@ function StatCard({
   };
 
   const style = styles[color];
+  const Icon = icon;
 
   return (
-    <div className={`admin-card-glass p-4 sm:p-5 ${style}`}>
+    <div className={`p-4 sm:p-5 ${style}`}>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-3xl">{icon}</span>
+        <Icon className={STAT_ICON} aria-hidden="true" />
       </div>
       <div className="text-3xl font-bold mb-1">{value}</div>
       <div className={`text-xs font-medium uppercase ${style.split(' ').pop()}`}>{label}</div>

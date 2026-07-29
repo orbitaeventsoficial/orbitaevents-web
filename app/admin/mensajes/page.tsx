@@ -6,7 +6,6 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 import { pluralize } from '@/lib/utils/pluralize';
 
 export const dynamic = 'force-dynamic';
@@ -86,11 +85,6 @@ export default async function MensajesPage() {
   const pendingNoNotesInSample = data.recentLeads.filter(
     (lead) => lead.status === 'NEW' && (lead.notes?.length ?? 0) === 0,
   ).length;
-  const systemItems = [
-    `Pendents (NEW): ${data.pendingLeads}`,
-    `Rebudes avui: ${data.todayLeads}`,
-    `Amb missatge (últimes 20): ${data.recentLeads.length}`,
-  ];
   const manualItems: string[] = [];
   if (data.stalePendingLeads > 0)
     manualItems.push(
@@ -100,61 +94,11 @@ export default async function MensajesPage() {
     manualItems.push(`${pendingNoNotesInSample} pendents sense cap nota (mostra recent)`);
   if (withoutContact > 0)
     manualItems.push(`${withoutContact} entrades de la mostra sense telèfon ni email`);
-  const nextStep =
-    data.recentLeads.length === 0
-      ? {
-          title: 'Encara no hi ha missatges',
-          detail:
-            'Cap entrada amb missatge ha arribat. Comparteix el formulari de contacte o WhatsApp per obrir el primer canal.',
-          href: '/admin/leads',
-          ctaLabel: 'Obrir entrades',
-        }
-      : data.stalePendingLeads > 0
-        ? {
-            title: `Respon ${data.stalePendingLeads} ${pluralize(data.stalePendingLeads, 'entrada', 'entrades')} NEW de més de 24h`,
-            detail:
-              'Superar les 24h sense resposta trenca la promesa comercial. Obre les entrades noves filtrades i tanca aquest backlog.',
-            href: '/admin/leads?status=NEW',
-            ctaLabel: 'Obrir entrades NEW',
-          }
-        : data.pendingLeads > 0
-          ? {
-              title: `Respon ${data.pendingLeads} ${pluralize(data.pendingLeads, 'entrada nova', 'entrades noves')}`,
-              detail:
-                'Encara no porten 24h però estan en estat NEW sense contacte. Obre-les i mou-les a la següent etapa.',
-              href: '/admin/leads?status=NEW',
-              ctaLabel: 'Obrir entrades NEW',
-            }
-          : {
-              title: 'Safata de missatges al dia',
-              detail:
-                'Sense pendents NEW. Aprofita per revisar la mostra recent i verifica que tot té nota de seguiment.',
-              href: '/admin/leads',
-              ctaLabel: 'Obrir entrades',
-            };
   const manualTone: 'info' | 'warning' | 'success' =
     data.stalePendingLeads > 0 ? 'warning' : data.pendingLeads > 0 ? 'info' : 'success';
 
   return (
     <AdminPage title="Missatges" subtitle="Gestiona les comunicacions amb la clientela">
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'BBDD',
-          title: 'Safata de comunicació',
-          tone: data.pendingLeads === 0 ? 'success' : 'info',
-          items: systemItems,
-          emptyText: 'Sense moviment recent.',
-        }}
-        manual={{
-          eyebrow: 'Pendents manuals',
-          title: 'Què requereix la teva mà',
-          tone: manualTone,
-          items: manualItems,
-          emptyText: 'Cap acció manual pendent.',
-        }}
-        nextStep={nextStep}
-        className="mb-2"
-      />
       <section className="ap-kpi-row sm:grid-cols-3">
         <div className="ap-kpi ap-kpi--warning">
           <p className="ap-kpi-label">Pendents de contactar</p>
@@ -203,10 +147,10 @@ export default async function MensajesPage() {
             <p className="font-medium">Primer contacte</p>
             <p className="mt-1 text-xs admin-tone-text-neutral">Resposta inicial a una entrada nova</p>
           </button>
-          <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
-            <p className="font-medium">Envia pressupost</p>
-            <p className="mt-1 text-xs admin-tone-text-neutral">Acompanyament de pressupost</p>
-          </button>
+          <Link href="/admin/presupuestos" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
+            <p className="font-medium">Obrir pressupostos</p>
+            <p className="mt-1 text-xs admin-tone-text-neutral">Proposta canònica i PDF final</p>
+          </Link>
           <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
             <p className="font-medium">Seguiment</p>
             <p className="mt-1 text-xs admin-tone-text-neutral">Recordatori després de dies</p>
@@ -293,4 +237,3 @@ export default async function MensajesPage() {
     </AdminPage>
   );
 }
-

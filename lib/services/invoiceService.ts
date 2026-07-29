@@ -7,12 +7,42 @@
 
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { EVENT_TYPE_DOCUMENT_LABELS } from '@/lib/constants';
+import { uploadFile } from '@/lib/storage';
+import { getCompanyConfig } from '@/lib/services/contractService';
+import { generateInvoicePDF, type InvoiceLineItem } from '@/lib/services/invoicePdfService';
+import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
+import { DOCUMENT_ADMIN_LOG_ACTIONS, recordDocumentAdminLog } from '@/lib/services/documentAuditTrailService';
 import {
   isHoldedEnabled,
   findOrCreateHoldedContact,
   createHoldedInvoice,
   getHoldedInvoiceStatus,
 } from './holdedService';
+import type { Prisma } from '@prisma/client';
+
+type InvoiceBookingForPdf = Prisma.BookingGetPayload<{
+  include: {
+    pack: { include: { translations: true } };
+    extras: { include: { extra: { include: { translations: true } } } };
+    serviceLines: true;
+  };
+}>;
+
+type InvoiceSourceForPdf = {
+  id?: string;
+  reference: string;
+  clientName: string;
+  clientNIF: string | null;
+  clientAddress: string | null;
+  subtotal: number;
+  vatRate: number;
+  vatAmount: number;
+  total: number;
+  createdAt: Date;
+  booking: InvoiceBookingForPdf;
+  customer: { email?: string | null; phone?: string | null } | null;
+};
 
 // ============================================
 // REFERENCE GENERATION (amb retry per race condition)
@@ -37,6 +67,159 @@ async function generateInvoiceReference(): Promise<string> {
   return `${prefix}${String(nextNum).padStart(4, '0')}`;
 }
 
+function normalizeInvoiceLocale(value: string): 'ca' | 'es' | 'en' {
+  return value === 'ca' || value === 'en' ? value : 'es';
+}
+
+function safeInvoiceFileSegment(value: string) {
+  return value.replace(/[^A-Za-z0-9_-]/g, '-');
+}
+
+function translatedName(
+  translations: Array<{ locale: string; name: string }> | undefined,
+  fallback: string,
+) {
+  return translations?.find((translation) => translation.locale === 'ca')?.name
+    || translations?.[0]?.name
+    || fallback;
+}
+
+function buildInvoiceLinesFromBooking(booking: InvoiceBookingForPdf, fallbackSubtotal: number): InvoiceLineItem[] {
+  const serviceLines = booking.serviceLines
+    .filter((line) => line.label.trim())
+    .filter((line) => !line.notes?.includes(TRAVEL_COST_LINE_MARKER))
+    .filter((line) => typeof line.revenueAmount === 'number' && line.revenueAmount !== 0)
+    .map((line) => {
+      const quantity = Math.max(1, line.quantity ?? 1);
+      const total = line.revenueAmount ?? 0;
+      return {
+        description: line.label,
+        quantity,
+        unitPrice: total / quantity,
+        total,
+      };
+    });
+
+  if (serviceLines.length > 0) return serviceLines;
+
+  const packName = translatedName(
+    booking.pack.translations,
+    booking.pack.slug || 'Servei',
+  );
+  const packTotal = booking.pack.price || fallbackSubtotal;
+  const lines: InvoiceLineItem[] = [{
+    description: packName,
+    quantity: 1,
+    unitPrice: packTotal,
+    total: packTotal,
+  }];
+
+  for (const bookingExtra of booking.extras) {
+    const quantity = Math.max(1, bookingExtra.quantity ?? 1);
+    const total = bookingExtra.price;
+    lines.push({
+      description: translatedName(bookingExtra.extra.translations, bookingExtra.extra.slug || 'Extra'),
+      quantity,
+      unitPrice: total / quantity,
+      total,
+    });
+  }
+
+  return lines;
+}
+
+async function renderInvoicePdfBuffer(source: InvoiceSourceForPdf): Promise<Buffer> {
+  const company = await getCompanyConfig();
+  const locale = normalizeInvoiceLocale(source.booking.preferredLocale);
+  const doc = await generateInvoicePDF({
+    invoiceNumber: source.reference,
+    issueDate: source.createdAt,
+    companyName: company.name,
+    companyNIF: company.nif,
+    companyAddress: company.address,
+    companyEmail: company.email,
+    companyPhone: company.phone,
+    companyIBAN: company.iban,
+    clientName: source.clientName,
+    clientNIF: source.clientNIF || undefined,
+    clientAddress: source.clientAddress || undefined,
+    clientEmail: source.customer?.email || source.booking.clientEmail,
+    clientPhone: source.customer?.phone || source.booking.clientPhone,
+    eventType: EVENT_TYPE_DOCUMENT_LABELS[String(source.booking.eventType)] || String(source.booking.eventType),
+    eventDate: source.booking.eventDate,
+    eventLocation: source.booking.eventVenue
+      ? `${source.booking.eventVenue} · ${source.booking.eventLocation}`
+      : source.booking.eventLocation,
+    lines: buildInvoiceLinesFromBooking(source.booking, source.subtotal),
+    subtotal: source.subtotal,
+    vatRate: source.vatRate,
+    vatAmount: source.vatAmount,
+    total: source.total,
+    depositAmount: source.booking.depositAmount,
+    depositPaid: source.booking.depositPaid,
+    depositPaidAt: source.booking.depositPaidAt,
+    remainingAmount: source.booking.remainingAmount,
+    remainingPaid: source.booking.remainingPaid,
+    remainingPaidAt: source.booking.remainingPaidAt,
+    cashAmount: source.booking.cashAmount,
+    notes: `Reserva ${source.booking.reference}`,
+  }, locale);
+
+  return Buffer.from(doc.output('arraybuffer'));
+}
+
+async function uploadInvoicePdf(source: InvoiceSourceForPdf) {
+  const pdfBuffer = await renderInvoicePdfBuffer(source);
+  const safeReference = safeInvoiceFileSegment(source.reference);
+  return uploadFile(`invoices/${source.booking.id}/${safeReference}.pdf`, pdfBuffer);
+}
+
+async function ensureInvoicePdf(invoiceId: string) {
+  const invoice = await prisma.invoice.findUniqueOrThrow({
+    where: { id: invoiceId },
+    include: {
+      customer: true,
+      booking: {
+        include: {
+          customer: true,
+          pack: { include: { translations: true } },
+          extras: { include: { extra: { include: { translations: true } } } },
+          serviceLines: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
+        },
+      },
+    },
+  });
+
+  if (invoice.pdfUrl && invoice.pdfKey) return invoice;
+
+  const uploaded = await uploadInvoicePdf(invoice);
+  const updated = await prisma.invoice.update({
+    where: { id: invoice.id },
+    data: {
+      pdfUrl: uploaded.publicUrl,
+      pdfKey: uploaded.path,
+    },
+  });
+
+  await recordDocumentAdminLog({
+    action: DOCUMENT_ADMIN_LOG_ACTIONS.INVOICE_PDF_GENERATED,
+    entity: 'invoice',
+    entityId: invoice.id,
+    details: {
+      documentType: 'INVOICE',
+      source: 'invoice_service_pdf_repair',
+      reference: invoice.reference,
+      bookingId: invoice.bookingId,
+      bookingReference: invoice.booking.reference,
+      customerId: invoice.customerId,
+      pdfUrl: uploaded.publicUrl,
+      pdfKey: uploaded.path,
+    },
+  });
+
+  return updated;
+}
+
 // ============================================
 // CREATE INVOICE FROM BOOKING
 // ============================================
@@ -51,6 +234,7 @@ export async function createInvoiceFromBooking(bookingId: string): Promise<{
       customer: true,
       pack: { include: { translations: true } },
       extras: { include: { extra: { include: { translations: true } } } },
+      serviceLines: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
     },
   });
 
@@ -63,6 +247,9 @@ export async function createInvoiceFromBooking(bookingId: string): Promise<{
     where: { bookingId, status: { not: 'CANCELLED' } },
   });
   if (existing) {
+    if (!existing.pdfUrl || !existing.pdfKey) {
+      await ensureInvoicePdf(existing.id);
+    }
     return { invoiceId: existing.id, reference: existing.reference };
   }
 
@@ -73,6 +260,20 @@ export async function createInvoiceFromBooking(bookingId: string): Promise<{
   while (attempts < MAX_ATTEMPTS) {
     try {
       const reference = await generateInvoiceReference();
+      const createdAt = new Date();
+      const uploadedPdf = await uploadInvoicePdf({
+        reference,
+        clientName: booking.clientName,
+        clientNIF: booking.customer?.dni || null,
+        clientAddress: null,
+        subtotal: booking.subtotal,
+        vatRate: booking.vatRate,
+        vatAmount: booking.vatAmount,
+        total: booking.total,
+        createdAt,
+        booking,
+        customer: booking.customer,
+      });
 
       const invoice = await prisma.invoice.create({
         data: {
@@ -88,6 +289,25 @@ export async function createInvoiceFromBooking(bookingId: string): Promise<{
           vatAmount: booking.vatAmount,
           total: booking.total,
           status: isHoldedEnabled() ? 'PENDING_SYNC' : 'DRAFT',
+          pdfUrl: uploadedPdf.publicUrl,
+          pdfKey: uploadedPdf.path,
+          createdAt,
+        },
+      });
+
+      await recordDocumentAdminLog({
+        action: DOCUMENT_ADMIN_LOG_ACTIONS.INVOICE_PDF_GENERATED,
+        entity: 'invoice',
+        entityId: invoice.id,
+        details: {
+          documentType: 'INVOICE',
+          source: 'invoice_service_create',
+          reference,
+          bookingId,
+          bookingReference: booking.reference,
+          customerId: booking.customerId,
+          pdfUrl: uploadedPdf.publicUrl,
+          pdfKey: uploadedPdf.path,
         },
       });
 
@@ -137,6 +357,7 @@ async function syncInvoiceToHolded(invoiceId: string): Promise<void> {
         include: {
           pack: { include: { translations: true } },
           extras: { include: { extra: { include: { translations: true } } } },
+          serviceLines: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
         },
       },
       customer: true,
@@ -158,33 +379,12 @@ async function syncInvoiceToHolded(invoiceId: string): Promise<void> {
     phone: invoice.customer.phone || undefined,
   });
 
-  // Build invoice items
-  const packName = invoice.booking.pack?.translations.find((t) => t.locale === 'ca')?.name
-    || invoice.booking.pack?.translations[0]?.name
-    || invoice.booking.pack?.slug
-    || 'Servei DJ';
-
-  const items = [
-    {
-      name: `Pack ${packName}`,
-      units: 1,
-      subtotal: invoice.booking.pack?.price || invoice.subtotal,
-      tax: invoice.vatRate,
-    },
-  ];
-
-  // Add extras
-  for (const be of invoice.booking.extras) {
-    const extraName = be.extra.translations.find((t) => t.locale === 'ca')?.name
-      || be.extra.translations[0]?.name
-      || be.extra.slug;
-    items.push({
-      name: extraName,
-      units: be.quantity,
-      subtotal: be.price,
-      tax: invoice.vatRate,
-    });
-  }
+  const items = buildInvoiceLinesFromBooking(invoice.booking, invoice.subtotal).map((line) => ({
+    name: line.description,
+    units: line.quantity ?? 1,
+    subtotal: line.unitPrice,
+    tax: invoice.vatRate,
+  }));
 
   // Apply discount as negative item
   if (invoice.discount > 0) {

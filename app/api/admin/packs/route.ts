@@ -2,7 +2,7 @@
 // API per gestionar packs
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { createAdminPack, listAdminPacks } from '@/lib/services/packAdminService';
 
@@ -11,6 +11,8 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'read');
+  if (permissionError) return permissionError;
 
   try {
     const { searchParams } = new URL(req.url);
@@ -30,6 +32,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
 

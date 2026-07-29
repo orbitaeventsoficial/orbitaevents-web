@@ -96,14 +96,14 @@ html.admin-mode {
      violet → or. Estat (rose/amber/emerald a dalt) es manté. Una capa → tot el
      dashboard Control Room passa a carbó+or quan els selectors reviuen. */
   --at-cr-sky: var(--at-gold);
-  --at-cr-sky-border: var(--at-gold-edge, var(--at-gold));
+  --at-cr-sky-border: var(--at-gold);
   --at-cr-sky-deep: var(--at-gold);
   --at-cr-sky-soft: color-mix(in oklab, var(--at-gold) 15%, transparent);
   --at-cr-sky-text: var(--at-gold-text);
   --at-cr-sky-bg: var(--o-admin-raised);
   --at-cr-cyan-border: var(--at-gold);
   --at-cr-cyan-text: var(--at-gold-text);
-  --at-cr-cyan-light: var(--at-gold-bright, var(--at-gold-text));
+  --at-cr-cyan-light: var(--at-gold-text);
 
   --at-cr-violet-border: var(--at-gold);
   --at-cr-violet-bg: var(--o-admin-raised);
@@ -212,7 +212,7 @@ html.admin-mode .admin-tone-soft-warning {
 html.admin-mode .admin-tone-bg-neutral { background: var(--at-raised); }
 html.admin-mode .admin-tone-bg-slate { background: color-mix(in oklab, var(--at-muted) 16%, var(--at-panel) 84%); }
 /* Canon Òrbita (Cristina/leads): NO hi ha blau de superfície. «Info/cyan/actiu»
-   = neutre carbó elevat, com el control actiu de la fitxa (`.fx__view button.is-on`
+   = neutre carbó elevat, com el control actiu de la fitxa (`.ap-leads-view button.is-on`
    → --raised, sense or). L'or queda reservat a diners/accions. Redefinició monocapa:
    abans aquestes 6 classes resolien a blau (#5fb7e8) i tintaven cards arreu. */
 html.admin-mode .admin-tone-bg-info { background: var(--at-raised); }
@@ -380,9 +380,8 @@ html.admin-mode .admin-gradient--progress-emerald {
   background: linear-gradient(to right, var(--o-success), color-mix(in oklab, var(--o-success) 70%, white));
 }
 
-/* ── Stagger animation global (totes les pàgines admin, no només dashboard) ──
-   admin-control-room té el seu propi selector més específic a control-room.css.
-   Aquí cobrim: leads, tasques, inbox, salut i qualsevol altra pàgina que
+/* ── Stagger animation global (totes les pàgines admin) ──
+   Cobreix: leads, tasques, inbox, salut i qualsevol altra pàgina que
    ja faci servir .admin-stagger-item. ── */
 html.admin-mode .admin-shell .admin-stagger-item {
   animation: admin-stagger-in 0.4s var(--at-ease-out, cubic-bezier(0,0,0.2,1)) both;

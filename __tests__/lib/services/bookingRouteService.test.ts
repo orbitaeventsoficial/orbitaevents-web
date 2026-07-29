@@ -4,13 +4,14 @@ const { mockPrisma, mockApplySideEffects, mockSyncCalendar, mockCalcGmapsDistanc
   mockPrisma: {
     booking: {
       findUnique: vi.fn(),
+      findFirst: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
     },
     lead: { update: vi.fn() },
     customer: { update: vi.fn() },
     bookingServiceLine: { findMany: vi.fn(), deleteMany: vi.fn(), createMany: vi.fn() },
-    availability: { updateMany: vi.fn() },
+    availability: { updateMany: vi.fn(), upsert: vi.fn() },
     bookingExtra: { deleteMany: vi.fn() },
     adminLog: { create: vi.fn() },
   },
@@ -32,7 +33,7 @@ vi.mock('@/lib/services/googleMapsDistance', () => ({
   calculateGoogleMapsDistance: mockCalcGmapsDistance,
 }));
 vi.mock('@/lib/services/fuelReferenceService', () => ({
-  getFuelCostPerKmReference: mockGetFuelRef,
+  getEffectiveVehicleCostPerKm: mockGetFuelRef,
 }));
 vi.mock('@/lib/services/travelCost', () => ({
   calculateTravelCharge: (km: number) => km > 50 ? (km - 50) * 0.5 : 0,
@@ -85,6 +86,7 @@ const MOCK_BOOKING = {
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.booking.findUnique.mockResolvedValue(MOCK_BOOKING);
+  mockPrisma.booking.findFirst.mockResolvedValue(null);
   mockPrisma.booking.update.mockResolvedValue(MOCK_BOOKING);
   mockPrisma.booking.delete.mockResolvedValue({});
   mockPrisma.lead.update.mockResolvedValue({});
@@ -93,6 +95,7 @@ beforeEach(() => {
   mockPrisma.bookingServiceLine.deleteMany.mockResolvedValue({ count: 0 });
   mockPrisma.bookingServiceLine.createMany.mockResolvedValue({ count: 0 });
   mockPrisma.availability.updateMany.mockResolvedValue({ count: 1 });
+  mockPrisma.availability.upsert.mockResolvedValue({});
   mockPrisma.bookingExtra.deleteMany.mockResolvedValue({});
   mockPrisma.adminLog.create.mockResolvedValue({});
   mockApplySideEffects.mockResolvedValue({ statsUpdated: false });
@@ -109,6 +112,13 @@ describe('getBookingDetail', () => {
     const result = await getBookingDetail('booking-1');
     expect(result.status).toBe(200);
     expect(result.body.booking).toBeDefined();
+  });
+
+  it('no carrega ClientFeedback al detall de reserva', async () => {
+    await getBookingDetail('booking-1');
+
+    const include = mockPrisma.booking.findUnique.mock.calls[0]?.[0]?.include;
+    expect(include).not.toHaveProperty('clientFeedback');
   });
 
   it('retorna 404 si no trobada', async () => {
@@ -182,6 +192,33 @@ describe('updateBookingDetail', () => {
     });
   });
 
+  it('mou disponibilitat canònica quan canvia la data de la reserva', async () => {
+    await updateBookingDetail('booking-1', {
+      eventDate: '2026-09-20',
+    });
+
+    expect(mockPrisma.availability.updateMany).toHaveBeenCalledWith({
+      where: {
+        date: new Date('2026-09-15T00:00:00.000Z'),
+        bookingId: 'booking-1',
+      },
+      data: { status: 'AVAILABLE', bookingId: null, note: null },
+    });
+    expect(mockPrisma.availability.upsert).toHaveBeenCalledWith({
+      where: { date: new Date('2026-09-20T00:00:00.000Z') },
+      create: expect.objectContaining({
+        status: 'BOOKED',
+        bookingId: 'booking-1',
+        note: expect.stringContaining('OE-2026-ABCD'),
+      }),
+      update: expect.objectContaining({
+        status: 'BOOKED',
+        bookingId: 'booking-1',
+        note: expect.stringContaining('OE-2026-ABCD'),
+      }),
+    });
+  });
+
   it('reemplaça línies de servei i recalcula totals', async () => {
     await updateBookingDetail('booking-1', {
       serviceLines: [
@@ -207,6 +244,38 @@ describe('updateBookingDetail', () => {
         expect.objectContaining({ bookingId: 'booking-1', kind: 'DJ', revenueAmount: 300, costAmount: 0 }),
         expect.objectContaining({ bookingId: 'booking-1', kind: 'PROVIDER_SERVICE', collaboratorId: 'partner-1', costAmount: 120 }),
       ],
+    });
+  });
+
+  it('ignora totalPrice negatiu en callers interns i no persisteix totals negatius', async () => {
+    await updateBookingDetail('booking-1', { totalPrice: -100 });
+
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'booking-1' },
+      data: {},
+    });
+  });
+
+  it('ignora imports de cobrament negatius en callers interns', async () => {
+    await updateBookingDetail('booking-1', {
+      depositAmount: -10,
+      remainingAmount: -5,
+      cashAmount: -2,
+      discount: -30,
+    });
+
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'booking-1' },
+      data: {},
+    });
+  });
+
+  it('permet netejar cashAmount amb null sense convertir-ho en import invalid', async () => {
+    await updateBookingDetail('booking-1', { cashAmount: null });
+
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'booking-1' },
+      data: { cashAmount: null },
     });
   });
 });
@@ -249,6 +318,18 @@ describe('changeBookingStatus', () => {
     expect(mockSyncCalendar).toHaveBeenCalledWith('booking-1');
   });
 
+  it('sincronitza disponibilitat canònica en canviar estat', async () => {
+    await changeBookingStatus('booking-1', 'CANCELLED');
+
+    expect(mockPrisma.availability.updateMany).toHaveBeenCalledWith({
+      where: {
+        date: new Date('2026-09-15T00:00:00.000Z'),
+        bookingId: 'booking-1',
+      },
+      data: { status: 'AVAILABLE', bookingId: null, note: null },
+    });
+  });
+
   it('crea adminLog amb detalls del canvi', async () => {
     await changeBookingStatus('booking-1', 'CONFIRMED');
 
@@ -273,6 +354,7 @@ describe('deleteBookingIfAllowed', () => {
       id: 'booking-1',
       status: 'PENDING' as const,
       reference: 'OE-2026-ABCD',
+      eventDate: new Date('2026-09-15'),
     });
 
     expect(result.ok).toBe(true);
@@ -285,6 +367,7 @@ describe('deleteBookingIfAllowed', () => {
       id: 'booking-1',
       status: 'CANCELLED' as const,
       reference: 'OE-2026-ABCD',
+      eventDate: new Date('2026-09-15'),
     });
 
     expect(result.ok).toBe(true);
@@ -295,6 +378,7 @@ describe('deleteBookingIfAllowed', () => {
       id: 'booking-1',
       status: 'CONFIRMED' as const,
       reference: 'OE-2026-ABCD',
+      eventDate: new Date('2026-09-15'),
     });
 
     expect(result.ok).toBe(false);
@@ -307,6 +391,7 @@ describe('deleteBookingIfAllowed', () => {
       id: 'booking-1',
       status: 'COMPLETED' as const,
       reference: 'OE-2026-ABCD',
+      eventDate: new Date('2026-09-15'),
     });
 
     expect(result.ok).toBe(false);
@@ -317,14 +402,16 @@ describe('deleteBookingIfAllowed', () => {
       id: 'booking-1',
       status: 'PENDING' as const,
       reference: 'OE-2026-ABCD',
+      eventDate: new Date('2026-09-15'),
     });
 
-    expect(mockPrisma.availability.updateMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { bookingId: 'booking-1' },
-        data: expect.objectContaining({ status: 'AVAILABLE' }),
-      })
-    );
+    expect(mockPrisma.availability.updateMany).toHaveBeenCalledWith({
+      where: {
+        date: new Date('2026-09-15T00:00:00.000Z'),
+        bookingId: 'booking-1',
+      },
+      data: { status: 'AVAILABLE', bookingId: null, note: null },
+    });
   });
 
   it('elimina bookingExtras associades', async () => {
@@ -332,6 +419,7 @@ describe('deleteBookingIfAllowed', () => {
       id: 'booking-1',
       status: 'PENDING' as const,
       reference: 'OE-2026-ABCD',
+      eventDate: new Date('2026-09-15'),
     });
 
     expect(mockPrisma.bookingExtra.deleteMany).toHaveBeenCalledWith({
@@ -344,6 +432,7 @@ describe('deleteBookingIfAllowed', () => {
       id: 'booking-1',
       status: 'PENDING' as const,
       reference: 'OE-2026-ABCD',
+      eventDate: new Date('2026-09-15'),
     });
 
     expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(

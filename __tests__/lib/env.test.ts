@@ -42,44 +42,4 @@ describe('Environment Validation', () => {
       consoleWarn.mockRestore();
     });
   });
-
-  describe('getEnv helpers', () => {
-    it('should detect development mode', async () => {
-      vi.stubEnv('DATABASE_URL', 'postgresql://user:pass@localhost:5432/db');
-      vi.stubEnv('ADMIN_USER', 'admin');
-      vi.stubEnv('ADMIN_PASS', 'password123');
-      vi.stubEnv('NODE_ENV', 'development');
-      vi.resetModules();
-
-      const { getEnv } = await import('@/lib/env');
-
-      expect(getEnv.isDev()).toBe(true);
-      expect(getEnv.isProd()).toBe(false);
-    });
-
-    it('should detect production mode', async () => {
-      vi.stubEnv('DATABASE_URL', 'postgresql://user:pass@localhost:5432/db');
-      vi.stubEnv('ADMIN_USER', 'admin');
-      vi.stubEnv('ADMIN_PASS', 'password123');
-      vi.stubEnv('NODE_ENV', 'production');
-      vi.resetModules();
-
-      const { getEnv } = await import('@/lib/env');
-
-      expect(getEnv.isDev()).toBe(false);
-      expect(getEnv.isProd()).toBe(true);
-    });
-
-    it('should return default site URL', async () => {
-      vi.stubEnv('DATABASE_URL', 'postgresql://user:pass@localhost:5432/db');
-      vi.stubEnv('ADMIN_USER', 'admin');
-      vi.stubEnv('ADMIN_PASS', 'password123');
-      vi.stubEnv('NODE_ENV', 'test');
-      vi.resetModules();
-
-      const { getEnv } = await import('@/lib/env');
-
-      expect(getEnv.siteUrl()).toBe('https://orbitaevents.com');
-    });
-  });
 });

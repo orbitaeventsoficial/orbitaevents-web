@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma } = vi.hoisted(() => ({
+const { mockPrisma, mockResolvePublicExtraDefinition } = vi.hoisted(() => ({
   mockPrisma: {
     setting: { findUnique: vi.fn(), upsert: vi.fn() },
   },
+  mockResolvePublicExtraDefinition: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -14,7 +15,7 @@ vi.mock('@/config/packs-config', () => ({
   ],
 }));
 vi.mock('@/lib/services/publicExtrasService', () => ({
-  resolvePublicExtraDefinition: vi.fn(),
+  resolvePublicExtraDefinition: mockResolvePublicExtraDefinition,
 }));
 
 import {
@@ -28,6 +29,24 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.setting.findUnique.mockResolvedValue(null);
   mockPrisma.setting.upsert.mockResolvedValue({});
+  mockResolvePublicExtraDefinition.mockImplementation((extra: {
+    slug: string;
+    price: number;
+    priceType: string;
+    translationName?: string | null;
+    translationDescription?: string | null;
+  }) => {
+    const name = String(extra.translationName || extra.slug);
+    const description = String(extra.translationDescription || '');
+
+    return {
+      id: extra.slug,
+      name: name.startsWith('services.') ? `Resol ${extra.slug}` : name,
+      description: description.startsWith('services.') ? `Desc ${extra.slug}` : description,
+      price: extra.priceType === 'ON_REQUEST' ? null : extra.price,
+      consultarPrecio: extra.priceType === 'ON_REQUEST',
+    };
+  });
 });
 
 describe('getDefaultExtrasConfig', () => {
@@ -84,6 +103,20 @@ describe('sanitizeExtrasConfig', () => {
     expect(result[0].popular).toBe(false);
     expect(result[0].premium).toBe(false);
     expect(result[0].category).toBe('other');
+  });
+
+  it('resol claus i18n a labels admin abans de retornar config', () => {
+    const result = sanitizeExtrasConfig([
+      {
+        id: 'hora-extra',
+        name: 'services.mobile.extras.hora-extra.name',
+        description: 'services.mobile.extras.hora-extra.description',
+        price: 75,
+      },
+    ]);
+
+    expect(result[0].name).toBe('Resol hora-extra');
+    expect(result[0].description).toBe('Desc hora-extra');
   });
 });
 

@@ -2,11 +2,9 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { requireAuth } from '@/lib/auth';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
-import { getDossierById } from '@/lib/services/dossierService';
+import { resolveDossierHtmlRenderPayload, resolveDossierTraceOrigin } from '@/lib/services/dossierService';
 import { generateDossierCompositePDF } from '@/lib/services/dossierCompositePdfService';
-import { getDossierCollaboratorProductsByIds } from '@/lib/services/collaboratorProductService';
-import type { DossierClientInfo } from '@/lib/utils/dossier-html-builder';
+import { DOCUMENT_ADMIN_LOG_ACTIONS, recordDocumentAdminLog } from '@/lib/services/documentAuditTrailService';
 
 function readLogoDataUri(): string | undefined {
   try {
@@ -22,22 +20,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const auth = requireAuth(req);
   if (auth) return auth;
 
-  const dossier = await getDossierById(params.id);
-  if (!dossier) return NextResponse.json({ error: 'No trobat' }, { status: 404 });
-
-  const allProducts = await getAnimacioProducts('ca');
-  const collaboratorProducts = await getDossierCollaboratorProductsByIds(dossier.productIds);
-  // Només productes propis d'animació aquí; els de col·laborador entren via
-  // `collaboratorProducts` (el generador ja els converteix). Evita duplicats.
-  const products = allProducts.filter((product) => dossier.productIds.includes(product.id));
-  const client: DossierClientInfo = {
-    nom: dossier.nom,
-    empresa: dossier.empresa ?? undefined,
-    telefon: dossier.telefon ?? undefined,
-    email: dossier.email ?? undefined,
-    eventDesc: dossier.eventDesc ?? undefined,
-    salutacio: dossier.salutacio ?? undefined,
-  };
+  const render = await resolveDossierHtmlRenderPayload(params.id);
+  if (!render) return NextResponse.json({ error: 'No trobat' }, { status: 404 });
+  const { dossier, clientInfo, products, transport, dataSource } = render;
 
   // Extres opcionals via query: ?extras=Nom:preu,Nom2:preu2
   const extrasParam = req.nextUrl.searchParams.get('extras');
@@ -52,16 +37,40 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     .filter((extra): extra is { nom: string; preu: number } => extra !== null);
 
   const doc = await generateDossierCompositePDF({
-    client,
+    client: clientInfo,
     products,
     productIds: dossier.productIds,
-    collaboratorProducts,
     extras,
+    transport,
     locale: 'ca',
     logoDataUri: readLogoDataUri(),
   });
   const pdf = Buffer.from(doc.output('arraybuffer'));
   const filename = `dossier-complet-${params.id}.pdf`;
+  const origin = await resolveDossierTraceOrigin(dossier.leadId);
+  await recordDocumentAdminLog({
+    action: DOCUMENT_ADMIN_LOG_ACTIONS.DOSSIER_COMPOSITE_PDF_GENERATED,
+    entity: 'dossier',
+    entityId: params.id,
+    details: {
+      documentType: 'DOSSIER',
+      source: 'dossier_composite_pdf',
+      dataSource,
+      dossierId: params.id,
+      leadId: origin.leadId,
+      leadName: origin.leadName,
+      customerId: origin.customerId,
+      customerName: origin.customerName,
+      filename,
+      clientName: dossier.nom,
+      productIds: dossier.productIds,
+      productCount: products.length,
+      collaboratorProductCount: render.collaboratorDossierProducts.length,
+      extrasCount: extras.length,
+      travelKm: transport.travelKm ?? null,
+      travelTollsEur: transport.travelTollsEur ?? null,
+    },
+  });
 
   return new NextResponse(pdf, {
     headers: {

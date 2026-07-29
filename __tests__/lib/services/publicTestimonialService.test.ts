@@ -16,6 +16,10 @@ const { mockPrisma } = vi.hoisted(() => ({
       findUnique: vi.fn(),
       create: vi.fn(),
     },
+    booking: {
+      findFirst: vi.fn(),
+      update: vi.fn(),
+    },
     customerActivity: { create: vi.fn() },
     $transaction: vi.fn(),
   },
@@ -29,6 +33,7 @@ vi.mock('@/lib/services/customerActivityService', () => ({
 import {
   listApprovedPublicTestimonials,
   listApprovedDatabaseReviews,
+  normalizePublicTestimonialPagination,
   submitPublicTestimonial,
 } from '@/lib/services/publicTestimonialService';
 import { recordCustomerTestimonialSubmitted } from '@/lib/services/customerActivityService';
@@ -116,6 +121,25 @@ describe('listApprovedPublicTestimonials', () => {
 
     expect(result.hasMore).toBe(true);
   });
+
+  it('normalitza paginacio publica abans de consultar Prisma', async () => {
+    mockPrisma.customerTestimonial.count.mockResolvedValue(100);
+
+    const result = await listApprovedPublicTestimonials(Number.NaN, -30, 'ca');
+
+    expect(mockPrisma.customerTestimonial.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ take: 10, skip: 0 }),
+    );
+    expect(result.hasMore).toBe(true);
+  });
+});
+
+describe('normalizePublicTestimonialPagination', () => {
+  it('descarta NaN, negatius i limita peticions massa grans', () => {
+    expect(normalizePublicTestimonialPagination(Number.NaN, Number.NaN)).toEqual({ limit: 10, offset: 0 });
+    expect(normalizePublicTestimonialPagination(0, -1)).toEqual({ limit: 1, offset: 0 });
+    expect(normalizePublicTestimonialPagination(500, 2.8)).toEqual({ limit: 50, offset: 2 });
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -158,7 +182,11 @@ describe('submitPublicTestimonial', () => {
         },
         customerDiscountCode: {
           findUnique: vi.fn().mockResolvedValue(null),
-          create: vi.fn().mockResolvedValue({}),
+          create: vi.fn().mockResolvedValue({ id: 'dc-1', code: 'OE-ABC123' }),
+        },
+        booking: {
+          findFirst: vi.fn().mockResolvedValue(null),
+          update: vi.fn().mockResolvedValue({}),
         },
         customerActivity: { create: vi.fn().mockResolvedValue({}) },
       };
@@ -264,7 +292,11 @@ describe('submitPublicTestimonial', () => {
         },
         customerDiscountCode: {
           findUnique: vi.fn().mockResolvedValue(null),
-          create: vi.fn().mockResolvedValue({}),
+          create: vi.fn().mockResolvedValue({ id: 'dc-2', code: 'OE-ABC123' }),
+        },
+        booking: {
+          findFirst: vi.fn().mockResolvedValue(null),
+          update: vi.fn().mockResolvedValue({}),
         },
         customerActivity: { create: vi.fn().mockResolvedValue({}) },
       };
@@ -300,5 +332,64 @@ describe('submitPublicTestimonial', () => {
       discountCode: expect.stringMatching(/^OE-[A-Z0-9]{6}$/),
       discountPercent: 5,
     }, expect.any(Object));
+  });
+
+  it('vincula el testimoni a la reserva del link public i marca reviewSubmittedAt', async () => {
+    const tx = {
+      customer: {
+        findUnique: vi.fn().mockResolvedValue({ id: 'booking-customer' }),
+        create: vi.fn(),
+      },
+      customerTestimonial: {
+        create: vi.fn().mockResolvedValue({ id: 'test-booking' }),
+        update: vi.fn().mockResolvedValue({}),
+      },
+      customerDiscountCode: {
+        create: vi.fn().mockResolvedValue({ id: 'dc-booking', code: 'OE-LINKED' }),
+      },
+      booking: {
+        findFirst: vi.fn().mockResolvedValue({
+          id: 'booking-1',
+          customerId: 'booking-customer',
+          eventType: 'WEDDING',
+          eventDate: new Date('2026-05-01T18:00:00.000Z'),
+        }),
+        update: vi.fn().mockResolvedValue({}),
+      },
+      customerActivity: { create: vi.fn().mockResolvedValue({}) },
+    };
+    mockPrisma.$transaction.mockImplementationOnce(async (fn: (tx: unknown) => Promise<unknown>) => fn(tx));
+
+    const result = await submitPublicTestimonial({
+      name: 'Maria',
+      email: 'maria@test.com',
+      rating: 5,
+      comment: 'Test vinculat',
+      allowGoogleShare: false,
+      consentPhotoPublication: false,
+      token: 'tok-1',
+      bookingRef: 'OE-2026-001',
+    });
+
+    expect(result.customerId).toBe('booking-customer');
+    expect(tx.booking.findFirst).toHaveBeenCalledWith({
+      where: { reference: 'OE-2026-001', reviewToken: 'tok-1' },
+      select: { id: true, customerId: true, eventType: true, eventDate: true },
+    });
+    expect(tx.customerTestimonial.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        customerId: 'booking-customer',
+        eventType: 'WEDDING',
+        eventDate: new Date('2026-05-01T18:00:00.000Z'),
+      }),
+    });
+    expect(tx.customerTestimonial.update).toHaveBeenCalledWith({
+      where: { id: 'test-booking' },
+      data: { discountCodeId: 'dc-booking' },
+    });
+    expect(tx.booking.update).toHaveBeenCalledWith({
+      where: { id: 'booking-1' },
+      data: { reviewSubmittedAt: expect.any(Date) },
+    });
   });
 });

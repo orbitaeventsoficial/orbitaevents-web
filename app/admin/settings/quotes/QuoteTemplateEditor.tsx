@@ -65,7 +65,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
     'admin-quote-template-input w-full rounded-xl border px-4 py-2.5 text-sm';
 
   return (
-    <section className="admin-quote-template rounded-2xl border p-5">
+    <section className="admin-quote-template ap-card p-5">
       <div className="grid gap-4 lg:grid-cols-2">
         <label className="text-sm">
           Títol principal
@@ -150,7 +150,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           type="button"
           onClick={save}
           disabled={saving}
-          className="admin-quote-template-save rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+          className="ap-btn disabled:opacity-60"
         >
           {saving ? 'Desant...' : 'Desar plantilla'}
         </button>

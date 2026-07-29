@@ -1,12 +1,17 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import AiCopySuggestionsInline from '../components/AiCopySuggestionsInline';
 import { buildSocialOperatingLoop } from '@/lib/socialOperatingLoop';
+import {
+  SOCIAL_REVIEW_BLOCKED_MESSAGE,
+  SOCIAL_REVIEW_GATED_STATUSES,
+  requiresPostEventReview,
+  resolvePostEventReviewNotes,
+} from '@/lib/socialPostReviewGuard';
 import {
   SOCIAL_PLATFORM_LABELS,
   SOCIAL_POST_STATUS_LABELS,
@@ -16,6 +21,8 @@ import {
   SOCIAL_POST_STATUSES,
   SOCIAL_CONTENT_TYPES,
   SOCIAL_CATEGORIES,
+  SOCIAL_POST_ORIGIN_LABELS,
+  SOCIAL_POST_ORIGIN_TYPES,
   formatDate as formatDateCanonical,
   formatDateTime as formatDateTimeCanonical,
   formatMonthYearLong,
@@ -23,6 +30,7 @@ import {
   type SocialPostStatus,
   type SocialContentType,
   type SocialCategory,
+  type SocialPostOriginType,
 } from '@/lib/constants';
 
 type SerializedPost = {
@@ -38,6 +46,9 @@ type SerializedPost = {
   publishedAt: string | null;
   mediaUrls: string[];
   bookingId: string | null;
+  originType: string;
+  originId: string | null;
+  originLabel: string | null;
   notes: string | null;
   createdAt: string;
   updatedAt: string;
@@ -81,9 +92,18 @@ type PostSeed = {
   scheduledAt: string | null;
   mediaUrl: string | null;
   bookingId: string | null;
+  originType: SocialPostOriginType;
+  originId: string | null;
+  originLabel: string | null;
 };
 
 type Counts = Record<SocialPostStatus, number>;
+
+type SocialMutationResponse = {
+  ok?: boolean;
+  error?: string;
+  message?: string;
+};
 
 const IDEA_SOURCE_ICON: Record<SerializedIdea['source'], string> = {
   booking: '📅',
@@ -99,12 +119,19 @@ const IDEA_SOURCE_LABEL: Record<SerializedIdea['source'], string> = {
   'upcoming-event': 'Teaser proper',
 };
 
+const IDEA_SOURCE_ORIGIN_TYPE: Record<SerializedIdea['source'], SocialPostOriginType> = {
+  booking: SOCIAL_POST_ORIGIN_TYPES.BOOKING,
+  testimonial: SOCIAL_POST_ORIGIN_TYPES.TESTIMONIAL,
+  portfolio: SOCIAL_POST_ORIGIN_TYPES.PORTFOLIO,
+  'upcoming-event': SOCIAL_POST_ORIGIN_TYPES.UPCOMING_EVENT,
+};
+
 const STATUS_TONE: Record<string, string> = {
-  IDEA: 'bg-[var(--o-admin-fill-4)] border-white/15 text-white/60',
+  IDEA: 'bg-[var(--o-admin-fill-4)] border-[var(--line)] text-[var(--t2)]',
   DRAFT: 'admin-tone-bg-warning admin-tone-border-warning admin-tone-text-warning',
   SCHEDULED: 'admin-tone-bg-cyan admin-tone-border-cyan admin-tone-text-cyan',
   PUBLISHED: 'admin-tone-bg-success admin-tone-border-success admin-tone-text-success',
-  ARCHIVED: 'bg-[var(--o-admin-fill-1)] border-white/10 text-white/40',
+  ARCHIVED: 'bg-[var(--o-admin-fill-1)] border-[var(--line)] text-[var(--t3)]',
 };
 
 const PLATFORM_ICON: Record<string, string> = {
@@ -127,16 +154,34 @@ function formatDateTime(iso: string | null): string {
   return formatDateTimeCanonical(iso);
 }
 
+function formatPostOrigin(post: Pick<SerializedPost, 'originType' | 'originId' | 'originLabel' | 'bookingId'>): string | null {
+  const type = post.originType as SocialPostOriginType;
+  if (!type || type === SOCIAL_POST_ORIGIN_TYPES.MANUAL) return null;
+  const label = SOCIAL_POST_ORIGIN_LABELS[type] || type;
+  const value = post.originLabel || post.originId || post.bookingId;
+  return value ? `${label}: ${value}` : label;
+}
+
+async function readSocialMutationPayload(res: Response): Promise<SocialMutationResponse> {
+  return (await res.json().catch(() => ({}))) as SocialMutationResponse;
+}
+
+function resolveSocialMutationError(payload: SocialMutationResponse, fallback: string): string {
+  return payload.error || payload.message || fallback;
+}
+
 export default function SocialClient({
   initialPosts,
   initialCounts,
   initialIdeas = [],
   initialContentPulse,
+  focusPostId = null,
 }: {
   initialPosts: SerializedPost[];
   initialCounts: Counts;
   initialIdeas?: SerializedIdea[];
   initialContentPulse: SerializedContentPulse;
+  focusPostId?: string | null;
 }) {
   const router = useRouter();
   const { confirm, dialogProps } = useConfirmDialog();
@@ -150,6 +195,25 @@ export default function SocialClient({
   const [postSeed, setPostSeed] = useState<PostSeed | null>(null);
   const [showIdeas, setShowIdeas] = useState(true);
   const [flash, setFlash] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [openedFocusPostId, setOpenedFocusPostId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!focusPostId || openedFocusPostId === focusPostId) return;
+    const focusedPost = posts.find((post) => post.id === focusPostId);
+    setOpenedFocusPostId(focusPostId);
+    setPostSeed(null);
+
+    if (!focusedPost) {
+      setFlash({ type: 'error', text: 'No he trobat aquest esborrany social' });
+      return;
+    }
+
+    setView('list');
+    setStatusFilter('all');
+    setEditingPost(focusedPost);
+    setShowCreate(true);
+    setFlash({ type: 'success', text: 'Esborrany social obert des del playbook' });
+  }, [focusPostId, openedFocusPostId, posts]);
 
   const filteredPosts = useMemo(() => {
     if (statusFilter === 'all') return posts;
@@ -206,34 +270,52 @@ export default function SocialClient({
     if (!ok) return;
     try {
       const res = await fetchWithCsrf(`/api/admin/social-posts/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error();
+      const data = await readSocialMutationPayload(res);
+      if (!res.ok || data.ok === false) {
+        throw new Error(resolveSocialMutationError(data, "No s'ha pogut eliminar la publicació"));
+      }
       setPosts((prev) => prev.filter((p) => p.id !== id));
       setFlash({ type: 'success', text: 'Publicació eliminada' });
       router.refresh();
     } catch (err) {
       console.error('Error eliminant publicació social', err);
-      setFlash({ type: 'error', text: 'Error eliminant publicació' });
+      setFlash({
+        type: 'error',
+        text: err instanceof Error && err.message ? err.message : "No s'ha pogut eliminar la publicació",
+      });
     }
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
+    const post = posts.find((item) => item.id === id);
+    if (post && SOCIAL_REVIEW_GATED_STATUSES.has(newStatus) && requiresPostEventReview(post)) {
+      setFlash({ type: 'error', text: SOCIAL_REVIEW_BLOCKED_MESSAGE });
+      return;
+    }
+
     try {
       const res = await fetchWithCsrf(`/api/admin/social-posts/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error();
+      const data = await readSocialMutationPayload(res);
+      if (!res.ok || !data.ok) {
+        throw new Error(resolveSocialMutationError(data, "No s'ha pogut canviar l'estat"));
+      }
       setPosts((prev) => prev.map((p) => p.id === id ? { ...p, status: newStatus, updatedAt: new Date().toISOString() } : p));
       setFlash({ type: 'success', text: `Estat canviat a ${SOCIAL_POST_STATUS_LABELS[newStatus as SocialPostStatus] || newStatus}` });
     } catch (err) {
       console.error('Error canviant estat publicació social', err);
-      setFlash({ type: 'error', text: 'Error canviant estat' });
+      setFlash({
+        type: 'error',
+        text: err instanceof Error && err.message ? err.message : "No s'ha pogut canviar l'estat",
+      });
     }
   }
 
   function handleUseIdea(idea: SerializedIdea) {
+    const originType = IDEA_SOURCE_ORIGIN_TYPE[idea.source];
     setEditingPost(null);
     setPostSeed({
       title: idea.title,
@@ -245,6 +327,9 @@ export default function SocialClient({
       scheduledAt: idea.scheduledAt,
       mediaUrl: idea.mediaUrl,
       bookingId: idea.source === 'booking' ? idea.sourceRef.id : null,
+      originType,
+      originId: idea.sourceRef.id,
+      originLabel: idea.sourceRef.label,
     });
     setShowCreate(true);
   }
@@ -253,9 +338,15 @@ export default function SocialClient({
     setIdeas((prev) => prev.filter((i) => i.id !== ideaId));
   }
 
+  function closePostModal() {
+    setShowCreate(false);
+    setEditingPost(null);
+    setPostSeed(null);
+    if (focusPostId) router.replace('/admin/social');
+  }
+
   const totalPosts = counts.IDEA + counts.DRAFT + counts.SCHEDULED + counts.PUBLISHED + counts.ARCHIVED;
   const scheduledCount = counts.SCHEDULED ?? 0;
-  const draftCount = counts.DRAFT ?? 0;
   const publishedCount = counts.PUBLISHED ?? 0;
   const pulse = initialContentPulse;
   const instagramConversionRate = pulse.instagramLeadCount > 0
@@ -267,39 +358,6 @@ export default function SocialClient({
     : pulse.daysSinceLastPost === null
       ? 'Hi ha activitat, però no hi ha data clara de darrera publicació.'
       : `Última publicació fa ${pulse.daysSinceLastPost} dies.`;
-  const weakestLink = totalPosts === 0
-    ? 'Encara no hi ha cap peça al calendari editorial.'
-    : !pulse.isActive
-      ? `El calendari existeix, però no hi ha publicació viva dins la finestra de ${pulse.windowDays} dies.`
-    : draftCount > 0
-      ? `${draftCount} publicacions continuen en esborrany i demanen decisió editorial.`
-      : pulse.consistencyScore < 50
-        ? `La consistència editorial és baixa (${pulse.consistencyScore}%). Cal reforçar cadència abans d'obrir més canals.`
-      : scheduledCount === 0 && publishedCount === 0
-        ? 'Hi ha peces en pipeline però cap calendari o publicació activa ara mateix.'
-        : 'El calendari té peça viva i no hi ha coll editorial evident al primer nivell.';
-  const nextStepTitle = totalPosts === 0
-    ? 'Crear la primera publicació del calendari'
-    : !pulse.isActive
-      ? 'Publicar una peça real abans de generar més idees'
-    : draftCount > 0
-      ? 'Tancar esborranys abans d’obrir més fronts'
-      : pulse.consistencyScore < 50
-        ? 'Programar cadència mínima per recuperar consistència'
-      : ideas.length > 0
-        ? 'Convertir idees suggerides en peces programades'
-        : 'Mantenir el calendari viu i revisar la propera onada';
-  const nextStepDescription = totalPosts === 0
-    ? 'Sense peces al calendari no hi ha pipeline social real per operar.'
-    : !pulse.isActive
-      ? 'La prioritat no és omplir el backlog, sinó transformar una idea o esborrany en publicació visible.'
-    : draftCount > 0
-      ? 'El retorn més alt aquí no és generar més idees, sinó passar primer els esborranys a programats o descartar-los.'
-      : pulse.consistencyScore < 50
-        ? 'La lectura comercial demana regularitat: programa la següent peça abans de perseguir més formats.'
-      : ideas.length > 0
-        ? 'La millor palanca actual és transformar idees automàtiques en publicacions reals abans que es refredin.'
-      : 'Amb el pipeline estable, el següent pas útil és revisar programació, publicació i tracció del calendari actual.';
   const operatingLoop = buildSocialOperatingLoop({
     ideasCount: ideas.length,
     scheduledCount,
@@ -312,86 +370,40 @@ export default function SocialClient({
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema al calendari social',
-          items: [
-            `${totalPosts} peces totals al pipeline social.`,
-            ideas.length > 0
-              ? `${ideas.length} idees generades automàticament des de bookings, testimonials, portfolio o esdeveniments propers.`
-              : 'Sense idees automàtiques pendents ara mateix.',
-            view === 'calendar'
-              ? 'La vista activa és calendari i el sistema agrupa el contingut per dia.'
-              : 'La vista activa és llista i el sistema prioritza estat i accions directes.',
-            pulse.instagramLeadCount > 0
-              ? `${pulse.publishedLast30d} publicades en ${pulse.windowDays} dies · consistència ${pulse.consistencyScore}% · Instagram: ${pulse.instagramLeadCount} leads, ${pulse.instagramWonCount} guanyats (${instagramConversionRate}%).`
-              : `${pulse.publishedLast30d} publicades en ${pulse.windowDays} dies · consistència ${pulse.consistencyScore}% · Instagram sense leads atribuïts dins la lectura actual.`,
-          ],
-          tone: pulseRisk ? 'warning' : 'info',
-          emptyText: 'Encara no hi ha lectura automàtica útil perquè no hi ha peces al pipeline.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          items: [
-            weakestLink,
-            statusFilter === 'all'
-              ? 'No hi ha filtre d’estat actiu: estàs governant el catàleg complet.'
-              : `Hi ha filtre actiu sobre ${SOCIAL_POST_STATUS_LABELS[statusFilter as SocialPostStatus] || statusFilter}.`,
-            showIdeas
-              ? 'El panell d’idees és visible i permet convertir o descartar suggeriments.'
-              : 'El panell d’idees està ocult i no està entrant a la lectura principal.',
-          ],
-          tone: draftCount > 0 || totalPosts === 0 ? 'warning' : 'success',
-          emptyText: 'No hi ha coll manual evident al primer nivell.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          title: nextStepTitle,
-          detail: `${nextStepDescription} Ara tens ${scheduledCount} programades i ${publishedCount} publicades.`,
-          href: '/admin/social',
-          ctaLabel: totalPosts === 0 ? 'Crear publicació' : 'Revisar calendari',
-          secondaryAction: ideas.length > 0
-            ? { href: '/admin/social', label: 'Veure idees' }
-            : undefined,
-        }}
-      />
-
-      <section className="admin-card-glass rounded-2xl border border-white/10 p-4">
+      <section className="ap-card p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-white/50">Bucle social únic</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Bucle social únic</p>
             <h2 className="mt-2 text-base font-bold leading-snug">{operatingLoop.title}</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/65">{operatingLoop.focus}</p>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--t2)]">{operatingLoop.focus}</p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs lg:justify-end">
-            <span className="rounded-full border border-white/10 px-2 py-1">{operatingLoop.evidence}</span>
-            <span className="rounded-full border border-white/10 px-2 py-1">{operatingLoop.captureLabel}</span>
+            <span className="ap-badge">{operatingLoop.evidence}</span>
+            <span className="ap-badge">{operatingLoop.captureLabel}</span>
           </div>
         </div>
       </section>
 
       <section className="grid gap-3 lg:grid-cols-4">
-        <article className={`admin-card-glass rounded-2xl border p-4 ${pulseRisk ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-success admin-tone-bg-success'}`}>
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Pols editorial</p>
+        <article className={`ap-card p-4 ${pulseRisk ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-success admin-tone-bg-success'}`}>
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Pols editorial</p>
           <h2 className="mt-2 text-base font-bold leading-snug">{pulse.isActive ? 'Actiu' : 'Aturat'}</h2>
-          <p className="mt-2 text-xs leading-relaxed text-white/65">{pulseSummary}</p>
+          <p className="mt-2 text-xs leading-relaxed text-[var(--t2)]">{pulseSummary}</p>
         </article>
-        <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Cadència</p>
+        <article className="ap-card p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Cadència</p>
           <p className="mt-2 text-2xl font-bold">{pulse.consistencyScore}%</p>
-          <p className="mt-1 text-xs text-white/60">{pulse.postsLast30d} peces creades · {pulse.scheduledUpcoming} programades</p>
+          <p className="mt-1 text-xs text-[var(--t2)]">{pulse.postsLast30d} peces creades · {pulse.scheduledUpcoming} programades</p>
         </article>
-        <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Cua editorial</p>
+        <article className="ap-card p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Cua editorial</p>
           <p className="mt-2 text-2xl font-bold">{pulse.draftsPending}</p>
-          <p className="mt-1 text-xs text-white/60">esborranys pendents de decisió</p>
+          <p className="mt-1 text-xs text-[var(--t2)]">esborranys pendents de decisió</p>
         </article>
-        <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Instagram → pipeline</p>
+        <article className="ap-card p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Instagram → pipeline</p>
           <p className="mt-2 text-2xl font-bold">{pulse.instagramLeadCount}</p>
-          <p className="mt-1 text-xs text-white/60">{pulse.instagramWonCount} guanyats · {instagramConversionRate}% conversió</p>
+          <p className="mt-1 text-xs text-[var(--t2)]">{pulse.instagramWonCount} guanyats · {instagramConversionRate}% conversió</p>
         </article>
       </section>
 
@@ -402,7 +414,7 @@ export default function SocialClient({
             key={key}
             onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
             type="button"
-            className={`admin-stagger-item rounded-xl border p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-white/10 admin-card-glass adm-row-hover'}`}
+            className={`admin-stagger-item ap-card p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-[var(--line)] adm-row-hover'}`}
           >
             <p className="text-xs font-semibold uppercase tracking-wider opacity-60">{label}</p>
             <p className="mt-1 text-xl font-bold">{counts[key as SocialPostStatus]}</p>
@@ -416,14 +428,14 @@ export default function SocialClient({
           <button
             onClick={() => setView('list')}
             type="button"
-            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${view === 'list' ? 'bg-white/10 border-white/20' : 'border-white/5 hover:bg-white/5'}`}
+            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${view === 'list' ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] hover:bg-[var(--raised)]'}`}
           >
             Llista
           </button>
           <button
             onClick={() => setView('calendar')}
             type="button"
-            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${view === 'calendar' ? 'bg-white/10 border-white/20' : 'border-white/5 hover:bg-white/5'}`}
+            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${view === 'calendar' ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] hover:bg-[var(--raised)]'}`}
           >
             Calendari
           </button>
@@ -447,7 +459,7 @@ export default function SocialClient({
 
       {/* Ideas Panel — auto-generades des de bookings, testimonials, portfolio i events futurs */}
       {ideas.length > 0 && (
-        <div className="rounded-xl border admin-tone-border-violet admin-tone-bg-violet p-4 admin-card-glass">
+        <div className="ap-card admin-tone-border-violet admin-tone-bg-violet p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-sm font-semibold flex items-center gap-2">
@@ -460,7 +472,7 @@ export default function SocialClient({
             <button
               onClick={() => setShowIdeas((v) => !v)}
               type="button"
-              className="rounded-lg border border-white/10 px-2 py-1 text-xs hover:bg-white/5 sm:self-auto self-start"
+              className="rounded-lg border border-[var(--line)] px-2 py-1 text-xs hover:bg-[var(--raised)] sm:self-auto self-start"
             >
               {showIdeas ? 'Amagar' : 'Mostrar'}
             </button>
@@ -471,7 +483,7 @@ export default function SocialClient({
               {ideas.map((idea) => (
                 <div
                   key={idea.id}
-                  className="admin-stagger-item rounded-lg border border-white/10 admin-card-glass p-3 adm-row-hover transition-colors"
+                  className="ap-card admin-stagger-item p-3 adm-row-hover transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
@@ -505,7 +517,7 @@ export default function SocialClient({
                     <button
                       onClick={() => handleDismissIdea(idea.id)}
                       type="button"
-                      className="rounded border border-white/10 px-2 py-1 text-xs opacity-60 hover:bg-white/5"
+                      className="rounded border border-[var(--line)] px-2 py-1 text-xs opacity-60 hover:bg-[var(--raised)]"
                     >
                       Descartar
                     </button>
@@ -528,7 +540,7 @@ export default function SocialClient({
             </div>
           ) : (
             filteredPosts.map((post) => (
-              <div key={post.id} className="admin-stagger-item rounded-xl border border-white/10 admin-card-glass p-4 adm-row-hover transition-colors">
+              <div key={post.id} className="ap-card admin-stagger-item p-4 adm-row-hover transition-colors">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -547,8 +559,17 @@ export default function SocialClient({
                     </div>
                     <p className="mt-1.5 font-semibold text-sm truncate">{post.title}</p>
                     {post.caption && <p className="mt-0.5 text-xs opacity-60 line-clamp-2">{post.caption}</p>}
+                    {(() => {
+                      const origin = formatPostOrigin(post);
+                      return origin ? <p className="mt-1 text-xs opacity-50">{origin}</p> : null;
+                    })()}
                     {post.hashtags.length > 0 && (
                       <p className="mt-1 text-xs admin-tone-text-cyan">{post.hashtags.map((h) => `#${h}`).join(' ')}</p>
+                    )}
+                    {requiresPostEventReview(post) && (
+                      <p className="mt-2 inline-flex rounded-full border admin-tone-border-warning admin-tone-bg-warning px-2 py-0.5 text-xs font-semibold admin-tone-text-warning">
+                        Revisió consentiment pendent
+                      </p>
                     )}
                   </div>
                   <div className="flex flex-col gap-2 text-left sm:max-w-none sm:shrink-0 sm:items-end sm:text-right max-w-full">
@@ -563,7 +584,7 @@ export default function SocialClient({
                       <select
                         value={post.status}
                         onChange={(e) => handleStatusChange(post.id, e.target.value)}
-                        className="min-w-0 rounded border border-white/10 bg-transparent px-1.5 py-0.5 text-xs"
+                        className="min-w-0 rounded border border-[var(--line)] bg-transparent px-1.5 py-0.5 text-xs"
                       >
                         {Object.entries(SOCIAL_POST_STATUSES).map(([, val]) => (
                           <option key={val} value={val}>{SOCIAL_POST_STATUS_LABELS[val]}</option>
@@ -572,14 +593,14 @@ export default function SocialClient({
                       <button
                         onClick={() => { setEditingPost(post); setShowCreate(true); }}
                         type="button"
-                        className="rounded border border-white/10 px-1.5 py-0.5 text-xs hover:bg-white/10"
+                        className="rounded border border-[var(--line)] px-1.5 py-0.5 text-xs hover:bg-[var(--raised)]"
                       >
                         ✏️
                       </button>
                       <button
                         onClick={() => handleDelete(post.id)}
                         type="button"
-                        className="rounded border border-white/10 px-1.5 py-0.5 text-xs hover:admin-tone-bg-danger"
+                        className="rounded border border-[var(--line)] px-1.5 py-0.5 text-xs hover:admin-tone-bg-danger"
                       >
                         🗑️
                       </button>
@@ -602,7 +623,7 @@ export default function SocialClient({
                 return { year: d.getFullYear(), month: d.getMonth() };
               })}
               type="button"
-              className="rounded-lg border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5"
+              className="rounded-lg border border-[var(--line)] px-3 py-1.5 text-sm hover:bg-[var(--raised)]"
             >
               ◀
             </button>
@@ -615,13 +636,13 @@ export default function SocialClient({
                 return { year: d.getFullYear(), month: d.getMonth() };
               })}
               type="button"
-              className="rounded-lg border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5"
+              className="rounded-lg border border-[var(--line)] px-3 py-1.5 text-sm hover:bg-[var(--raised)]"
             >
               ▶
             </button>
           </div>
           <div className="overflow-x-auto rounded-xl">
-            <div className="grid min-w-[720px] grid-cols-7 gap-px overflow-x-auto rounded-xl border border-white/10 overflow-hidden admin-card-glass">
+            <div className="ap-card grid min-w-[720px] grid-cols-7 gap-px overflow-x-auto overflow-hidden">
             {['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'].map((d) => (
               <div key={d} className="bg-[var(--o-admin-fill-3)] p-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
                 {d}
@@ -633,7 +654,7 @@ export default function SocialClient({
               return (
                 <div
                   key={day.date}
-                  className={`min-h-[80px] border-t border-white/5 p-1.5 ${day.isCurrentMonth ? 'bg-[var(--o-admin-fill-1)]' : 'bg-transparent opacity-30'} ${isToday ? 'ring-1 ring-inset ring-[var(--ax-hair-gold)]' : ''}`}
+                  className={`min-h-[80px] border-t border-[var(--line)] p-1.5 ${day.isCurrentMonth ? 'bg-[var(--o-admin-fill-1)]' : 'bg-transparent opacity-30'} ${isToday ? 'ring-1 ring-inset ring-[var(--ax-hair-gold)]' : ''}`}
                 >
                   <p className={`text-xs font-medium ${isToday ? 'admin-tone-text-cyan' : 'opacity-60'}`}>{day.day}</p>
                   <div className="mt-0.5 space-y-0.5">
@@ -664,7 +685,7 @@ export default function SocialClient({
         <SocialPostModal
           post={editingPost}
           seed={postSeed}
-          onClose={() => { setShowCreate(false); setEditingPost(null); setPostSeed(null); }}
+          onClose={closePostModal}
           onSaved={(saved) => {
             if (editingPost) {
               setPosts((prev) => prev.map((p) => p.id === saved.id ? saved : p));
@@ -673,6 +694,7 @@ export default function SocialClient({
               // Si venia d'una idea, la treiem de la llista
               if (postSeed) {
                 const matchingIdea = ideas.find((i) =>
+                  (postSeed.originType === IDEA_SOURCE_ORIGIN_TYPE[i.source] && i.sourceRef.id === postSeed.originId) ||
                   i.title === postSeed.title ||
                   (postSeed.bookingId && i.sourceRef.id === postSeed.bookingId)
                 );
@@ -683,6 +705,7 @@ export default function SocialClient({
             setEditingPost(null);
             setPostSeed(null);
             setFlash({ type: 'success', text: editingPost ? 'Publicació actualitzada' : 'Publicació creada' });
+            if (focusPostId) router.replace('/admin/social');
             router.refresh();
           }}
         />
@@ -720,11 +743,22 @@ function SocialPostModal({
   const [notes, setNotes] = useState(post?.notes ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pendingPostEventReview = requiresPostEventReview({
+    bookingId: post?.bookingId ?? seed?.bookingId ?? null,
+    category,
+    notes,
+  });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+
+    if (SOCIAL_REVIEW_GATED_STATUSES.has(status) && pendingPostEventReview) {
+      setError(SOCIAL_REVIEW_BLOCKED_MESSAGE);
+      setSaving(false);
+      return;
+    }
 
     const body: Record<string, unknown> = {
       title: title.trim(),
@@ -740,6 +774,9 @@ function SocialPostModal({
     if (!post && seed) {
       if (seed.bookingId) body.bookingId = seed.bookingId;
       if (seed.mediaUrl) body.mediaUrls = [seed.mediaUrl];
+      body.originType = seed.originType;
+      body.originId = seed.originId;
+      body.originLabel = seed.originLabel;
     }
 
     try {
@@ -762,6 +799,9 @@ function SocialPostModal({
         updatedAt: saved.updatedAt ?? new Date().toISOString(),
         scheduledAt: saved.scheduledAt ?? null,
         publishedAt: saved.publishedAt ?? null,
+        originType: saved.originType ?? post?.originType ?? seed?.originType ?? SOCIAL_POST_ORIGIN_TYPES.MANUAL,
+        originId: saved.originId ?? post?.originId ?? seed?.originId ?? null,
+        originLabel: saved.originLabel ?? post?.originLabel ?? seed?.originLabel ?? null,
       });
     } catch (err) {
       console.error('Error desant publicació social', err);
@@ -780,11 +820,25 @@ function SocialPostModal({
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
-        className="w-full max-w-lg rounded-2xl border border-white/10 admin-form-deep p-6 space-y-4 max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg rounded-2xl border border-[var(--line)] admin-form-deep p-6 space-y-4 max-h-[90vh] overflow-y-auto"
       >
         <h2 className="ap-h2">{post ? 'Editar publicació' : 'Nova publicació'}</h2>
 
         {error && <p className="rounded-lg border admin-tone-border-danger admin-tone-bg-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
+        {pendingPostEventReview && (
+          <div className="rounded-lg border admin-tone-border-warning admin-tone-bg-warning px-3 py-2 text-sm admin-tone-text-warning">
+            <p className="m-0">
+              Revisió obligatòria: confirma consentiment, imatges i dades personals abans de programar o publicar.
+            </p>
+            <button
+              type="button"
+              onClick={() => setNotes((current) => resolvePostEventReviewNotes(current))}
+              className="mt-2 rounded border border-current px-2 py-1 text-xs font-semibold transition-colors hover:bg-[var(--raised)]"
+            >
+              Marcar revisió feta
+            </button>
+          </div>
+        )}
 
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Títol *</label>
@@ -799,7 +853,7 @@ function SocialPostModal({
                 key={val}
                 type="button"
                 onClick={() => togglePlatform(val)}
-                className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${platforms.includes(val) ? 'admin-tone-bg-cyan admin-tone-border-cyan admin-tone-text-cyan' : 'border-white/10 hover:bg-white/5'}`}
+                className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${platforms.includes(val) ? 'admin-tone-bg-cyan admin-tone-border-cyan admin-tone-text-cyan' : 'border-[var(--line)] hover:bg-[var(--raised)]'}`}
               >
                 {PLATFORM_ICON[val]} {SOCIAL_PLATFORM_LABELS[val as SocialPlatform]}
               </button>
@@ -862,7 +916,7 @@ function SocialPostModal({
         </div>
 
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
-          <button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-2 text-sm hover:bg-white/5">
+          <button type="button" onClick={onClose} className="ap-btn">
             Cancel·lar
           </button>
           <button type="submit" disabled={saving || !title.trim() || platforms.length === 0} className="ap-btn ap-btn--primary px-6 py-2 disabled:opacity-50 sm:w-auto w-full">

@@ -3,8 +3,10 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency, formatDateTime, getProposalStatusDisplay } from '@/lib/constants';
 import { buildCustomerProposalHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildProposalBookingCreateHref } from '@/lib/admin/proposalWorkspaceHref';
 import ProposalOwnerPanel from '../ProposalOwnerPanel';
-import '../presupuestos.css';
+import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,30 +41,38 @@ export default async function ProposalDetailPage({ params }: Props) {
   const editorHref = proposal.customerId
     ? buildCustomerProposalHref(proposal.customerId, proposal.id)
     : null;
+  const bookingAction = proposal.bookingId && proposal.booking
+    ? { href: buildBookingHref(proposal.booking.id), label: 'Obrir reserva' }
+    : proposal.status === 'ACCEPTED' && proposal.sentAt && proposal.pdfUrl && proposal.pdfKey
+      ? {
+          href: buildProposalBookingCreateHref({
+            proposalId: proposal.id,
+            leadId: proposal.leadId,
+            customerId: proposal.customerId,
+          }),
+          label: 'Crear reserva',
+        }
+      : null;
 
   return (
-    <main className="pr__page">
-        <header className="pr__hero">
-          <div>
-            <Link
-              href="/admin/presupuestos"
-              className="ap-back"
-            >
-              ← Tots els pressupostos
-            </Link>
-            <p className="pr__eyebrow">Comercial · Detall de proposta</p>
-            <h1 className="pr__title">{proposal.reference}</h1>
-            <div className="pr__statusLine">
-              <span
-                className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusDisplay.bg} ${statusDisplay.text} ${statusDisplay.border}`}
-              >
-                {statusDisplay.label}
-              </span>
-              <span className="pr__amount">{formatCurrency(proposal.total)}</span>
-              <span className="pr__muted text-xs">Creat {formatDateTime(proposal.createdAt)}</span>
-            </div>
-          </div>
-          <div className="pr__heroActions">
+    <AdminPage
+      back={{ href: '/admin/presupuestos', label: 'Tots els pressupostos' }}
+      eyebrow="Comercial · Detall de proposta"
+      title={proposal.reference}
+      subtitle={
+        <span className="flex flex-wrap items-center gap-2">
+          <span
+            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusDisplay.bg} ${statusDisplay.text} ${statusDisplay.border}`}
+          >
+            {statusDisplay.label}
+          </span>
+          <span className="[font-family:var(--display)] font-bold tabular-nums text-[var(--t)]">{formatCurrency(proposal.total)}</span>
+          <span className="text-xs text-[var(--t3)]">Creat {formatDateTime(proposal.createdAt)}</span>
+        </span>
+      }
+      actions={
+        (
+          <div className="flex flex-wrap items-center gap-2">
             {editorHref ? (
               <Link
                 href={editorHref}
@@ -71,14 +81,23 @@ export default async function ProposalDetailPage({ params }: Props) {
                 Obrir editor
               </Link>
             ) : (
-              <span className="pr__muted text-xs italic">
+              <span className="text-xs italic text-[var(--t3)]">
                 Vincula un client per editar el pressupost
               </span>
             )}
+            {bookingAction && (
+              <Link
+                href={bookingAction.href}
+                className="ap-btn ap-btn--primary"
+              >
+                {bookingAction.label}
+              </Link>
+            )}
           </div>
-        </header>
-
-        <section className="pr__detailGrid">
+        )
+      }
+    >
+        <section className="grid gap-4">
         <ProposalOwnerPanel
           proposalId={proposal.id}
           initial={{
@@ -105,6 +124,6 @@ export default async function ProposalDetailPage({ params }: Props) {
           }}
         />
         </section>
-    </main>
+    </AdminPage>
   );
 }

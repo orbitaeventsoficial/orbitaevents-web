@@ -6,8 +6,18 @@ import { getTranslatedPackName } from '@/lib/pack-name';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import InfoTooltip from '../components/InfoTooltip';
+import {
+  isAdminTestArtifactFromParts,
+  isAdminTestBookingArtifact,
+  type AdminTestBookingArtifactInput,
+} from '@/lib/admin/testArtifacts';
+import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
+import {
+  buildPendingPostEventEmailBookingWhere,
+  buildPendingPostEventReportBookingWhere,
+  buildPendingPostEventSurveyBookingWhere,
+} from '@/lib/services/postEventPendingService';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,71 +25,217 @@ export const metadata = {
   title: 'Post-Event | Òrbita Admin',
 };
 
+type PostEventPageProps = {
+  searchParams?: {
+    showTestPostEvent?: string;
+  };
+};
 
+type PostEventReportTestInput = {
+  booking: AdminTestBookingArtifactInput;
+  hitSongs?: string | null;
+  memorableMoment?: string | null;
+  clientComments?: string | null;
+  incidentDescription?: string | null;
+  whatWorkedBest?: string | null;
+  whatToImprove?: string | null;
+  lessonsLearned?: string | null;
+};
 
-async function getPostEventData() {
+type ClientSurveyTestInput = {
+  booking: AdminTestBookingArtifactInput;
+  bestMoment?: string | null;
+  additionalComments?: string | null;
+};
+
+function isTestPostEventReportArtifact(report: PostEventReportTestInput): boolean {
+  return (
+    isAdminTestBookingArtifact(report.booking) ||
+    isAdminTestArtifactFromParts([
+      report.hitSongs,
+      report.memorableMoment,
+      report.clientComments,
+      report.incidentDescription,
+      report.whatWorkedBest,
+      report.whatToImprove,
+      report.lessonsLearned,
+    ])
+  );
+}
+
+function isTestClientSurveyArtifact(survey: ClientSurveyTestInput): boolean {
+  return (
+    isAdminTestBookingArtifact(survey.booking) ||
+    isAdminTestArtifactFromParts([
+      survey.bestMoment,
+      survey.additionalComments,
+    ])
+  );
+}
+
+function buildPostEventVisibilityHref(showTestPostEvent: boolean): string {
+  return showTestPostEvent ? '/admin/post-event?showTestPostEvent=1' : '/admin/post-event';
+}
+
+async function getPostEventData(showTestPostEvent: boolean) {
   try {
+    const now = new Date();
     const [
-      recentBookings,
-      pendingReports,
-      pendingSurveys,
-      completedReports,
-      completedSurveys,
+      pendingEmailBookingsRaw,
+      recentBookingsRaw,
+      pendingReportsRaw,
+      pendingSurveyBookingsRaw,
+      completedReportsRaw,
+      completedSurveysRaw,
     ] = await Promise.all([
+      // Emails post-event pendents
+      prisma.booking.findMany({
+        where: buildPendingPostEventEmailBookingWhere(now),
+        take: POST_EVENT_WORKFLOW.pendingTake,
+        select: {
+          reference: true,
+          clientName: true,
+          clientEmail: true,
+          clientPhone: true,
+          eventLocation: true,
+          eventVenue: true,
+          notes: true,
+          lead: { select: { name: true, email: true, phone: true, notes: true } },
+        },
+      }),
       // Reserves recents completades sense informe
       prisma.booking.findMany({
-        where: {
-          status: 'COMPLETED',
-          postEventReport: null,
-        },
+        where: buildPendingPostEventReportBookingWhere(now),
         orderBy: { eventDate: 'desc' },
-        take: 10,
+        take: POST_EVENT_WORKFLOW.pendingTake,
         include: {
           pack: { include: { translations: true } },
-          lead: { select: { preferredLocale: true } },
+          lead: { select: { preferredLocale: true, name: true, email: true, phone: true, notes: true } },
         },
       }),
       // Informes pendents (draft)
-      prisma.postEventReport.count({
+      prisma.postEventReport.findMany({
         where: { status: 'DRAFT' },
+        include: {
+          booking: {
+            select: {
+              reference: true,
+              clientName: true,
+              clientEmail: true,
+              clientPhone: true,
+              eventLocation: true,
+              eventVenue: true,
+              notes: true,
+              lead: { select: { name: true, email: true, phone: true, notes: true } },
+            },
+          },
+        },
       }),
-      // Enquestes pendents d'enviar
-      prisma.booking.count({
-        where: {
-          status: 'COMPLETED',
-          clientSurvey: null,
-          eventDate: { lt: new Date() },
+      // Enquestes sense resposta
+      prisma.booking.findMany({
+        where: buildPendingPostEventSurveyBookingWhere(now),
+        take: POST_EVENT_WORKFLOW.pendingTake,
+        select: {
+          reference: true,
+          clientName: true,
+          clientEmail: true,
+          clientPhone: true,
+          eventLocation: true,
+          eventVenue: true,
+          notes: true,
+          lead: { select: { name: true, email: true, phone: true, notes: true } },
         },
       }),
       // Informes completats
-      prisma.postEventReport.count({
+      prisma.postEventReport.findMany({
         where: { status: 'COMPLETED' },
+        include: {
+          booking: {
+            select: {
+              reference: true,
+              clientName: true,
+              clientEmail: true,
+              clientPhone: true,
+              eventLocation: true,
+              eventVenue: true,
+              notes: true,
+              lead: { select: { name: true, email: true, phone: true, notes: true } },
+            },
+          },
+        },
       }),
       // Enquestes rebudes
-      prisma.clientSurvey.count(),
+      prisma.clientSurvey.findMany({
+        include: {
+          booking: {
+            select: {
+              reference: true,
+              clientName: true,
+              clientEmail: true,
+              clientPhone: true,
+              eventLocation: true,
+              eventVenue: true,
+              notes: true,
+              lead: { select: { name: true, email: true, phone: true, notes: true } },
+            },
+          },
+        },
+      }),
     ]);
+
+    const recentBookings = (showTestPostEvent
+      ? recentBookingsRaw
+      : recentBookingsRaw.filter((booking) => !isAdminTestBookingArtifact(booking)))
+      .slice(0, 10);
+    const pendingEmailBookings = showTestPostEvent
+      ? pendingEmailBookingsRaw
+      : pendingEmailBookingsRaw.filter((booking) => !isAdminTestBookingArtifact(booking));
+    const pendingReports = showTestPostEvent
+      ? pendingReportsRaw
+      : pendingReportsRaw.filter((report) => !isTestPostEventReportArtifact(report));
+    const pendingSurveyBookings = showTestPostEvent
+      ? pendingSurveyBookingsRaw
+      : pendingSurveyBookingsRaw.filter((booking) => !isAdminTestBookingArtifact(booking));
+    const completedReports = showTestPostEvent
+      ? completedReportsRaw
+      : completedReportsRaw.filter((report) => !isTestPostEventReportArtifact(report));
+    const completedSurveys = showTestPostEvent
+      ? completedSurveysRaw
+      : completedSurveysRaw.filter((survey) => !isTestClientSurveyArtifact(survey));
+    const testArtifactCount =
+      pendingEmailBookingsRaw.filter((booking) => isAdminTestBookingArtifact(booking)).length +
+      recentBookingsRaw.filter((booking) => isAdminTestBookingArtifact(booking)).length +
+      pendingReportsRaw.filter((report) => isTestPostEventReportArtifact(report)).length +
+      pendingSurveyBookingsRaw.filter((booking) => isAdminTestBookingArtifact(booking)).length +
+      completedReportsRaw.filter((report) => isTestPostEventReportArtifact(report)).length +
+      completedSurveysRaw.filter((survey) => isTestClientSurveyArtifact(survey)).length;
 
     return {
       recentBookings,
-      pendingReports,
-      pendingSurveys,
-      completedReports,
-      completedSurveys,
+      pendingEmails: pendingEmailBookings.length,
+      pendingReports: pendingReports.length,
+      pendingSurveys: pendingSurveyBookings.length,
+      completedReports: completedReports.length,
+      completedSurveys: completedSurveys.length,
+      testArtifactCount,
     };
   } catch (error) {
     log.error('Error obtenint dades post-event:', error);
     return {
       recentBookings: [],
+      pendingEmails: 0,
       pendingReports: 0,
       pendingSurveys: 0,
       completedReports: 0,
       completedSurveys: 0,
+      testArtifactCount: 0,
     };
   }
 }
 
-export default async function PostEventPage() {
-  const data = await getPostEventData();
+export default async function PostEventPage({ searchParams }: PostEventPageProps) {
+  const showTestPostEvent = searchParams?.showTestPostEvent === '1';
+  const data = await getPostEventData(showTestPostEvent);
   const workflowSteps = [
     {
       number: 1,
@@ -101,12 +257,21 @@ export default async function PostEventPage() {
     },
     {
       number: 3,
-      title: 'Feedback al Client',
-      subtitle: 'Envia agraïment',
-      href: '/admin/post-event/feedback',
-      cta: 'Veure feedback',
+      title: 'Agraïment al Client',
+      subtitle: 'Seguiment post-event',
+      href: '/admin/post-event/seguiment',
+      cta: 'Veure seguiment',
       numberTone: 'admin-tone-soft-success admin-tone-border-success admin-tone-text-success',
       items: ['💌 Missatge personalitzat', '📸 Foto icònica', '🎁 Codi descompte 10%', '👥 Per referits'],
+    },
+    {
+      number: 4,
+      title: 'Playbook',
+      subtitle: 'Checklist de tancament',
+      href: '/admin/post-event/playbook',
+      cta: 'Obrir playbook',
+      numberTone: 'admin-tone-soft-cyan admin-tone-border-cyan admin-tone-text-cyan',
+      items: ['✅ Agraïment', '⭐ Testimoni aprovat', '📣 Publicació social', '👥 Referral'],
     },
   ] as const;
 
@@ -130,6 +295,9 @@ export default async function PostEventPage() {
   }
 
   const manualItems: string[] = [];
+  if (data.pendingEmails > 0) {
+    manualItems.push(`${data.pendingEmails} emails post-event pendents d'enviar`);
+  }
   if (bookingsWithoutReport > 0) {
     manualItems.push(`${bookingsWithoutReport} events completats sense informe intern`);
   }
@@ -137,80 +305,48 @@ export default async function PostEventPage() {
     manualItems.push(`${data.pendingReports} informes en esborrany per completar`);
   }
   if (data.pendingSurveys > 0) {
-    manualItems.push(`${data.pendingSurveys} enquestes encara sense enviar al client`);
+    manualItems.push(`${data.pendingSurveys} enquestes encara sense resposta del client`);
   }
 
-  const nextStep = bookingsWithoutReport > 0
-    ? {
-        eyebrow: 'Següent pas · Informe',
-        title: `Crear informe del primer event pendent`,
-        detail: `${bookingsWithoutReport} ${bookingsWithoutReport === 1 ? 'event completat no té' : 'events completats no tenen'} informe intern. Tancar el cicle operatiu comença per aquí.`,
-        href: `/admin/post-event/reports/new?bookingId=${data.recentBookings[0]!.id}`,
-        ctaLabel: 'Crear informe',
-        secondaryAction: { href: '/admin/post-event/reports', label: 'Veure tots' },
-      }
-    : data.pendingReports > 0
-    ? {
-        eyebrow: 'Següent pas · Tancar',
-        title: 'Completar informes en esborrany',
-        detail: `${data.pendingReports} ${data.pendingReports === 1 ? 'informe intern està' : 'informes interns estan'} en DRAFT. Tanca'ls per poder processar feedback i aprenentatges.`,
-        href: '/admin/post-event/reports',
-        ctaLabel: 'Revisar esborranys',
-      }
-    : data.pendingSurveys > 0
-    ? {
-        eyebrow: 'Següent pas · Enquestes',
-        title: 'Enviar enquestes pendents',
-        detail: `${data.pendingSurveys} ${data.pendingSurveys === 1 ? 'event completat no ha' : 'events completats no han'} rebut l'enquesta al client. Sense resposta no hi ha NPS ni testimonis.`,
-        href: '/admin/post-event/surveys',
-        ctaLabel: 'Gestionar enquestes',
-      }
-    : {
-        eyebrow: 'Següent pas',
-        title: 'Cicle post-event al dia',
-        detail: 'Tots els events tenen informe, les enquestes s\'envien i el backlog està net. Aprofita per enviar agraïments i codis de referits.',
-        href: '/admin/post-event/feedback',
-        ctaLabel: 'Feedback al client',
-        secondaryAction: { href: '/admin/post-event/playbook', label: 'Obrir playbook' },
-      };
 
   return (
-    <AdminPage title="Post-Event" subtitle="Gestiona informes, enquestes i feedback dels esdeveniments">
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic · Cicle tancat',
-          title: data.completedReports > 0 || data.completedSurveys > 0
-            ? 'Historial post-event'
-            : 'Sense historial encara',
-          tone: data.completedReports > 0 || data.completedSurveys > 0 ? 'success' : 'info',
-          items: systemItems,
-          emptyText: 'Encara no hi ha informes ni enquestes tancades.',
-        }}
-        manual={{
-          eyebrow: 'Manual · Backlog',
-          title: manualItems.length === 0
-            ? 'Cap backlog visible'
-            : `${manualItems.length} senyals per revisar`,
-          tone: bookingsWithoutReport > 0 || data.pendingReports > 0
-            ? 'warning'
-            : manualItems.length > 0
-            ? 'info'
-            : 'success',
-          items: manualItems,
-          emptyText: 'Tots els events tenen informe i enquesta al dia.',
-        }}
-        nextStep={nextStep}
-      />
-      <section className="ap-kpi-row lg:grid-cols-4">
+    <AdminPage
+      title="Post-Event"
+      subtitle="Gestiona informes, enquestes i seguiment dels esdeveniments"
+      actions={data.testArtifactCount > 0 ? (
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <span className="ap-badge">
+            {data.testArtifactCount} elements de prova post-event {showTestPostEvent ? 'visibles' : 'ocults'}
+          </span>
+          <Link
+            href={buildPostEventVisibilityHref(!showTestPostEvent)}
+            className="ap-btn ap-btn--secondary ap-btn--xs"
+          >
+            {showTestPostEvent ? 'Ocultar proves' : 'Mostrar proves'}
+          </Link>
+        </div>
+      ) : undefined}
+    >
+      <section className="ap-kpi-row lg:grid-cols-5">
+        <div className="ap-kpi ap-kpi--warning">
+          <p className="ap-kpi-label">Emails pendents <InfoTooltip text="Reserves completades que encara no tenen email post-event enviat. L'enviament real es fa des d'Emails amb confirmació." /></p>
+          <p className="ap-kpi-value">{data.pendingEmails}</p>
+          <p className="ap-kpi-meta">Agraïment</p>
+          {data.pendingEmails > 0 && (
+            <Link href="/admin/emails" className="ap-btn ap-btn--secondary ap-btn--xs mt-3">
+              Gestionar emails
+            </Link>
+          )}
+        </div>
         <div className="ap-kpi ap-kpi--warning">
           <p className="ap-kpi-label">Informes pendents <InfoTooltip text="Esdeveniments completats que encara no tenen informe intern. Fes-lo per tancar el cicle operatiu." /></p>
           <p className="ap-kpi-value">{data.pendingReports}</p>
           <p className="ap-kpi-meta">Esborrany</p>
         </div>
         <div className="ap-kpi ap-kpi--info">
-          <p className="ap-kpi-label">Enquestes per enviar <InfoTooltip text="Esdeveniments completats on el client encara no ha rebut l'enquesta de satisfacció." /></p>
+          <p className="ap-kpi-label">Enquestes sense resposta <InfoTooltip text="Esdeveniments completats on encara no consta cap resposta d'enquesta del client." /></p>
           <p className="ap-kpi-value">{data.pendingSurveys}</p>
-          <p className="ap-kpi-meta">Sense enquesta enviada</p>
+          <p className="ap-kpi-meta">Sense resposta rebuda</p>
         </div>
         <div className="ap-kpi ap-kpi--success">
           <p className="ap-kpi-label">Informes completats <InfoTooltip text="Informes interns ja tancats. Serveixen per avaluar com va anar l'event i millorar." /></p>
@@ -222,7 +358,7 @@ export default async function PostEventPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {workflowSteps.map((step) => (
           <article key={step.number} className="ap-card overflow-hidden rounded-2xl p-0">
             <div className="border-b p-4 admin-tone-border-neutral">

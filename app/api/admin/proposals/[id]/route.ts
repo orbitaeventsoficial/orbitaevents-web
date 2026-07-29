@@ -4,9 +4,30 @@ import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
-import { getAdminProposalById, updateAdminProposal, deleteAdminProposal } from '@/lib/services/proposalAdminService';
+import {
+  getAdminProposalById,
+  ProposalCanonicalAcceptanceError,
+  getProposalFinancialConsistencyIssues,
+  ProposalCanonicalDispatchError,
+  updateAdminProposal,
+  deleteAdminProposal,
+} from '@/lib/services/proposalAdminService';
+import { PROPOSAL_FINANCIAL_FIELDS } from '@/lib/constants/pricing';
 import { dispatchAutoTrigger } from '@/lib/services/automationTriggers';
 import { z } from 'zod';
+
+function addFinancialConsistencyIssues(
+  ctx: z.RefinementCtx,
+  data: { subtotal: number; discount: number; vatRate: number; vatAmount: number; total: number },
+) {
+  for (const issue of getProposalFinancialConsistencyIssues(data)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [issue.field],
+      message: issue.message,
+    });
+  }
+}
 
 const updateProposalSchema = z.object({
   status: z.nativeEnum(ProposalStatus).optional(),
@@ -23,6 +44,26 @@ const updateProposalSchema = z.object({
   pdfKey: z.string().optional(),
   sentAt: z.string().datetime().nullable().optional(),
   acceptedAt: z.string().datetime().nullable().optional(),
+}).superRefine((data, ctx) => {
+  const presentFinancialFields = PROPOSAL_FINANCIAL_FIELDS.filter((field) => data[field] !== undefined);
+  if (presentFinancialFields.length === 0) return;
+
+  if (presentFinancialFields.length !== PROPOSAL_FINANCIAL_FIELDS.length) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['total'],
+      message: 'Els camps econòmics del pressupost s’han d’actualitzar junts',
+    });
+    return;
+  }
+
+  addFinancialConsistencyIssues(ctx, {
+    subtotal: data.subtotal!,
+    discount: data.discount!,
+    vatRate: data.vatRate!,
+    vatAmount: data.vatAmount!,
+    total: data.total!,
+  });
 });
 
 interface Params {
@@ -68,6 +109,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
+    if (error instanceof ProposalCanonicalAcceptanceError) {
+      return NextResponse.json(error.body, { status: error.status });
+    }
+    if (error instanceof ProposalCanonicalDispatchError) {
+      return NextResponse.json(error.body, { status: error.status });
+    }
     log.error('Error actualitzant pressupost', error, {
       context: {
         requestId,

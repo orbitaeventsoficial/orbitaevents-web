@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -32,10 +32,11 @@ export default function PackPriceQuickEditor({
   alertThreshold: number;
 }) {
   const router = useRouter();
+  const fieldId = useId();
   const [price, setPrice] = useState(initialPrice.toFixed(2));
   const [extraHourPrice, setExtraHourPrice] = useState(initialExtraHourPrice.toFixed(2));
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const priceNum = Number(price);
   const extraNum = Number(extraHourPrice);
@@ -61,10 +62,10 @@ export default function PackPriceQuickEditor({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.error || 'No s\'ha pogut desar el PVP');
-      setMsg('PVP desat');
+      setMsg({ type: 'success', text: 'PVP desat' });
       router.refresh();
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Error en desar');
+      setMsg({ type: 'error', text: error instanceof Error ? error.message : 'Error en desar' });
     } finally {
       setSaving(false);
     }
@@ -74,15 +75,19 @@ export default function PackPriceQuickEditor({
 
   return (
     <>
-      <div className="rounded-xl border p-2">
-        <p className="">Pack PVP (editable)</p>
-        <input className={inputClass} value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" />
+      <div className="ap-card p-2">
+        <label htmlFor={`${fieldId}-pack-price`} className="block text-xs font-medium">
+          Pack PVP (editable)
+        </label>
+        <input id={`${fieldId}-pack-price`} className={inputClass} value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" />
       </div>
-      <div className="rounded-xl border p-2">
-        <p className="">Hora extra PVP (editable)</p>
-        <input className={inputClass} value={extraHourPrice} onChange={(e) => setExtraHourPrice(e.target.value)} inputMode="decimal" />
+      <div className="ap-card p-2">
+        <label htmlFor={`${fieldId}-extra-hour-price`} className="block text-xs font-medium">
+          Hora extra PVP (editable)
+        </label>
+        <input id={`${fieldId}-extra-hour-price`} className={inputClass} value={extraHourPrice} onChange={(e) => setExtraHourPrice(e.target.value)} inputMode="decimal" />
       </div>
-      <div className={`col-span-2 rounded-xl border p-2 ${overallClass}`}>
+      <div className={`col-span-2 ap-card p-2 ${overallClass}`}>
         <p className="font-semibold">Semàfor preu pack: {packDiv >= 0 ? '+' : ''}{packDiv.toFixed(1)}%</p>
         <p className="font-semibold">Semàfor hora extra: {extraDiv >= 0 ? '+' : ''}{extraDiv.toFixed(1)}%</p>
         <div className="mt-2 flex items-center gap-2">
@@ -90,14 +95,17 @@ export default function PackPriceQuickEditor({
             type="button"
             onClick={save}
             disabled={saving}
-            className="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-semibold hover:bg-white/20 disabled:opacity-60"
+            className="ap-btn ap-btn--xs"
           >
             {saving ? 'Desant...' : 'Desar PVP'}
           </button>
-          {msg && <span className="text-xs">{msg}</span>}
+          {msg && (
+            <span className="text-xs" role={msg.type === 'success' ? 'status' : 'alert'}>
+              {msg.text}
+            </span>
+          )}
         </div>
       </div>
     </>
   );
 }
-

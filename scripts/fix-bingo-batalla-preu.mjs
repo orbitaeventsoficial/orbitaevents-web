@@ -1,12 +1,13 @@
 /**
  * Correcció Bingo/Batalla Musical (Masquerade) — ordre del propietari 2026-06-09.
  *
- * Decisió: bingo i batalla = 1,5h, AMB tècnic de so inclòs (no desglossat).
+ * Decisió: bingo i batalla = 1,5h, AMB tècnic de so inclòs i assignable.
  * Preu: cost 200 (160 animació + 40 tècnic) → PVP resellPrice(200) = 240.
  *
  * Accions (idempotent, NO destructiu — només updates + isActive=false):
  *  - Bingo Musical i Batalla Musical (cat "Animació adulta") → cost 200, PVP 240,
- *    crew amb tècnic inclòs, durada 1h 30.
+ *    crew amb tècnic inclòs, durada 1h 30. El configurador el desdobla en
+ *    Carlos/equip + línia de tècnic inclosa per decidir qui el fa/cobra.
  *  - Desactiva el duplicat "Bingo musical" (cat "Bingo").
  *  - Desactiva "Tècnic de so (bingo)" (ja inclòs al preu, no es desglossa).
  *
@@ -36,7 +37,7 @@ async function main() {
     console.log(`✓ ${p.name}: ${p.costPrice}€/${p.sellPrice}€ → ${COST}€/${PVP}€`);
   }
 
-  // 2. Desactivar duplicats i tècnic desglossat (no esborrar).
+  // 2. Desactivar duplicats i l'antic tècnic ofert com extra independent (no esborrar).
   const toDisable = await prisma.collaboratorProduct.findMany({
     where: {
       isActive: true,

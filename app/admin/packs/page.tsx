@@ -3,13 +3,13 @@ import { log } from '@/lib/logger';
 // Pàgina de gestió de packs
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { Cloud, Info, Mic, Music, Package, Pencil, Star, Users, Volume2 } from 'lucide-react';
 import SyncButton from './SyncButton';
 import PackPriceQuickEditor from './PackPriceQuickEditor';
 import { getAllPacks } from '@/config/packs-config';
 import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
-import { PACK_SERVICE_OPTIONS, formatCurrencyExact } from '@/lib/constants';
+import { PACK_SERVICE_OPTIONS, formatCurrency, formatCurrencyExact } from '@/lib/constants';
 import { ORBITA_SERVICES } from '@/lib/constants/orbita-services';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
@@ -22,9 +22,11 @@ export const metadata = {
 
 type PackFocus = 'alert' | 'critical-margin' | 'missing-capacity' | 'partial-cost' | 'without-inventory';
 
+const PACK_ICON = 'h-3.5 w-3.5 shrink-0';
+
 function renderPackInventoryPreview(pack: Awaited<ReturnType<typeof getPacks>>[number]) {
   if (pack.inventory.length === 0) {
-    return <p className="text-xs text-white/40">Sense equip base assignat</p>;
+    return <p className="text-xs text-[var(--t3)]">Sense equip base assignat</p>;
   }
 
   return (
@@ -40,12 +42,12 @@ function renderPackInventoryPreview(pack: Awaited<ReturnType<typeof getPacks>>[n
           </span>
         ))}
         {pack.inventory.length > 4 && (
-          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-semibold text-white/70">
+          <span className="ap-badge">
             +{pack.inventory.length - 4} més
           </span>
         )}
       </div>
-      <p className="text-xs text-white/55">
+      <p className="text-xs text-[var(--t3)]">
         {pack.inventory.filter((row) => row.isRequired).length} obligatoris · {pack.inventory.reduce((sum, row) => sum + Math.max(1, row.quantity), 0)} unitats totals
       </p>
     </div>
@@ -235,64 +237,6 @@ export default async function PacksPage({
     packsManualItems.push(`${missingCapacityCount} packs sense rang clar de convidats`);
   }
 
-  const packsNextStep = packs.length === 0
-    ? {
-        eyebrow: 'Següent pas · Iniciar',
-        title: 'Configurar catàleg de packs',
-        detail: 'Encara no hi ha packs a la BD. Executa el seed o crea el primer pack per obrir el catàleg comercial.',
-        href: '/admin/packs/new',
-        ctaLabel: 'Nou pack',
-      }
-    : !packsInSync
-    ? {
-        eyebrow: 'Següent pas · Sync',
-        title: 'Sincronitzar BD amb el config',
-        detail: `BD ${packs.length} ≠ config ${configPacks.length}. Executa el sync per alinear el catàleg productiu amb la font de veritat del repo.`,
-        href: '/admin/packs',
-        ctaLabel: 'Tornar a la taula',
-        secondaryAction: { href: '/admin/pricing', label: 'Obrir pricing' },
-      }
-    : pricingAlertsCount > 0
-    ? {
-        eyebrow: 'Següent pas · Preu',
-        title: 'Tancar divergències de preu',
-        detail: `${pricingAlertsCount} ${pricingAlertsCount === 1 ? 'pack supera' : 'packs superen'} el llindar del ${pricingConfig.alertDivergencePct}% entre públic i recomanat. Ajusta o justifica la divergència.`,
-        href: '/admin/packs?focus=alert',
-        ctaLabel: 'Filtrar alertes',
-        secondaryAction: { href: '/admin/pricing', label: 'Obrir pricing' },
-      }
-    : criticalMarginCount > 0
-    ? {
-        eyebrow: 'Següent pas · Marge',
-        title: 'Revisar packs amb marge crític',
-        detail: `${criticalMarginCount} ${criticalMarginCount === 1 ? 'pack està' : 'packs estan'} per sota del marge objectiu. Puja preu, baixa cost o retira del catàleg públic.`,
-        href: '/admin/packs?focus=critical-margin',
-        ctaLabel: 'Filtrar marge crític',
-      }
-    : withoutInventoryCount > 0
-    ? {
-        eyebrow: 'Següent pas · Equip',
-        title: 'Assignar equip base a packs',
-        detail: `${withoutInventoryCount} ${withoutInventoryCount === 1 ? 'pack no té' : 'packs no tenen'} equip base definit. Sense inventari assignat el cost real queda invisible.`,
-        href: '/admin/packs?focus=without-inventory',
-        ctaLabel: 'Filtrar sense equip',
-      }
-    : partialCostCount > 0 || missingCapacityCount > 0
-    ? {
-        eyebrow: 'Següent pas · Higiene',
-        title: 'Completar dades de càlcul',
-        detail: 'Queden packs amb càlcul parcial o sense rang de convidats clar. Petits arreglaments però necessaris per càlcul de preu net.',
-        href: partialCostCount > 0 ? '/admin/packs?focus=partial-cost' : '/admin/packs?focus=missing-capacity',
-        ctaLabel: 'Revisar focus',
-      }
-    : {
-        eyebrow: 'Següent pas',
-        title: 'Catàleg al dia',
-        detail: 'Sense alertes visibles al catàleg. Aprofita per revisar extras, crear un pack nou o obrir el cockpit de preus.',
-        href: '/admin/packs/new',
-        ctaLabel: 'Nou pack',
-        secondaryAction: { href: '/admin/packs/extras', label: 'Veure extres' },
-      };
 
   return (
     <AdminPage
@@ -310,7 +254,8 @@ export default async function PacksPage({
           )}
           {!packsInSync && (
             <span className="mt-2 inline-flex items-center gap-2 rounded-md px-3 py-1 text-sm border">
-              ℹ️ Packs en BD: {packs.length} · Packs al config (seed): {configPacks.length}
+              <Info className={PACK_ICON} aria-hidden="true" />
+              Packs en BD: {packs.length} · Packs al config (seed): {configPacks.length}
             </span>
           )}
         </>
@@ -320,37 +265,13 @@ export default async function PacksPage({
           <SyncButton />
           <Link
             href="/admin/packs/new"
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-[var(--gold-ink)] transition-colors"
+            className="ap-btn ap-btn--primary"
           >
             + Nou Pack
           </Link>
         </div>
       }
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic · Catàleg de packs',
-          title: packs.length === 0 ? 'Sense packs' : `${packs.length} packs al catàleg`,
-          tone: packsInSync && packs.length > 0 ? 'info' : 'warning',
-          items: packsSystemItems,
-          emptyText: 'Encara no hi ha packs configurats.',
-        }}
-        manual={{
-          eyebrow: 'Manual · Salut del catàleg',
-          title: packsManualItems.length === 0
-            ? 'Cap alerta visible'
-            : `${packsManualItems.length} senyals per revisar`,
-          tone: (pricingAlertsCount > 0 || criticalMarginCount > 0)
-            ? 'warning'
-            : packsManualItems.length > 0
-            ? 'info'
-            : 'success',
-          items: packsManualItems,
-          emptyText: 'Cap pack requereix intervenció manual ara mateix.',
-        }}
-        nextStep={packsNextStep}
-      />
-
       <nav className="flex flex-wrap gap-2">
         <Link
           href="/admin/packs"
@@ -360,36 +281,36 @@ export default async function PacksPage({
         </Link>
         <Link
           href="/admin/packs/extras"
-          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/60 hover:bg-white/10"
+          className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--raised)] px-4 py-2 text-sm font-medium text-[var(--t2)] hover:bg-[var(--raised)]"
         >
           Extres
         </Link>
       </nav>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Total Packs</p>
           <p className="mt-2 text-3xl font-bold">{filteredPacks.length}</p>
         </div>
-        <div className="rounded-2xl border p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Actius</p>
           <p className="mt-2 text-3xl font-bold">
             {filteredPacks.filter((p) => p.isActive).length}
           </p>
         </div>
-        <div className="rounded-2xl border p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Destacats</p>
           <p className="mt-2 text-3xl font-bold">
             {filteredPacks.filter((p) => p.isFeatured).length}
           </p>
         </div>
-        <div className="rounded-2xl border p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Total Reserves</p>
           <p className="mt-2 text-3xl font-bold">
             {filteredPacks.reduce((sum, p) => sum + p._count.bookings, 0)}
           </p>
         </div>
-        <div className={`rounded-2xl border p-4 ${pricingAlertsCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'admin-tone-border-success admin-tone-bg-success'}`}>
+        <div className={`ap-card p-4 ${pricingAlertsCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'admin-tone-border-success admin-tone-bg-success'}`}>
           <p className={`text-xs font-medium uppercase ${pricingAlertsCount > 0 ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}>Alertes de preu pack</p>
           <p className="mt-2 text-3xl font-bold">{pricingAlertsCount}</p>
         </div>
@@ -414,10 +335,10 @@ export default async function PacksPage({
               return (
                 <div
                   key={pack.id}
-                  className={`rounded-2xl border admin-card-glass overflow-hidden ${
+                  className={`ap-card overflow-hidden ${
                     pack.isFeatured
                       ? 'ring-1 admin-tone-border-warning'
-                      : 'border-white/10'
+                      : 'border-[var(--line)]'
                   }`}
                 >
                   <div className="p-4 border-b">
@@ -432,8 +353,9 @@ export default async function PacksPage({
                       </div>
                       <div className="flex gap-1">
                         {pack.isFeatured && (
-                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium">
-                            ⭐ Destacat
+                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium">
+                            <Star className={PACK_ICON} aria-hidden="true" />
+                            Destacat
                           </span>
                         )}
                         {!pack.isActive && (
@@ -461,9 +383,9 @@ export default async function PacksPage({
                     </div>
                     {health && (
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="rounded-xl border p-2">
+                        <div className="ap-card p-2">
                           <p className="">Pack recomanat</p>
-                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedPrice)}</p>
+                          <p className="text-sm font-semibold">{formatCurrency(health.recommendedPrice)}</p>
                         </div>
                         <PackPriceQuickEditor
                           packId={pack.id}
@@ -473,51 +395,52 @@ export default async function PacksPage({
                           recommendedExtraHourPrice={health.recommendedExtraHourPrice}
                           alertThreshold={pricingConfig.alertDivergencePct}
                         />
-                        <div className="rounded-xl border p-2">
+                        <div className="ap-card p-2">
                           <p className="">Hora extra recomanada</p>
-                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
+                          <p className="text-sm font-semibold">{formatCurrency(health.recommendedExtraHourPrice)}</p>
                         </div>
-                        <div className={`col-span-2 rounded-xl border p-2 ${divergenceColor}`}>
+                        <div className={`ap-card col-span-2 p-2 ${divergenceColor}`}>
                           <p className="text-xs">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
-                          Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
+                        <div className="ap-card col-span-2 p-2 text-xs">
+                          Operari extra sempre disponible: {formatCurrency(health.recommendedOperatorExtraHourPrice)}/h (recomanat)
                         </div>
                       </div>
                     )}
 
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <span>🎵</span>
+                        <Music className={PACK_ICON} aria-hidden="true" />
                         <span>{pack.djHours}h DJ</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span>🔊</span>
+                        <Volume2 className={PACK_ICON} aria-hidden="true" />
                         <span>{pack.soundWatts}W</span>
                       </div>
                       {pack.includesFog && (
                         <div className="flex items-center gap-2">
-                          <span>🌫️</span>
+                          <Cloud className={PACK_ICON} aria-hidden="true" />
                           <span>Fum inclòs</span>
                         </div>
                       )}
                       {pack.includesMic && (
                         <div className="flex items-center gap-2">
-                          <span>🎤</span>
+                          <Mic className={PACK_ICON} aria-hidden="true" />
                           <span>Micro inclòs</span>
                         </div>
                       )}
                     </div>
 
                     {(pack.minGuests || pack.maxGuests) && (
-                      <div className="text-sm">
-                        👥 {pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className={PACK_ICON} aria-hidden="true" />
+                        <span>{pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats</span>
                       </div>
                     )}
 
@@ -531,8 +454,8 @@ export default async function PacksPage({
                     </div>
                     <div className="ap-card p-3 text-xs">
                       <div className="mb-2 flex items-center justify-between gap-2">
-                        <span className="font-semibold text-white/80">Equip del pack</span>
-                        <span className="text-white/55">{pack.inventory.length} elements</span>
+                        <span className="font-semibold text-[var(--t2)]">Equip del pack</span>
+                        <span className="text-[var(--t3)]">{pack.inventory.length} elements</span>
                       </div>
                       {renderPackInventoryPreview(pack)}
                     </div>
@@ -541,15 +464,17 @@ export default async function PacksPage({
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
                       href={buildPackHref(pack.id)}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
-                      ✏️ Editar
+                      <Pencil className={PACK_ICON} aria-hidden="true" />
+                      Editar
                     </Link>
                     <Link
                       href={buildPackHref(pack.id, 'content')}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
-                      📦 Equip
+                      <Package className={PACK_ICON} aria-hidden="true" />
+                      Equip
                     </Link>
                   </div>
                 </div>
@@ -578,10 +503,10 @@ export default async function PacksPage({
               return (
                 <div
                   key={pack.id}
-                  className={`rounded-2xl border admin-card-glass overflow-hidden ${
+                  className={`ap-card overflow-hidden ${
                     pack.isFeatured
                       ? 'ring-1 admin-tone-border-warning'
-                      : 'border-white/10'
+                      : 'border-[var(--line)]'
                   }`}
                 >
                   <div className="p-4 border-b">
@@ -596,8 +521,9 @@ export default async function PacksPage({
                       </div>
                       <div className="flex gap-1">
                         {pack.isFeatured && (
-                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium">
-                            ⭐ Destacat
+                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium">
+                            <Star className={PACK_ICON} aria-hidden="true" />
+                            Destacat
                           </span>
                         )}
                         {!pack.isActive && (
@@ -625,9 +551,9 @@ export default async function PacksPage({
                     </div>
                     {health && (
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="rounded-xl border p-2">
+                        <div className="ap-card p-2">
                           <p className="">Pack recomanat</p>
-                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedPrice)}</p>
+                          <p className="text-sm font-semibold">{formatCurrency(health.recommendedPrice)}</p>
                         </div>
                         <PackPriceQuickEditor
                           packId={pack.id}
@@ -637,51 +563,52 @@ export default async function PacksPage({
                           recommendedExtraHourPrice={health.recommendedExtraHourPrice}
                           alertThreshold={pricingConfig.alertDivergencePct}
                         />
-                        <div className="rounded-xl border p-2">
+                        <div className="ap-card p-2">
                           <p className="">Hora extra recomanada</p>
-                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
+                          <p className="text-sm font-semibold">{formatCurrency(health.recommendedExtraHourPrice)}</p>
                         </div>
-                        <div className={`col-span-2 rounded-xl border p-2 ${divergenceColor}`}>
+                        <div className={`ap-card col-span-2 p-2 ${divergenceColor}`}>
                           <p className="text-xs">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
-                          Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
+                        <div className="ap-card col-span-2 p-2 text-xs">
+                          Operari extra sempre disponible: {formatCurrency(health.recommendedOperatorExtraHourPrice)}/h (recomanat)
                         </div>
                       </div>
                     )}
 
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <span>🎵</span>
+                        <Music className={PACK_ICON} aria-hidden="true" />
                         <span>{pack.djHours}h DJ</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span>🔊</span>
+                        <Volume2 className={PACK_ICON} aria-hidden="true" />
                         <span>{pack.soundWatts}W</span>
                       </div>
                       {pack.includesFog && (
                         <div className="flex items-center gap-2">
-                          <span>🌫️</span>
+                          <Cloud className={PACK_ICON} aria-hidden="true" />
                           <span>Fum inclòs</span>
                         </div>
                       )}
                       {pack.includesMic && (
                         <div className="flex items-center gap-2">
-                          <span>🎤</span>
+                          <Mic className={PACK_ICON} aria-hidden="true" />
                           <span>Micro inclòs</span>
                         </div>
                       )}
                     </div>
 
                     {(pack.minGuests || pack.maxGuests) && (
-                      <div className="text-sm">
-                        👥 {pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className={PACK_ICON} aria-hidden="true" />
+                        <span>{pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats</span>
                       </div>
                     )}
 
@@ -695,8 +622,8 @@ export default async function PacksPage({
                     </div>
                     <div className="ap-card p-3 text-xs">
                       <div className="mb-2 flex items-center justify-between gap-2">
-                        <span className="font-semibold text-white/80">Equip del pack</span>
-                        <span className="text-white/55">{pack.inventory.length} elements</span>
+                        <span className="font-semibold text-[var(--t2)]">Equip del pack</span>
+                        <span className="text-[var(--t3)]">{pack.inventory.length} elements</span>
                       </div>
                       {renderPackInventoryPreview(pack)}
                     </div>
@@ -705,15 +632,17 @@ export default async function PacksPage({
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
                       href={buildPackHref(pack.id)}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
-                      ✏️ Editar
+                      <Pencil className={PACK_ICON} aria-hidden="true" />
+                      Editar
                     </Link>
                     <Link
                       href={buildPackHref(pack.id, 'content')}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
-                      📦 Equip
+                      <Package className={PACK_ICON} aria-hidden="true" />
+                      Equip
                     </Link>
                   </div>
                 </div>
@@ -724,14 +653,14 @@ export default async function PacksPage({
       )}
 
       {filteredPacks.length === 0 && (
-        <div className="rounded-2xl border admin-card-glass p-12 text-center">
-          <span className="text-4xl">📦</span>
+        <div className="ap-card p-12 text-center">
+          <Package className="mx-auto h-10 w-10" aria-hidden="true" />
           <p className="mt-4">{activeFocusLabel ? 'No hi ha packs dins d’aquest focus' : 'No hi ha packs configurats'}</p>
           <p className="text-sm">{activeFocusLabel ? 'Canvia el focus o torna a la vista completa.' : 'Executa el seed per carregar dades inicials'}</p>
         </div>
       )}
 
-      <section className="mt-8 rounded-2xl border admin-card-glass p-5">
+      <section className="ap-card mt-8 p-5">
         <h2 className="ap-h2">Serveis solts d&apos;Òrbita</h2>
         <p className="mt-1 text-sm admin-tone-text-neutral">
           Serveis propis que s&apos;afegeixen a una reserva fora de pack (p. ex. DJ extra, tècnic de so).

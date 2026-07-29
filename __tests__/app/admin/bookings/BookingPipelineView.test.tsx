@@ -59,7 +59,11 @@ function makeBooking(overrides: Partial<Record<string, unknown>> = {}) {
     eventDate: '2026-09-20T00:00:00.000Z',
     eventType: 'WEDDING',
     total: 1200,
+    depositAmount: 300,
     depositPaid: false,
+    remainingAmount: 900,
+    remainingPaid: false,
+    cashAmount: null,
     status: 'PENDING',
     leadId: null,
     marginPct: 38,
@@ -106,6 +110,51 @@ describe('BookingPipelineView', () => {
     expect(screen.getByText('B-002')).toBeInTheDocument();
     expect(screen.queryByText('B-003')).not.toBeInTheDocument();
     expect(screen.getByText('+ 1 cancel·lada (ocultes del kanban)')).toBeInTheDocument();
+  });
+
+  it('no mostra la pill de pagament pendent si cashAmount cobreix la bestreta', async () => {
+    mockFetchWithCsrf.mockResolvedValueOnce(
+      mockJsonResponse({
+        data: {
+          bookings: [
+            makeBooking({ cashAmount: 300, depositPaid: false, remainingPaid: false }),
+          ],
+        },
+      })
+    );
+
+    render(<BookingPipelineView />);
+
+    expect(await screen.findByText('B-001')).toBeInTheDocument();
+    expect(screen.queryByText('Paga pendent')).not.toBeInTheDocument();
+  });
+
+  it('manté la pill si queda bestreta pendent real', async () => {
+    mockFetchWithCsrf.mockResolvedValueOnce(
+      mockJsonResponse({
+        data: {
+          bookings: [
+            makeBooking({ cashAmount: 100, depositPaid: false, remainingPaid: false }),
+          ],
+        },
+      })
+    );
+
+    render(<BookingPipelineView />);
+
+    expect(await screen.findByText('B-001')).toBeInTheDocument();
+    expect(screen.getByText('Paga pendent')).toBeInTheDocument();
+  });
+
+  it('preserva customerId quan el kanban s’obre des del Customer Hub', async () => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams('customerId=customer-1&view=kanban&page=2'));
+    mockFetchWithCsrf.mockResolvedValueOnce(mockJsonResponse({ data: { bookings: [] } }));
+
+    render(<BookingPipelineView />);
+
+    await waitFor(() => expect(mockFetchWithCsrf).toHaveBeenCalledTimes(1));
+    const [url] = mockFetchWithCsrf.mock.calls[0];
+    expect(url).toBe('/api/admin/bookings?customerId=customer-1&limit=500&pipeline=true');
   });
 
   it('mou una reserva endavant i mostra toast d’èxit quan el PATCH respon OK', async () => {

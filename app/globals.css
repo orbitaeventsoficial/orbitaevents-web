@@ -61,6 +61,8 @@
     /* Fons canònic del portal client (sub-app proposta→signatura→pagament).
        Era el mateix gradient inline repetit ~12 cops a les pàgines del portal. */
     --o-portal-bg: linear-gradient(160deg, #050709 0%, #0a0d12 40%, #060810 100%);
+    --o-portal-bottom-nav-h: 4.25rem;
+    --o-cookie-mobile-banner-h: 3.5rem;
 
     /* ─────────────────────────────────────────────────────────────────────────
        GRADIENTS
@@ -1340,7 +1342,7 @@ textarea:focus-visible {
   width: auto !important;
 }
 
-/* Control Room CSS moved to app/admin/control-room.css */
+/* Control Room CSS consolidat a app/admin/admin-theme.css (tokens --at-cr-*) */
 
 
 
@@ -1456,7 +1458,7 @@ html.admin-mode .admin-sidebar-block-title {
 
 html.admin-mode .admin-sidebar-block-list {
   display: grid;
-  gap: 2px;
+  gap: var(--o-space-05);
 }
 
 html.admin-mode .admin-sidebar-recent {
@@ -1509,9 +1511,9 @@ html.admin-mode .admin-nav-section-caret--open {
 }
 
 html.admin-mode .admin-nav-section-content {
-  margin-top: 2px;
+  margin-top: var(--o-space-05);
   display: grid;
-  gap: 2px;
+  gap: var(--o-space-05);
 }
 
 /* Items de navegació */
@@ -2467,27 +2469,9 @@ html.admin-mode .admin-shell .admin-pack-model-chip--warn   { border-color: var(
 html.admin-mode .admin-shell .admin-pack-model-chip--danger { border-color: var(--at-red); background: var(--at-red-dim); color: var(--at-text); }
 
 /* ── 16. CATÀLEG ─────────────────────────────────────────────────────────── */
-html.admin-mode .admin-shell .admin-catalog-tab {
-  border-color: var(--at-border);
-  transition: var(--at-transition);
-}
 
-html.admin-mode .admin-shell .admin-catalog-tab--active {
-  background: color-mix(in oklab, var(--at-gold) 20%, var(--at-panel) 80%);
-  border-color: var(--at-gold);
-  color: var(--at-gold-text);
-}
 
-html.admin-mode .admin-shell .admin-catalog-tab--idle {
-  background: var(--at-panel);
-  color: var(--at-muted);
-}
 
-html.admin-mode .admin-shell .admin-catalog-tab--idle:hover {
-  background: var(--at-raised);
-  border-color: var(--at-border-s);
-  color: var(--at-text);
-}
 
 /* ── 17. QUOTE TEMPLATE ──────────────────────────────────────────────────── */
 html.admin-mode .admin-shell .admin-quote-template {
@@ -2622,22 +2606,27 @@ html.admin-mode .ap-page {
 
 /* ── HEADER ──────────────────────────────────────────────────────────────────
    Canon Temporada (TANCAT CHARLIE): eyebrow mono + h1 display + sub mono,
-   separats per hairline. Clonic a `.fx__pagehead`. */
+   separats per hairline. Clonic a `.ap-leads-pagehead`. */
 html.admin-mode .ap-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  padding-bottom: 0.625rem;
-  border-bottom: 1px solid var(--line);
+  /* Header canònic: consumeix els tokens de Studio (--head-*), referència = leads.
+     Cap pàgina defineix paràmetres propis de header. */
+  padding: var(--head-pad);
+  border-bottom: var(--head-border);
+  background: var(--head-bg);
+  border-radius: var(--o-r-md) var(--o-r-md) 0 0;
 }
 
 html.admin-mode .ap-header-left {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 0.375rem;
   min-width: 0;
+  flex: 1 1 24rem;
 }
 
 html.admin-mode .ap-header-actions {
@@ -2645,7 +2634,8 @@ html.admin-mode .ap-header-actions {
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
-  flex-shrink: 0;
+  flex: 0 1 auto;
+  min-width: 0;
   justify-content: flex-end;
 }
 
@@ -2684,6 +2674,7 @@ html.admin-mode .ap-title {
   letter-spacing: -0.018em;
   line-height: 1;
   color: var(--t);
+  overflow-wrap: anywhere;
 }
 
 html.admin-mode .ap-subtitle {
@@ -2693,16 +2684,49 @@ html.admin-mode .ap-subtitle {
   color: var(--t3);
   letter-spacing: 0.015em;
   line-height: 1.4;
+  max-width: 78ch;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 767px) {
-  html.admin-mode .ap-title { font-size: var(--o-text-xl); }
-  html.admin-mode .ap-header-actions { width: 100%; justify-content: space-between; }
+  html.admin-mode .ap-header {
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  html.admin-mode .ap-header-left {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  html.admin-mode .ap-title {
+    font-size: var(--o-text-xl);
+    line-height: 1.08;
+  }
+
+  html.admin-mode .ap-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  html.admin-mode .ap-header-actions > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  html.admin-mode .ap-header-actions .ap-btn,
+  html.admin-mode .ap-header-actions a,
+  html.admin-mode .ap-header-actions button {
+    flex: 1 1 min(100%, 10rem);
+    justify-content: center;
+  }
 }
 
 /* ── KPIS ────────────────────────────────────────────────────────────────── */
 html.admin-mode .ap-kpis {
-  /* el padding és a ap-kpi-row */
+  padding-inline: var(--page-gutter);
 }
 
 html.admin-mode .ap-kpi-row {
@@ -2808,6 +2832,7 @@ html.admin-mode .ap-tabs-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 0.375rem;
+  padding-inline: var(--page-gutter);
 }
 
 html.admin-mode .ap-tab {
@@ -2848,6 +2873,9 @@ html.admin-mode .ap-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  /* Gutter lateral canònic: s'alinea amb el header (--head-pad). De fàbrica per a
+     tota pàgina AdminPage; cap pàgina el defineix a mà. */
+  padding-inline: var(--page-gutter);
 }
 
 /* ── SECTION ─────────────────────────────────────────────────────────────── */
@@ -2870,6 +2898,10 @@ html.admin-mode .ap-section-head {
   gap: 1rem;
   padding: 0.875rem 1.125rem 0.75rem;
   border-bottom: 1px solid var(--line);
+}
+
+html.admin-mode .ap-section-head > div {
+  min-width: 0;
 }
 
 html.admin-mode .ap-section-title {
@@ -2906,7 +2938,28 @@ html.admin-mode .ap-section-actions {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  flex-shrink: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (max-width: 767px) {
+  html.admin-mode .ap-section-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  html.admin-mode .ap-section-actions {
+    justify-content: flex-start;
+  }
+
+  html.admin-mode .ap-section-actions .ap-btn,
+  html.admin-mode .ap-section-actions a,
+  html.admin-mode .ap-section-actions button {
+    flex: 1 1 min(100%, 10rem);
+    justify-content: center;
+  }
 }
 
 html.admin-mode .ap-section-body {
@@ -3038,6 +3091,7 @@ html.admin-mode .ap-badge--info    { background: var(--at-blue-dim);   border-co
 html.admin-mode .ap-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.375rem;
   padding: 0.45rem 0.875rem;
   border-radius: 0.625rem;
@@ -3054,6 +3108,10 @@ html.admin-mode .ap-btn {
   text-decoration: none;
   white-space: nowrap;
   line-height: 1.4;
+  max-width: 100%;
+  /* Target tàctil canònic (UX): mínim 36px desktop; al mòbil creix a 44px (WCAG).
+     Un sol lloc → tots els botons de l'admin respecten la diana tàctil. */
+  min-height: 2.25rem;
 }
 
 html.admin-mode .ap-btn:hover {
@@ -3070,17 +3128,20 @@ html.admin-mode .ap-btn:disabled {
   pointer-events: none;
 }
 
-/* Acció primària = outline or de Cristina (`.fx__add`): fons transparent, vora
+/* Acció primària = outline or de Cristina (`.ap-leads-add`): fons transparent, vora
    hairline d'or, text or. Abans era or 22% sobre panel = massa fosc, semblava negre. */
 html.admin-mode .ap-btn--primary {
-  background: transparent;
-  border-color: var(--at-gold);
-  color: var(--at-gold-text);
+  /* Botó primari canònic: OUTLINE daurat VISIBLE (decisió propietari 2026-06-30).
+     Recuadre daurat clar + fons subtil per marcar la forma. Canviar aquí afecta
+     TOTS els botons primaris de l'admin. */
+  background: color-mix(in oklab, var(--gold) 7%, transparent);
+  border-color: var(--gold);
+  color: var(--gold-bright);
 }
 
 html.admin-mode .ap-btn--primary:hover {
-  background: color-mix(in oklab, var(--at-gold) 8%, transparent);
-  border-color: var(--at-gold);
+  background: color-mix(in oklab, var(--gold) 15%, transparent);
+  border-color: var(--gold-bright);
 }
 
 html.admin-mode .ap-btn--secondary {
@@ -3108,6 +3169,14 @@ html.admin-mode .ap-btn--danger:hover {
 html.admin-mode .ap-btn--xs {
   font-size: 0.7rem;
   padding: 0.25rem 0.625rem;
+  min-height: 1.75rem; /* desktop dens (taules); al mòbil creix a target tàctil */
+}
+
+/* Target tàctil mòbil (UX/WCAG): al mòbil tots els botons ≥44px per ser pitjables.
+   Canònic: viu aquí, cap component ho repeteix. */
+@media (max-width: 640px) {
+  html.admin-mode .ap-btn { min-height: 2.75rem; }
+  html.admin-mode .ap-btn--xs { min-height: 2.5rem; padding-block: 0.5rem; }
 }
 
 /* ── EMPTY STATE ─────────────────────────────────────────────────────────── */
@@ -3158,3 +3227,14 @@ html.admin-mode .ap-empty-action {
 
 /* Fons canònic del portal client — substitueix l'inline repetit ~12× (monocapa). */
 .portal-shell-bg { background: var(--o-portal-bg); }
+
+@media (max-width: 767px) {
+  .portal-shell-bg {
+    padding-bottom: calc(
+      var(--o-portal-bottom-nav-h) +
+      var(--o-cookie-mobile-banner-h) +
+      var(--safe-bottom) +
+      1rem
+    );
+  }
+}

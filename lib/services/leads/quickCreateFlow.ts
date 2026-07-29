@@ -42,6 +42,20 @@ export type QuickCreateResult =
 
 const PROPOSAL_DEFAULT_VALIDITY = 15;
 
+async function resolveProposalSubtotal(input: QuickCreateInput): Promise<number> {
+  const packId = input.event.interestedPackId;
+  if (!packId) {
+    return input.proposalSubtotal ?? 0;
+  }
+
+  const pack = await prisma.pack.findUnique({
+    where: { id: packId },
+    select: { price: true },
+  });
+
+  return pack?.price ?? 0;
+}
+
 export async function quickCreate(input: QuickCreateInput): Promise<QuickCreateResult> {
   const wantProposal =
     input.outcome === 'lead+proposal' || input.outcome === 'lead+proposal+booking';
@@ -96,7 +110,7 @@ export async function quickCreate(input: QuickCreateInput): Promise<QuickCreateR
   // 2. Proposal — opcional
   let proposalId: string | null = null;
   if (wantProposal) {
-    const subtotal = input.proposalSubtotal ?? 0;
+    const subtotal = await resolveProposalSubtotal(input);
     const vatRate = VAT_RATE_INVOICE;
     const vatAmount = calcVatAmount(subtotal, true);
     const total = roundMoney(subtotal + vatAmount);

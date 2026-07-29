@@ -4,6 +4,10 @@ import { getTranslatedPackName } from '@/lib/pack-name';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { PORTFOLIO_EVENT_ORIGIN_TYPES } from '@/lib/constants/portfolio-media';
+import { EnsurePortfolioEventButton } from './EnsurePortfolioEventButton';
+import { POST_EVENT_WORKFLOW } from '@/lib/constants/postEventWorkflow';
+import { buildPendingPostEventReportBookingWhere } from '@/lib/services/postEventPendingService';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,12 +33,9 @@ async function getReports() {
 
 async function getAvailableBookings() {
   return prisma.booking.findMany({
-    where: {
-      status: 'COMPLETED',
-      postEventReport: null,
-    },
+    where: buildPendingPostEventReportBookingWhere(),
     orderBy: { eventDate: 'desc' },
-    take: 5,
+    take: POST_EVENT_WORKFLOW.pendingTake,
     include: {
       pack: { include: { translations: true } },
       lead: { select: { preferredLocale: true } },
@@ -47,6 +48,30 @@ export default async function ReportsPage() {
     getReports(),
     getAvailableBookings(),
   ]);
+  const reportBookingIds = reports.map((report) => report.bookingId);
+  const portfolioEvents = reportBookingIds.length > 0
+    ? await prisma.portfolioEvent.findMany({
+        where: {
+          sourceBookingId: { in: reportBookingIds },
+          originType: {
+            in: [
+              PORTFOLIO_EVENT_ORIGIN_TYPES.POST_EVENT_REPORT,
+              PORTFOLIO_EVENT_ORIGIN_TYPES.BOOKING_GALLERY,
+            ],
+          },
+        },
+        select: {
+          id: true,
+          title: true,
+          sourceBookingId: true,
+        },
+      })
+    : [];
+  const portfolioEventByBooking = new Map(
+    portfolioEvents
+      .filter((event) => event.sourceBookingId)
+      .map((event) => [event.sourceBookingId!, event])
+  );
 
   const draftReports = reports.filter(r => r.status === 'DRAFT');
   const completedReports = reports.filter(r => r.status === 'COMPLETED');
@@ -60,15 +85,15 @@ export default async function ReportsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Esborranys</div>
           <div className="text-3xl font-bold mt-1">{draftReports.length}</div>
         </div>
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Completats</div>
           <div className="text-3xl font-bold mt-1">{completedReports.length}</div>
         </div>
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Total</div>
           <div className="text-3xl font-bold mt-1">{reports.length}</div>
         </div>
@@ -123,13 +148,14 @@ export default async function ReportsPage() {
               report.booking.pack.slug,
               report.booking.lead?.preferredLocale
             );
+            const portfolioEvent = portfolioEventByBooking.get(report.bookingId);
             return (
               <div
                 key={report.id}
                 className="ap-card p-4 hover:brightness-105 transition-colors"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold">
                         {report.booking.clientName}
@@ -151,12 +177,24 @@ export default async function ReportsPage() {
                       </p>
                     )}
                   </div>
-                  <Link
-                    href={buildBookingHref(report.bookingId)}
-                    className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
-                  >
-                    Veure detalls
-                  </Link>
+                  <div className="flex shrink-0 flex-col items-end gap-2">
+                    <Link
+                      href={buildBookingHref(report.bookingId, 'sec-post-event')}
+                      className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
+                    >
+                      Veure detalls
+                    </Link>
+                    {report.status === 'COMPLETED' && (
+                      <EnsurePortfolioEventButton
+                        bookingId={report.bookingId}
+                        existingEvent={portfolioEvent ? {
+                          id: portfolioEvent.id,
+                          title: portfolioEvent.title,
+                          adminHref: '/admin/portfolio#events',
+                        } : null}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -166,11 +204,6 @@ export default async function ReportsPage() {
     </AdminPage>
   );
 }
-
-
-
-
-
 
 
 

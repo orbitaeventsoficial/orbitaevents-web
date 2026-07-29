@@ -96,6 +96,16 @@ describe('uploadLeadDocument', () => {
     expect(result.status).toBe(400);
   });
 
+  it('retorna 410 si s intenta pujar un pressupost legacy com LeadDocument QUOTE', async () => {
+    const fd = makeFormData({ type: 'QUOTE' });
+
+    const result = await uploadLeadDocument('l1', fd);
+
+    expect(result.status).toBe(410);
+    expect(mockUploadFile).not.toHaveBeenCalled();
+    expect(mockPrisma.leadDocument.create).not.toHaveBeenCalled();
+  });
+
   it('retorna 400 amb mime type no permès', async () => {
     const file = makeBlobFile('test.exe', 'application/x-msdownload');
     const fd = makeFormData({ file });

@@ -7,9 +7,12 @@ interface UseBookingDistanceOptions {
   eventVenue: string;
   eventLocation: string;
   onDistanceResolved: (distanceKm: string) => void;
+  /** Peatges automàtics (#1373): Google els dona amb la ruta quan n'hi ha. */
+  onTollsResolved?: (tollsEur: string) => void;
+  enabled?: boolean;
 }
 
-export function useBookingDistance({ eventVenue, eventLocation, onDistanceResolved }: UseBookingDistanceOptions) {
+export function useBookingDistance({ eventVenue, eventLocation, onDistanceResolved, onTollsResolved, enabled = true }: UseBookingDistanceOptions) {
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
   const lastDistanceDestinationRef = useRef('');
@@ -31,9 +34,13 @@ export function useBookingDistance({ eventVenue, eventLocation, onDistanceResolv
       }
 
       onDistanceResolved(String(data.roundTripKm || 0));
+      if (onTollsResolved && typeof data.tollsEur === 'number' && data.tollsEur > 0) {
+        onTollsResolved(String(data.tollsEur));
+      }
       lastDistanceDestinationRef.current = destination;
+      const tollNote = typeof data.tollsEur === 'number' && data.tollsEur > 0 ? ` · peatges ${data.tollsEur} €` : '';
       setDistanceMessage(
-        `Ruta calculada: ${data.originResolved || 'Origen'} → ${data.destinationResolved || 'Destí'} (${data.oneWayKm || 0} km anada, ${data.roundTripKm || 0} km anada+tornada).`
+        `Ruta calculada: ${data.originResolved || 'Origen'} → ${data.destinationResolved || 'Destí'} (${data.oneWayKm || 0} km anada, ${data.roundTripKm || 0} km anada+tornada${tollNote}).`
       );
     } catch (error) {
       setDistanceMessage(error instanceof Error ? error.message : 'Error calculant distància');
@@ -43,6 +50,7 @@ export function useBookingDistance({ eventVenue, eventLocation, onDistanceResolv
   }, [onDistanceResolved]);
 
   useEffect(() => {
+    if (!enabled) return;
     const destination = [eventVenue.trim(), eventLocation.trim()].filter(Boolean).join(', ');
     if (destination.length < 3) return;
     if (destination === lastDistanceDestinationRef.current) return;
@@ -52,7 +60,7 @@ export function useBookingDistance({ eventVenue, eventLocation, onDistanceResolv
     }, 550);
 
     return () => clearTimeout(timer);
-  }, [calculateDistanceForDestination, eventLocation, eventVenue]);
+  }, [calculateDistanceForDestination, enabled, eventLocation, eventVenue]);
 
   return {
     calculatingDistance,

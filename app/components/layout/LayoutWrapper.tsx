@@ -11,6 +11,11 @@ import { useState, useEffect, useCallback } from 'react';
 import HeroPortalLogo from '@/app/components/ui/HeroPortalLogo';
 import { trackPageView } from '@/app/lib/analytics';
 import { APP_IMMERSIVE_PAGES } from '@/lib/constants';
+import {
+  shouldHidePublicMobileChrome,
+  shouldOffsetMobileCookieConsentForPortalNav,
+  shouldRenderCookieConsent,
+} from '@/lib/constants/publicChrome';
 import { getClientIntroMode, hasSeenMobileIntro, isIntroPage, markMobileIntroSeen, MOBILE_INTRO_COMPLETE_EVENT, MOBILE_INTRO_STORAGE_KEY, type IntroMode } from '@/lib/intro';
 
 // Components dinàmics (lazy loading + ssr: false per evitar hydration issues)
@@ -220,12 +225,13 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const isImmersive = APP_IMMERSIVE_PAGES.some(page => pathname?.includes(page));
   const isIntroActive = showIntro || hideHeaderOnMobileIntro;
   const pathWithoutLocale = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-  const hideMobileChrome = isMobileViewport && (
-    pathWithoutLocale.startsWith('/configurador') ||
-    pathWithoutLocale.startsWith('/contacto') ||
-    pathWithoutLocale.startsWith('/reservar')
-  );
+  const hideMobileChrome = shouldHidePublicMobileChrome(pathWithoutLocale, isMobileViewport);
+  const renderCookieConsent = shouldRenderCookieConsent(pathWithoutLocale);
   const needsMobileBottomOffset = !isIntroActive && !hideMobileChrome && isMobileViewport;
+  const offsetCookieConsentForPortalNav = shouldOffsetMobileCookieConsentForPortalNav(
+    pathWithoutLocale,
+    isMobileViewport,
+  );
 
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER: Pàgina immersiva (sense header/footer)
@@ -273,14 +279,11 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {!isIntroActive && (!isMobileViewport || !hideMobileChrome) && <FloatingCTAs />}
 
       {/* Consentiment cookies */}
-      {!isIntroActive && <CookieConsent />}
+      {!isIntroActive && renderCookieConsent && <CookieConsent mobileBottomOffset={offsetCookieConsentForPortalNav} />}
 
     </>
   );
 }
-
-
-
 
 
 

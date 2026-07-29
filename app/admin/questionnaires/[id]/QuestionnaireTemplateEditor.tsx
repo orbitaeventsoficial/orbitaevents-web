@@ -73,24 +73,24 @@ export default function QuestionnaireTemplateEditor({
 
       <div className="space-y-4 ap-card p-4">
         <div>
-          <label htmlFor="tpl-title" className="block text-xs text-white/50 mb-1">Títol</label>
+          <label htmlFor="tpl-title" className="block text-xs text-[var(--t3)] mb-1">Títol</label>
           <input
             id="tpl-title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+            className="w-full rounded-lg border border-[var(--line)] bg-[var(--raised)] px-3 py-2 text-sm text-[var(--t)] focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
           />
         </div>
         <div>
-          <label htmlFor="tpl-desc" className="block text-xs text-white/50 mb-1">Descripció (opcional)</label>
+          <label htmlFor="tpl-desc" className="block text-xs text-[var(--t3)] mb-1">Descripció (opcional)</label>
           <input
             id="tpl-desc"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+            className="w-full rounded-lg border border-[var(--line)] bg-[var(--raised)] px-3 py-2 text-sm text-[var(--t)] focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
           />
         </div>
-        <label className="flex items-center gap-2 text-sm text-white/70 cursor-pointer">
+        <label className="flex items-center gap-2 text-sm text-[var(--t2)] cursor-pointer">
           <input
             type="checkbox"
             checked={isActive}
@@ -104,11 +104,11 @@ export default function QuestionnaireTemplateEditor({
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-white/70">Preguntes</h2>
+        <h2 className="text-sm font-semibold text-[var(--t2)]">Preguntes</h2>
         {questions.map((q, idx) => (
           <div key={q.id} className="ap-card p-4 space-y-3">
             <div className="flex items-start justify-between gap-2">
-              <p className="text-xs text-white/40">Pregunta {idx + 1}</p>
+              <p className="text-xs text-[var(--t3)]">Pregunta {idx + 1}</p>
               {questions.length > 1 && (
                 <button
                   onClick={() => removeQuestion(idx)}
@@ -120,22 +120,22 @@ export default function QuestionnaireTemplateEditor({
               )}
             </div>
             <div>
-              <label htmlFor={`q-label-${idx}`} className="block text-xs text-white/50 mb-1">Enunciat</label>
+              <label htmlFor={`q-label-${idx}`} className="block text-xs text-[var(--t3)] mb-1">Enunciat</label>
               <input
                 id={`q-label-${idx}`}
                 value={q.label}
                 onChange={(e) => updateQuestion(idx, { label: e.target.value })}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+                className="w-full rounded-lg border border-[var(--line)] bg-[var(--raised)] px-3 py-2 text-sm text-[var(--t)] focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
               />
             </div>
             <div>
-              <label htmlFor={`q-type-${idx}`} className="block text-xs text-white/50 mb-1">Tipus</label>
+              <label htmlFor={`q-type-${idx}`} className="block text-xs text-[var(--t3)] mb-1">Tipus</label>
               <select
                 id={`q-type-${idx}`}
                 value={q.type}
                 onChange={(e) => updateQuestion(idx, { type: e.target.value as QuestionType })}
                 aria-label="Tipus de pregunta"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+                className="w-full rounded-lg border border-[var(--line)] bg-[var(--raised)] px-3 py-2 text-sm text-[var(--t)] focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
               >
                 {QUESTION_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>{t.label}</option>
@@ -144,17 +144,17 @@ export default function QuestionnaireTemplateEditor({
             </div>
             {(q.type === 'select' || q.type === 'multiselect') && (
               <div>
-                <label htmlFor={`q-opts-${idx}`} className="block text-xs text-white/50 mb-1">Opcions (una per línia)</label>
+                <label htmlFor={`q-opts-${idx}`} className="block text-xs text-[var(--t3)] mb-1">Opcions (una per línia)</label>
                 <textarea
                   id={`q-opts-${idx}`}
                   rows={3}
                   value={(q.options ?? []).join('\n')}
                   onChange={(e) => updateQuestion(idx, { options: e.target.value.split('\n').filter(Boolean) })}
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+                  className="w-full rounded-lg border border-[var(--line)] bg-[var(--raised)] px-3 py-2 text-sm text-[var(--t)] focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
                 />
               </div>
             )}
-            <label className="flex items-center gap-2 text-sm text-white/70 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-[var(--t2)] cursor-pointer">
               <input
                 type="checkbox"
                 checked={q.required}
@@ -170,7 +170,7 @@ export default function QuestionnaireTemplateEditor({
         <button
           onClick={addQuestion}
           type="button"
-          className="inline-flex rounded-lg border border-white/15 px-4 py-2 text-sm text-white/70 hover:bg-white/5"
+          className="ap-btn inline-flex"
         >
           + Afegir pregunta
         </button>
@@ -188,7 +188,7 @@ export default function QuestionnaireTemplateEditor({
         <button
           onClick={() => router.back()}
           type="button"
-          className="inline-flex rounded-lg border border-white/15 px-5 py-2 text-sm text-white/70 hover:bg-white/5"
+          className="inline-flex rounded-lg border border-[var(--line)] px-5 py-2 text-sm text-[var(--t2)] hover:bg-[var(--raised)]"
         >
           Cancel·lar
         </button>

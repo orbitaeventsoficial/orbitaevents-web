@@ -2,12 +2,13 @@ import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const {
-  mockRequireAuth,
+  mockRequireAuth, mockVerifyCsrf,
   mockCreateAdminLead,
   mockPreviewLeadCustomerLink,
   mockLinkLeadToCustomer,
 } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockCreateAdminLead: vi.fn(),
   mockPreviewLeadCustomerLink: vi.fn(),
   mockLinkLeadToCustomer: vi.fn(),
@@ -24,6 +25,8 @@ vi.mock('@/lib/services/leads/leadCustomerLinkService', () => ({
   linkLeadToCustomer: mockLinkLeadToCustomer,
 }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { POST } from '@/app/api/admin/leads/route';
 
 function makeRequest(body: Record<string, unknown>) {
@@ -36,7 +39,7 @@ function makeRequest(body: Record<string, unknown>) {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockRequireAuth.mockReturnValue(null);
+  mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
   mockCreateAdminLead.mockResolvedValue({
     ok: true,
     lead: {
@@ -82,6 +85,53 @@ describe('POST /api/admin/leads', () => {
       linked: true,
       created: true,
       customerId: 'customer-1',
+    }));
+  });
+
+  it('rebutja eventDate ambigu a la creació manual', async () => {
+    const res = await POST(makeRequest({
+      name: 'Maria',
+      email: 'maria@test.com',
+      eventType: 'WEDDING',
+      eventDate: '26 Setiembre',
+    }));
+
+    expect(res.status).toBe(400);
+    expect(mockCreateAdminLead).not.toHaveBeenCalled();
+  });
+
+  it('permet crear una entrada manual amb telefon i sense email', async () => {
+    const res = await POST(makeRequest({
+      name: 'Maria',
+      phone: '600123123',
+      eventType: 'WEDDING',
+      eventDate: '2026-09-26',
+      eventStartTime: '18:00',
+    }));
+
+    expect(res.status).toBe(200);
+    expect(mockCreateAdminLead).toHaveBeenCalledWith(expect.objectContaining({
+      name: 'Maria',
+      phone: '600123123',
+      email: expect.stringMatching(/^manual-.+@leads\.orbitaevents\.local$/),
+      eventDate: '2026-09-26',
+      eventStartTime: '18:00',
+      status: 'CONTACTED',
+    }));
+  });
+
+  it('normalitza source EMAIL i eventType desconegut de l’extractor', async () => {
+    const res = await POST(makeRequest({
+      name: 'Maria',
+      email: 'maria@test.com',
+      eventType: 'evento',
+      source: 'EMAIL',
+    }));
+
+    expect(res.status).toBe(200);
+    expect(mockCreateAdminLead).toHaveBeenCalledWith(expect.objectContaining({
+      eventType: 'OTHER',
+      source: 'OTHER',
     }));
   });
 

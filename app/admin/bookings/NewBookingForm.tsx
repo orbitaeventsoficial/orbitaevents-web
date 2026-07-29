@@ -1,24 +1,31 @@
 'use client';
 
 /* ============================================================================
-   ÒRBITA ADMIN — Nova reserva (Brass & Obsidian)
+   ÒRBITA ADMIN — Nova reserva
    ----------------------------------------------------------------------------
-   Shell `nb-root` amb top bar + hero + layout 2 columnes (main + sidebar
-   sticky). Reaprofita tots els hooks i la lògica existent. Substitueix
-   `<AdminPage>` (vell) i les classes Tailwind del Frankenstein per CSS
-   canònic `nb__*` consumint tokens Studio.
-   Canvi #842.
+   Canònic: AdminPage + AdminSection + .ap-card + .adm-input + .ap-btn +
+   Tailwind/tokens de /studio. sistema propi `nb-*` eradicat (canonització 2026-06-30).
+   Layout de 2 columnes (qüestionari + sidebar sticky amb resum i CTA).
+   Reaprofita tots els hooks i la lògica de càlcul de preu existent.
 ============================================================================ */
 
-import { useEffect, useState } from 'react';
-import { VAT_RATE_INVOICE } from '@/lib/constants/pricing';
+import { useEffect, useMemo, useState } from 'react';
 import { formatCurrency } from '@/lib/constants';
+import { getBookingFiscalMode } from '@/lib/constants/booking-payment';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import {
+  buildTravelMealAllowanceLines,
+  calculateTravelCostBreakdown,
+  computeBoloTransport,
+  deriveTravelHeadcount,
+} from '@/lib/services/travelLaborCost';
 import { useToast } from '../components/ToastProvider';
+import { AdminPage, AdminSection } from '../components/AdminPage';
+import { NB_FIELD, NB_LABEL, NB_HINT, NB_GROUP } from './booking-form-classes';
 import BookingPricingSummary from './BookingPricingSummary';
 import BookingPackExtrasSection from './BookingPackExtrasSection';
 import BookingTravelDiscountSection from './BookingTravelDiscountSection';
@@ -31,10 +38,62 @@ import { useBookingDiscountValidation } from './useBookingDiscountValidation';
 import { useBookingDistance } from './useBookingDistance';
 import { useBookingDateConflicts } from './useBookingDateConflicts';
 import { useBookingPricing } from './useBookingPricing';
-import { useFormAutosave } from '@/lib/hooks/useFormAutosave';
+import { clearFormAutosaveDraft, useFormAutosave } from '@/lib/hooks/useFormAutosave';
 import type { BookingExtra, BookingFormData, BookingSelectedExtras, BookingPartnerOption } from './booking-form.types';
 import { OPERATOR_EXTRA_ID, bookingAutosaveKey } from './booking-form.types';
-import './nb-design.css';
+import { fetchWithCsrf } from '@/lib/csrf';
+import { log } from '@/lib/logger';
+
+type ProposalBookingPrefill = {
+  ok?: boolean;
+  proposal?: {
+    id: string;
+    customerId?: string | null;
+    leadId?: string | null;
+    total?: number | null;
+    vatRate?: number | null;
+    booking?: { id: string } | null;
+    customer?: { name?: string | null; email?: string | null; phone?: string | null } | null;
+    lead?: {
+      name?: string | null;
+      email?: string | null;
+      phone?: string | null;
+      eventDate?: string | null;
+      eventStartTime?: string | null;
+      eventEndTime?: string | null;
+      eventLocation?: string | null;
+      eventAddress?: string | null;
+      distanceKm?: number | null;
+      tollsEur?: number | null;
+      guestCount?: number | null;
+    } | null;
+    snapshot?: {
+      customer?: { name?: unknown; email?: unknown; phone?: unknown };
+      event?: { date?: unknown; schedule?: unknown; location?: unknown; guests?: unknown };
+      pricing?: { travelKm?: unknown; travelTollsEur?: unknown };
+    } | null;
+  };
+};
+
+function moneyInputValue(value?: number | null): string {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return '';
+  return Number.isInteger(value) ? String(value) : value.toFixed(2);
+}
+
+function stringValue(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function numberStringValue(value: unknown): string {
+  return typeof value === 'number' && Number.isFinite(value) ? String(value) : '';
+}
+
+function splitSchedule(schedule: unknown): { start: string; end: string } {
+  const raw = stringValue(schedule);
+  if (!raw) return { start: '', end: '' };
+  const [start = '', end = ''] = raw.split('-').map((part) => part.trim());
+  return { start, end };
+}
 
 // Opcions del desplegable de partners agrupades: Favorits primer, Altres després.
 // Així els típics (Masquerade) queden a dalt i els de material (Tronios, DJ Mania)
@@ -62,9 +121,15 @@ function renderPartnerOptions(partners: BookingPartnerOption[]) {
 export default function NewBookingForm() {
   const toast = useToast();
   const searchParams = useSearchParams();
-  const leadId = searchParams?.get('leadId') ?? null;
-  const customerId = searchParams?.get('customerId') ?? null;
+  const proposalId = searchParams?.get('proposalId') ?? null;
+  const queryLeadId = searchParams?.get('leadId') ?? null;
+  const queryCustomerId = searchParams?.get('customerId') ?? null;
+  const [proposalLeadId, setProposalLeadId] = useState<string | null>(null);
+  const [proposalCustomerId, setProposalCustomerId] = useState<string | null>(null);
+  const leadId = queryLeadId || proposalLeadId;
+  const customerId = queryCustomerId || proposalCustomerId;
   const dateParam = searchParams?.get('date') ?? null;
+  const forceLeadPrefill = searchParams?.get('prefill') === 'lead';
   // Si la reserva ve d'un lead, el back natural és la fitxa del lead (Agenda).
   // Si ve d'un client, el back és la pestanya Reserves del client. Cas isolat: Agenda.
   const backHref = customerId
@@ -75,10 +140,14 @@ export default function NewBookingForm() {
   const backLabel = customerId ? 'Client' : leadId ? 'Lead' : 'Agenda';
   const crumbContext = customerId ? 'Client' : 'Agenda';
 
-  const { form, setForm, packs, extras, loading, leadData, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam });
+  const { form, setForm, packs, extras, loading, leadData, leadServiceLines, leadRouteCostLines, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, customerId, dateParam, forceLeadPrefill });
   // Autosave de l'esborrany de reserva (hora, lloc, tot). Només actiu un cop
   // carregat el prefill del lead, perquè no machaqui ni el sobreescrigui.
   const autosaveKey = bookingAutosaveKey(leadId, customerId);
+  useEffect(() => {
+    if (!forceLeadPrefill) return;
+    clearFormAutosaveDraft(autosaveKey);
+  }, [autosaveKey, forceLeadPrefill]);
   // Autosave silenciós (sense banner): desa i restaura l'esborrany de la reserva.
   const { clear: clearBookingDraft } = useFormAutosave(
     autosaveKey, form, setForm, { enabled: !loading },
@@ -87,6 +156,12 @@ export default function NewBookingForm() {
   const [customPackPrice, setCustomPackPrice] = useState('');
   const [manualTotalPrice, setManualTotalPrice] = useState('');
   const [serviceLines, setServiceLines] = useState<BookingServiceLineFormInput[]>([]);
+  const [leadServiceLinesApplied, setLeadServiceLinesApplied] = useState(false);
+  const [travelRouteHours, setTravelRouteHours] = useState('');
+  const [travelVehicleOwner, setTravelVehicleOwner] = useState('OWNER');
+  const [travelDriver, setTravelDriver] = useState('OWNER');
+  const [travelPartnerId, setTravelPartnerId] = useState('');
+  const [travelHeadcountOverride, setTravelHeadcountOverride] = useState('');
   // Arrossega el pressupost del lead com a punt de partida del preu acordat.
   useEffect(() => {
     if (!leadData?.budget || manualTotalPrice) return;
@@ -94,12 +169,77 @@ export default function NewBookingForm() {
     if (parsed) setManualTotalPrice(parsed);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- només ha de reaccionar quan arriba leadData, no a manualTotalPrice
   }, [leadData]);
+  useEffect(() => {
+    setLeadServiceLinesApplied(false);
+  }, [leadId]);
+  useEffect(() => {
+    if (leadServiceLinesApplied || serviceLines.length > 0 || leadServiceLines.length === 0) return;
+    setServiceLines(leadServiceLines);
+    setLeadServiceLinesApplied(true);
+  }, [leadServiceLines, leadServiceLinesApplied, serviceLines.length]);
   const [invoiceRequired, setInvoiceRequired] = useState(false);
+  const fiscalMode = getBookingFiscalMode(invoiceRequired);
   const [showPack, setShowPack] = useState(false);
   useEffect(() => { if (form.packId) setShowPack(true); }, [form.packId]);
+  useEffect(() => {
+    if (!proposalId) {
+      setProposalLeadId(null);
+      setProposalCustomerId(null);
+      return;
+    }
+
+    let cancelled = false;
+    async function loadProposalPrefill() {
+      try {
+        const res = await fetchWithCsrf(`/api/admin/proposals/${proposalId}`);
+        const payload = await res.json().catch(() => null) as ProposalBookingPrefill | null;
+        const proposal = payload?.proposal;
+        if (!res.ok || !payload?.ok || !proposal || cancelled) return;
+
+        setProposalLeadId(proposal.leadId || null);
+        setProposalCustomerId(proposal.customerId || null);
+        const totalValue = moneyInputValue(proposal.total);
+        if (totalValue) setManualTotalPrice((prev) => prev || totalValue);
+        if (typeof proposal.vatRate === 'number') setInvoiceRequired(proposal.vatRate > 0);
+
+        const snapshotCustomer = proposal.snapshot?.customer;
+        const snapshotEvent = proposal.snapshot?.event;
+        const snapshotPricing = proposal.snapshot?.pricing;
+        const schedule = splitSchedule(snapshotEvent?.schedule);
+        const lead = proposal.lead;
+        const proposalCustomer = proposal.customer;
+
+        setForm((prev) => ({
+          ...prev,
+          clientName: prev.clientName || lead?.name || proposalCustomer?.name || stringValue(snapshotCustomer?.name),
+          clientEmail: prev.clientEmail || lead?.email || proposalCustomer?.email || stringValue(snapshotCustomer?.email),
+          clientPhone: prev.clientPhone || lead?.phone || proposalCustomer?.phone || stringValue(snapshotCustomer?.phone),
+          eventDate: lead?.eventDate ? lead.eventDate.slice(0, 10) : (stringValue(snapshotEvent?.date).slice(0, 10) || prev.eventDate),
+          eventStartTime: lead?.eventStartTime || schedule.start || prev.eventStartTime,
+          eventEndTime: lead?.eventEndTime || schedule.end || prev.eventEndTime,
+          eventLocation: lead?.eventLocation || stringValue(snapshotEvent?.location) || prev.eventLocation,
+          eventVenue: lead?.eventAddress || prev.eventVenue,
+          guestCount: numberStringValue(lead?.guestCount) || numberStringValue(snapshotEvent?.guests) || prev.guestCount,
+          distanceKm: numberStringValue(lead?.distanceKm) || numberStringValue(snapshotPricing?.travelKm) || prev.distanceKm,
+          tollsEur: numberStringValue(lead?.tollsEur) || numberStringValue(snapshotPricing?.travelTollsEur) || prev.tollsEur,
+        }));
+      } catch (error) {
+        log.warn('[NewBooking] No s’ha pogut carregar el prefill del pressupost', {
+          error: error instanceof Error ? error.message : String(error),
+          proposalId,
+        });
+      }
+    }
+
+    void loadProposalPrefill();
+    return () => {
+      cancelled = true;
+    };
+  }, [proposalId, setForm]);
   const [sourceCollaboratorId, setSourceCollaboratorId] = useState('');
   const [billedCollaboratorId, setBilledCollaboratorId] = useState('');
   const [showSourceBilling, setShowSourceBilling] = useState(false);
+  const [showInternalTravel, setShowInternalTravel] = useState(false);
   useEffect(() => {
     if (sourceCollaboratorId || billedCollaboratorId) setShowSourceBilling(true);
   }, [sourceCollaboratorId, billedCollaboratorId]);
@@ -114,12 +254,100 @@ export default function NewBookingForm() {
     eventVenue: form.eventVenue,
     eventLocation: form.eventLocation,
     onDistanceResolved: (distanceKm) => setForm((prev) => ({ ...prev, distanceKm })),
+    onTollsResolved: (tollsEur) => setForm((prev) => ({ ...prev, tollsEur })),
   });
-  const dateConflicts = useBookingDateConflicts(form.eventDate);
+  const { dateConflicts, dateConflictError } = useBookingDateConflicts(form.eventDate);
+  const dateConflictSignature = useMemo(
+    () => dateConflicts.map((conflict) => conflict.id).join('|'),
+    [dateConflicts],
+  );
+  const hasDateConflicts = dateConflicts.length > 0;
+  const hasDateConflictError = Boolean(dateConflictError);
+  const [dateConflictAcknowledged, setDateConflictAcknowledged] = useState(false);
+
+  useEffect(() => {
+    setDateConflictAcknowledged(false);
+  }, [form.eventDate, dateConflictSignature]);
 
   const updateField = (field: keyof BookingFormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
+
+  const travelPartner = useMemo(
+    () => partners.find((partner) => partner.id === travelPartnerId) || null,
+    [partners, travelPartnerId],
+  );
+  const travelPartnerLabel = travelPartner ? (travelPartner.company || travelPartner.name) : 'Proveïdor';
+  const travelVehicleOwnerMeta = travelVehicleOwner === 'PARTNER' && travelPartner
+    ? { label: travelPartnerLabel, collaboratorId: travelPartner.id }
+    : { label: 'Òrbita' };
+  const travelDriverMeta = travelDriver === 'PARTNER' && travelPartner
+    ? { label: travelPartnerLabel, collaboratorId: travelPartner.id }
+    : { label: 'Òrbita' };
+  const selectedPackForTravel = packs.find((pack) => pack.id === form.packId) || null;
+  const derivedTravelHeadcount = useMemo(() => {
+    return deriveTravelHeadcount(serviceLines, Boolean(selectedPackForTravel));
+  }, [selectedPackForTravel, serviceLines]);
+  const travelHeadcount = travelHeadcountOverride
+    ? Math.max(0, Math.floor(Number(travelHeadcountOverride) || 0))
+    : derivedTravelHeadcount;
+  const travelPeople = useMemo(() => {
+    const passengerCount = Math.max(0, travelHeadcount - 1);
+    const passengerMeta = travelPartner
+      ? { label: travelPartnerLabel, collaboratorId: travelPartner.id }
+      : { label: 'Equip ruta' };
+    return [
+      ...(travelHeadcount > 0 ? [{ role: 'DRIVER' as const, ...travelDriverMeta }] : []),
+      ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, ...passengerMeta, count: passengerCount }] : []),
+    ];
+  }, [travelDriverMeta, travelHeadcount, travelPartner, travelPartnerLabel]);
+  const travelCostBreakdown = useMemo(() => {
+    return calculateTravelCostBreakdown({
+      roundTripKm: Number(form.distanceKm) || 0,
+      vehicleCostPerKm: Number(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM,
+      tollsEur: Number(form.tollsEur) || 0,
+      routeHours: travelRouteHours ? Number(travelRouteHours) : undefined,
+      vehicleOwner: travelVehicleOwnerMeta,
+      people: travelPeople,
+    });
+  }, [form.distanceKm, form.fuelCostPerKm, form.tollsEur, travelPeople, travelRouteHours, travelVehicleOwnerMeta]);
+  const travelTransport = useMemo(() => computeBoloTransport({
+    roundTripKm: Number(form.distanceKm) || 0,
+    headcountOverride: travelHeadcount,
+    tollsEur: Number(form.tollsEur) || 0,
+    vehicleCostPerKm: Number(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM,
+  }), [form.distanceKm, form.fuelCostPerKm, form.tollsEur, travelHeadcount]);
+  const currentRouteCostLines = useMemo<BookingServiceLineFormInput[]>(() => {
+    if ((Number(form.distanceKm) || 0) <= 0) return [];
+    const mealLines = buildTravelMealAllowanceLines(travelPeople, travelTransport.mealAllowance);
+    return [...travelCostBreakdown.lines, ...mealLines].map((line) => ({
+      collaboratorId: line.collaboratorId || undefined,
+      kind: 'OTHER',
+      label: line.label,
+      revenueAmount: 0,
+      costAmount: line.costAmount,
+      quantity: 1,
+      notes: line.notes,
+    }));
+  }, [form.distanceKm, travelCostBreakdown.lines, travelPeople, travelTransport.mealAllowance]);
+  const routeInputsAdjusted = Boolean(
+    travelRouteHours ||
+    travelVehicleOwner !== 'OWNER' ||
+    travelDriver !== 'OWNER' ||
+    travelPartnerId ||
+    travelHeadcountOverride,
+  );
+  const leadDistance = typeof leadData?.distanceKm === 'number' ? leadData.distanceKm : null;
+  const leadTolls = typeof leadData?.tollsEur === 'number' ? leadData.tollsEur : 0;
+  const leadRouteStillMatches = leadDistance != null
+    && Math.abs((Number(form.distanceKm) || 0) - leadDistance) < 0.05
+    && Math.abs((Number(form.tollsEur) || 0) - leadTolls) < 0.01;
+  const useLeadRouteCostLines = leadRouteCostLines.length > 0 && leadRouteStillMatches && !routeInputsAdjusted;
+  const routeCostLinesForSubmit = useLeadRouteCostLines ? leadRouteCostLines : currentRouteCostLines;
+  const leadRouteCostTotal = leadRouteCostLines.reduce((sum, line) => sum + (line.costAmount || 0) * (line.quantity || 1), 0);
+  const internalTravelCostForPricing = useLeadRouteCostLines && leadRouteCostTotal > 0
+    ? leadRouteCostTotal
+    : travelTransport.cost;
 
   const {
     internalTravelCost,
@@ -139,6 +367,7 @@ export default function NewBookingForm() {
     manualTotalPrice: manualTotalPrice ? Number(manualTotalPrice) : undefined,
     invoiceRequired,
     serviceLines,
+    internalTravelCostOverride: internalTravelCostForPricing,
   });
 
   useEffect(() => {
@@ -160,6 +389,7 @@ export default function NewBookingForm() {
     onSuccess: clearBookingDraft,
     form,
     selectedExtras,
+    proposalId,
     leadId,
     leadData,
     customerId,
@@ -169,6 +399,7 @@ export default function NewBookingForm() {
     manualTotalPrice: manualTotalPrice ? Number(manualTotalPrice) : undefined,
     invoiceRequired,
     serviceLines: serviceLines.length > 0 ? serviceLines : undefined,
+    routeCostLines: routeCostLinesForSubmit,
     billedCollaboratorId: billedCollaboratorId || undefined,
   });
 
@@ -193,51 +424,63 @@ export default function NewBookingForm() {
 
   if (loading) {
     return (
-      <div className="nb-root">
-        <div className="nb__loading"><span className="nb__spinner" aria-label="Carregant" /></div>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <span
+          className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--hair-gold)] border-t-transparent"
+          aria-label="Carregant"
+        />
       </div>
     );
   }
 
   // El bolo no pot ser buit: pack de catàleg, o serveis/productes, o total pactat.
   const boloNotEmpty = !!form.packId || serviceLines.length > 0 || Object.keys(selectedExtras).length > 0 || (!!manualTotalPrice && Number(manualTotalPrice) > 0);
-  const submitDisabled = submitting || !form.clientName || !form.clientEmail || !boloNotEmpty;
+  const hasClientBasics = Boolean(form.clientName.trim() && form.clientEmail.trim() && form.clientPhone.trim());
+  const hasEventBasics = Boolean(form.eventDate && form.eventLocation.trim());
+  const submitBlockedByMissingBasics = !hasClientBasics || !hasEventBasics || !boloNotEmpty;
+  const submitBlockedByDateConflictCheck = hasDateConflictError;
+  const submitBlockedByDateConflict = hasDateConflicts && !dateConflictAcknowledged;
+  const submitDisabled = submitting || submitBlockedByMissingBasics || submitBlockedByDateConflictCheck || submitBlockedByDateConflict;
+  const submitLabel = submitting
+    ? 'Creant reserva…'
+    : !hasClientBasics
+      ? 'Completa client i contacte'
+      : !hasEventBasics
+        ? 'Completa data i lloc'
+        : !boloNotEmpty
+          ? 'Afegeix servei o pack'
+          : submitBlockedByDateConflictCheck
+            ? 'Verifica disponibilitat'
+          : submitBlockedByDateConflict
+            ? 'Confirma conflicte de dia'
+            : 'Crear reserva';
+
+  const narrowField = `${NB_FIELD} max-w-[12.5rem] flex-1 basis-40`;
 
   return (
-    <div className="nb-root">
-      <div className="nb__bar">
-        <Link href={backHref} className="nb__back">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8l4-4" /></svg>
-          {backLabel}
-        </Link>
-        <span className="nb__crumb">{crumbContext} <em>/</em> <strong>Nova reserva</strong></span>
-      </div>
-
-      <div className="nb__hero">
-        <span className="nb__eyebrow">Nova reserva</span>
-        <h1 className="nb__h1">{leadData ? leadData.name : 'Crear reserva'}</h1>
-        <p className="nb__sub">
-          {leadData ? (
-            <>
-              Des de l&apos;entrada <Link href={buildLeadWorkspaceHref(leadData.id)} className="nb__leadlink">{leadData.name}</Link>
-              {leadData.budget && <> · Pressupost <b>{leadData.budget}</b></>}
-              {leadData.email && <> · {leadData.email}</>}
-            </>
-          ) : (
-            'Omple les dades del client, l\'esdeveniment i selecciona un pack.'
-          )}
-        </p>
-      </div>
-
-      <div className="nb__layout">
-        <div className="nb__main">
+    <AdminPage
+      back={{ href: backHref, label: backLabel }}
+      eyebrow={`${crumbContext} · Nova reserva`}
+      title={leadData ? leadData.name : 'Crear reserva'}
+      subtitle={leadData ? (
+        <>
+          Des de l&apos;entrada <Link href={buildLeadWorkspaceHref(leadData.id)} className="text-[var(--gold-bright)] underline decoration-dashed underline-offset-2 hover:text-[var(--gold)]">{leadData.name}</Link>
+          {leadData.budget && <> · Pressupost <b className="text-[var(--t)]">{leadData.budget}</b></>}
+          {leadData.email && <> · {leadData.email}</>}
+        </>
+      ) : (
+        'Omple les dades del client, l\'esdeveniment i selecciona un pack.'
+      )}
+    >
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="flex min-w-0 flex-col gap-3">
           {error && (
-            <div className="nb__panel nb__panel--error">
-              <p className="nb__errortext">{error}</p>
+            <div className="ap-card ap-card--danger ap-card-body">
+              <p className="text-sm text-[var(--t)]">{error}</p>
             </div>
           )}
 
-          <div className="nb__group"><span className="nb__group-label">Qui i quan</span></div>
+          <div className={NB_GROUP}>Qui i quan</div>
 
           <BookingClientEventSection
             leadData={leadData ? {
@@ -261,14 +504,16 @@ export default function NewBookingForm() {
             calculatingDistance={calculatingDistance}
             distanceMessage={distanceMessage}
             dateConflicts={dateConflicts}
+            dateConflictError={dateConflictError}
             onFieldChange={updateField}
           />
 
-          <div className="nb__group"><span className="nb__group-label">Què contractem</span></div>
+          <div className={NB_GROUP}>Què contractem</div>
 
           <BookingServiceLinesSection
             lines={serviceLines}
             onChange={setServiceLines}
+            guestCount={form.guestCount}
             packs={packs}
             selectedPackId={form.packId}
             onPackSelect={(packId) => { updateField('packId', packId); setCustomPackPrice(''); }}
@@ -295,16 +540,15 @@ export default function NewBookingForm() {
           <BookingTravelDiscountSection
             form={{
               distanceKm: form.distanceKm,
+              tollsEur: form.tollsEur,
               discount: form.discount,
               discountCode: form.discountCode,
               notes: form.notes,
             }}
-            travelBlocks={travelBlocks}
             travelCharge={travelCharge}
-            billableKm={billableKm}
+            travelHeadcount={travelHeadcount}
+            chargeableHours={travelCostBreakdown.chargeableHours}
             includedTravelKm={INCLUDED_TRAVEL_KM}
-            travelBlockKm={TRAVEL_BLOCK_KM}
-            travelBlockEur={TRAVEL_BLOCK_EUR}
             fuelReferenceInfo={fuelReferenceInfo}
             validatingCode={validatingCode}
             discountValidation={discountValidation}
@@ -313,34 +557,106 @@ export default function NewBookingForm() {
             onValidateDiscountCode={() => void validateDiscountCode(form.discountCode)}
           />
 
-          <div className="nb__group"><span className="nb__group-label">Preu i tancament</span></div>
-
-          <section className="nb__panel">
-            <div className="nb__phead">
-              <h2 className="nb__h2">Preu acordat</h2>
-              <span className="nb__pintro">Resum econòmic del bolo</span>
+          <AdminSection
+            title="Transport real"
+            description={`${formatCurrency(internalTravelCostForPricing)} cost intern · ${travelCostBreakdown.peopleCount} integrants`}
+            actions={(
+              <button type="button" className="ap-btn ap-btn--xs" onClick={() => setShowInternalTravel((value) => !value)}>
+                {showInternalTravel ? 'Amagar' : 'Ajustar'}
+              </button>
+            )}
+          >
+            {showInternalTravel ? (
+            <>
+            <div className="grid gap-3 md:grid-cols-3">
+              <label className={NB_FIELD}>
+                <span className={NB_LABEL}>Hores totals de cotxe</span>
+                <input
+                  type="number"
+                  min={0}
+                  step={0.25}
+                  value={travelRouteHours}
+                  onChange={(event) => setTravelRouteHours(event.target.value)}
+                  placeholder={travelCostBreakdown.routeHours ? String(travelCostBreakdown.routeHours) : '0'}
+                  className="adm-input"
+                />
+                <span className={NB_HINT}>Anada + tornada. Si ho deixes buit, estima per km.</span>
+              </label>
+              <label className={NB_FIELD}>
+                <span className={NB_LABEL}>Vehicle</span>
+                <select value={travelVehicleOwner} onChange={(event) => setTravelVehicleOwner(event.target.value)} className="adm-input">
+                  <option value="OWNER">Vehicle Òrbita</option>
+                  <option value="PARTNER" disabled={!travelPartner}>Vehicle proveïdor</option>
+                </select>
+              </label>
+              <label className={NB_FIELD}>
+                <span className={NB_LABEL}>Proveïdor/persona externa</span>
+                <select value={travelPartnerId} onChange={(event) => setTravelPartnerId(event.target.value)} className="adm-input">
+                  <option value="">Cap proveïdor</option>
+                  {renderPartnerOptions(partners)}
+                </select>
+              </label>
+              <label className={NB_FIELD}>
+                <span className={NB_LABEL}>Integrants derivats</span>
+                <input type="number" min={0} step={1} value={derivedTravelHeadcount} className="adm-input" readOnly />
+                <span className={NB_HINT}>Surt del pack i dels productes contractats.</span>
+              </label>
+              <label className={NB_FIELD}>
+                <span className={NB_LABEL}>Conductor</span>
+                <select value={travelDriver} onChange={(event) => setTravelDriver(event.target.value)} className="adm-input">
+                  <option value="OWNER">Òrbita</option>
+                  <option value="PARTNER" disabled={!travelPartner}>Proveïdor</option>
+                </select>
+              </label>
+              <label className={NB_FIELD}>
+                <span className={NB_LABEL}>Ajust manual integrants</span>
+                <input type="number" min={0} step={1} value={travelHeadcountOverride} onChange={(event) => setTravelHeadcountOverride(event.target.value)} className="adm-input" placeholder={String(derivedTravelHeadcount)} />
+                <span className={NB_HINT}>Només si algú no viatja o s'afegeix una persona.</span>
+              </label>
             </div>
-            <div className="nb__pack-tune-grid">
-              <div className="nb__field nb__field--narrow">
-                <label htmlFor="nb-manual-total" className="nb__label">Total tancat amb el client</label>
+            <div className="mt-3 grid gap-2 sm:grid-cols-4">
+              <div className="ap-kpi"><p className="text-xs font-medium uppercase">Vehicle</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.vehicleCost)}</p></div>
+              <div className="ap-kpi"><p className="text-xs font-medium uppercase">Conductor</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.driverCost)}</p></div>
+              <div className="ap-kpi"><p className="text-xs font-medium uppercase">Passatgers</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.passengerCost)}</p></div>
+              <div className="ap-kpi"><p className="text-xs font-medium uppercase">Cost ruta</p><p className="text-lg font-bold">{formatCurrency(internalTravelCostForPricing)}</p></div>
+            </div>
+            <p className="mt-3 text-xs text-[var(--t3)]">
+              Integrants ruta: {travelCostBreakdown.peopleCount} · 1a hora inclosa, es cobra a partir de 2 h ({travelCostBreakdown.chargeableHours} h de {travelCostBreakdown.routeHours} h) · el cost de vehicle i temps s'imputa al marge intern, no a productes contractats.
+            </p>
+            </>
+            ) : (
+              <p className="text-xs text-[var(--t3)]">
+                Tancat per defecte per no allargar la reserva. Obre només si cal ajustar hores, vehicle, conductor o integrants.
+              </p>
+            )}
+          </AdminSection>
+
+          <div className={NB_GROUP}>Preu i tancament</div>
+
+          <AdminSection title="Preu acordat" description="Resum econòmic del bolo">
+            <div className="flex flex-wrap gap-4">
+              <div className={narrowField}>
+                <label htmlFor="nb-manual-total" className={NB_LABEL}>Total tancat amb el client</label>
                 <input
                   id="nb-manual-total" type="number" min={0} placeholder="Ex. 340"
                   value={manualTotalPrice} onChange={(e) => setManualTotalPrice(e.target.value)}
-                  className="nb__input"
+                  className="adm-input"
                 />
-                <span className="nb__field-hint">preu final pactat; substitueix el càlcul automàtic</span>
+                <span className={NB_HINT}>preu final pactat; substitueix el càlcul automàtic</span>
               </div>
-              <div className="nb__field nb__field--narrow">
-                <span className="nb__label">Factura</span>
-                <label className="nb__invoice-check">
+              <div className={narrowField}>
+                <span className={NB_LABEL}>Fiscalitat</span>
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--t2)]">
                   <input
                     type="checkbox" checked={invoiceRequired}
                     onChange={(e) => setInvoiceRequired(e.target.checked)}
+                    className="accent-[var(--gold)]"
                     role="switch" aria-checked={invoiceRequired}
                   />
-                  Vol factura
-                  {invoiceRequired && <span className="nb__vat-flag">+{VAT_RATE_INVOICE}% IVA</span>}
+                  Factura amb IVA
+                  {invoiceRequired && <span className="ml-1 text-xs text-[var(--o-warning)]">+{fiscalMode.vatRate}% IVA</span>}
                 </label>
+                <span className={NB_HINT}>{fiscalMode.help}</span>
               </div>
             </div>
 
@@ -351,56 +667,52 @@ export default function NewBookingForm() {
               const diffPct = calculat > 0 ? (diff / calculat) * 100 : null;
               if (!diff) return null;
               return (
-                <p className="nb__econ-diff">
+                <p className="mt-2.5 text-xs text-[var(--t2)]">
                   Pactat {diff > 0 ? '+' : ''}{formatCurrency(diff)} sobre el calculat ({formatCurrency(calculat)})
                   {diffPct != null ? ` · ${diffPct > 0 ? '+' : ''}${diffPct.toFixed(0)}%` : ''}
-                  <span className="nb__econ-diff-hint"> · el marge i el total complet són al resum de la dreta</span>
+                  <span className="text-[var(--t3)]"> · el marge i el total complet són al resum de la dreta</span>
                 </p>
               );
             })()}
-          </section>
+          </AdminSection>
 
-          <section className="nb__panel">
-            <div className="nb__phead nb__phead--toggle">
-              <div>
-                <h2 className="nb__h2">Origen i facturació</h2>
-                <span className="nb__pintro">
-                  {(() => {
-                    const src = partners.find((p) => p.id === sourceCollaboratorId);
-                    const bill = partners.find((p) => p.id === billedCollaboratorId);
-                    const origin = src ? `Ve de ${src.company || src.name}` : 'Client directe';
-                    const billing = bill ? `factura a ${bill.company || bill.name}` : 'factura al client final';
-                    return `${origin} · ${billing}`;
-                  })()}
-                </span>
-              </div>
-              <button type="button" className="nb__toggle" onClick={() => setShowSourceBilling((v) => !v)}>
+          <AdminSection
+            title="Origen i facturació"
+            description={(() => {
+              const src = partners.find((p) => p.id === sourceCollaboratorId);
+              const bill = partners.find((p) => p.id === billedCollaboratorId);
+              const origin = src ? `Ve de ${src.company || src.name}` : 'Client directe';
+              const billing = bill ? `factura a ${bill.company || bill.name}` : 'factura al client final';
+              return `${origin} · ${billing}`;
+            })()}
+            actions={(
+              <button type="button" className="ap-btn ap-btn--xs" onClick={() => setShowSourceBilling((v) => !v)}>
                 {showSourceBilling ? 'Amagar' : 'Ajustar'}
               </button>
-            </div>
+            )}
+          >
             {showSourceBilling && (
               <div className="grid gap-3 md:grid-cols-2">
-                <label className="nb__field">
-                  <span className="nb__label">D&apos;on ve el bolo</span>
-                  <select value={sourceCollaboratorId} onChange={(e) => setSourceCollaboratorId(e.target.value)} className="nb__input">
+                <label className={NB_FIELD}>
+                  <span className={NB_LABEL}>D&apos;on ve el bolo</span>
+                  <select value={sourceCollaboratorId} onChange={(e) => setSourceCollaboratorId(e.target.value)} className="adm-input">
                     <option value="">Client directe (cap intermediari)</option>
                     {renderPartnerOptions(partners)}
                   </select>
                 </label>
-                <label className="nb__field">
-                  <span className="nb__label">A qui facturem</span>
-                  <select value={billedCollaboratorId} onChange={(e) => setBilledCollaboratorId(e.target.value)} className="nb__input">
+                <label className={NB_FIELD}>
+                  <span className={NB_LABEL}>A qui facturem</span>
+                  <select value={billedCollaboratorId} onChange={(e) => setBilledCollaboratorId(e.target.value)} className="adm-input">
                     <option value="">Al client final</option>
                     {renderPartnerOptions(partners)}
                   </select>
                 </label>
               </div>
             )}
-          </section>
-
+          </AdminSection>
         </div>
 
-        <aside className="nb__side">
+        <aside className="flex flex-col gap-3.5 xl:sticky xl:top-4">
           {pricing && (
             <BookingPricingSummary
               pricing={pricing}
@@ -410,21 +722,43 @@ export default function NewBookingForm() {
               marginEstimate={marginEstimate}
             />
           )}
-          <div className="nb__cta">
+          <div className="flex flex-col gap-2">
+            {dateConflictError && (
+              <div className="ap-card ap-card--danger ap-card-body" role="alert">
+                <p className="text-sm font-semibold text-[var(--t)]">No es pot crear sense verificar disponibilitat.</p>
+                <p className="mt-1 text-xs text-[var(--t2)]">{dateConflictError}</p>
+              </div>
+            )}
+            {hasDateConflicts && (
+              <div className="ap-card ap-card--warning ap-card-body">
+                <label className="flex items-start gap-2.5 text-sm text-[var(--t)]">
+                  <input
+                    type="checkbox"
+                    checked={dateConflictAcknowledged}
+                    onChange={(e) => setDateConflictAcknowledged(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-[var(--gold)]"
+                  />
+                  <span>
+                    <span className="block font-semibold">He revisat les reserves d&apos;aquest dia</span>
+                    <span className="mt-1 block text-xs text-[var(--t2)]">Només continua si horaris, equip i transport encaixen.</span>
+                  </span>
+                </label>
+              </div>
+            )}
             <button
               type="button"
               onClick={handleSubmit}
               disabled={submitDisabled}
-              className="nb__btn--prim"
+              className="ap-btn ap-btn--primary w-full"
             >
-              {submitting ? 'Creant reserva…' : 'Crear reserva'}
+              {submitLabel}
             </button>
-            <Link href={backHref} className="nb__btn--sec">
+            <Link href={backHref} className="ap-btn w-full">
               Cancel·lar
             </Link>
           </div>
         </aside>
       </div>
-    </div>
+    </AdminPage>
   );
 }

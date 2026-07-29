@@ -1,9 +1,35 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const { mockPrisma, mockCachedQuery, mockIsBuildPrerenderPhase } = vi.hoisted(() => ({
+  mockPrisma: {
+    setting: { findMany: vi.fn() },
+    booking: { count: vi.fn() },
+  },
+  mockCachedQuery: vi.fn(),
+  mockIsBuildPrerenderPhase: vi.fn(),
+}));
+
+vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+vi.mock('@/lib/query-cache', () => ({
+  CacheTTL: { LONG: 60_000 },
+  cachedQuery: mockCachedQuery,
+}));
+vi.mock('@/lib/build-phase', () => ({ isBuildPrerenderPhase: mockIsBuildPrerenderPhase }));
 
 import {
+  getPublicStats,
   getPublicStatsLocale,
   getFallbackPublicStats,
 } from '@/lib/services/publicStatsService';
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  process.env.DATABASE_URL = 'postgres://test';
+  mockIsBuildPrerenderPhase.mockReturnValue(false);
+  mockCachedQuery.mockImplementation((_key: string, loader: () => unknown) => loader());
+  mockPrisma.setting.findMany.mockResolvedValue([]);
+  mockPrisma.booking.count.mockResolvedValue(0);
+});
 
 describe('getPublicStatsLocale', () => {
   it('retorna es per defecte', () => {
@@ -71,5 +97,32 @@ describe('getFallbackPublicStats', () => {
     expect(getFallbackPublicStats('ca').coverage).toBe('Barcelona + Girona');
     expect(getFallbackPublicStats('es').coverage).toBe('Barcelona + Girona');
     expect(getFallbackPublicStats('en').coverage).toBe('Barcelona + Girona');
+  });
+});
+
+describe('getPublicStats', () => {
+  it('respecta les claus que escriu /admin/stats en el servei públic', async () => {
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'stats.events_completed', value: '120' },
+      { key: 'stats.people_entertained', value: '9000' },
+      { key: 'stats.years_experience', value: '12' },
+      { key: 'stats.rating_average', value: '4.7' },
+      { key: 'stats.googleReviewCount', value: '321' },
+    ]);
+    mockPrisma.booking.count
+      .mockResolvedValueOnce(50)
+      .mockResolvedValueOnce(5)
+      .mockResolvedValueOnce(6)
+      .mockResolvedValueOnce(7);
+
+    const result = await getPublicStats('ca');
+
+    expect(result.ok).toBe(true);
+    expect(result.stats.totalEvents).toBe(120);
+    expect(result.stats.peopleEntertained).toBe(9000);
+    expect(result.stats.yearsExperience).toContain('12 anys');
+    expect(result.stats.averageRating).toBe(4.7);
+    expect(result.stats.googleRating).toBe(4.7);
+    expect(result.stats.googleReviewsCount).toBe(321);
   });
 });

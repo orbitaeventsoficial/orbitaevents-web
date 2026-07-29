@@ -1,8 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { AdminPage } from '../../components/AdminPage';
+import { AdminPage, AdminEmptyState } from '../../components/AdminPage';
 import { MarkdownView } from '../MarkdownView';
-import '../docs-view.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,13 +24,16 @@ export default async function FullDeRutaPage() {
       subtitle="La idealització del producte (zenit) i el camí per fases per arribar-hi, segons els ingredients reals."
     >
       {markdown ? (
-        <article className="dmd__doc">
-          <MarkdownView markdown={markdown} />
+        <article className="ap-card mx-auto max-w-[64rem]">
+          <div className="ap-card-body">
+            <MarkdownView markdown={markdown} />
+          </div>
         </article>
       ) : (
-        <div className="dmd__empty">
-          <p>No s&apos;ha trobat <code>docs/producte-zenit-full-de-ruta.md</code>.</p>
-        </div>
+        <AdminEmptyState
+          title="Document no disponible"
+          description="No s'ha trobat el fitxer docs/producte-zenit-full-de-ruta.md."
+        />
       )}
     </AdminPage>
   );

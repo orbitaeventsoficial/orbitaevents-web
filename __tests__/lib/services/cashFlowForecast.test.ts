@@ -114,35 +114,37 @@ describe('buildCashFlowForecast', () => {
   });
 
   it('calcula costos via computeBookingFinancialSummary', async () => {
-    mockComputeSummary.mockReturnValue({ directCost: 800 });
+    mockComputeSummary.mockReturnValue({ directCost: 800.45 });
     mockPrisma.booking.findMany.mockResolvedValue([makeBooking(0)]);
 
     const result = await buildCashFlowForecast(3);
 
-    expect(result[0].costs).toBe(800);
+    expect(result[0].costs).toBe(800.45);
     expect(mockComputeSummary).toHaveBeenCalledOnce();
   });
 
   it('calcula netFlow i cumulative correctament', async () => {
-    mockComputeSummary.mockReturnValue({ directCost: 500 });
+    mockComputeSummary.mockReturnValueOnce({ directCost: 500.1 }).mockReturnValueOnce({ directCost: 500.2 });
     mockPrisma.booking.findMany.mockResolvedValue([
-      makeBooking(0, { total: 2000, depositAmount: 500, depositPaid: false, remainingPaid: false }),
-      makeBooking(1, { total: 3000, depositAmount: 1000, depositPaid: false, remainingPaid: false }),
+      makeBooking(0, { total: 2000.25, depositAmount: 500.1, depositPaid: false, remainingPaid: false }),
+      makeBooking(1, { total: 3000.4, depositAmount: 1000.15, depositPaid: false, remainingPaid: false }),
     ]);
 
     const result = await buildCashFlowForecast(3);
 
-    // Mes 0: income=2000, costs=500, net=1500
-    expect(result[0].netFlow).toBe(1500);
-    expect(result[0].cumulative).toBe(1500);
+    // Mes 0: income=2000.25, costs=500.1, net=1500.15
+    expect(result[0].income).toBe(2000.25);
+    expect(result[0].netFlow).toBe(1500.15);
+    expect(result[0].cumulative).toBe(1500.15);
 
-    // Mes 1: income=3000, costs=500, net=2500
-    expect(result[1].netFlow).toBe(2500);
-    expect(result[1].cumulative).toBe(4000);
+    // Mes 1: income=3000.4, costs=500.2, net=2500.2
+    expect(result[1].income).toBe(3000.4);
+    expect(result[1].netFlow).toBe(2500.2);
+    expect(result[1].cumulative).toBe(4000.35);
 
     // Mes 2: income=0, costs=0, net=0
     expect(result[2].netFlow).toBe(0);
-    expect(result[2].cumulative).toBe(4000);
+    expect(result[2].cumulative).toBe(4000.35);
   });
 
   it('ignora reserves fora del rang de mesos', async () => {
@@ -180,6 +182,38 @@ describe('buildCashFlowForecast', () => {
 
     // remainingAmount explícit = 3500
     expect(result[0].income).toBe(3500);
+  });
+
+  it('resta cashAmount dels ingressos pendents perquè la caixa no quedi inflada', async () => {
+    mockPrisma.booking.findMany.mockResolvedValue([
+      makeBooking(0, {
+        total: 3000,
+        depositAmount: 1000,
+        depositPaid: false,
+        remainingPaid: false,
+        cashAmount: 3000,
+      }),
+    ]);
+
+    const result = await buildCashFlowForecast(3);
+
+    expect(result[0].income).toBe(0);
+  });
+
+  it('respecta remainingAmount explícit a zero', async () => {
+    mockPrisma.booking.findMany.mockResolvedValue([
+      makeBooking(0, {
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 0,
+        depositPaid: true,
+        remainingPaid: false,
+      }),
+    ]);
+
+    const result = await buildCashFlowForecast(3);
+
+    expect(result[0].income).toBe(0);
   });
 
   it('respecta el paràmetre monthsAhead', async () => {

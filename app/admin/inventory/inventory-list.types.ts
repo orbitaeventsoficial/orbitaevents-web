@@ -21,6 +21,8 @@ export interface InventoryItem {
   minStock: number | null;
   imageUrl: string | null;
   purchasePrice: number | null;
+  purchasePriceSource: string | null;
+  purchasePriceSourceCheckedAt: string | Date | null;
   expectedLifeHours: number | null;
   totalHoursUsed: number;
   packItems: Array<{ id: string; pack: { id: string; slug: string } }>;

@@ -1,4 +1,3 @@
-import { getAllPacks } from '@/app/config/packs-config';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 export const ADMIN_SHORTCUT_ROUTES: Record<string, string> = {
@@ -58,7 +57,45 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1162;
+export const ADMIN_CHANGE_COUNTER = 2024;
+
+export const ADMIN_BOOKING_DEPOSIT_DUE_DAYS = 30;
+export const ADMIN_ECONOMY_PAYMENT_DUE_SOON_DAYS = 7;
+
+/**
+ * Màximes d'Economia (#1390): brúixola de gestió sempre visible al top del dashboard i
+ * d'Economia (ticker rotatiu). Recorden la doctrina del propietari: el transport és cost,
+ * no negoci; el marge viu al producte propi; el temps (dissabtes) és el recurs escàs.
+ * Font única — es canvien AQUÍ, no al JSX.
+ */
+export const ADMIN_ECONOMY_MAXIMS = [
+  'El marge és el que fas, no el que condueixes.',
+  'Tens 50 dissabtes l’any: gasta’ls en el que et fa ric.',
+  'Ven el teu talent, no els teus quilòmetres.',
+  'Lluny, només amb producte teu.',
+  'El transport no és negoci: és cost. El marge viu al producte.',
+  'Cap taxista s’ha fet ric fent carreres llargues barates.',
+  'El pitjor client és el que et té ocupat sense marge.',
+  'Un «no» a un mal bolo és un èxit, no un fracàs.',
+  'Els euros es recuperen; els dissabtes, no.',
+  'Cada quilòmetre et fa xofer; cada bolo teu et fa empresari.',
+  'Si el pressupost honest espanta, el bolo no era teu.',
+  'Facturar és vanitat; el marge, seny; el temps, el rei.',
+  'Ocupat no és el mateix que rendible.',
+  'Cada «sí» a un mal bolo és un «no» a un de bo.',
+  'Competeix en el que ningú més sap fer, no en preu.',
+  'El descompte d’avui el pagues tota la temporada.',
+  'Un preu sense marge és una feina que et fa pobre.',
+  'Coneix el teu cost, o el client el decidirà per tu.',
+  'Cobra pel valor, no per les hores.',
+  'Créixer en vendes perdent marge és córrer cap enrere.',
+  'El teu preu diu què vals: no en demanis perdó.',
+  'La feina barata sempre surt cara.',
+  'El marge és oxigen; el volum sol, asfíxia.',
+  'Primer els números, després l’emoció.',
+  'No hi ha clients dolents: hi ha preus mal posats.',
+  'La caixa és la reina; cobra abans, paga després.',
+] as const;
 
 export const ADMIN_DOSSIER_GENERATOR_COPY = {
   page: {
@@ -68,6 +105,21 @@ export const ADMIN_DOSSIER_GENERATOR_COPY = {
     railCustomer: 'Lead/client',
     railCatalog: 'serveis',
     railSaved: 'dossiers',
+  },
+  draftSuggestions: {
+    title: 'Dossiers a preparar',
+    description: 'Leads oberts sense dossier actiu. Obre el generador preomplert; no envia res.',
+    rail: 'cua segura',
+    prepareAction: 'Preparar dossier',
+    createDraftAction: 'Crear esborrany',
+    draftBadge: 'Esborrany',
+    leadAction: 'Obrir lead',
+    scoreLabel: 'Prioritat',
+    serviceLinesLabel: 'línies de bolo',
+    eventNoDate: 'Sense data',
+    eventToday: 'Avui',
+    eventTomorrow: 'Demà',
+    eventInDays: 'dies',
   },
   client: {
     title: 'Dades del client',
@@ -107,10 +159,29 @@ export const ADMIN_DOSSIER_GENERATOR_COPY = {
     hint: 'Serveis contractats i imports orientatius abans de crear el dossier.',
     totalLabel: 'Total bolo',
     empty: 'Cap servei seleccionat.',
+    marginTitle: 'Marge abans d’enviar',
+    marginHint: 'Estimació interna amb serveis, cost de partner, CAC i desplaçament.',
+    revenueLabel: 'Ingressos',
+    directCostLabel: 'Cost + CAC',
+    netMarginLabel: 'Marge net',
+    subcontractedLabel: 'Markup partner',
   },
   catalog: {
     title: 'Catàleg disponible',
     hint: 'Tria només els serveis que formaran part del dossier final.',
+    serviceCountLabel: 'serveis',
+    audiences: {
+      infantil: {
+        title: 'Infantils',
+        subtitle: 'Casals, escoles, festes familiars i propostes per a mainada.',
+        empty: 'Cap servei infantil actiu.',
+      },
+      adult: {
+        title: 'Adults i general',
+        subtitle: 'Bingo, batalla, DJ, material i serveis transversals.',
+        empty: 'Cap servei adult o general actiu.',
+      },
+    },
     groups: {
       orbita: {
         title: 'Serveis d’Òrbita',
@@ -133,6 +204,7 @@ export const ADMIN_DOSSIER_GENERATOR_COPY = {
   actions: {
     createCrmFlow: 'Crear lead i client en desar',
     createLeadForCustomer: 'Crear lead vinculat al client',
+    useLinkedLead: 'Crear dossier des del lead vinculat',
     sendOnSave: 'Enviar per email en desar',
   },
 } as const;
@@ -180,6 +252,20 @@ export const ADMIN_ACTIVITY_ACTION_META: Record<string, { label: string; icon: s
   CALENDAR_SYNC: { label: 'Sync calendari', icon: '📅', tone: 'admin-tone-text-info' },
   CALENDAR_SYNC_ERROR: { label: 'Error sync calendari', icon: '❌', tone: 'admin-tone-text-danger' },
   PORTAL_AUTO_CREATED: { label: 'Portal client creat', icon: '🔑', tone: 'admin-tone-text-violet' },
+  DOCUMENT_PROPOSAL_SENT: { label: 'Pressupost enviat', icon: '📄', tone: 'admin-tone-text-info' },
+  DOCUMENT_DOSSIER_SENT: { label: 'Dossier enviat', icon: '📤', tone: 'admin-tone-text-info' },
+  DOCUMENT_DOSSIER_COMPOSITE_PDF_GENERATED: { label: 'PDF dossier generat', icon: '📎', tone: 'admin-tone-text-info' },
+  DOCUMENT_CONTRACT_GENERATED: { label: 'Contracte generat', icon: '📝', tone: 'admin-tone-text-info' },
+  DOCUMENT_CONTRACT_SENT: { label: 'Contracte enviat', icon: '📤', tone: 'admin-tone-text-info' },
+  DOCUMENT_CONTRACT_SIGNED: { label: 'Contracte signat', icon: '✍️', tone: 'admin-tone-text-success' },
+  DOCUMENT_CONTRACT_CANCELLED: { label: 'Contracte cancel·lat', icon: '⛔', tone: 'admin-tone-text-warning' },
+  DOCUMENT_CONTRACT_SIGNED_PDF_GENERATED: { label: 'PDF signat generat', icon: '📎', tone: 'admin-tone-text-success' },
+  DOCUMENT_INVOICE_PDF_GENERATED: { label: 'PDF factura generat', icon: '🧾', tone: 'admin-tone-text-info' },
+  DOCUMENT_DELIVERY_NOTE_CREATED: { label: 'Albarà creat', icon: '📋', tone: 'admin-tone-text-info' },
+  DOCUMENT_DELIVERY_NOTE_DELIVERED: { label: 'Albarà lliurat', icon: '📋', tone: 'admin-tone-text-info' },
+  DOCUMENT_DELIVERY_NOTE_SIGNED: { label: 'Albarà signat', icon: '✍️', tone: 'admin-tone-text-success' },
+  DOCUMENT_DELIVERY_NOTE_CANCELLED: { label: 'Albarà cancel·lat', icon: '⛔', tone: 'admin-tone-text-warning' },
+  DOCUMENT_DELIVERY_NOTE_PDF_GENERATED: { label: 'PDF albarà generat', icon: '📎', tone: 'admin-tone-text-info' },
   CREATE: { label: 'Creat', icon: '➕', tone: 'admin-tone-text-success' },
   UPDATE: { label: 'Actualitzat', icon: '✏️', tone: 'admin-tone-text-info' },
   DELETE: { label: 'Eliminat', icon: '🗑️', tone: 'admin-tone-text-danger' },
@@ -188,6 +274,7 @@ export const ADMIN_ACTIVITY_ACTION_META: Record<string, { label: string; icon: s
 
 export const CUSTOMER_TIMELINE_FILTER_OPTIONS = [
   { key: 'all', label: 'Tot', icon: '📋' },
+  { key: 'documents', label: 'Documents', icon: '📎' },
   { key: 'proposals', label: 'Pressupostos', icon: '📄' },
   { key: 'bookings', label: 'Reserves', icon: '📅' },
   { key: 'tasks', label: 'Tasques', icon: '✅' },
@@ -195,19 +282,19 @@ export const CUSTOMER_TIMELINE_FILTER_OPTIONS = [
 ] as const;
 
 export const CUSTOMER_TIMELINE_EVENT_META: Record<string, { filter: 'proposals' | 'bookings' | 'tasks' | 'comms'; icon: string; toneClass: string }> = {
-  PROPOSAL_CREATED: { filter: 'proposals', icon: '📄', toneClass: 'ch__timeline-event--proposal' },
-  PROPOSAL_SENT: { filter: 'proposals', icon: '📤', toneClass: 'ch__timeline-event--proposal' },
-  PROPOSAL_ACCEPTED: { filter: 'proposals', icon: '✅', toneClass: 'ch__timeline-event--success' },
-  BOOKING_CREATED: { filter: 'bookings', icon: '📅', toneClass: 'ch__timeline-event--booking' },
-  BOOKING_CONFIRMED: { filter: 'bookings', icon: '🎉', toneClass: 'ch__timeline-event--success' },
-  TASK_CREATED: { filter: 'tasks', icon: '📝', toneClass: 'ch__timeline-event--warning' },
-  TASK_DONE: { filter: 'tasks', icon: '✓', toneClass: 'ch__timeline-event--success' },
-  MESSAGE_SENT: { filter: 'comms', icon: '✉️', toneClass: 'ch__timeline-event--comms' },
-  EMAIL_RECEIVED: { filter: 'comms', icon: '📩', toneClass: 'ch__timeline-event--comms' },
-  WHATSAPP_SENT: { filter: 'comms', icon: '💬', toneClass: 'ch__timeline-event--comms' },
-  PHONE_CALL: { filter: 'comms', icon: '📞', toneClass: 'ch__timeline-event--comms' },
-  NOTE_ADDED: { filter: 'comms', icon: '📌', toneClass: 'ch__timeline-event--note' },
-  ACTIVITY: { filter: 'comms', icon: '•', toneClass: 'ch__timeline-event--activity' },
+  PROPOSAL_CREATED: { filter: 'proposals', icon: '📄', toneClass: 'border-l-[var(--o-info)]' },
+  PROPOSAL_SENT: { filter: 'proposals', icon: '📤', toneClass: 'border-l-[var(--o-info)]' },
+  PROPOSAL_ACCEPTED: { filter: 'proposals', icon: '✅', toneClass: 'border-l-[var(--o-success)]' },
+  BOOKING_CREATED: { filter: 'bookings', icon: '📅', toneClass: 'border-l-[var(--ax-vip)]' },
+  BOOKING_CONFIRMED: { filter: 'bookings', icon: '🎉', toneClass: 'border-l-[var(--o-success)]' },
+  TASK_CREATED: { filter: 'tasks', icon: '📝', toneClass: 'border-l-[var(--o-warning)]' },
+  TASK_DONE: { filter: 'tasks', icon: '✓', toneClass: 'border-l-[var(--o-success)]' },
+  MESSAGE_SENT: { filter: 'comms', icon: '✉️', toneClass: 'border-l-[var(--ax-vip)]' },
+  EMAIL_RECEIVED: { filter: 'comms', icon: '📩', toneClass: 'border-l-[var(--ax-vip)]' },
+  WHATSAPP_SENT: { filter: 'comms', icon: '💬', toneClass: 'border-l-[var(--ax-vip)]' },
+  PHONE_CALL: { filter: 'comms', icon: '📞', toneClass: 'border-l-[var(--ax-vip)]' },
+  NOTE_ADDED: { filter: 'comms', icon: '📌', toneClass: 'border-l-[var(--o-admin-line-2)]' },
+  ACTIVITY: { filter: 'comms', icon: '•', toneClass: 'border-l-[var(--o-admin-line)]' },
 };
 
 
@@ -289,6 +376,7 @@ export const ADMIN_ACTIVITY_ENTITY_LINKS: Record<string, string> = {
   lead: '/admin/leads',
   pack: '/admin/packs',
   customer: '/admin/clientes',
+  proposal: '/admin/presupuestos',
 };
 
 export const ADMIN_ACTIVITY_CATEGORY_MAP: Record<string, string> = {
@@ -310,6 +398,20 @@ export const ADMIN_ACTIVITY_CATEGORY_MAP: Record<string, string> = {
   CALENDAR_SYNC: 'system',
   CALENDAR_SYNC_ERROR: 'system',
   PORTAL_AUTO_CREATED: 'system',
+  DOCUMENT_PROPOSAL_SENT: 'comms',
+  DOCUMENT_DOSSIER_SENT: 'comms',
+  DOCUMENT_DOSSIER_COMPOSITE_PDF_GENERATED: 'system',
+  DOCUMENT_CONTRACT_GENERATED: 'system',
+  DOCUMENT_CONTRACT_SENT: 'comms',
+  DOCUMENT_CONTRACT_SIGNED: 'system',
+  DOCUMENT_CONTRACT_CANCELLED: 'system',
+  DOCUMENT_CONTRACT_SIGNED_PDF_GENERATED: 'system',
+  DOCUMENT_INVOICE_PDF_GENERATED: 'system',
+  DOCUMENT_DELIVERY_NOTE_CREATED: 'system',
+  DOCUMENT_DELIVERY_NOTE_DELIVERED: 'system',
+  DOCUMENT_DELIVERY_NOTE_SIGNED: 'system',
+  DOCUMENT_DELIVERY_NOTE_CANCELLED: 'system',
+  DOCUMENT_DELIVERY_NOTE_PDF_GENERATED: 'system',
   CREATE: 'crud',
   UPDATE: 'crud',
   DELETE: 'crud',
@@ -391,6 +493,8 @@ export const ADMIN_COLLABORATOR_PRODUCT_EMPTY_FORM: {
   includes: string;
   imageUrl: string;
   isActive: boolean;
+  visibleInDossier: boolean;
+  visibleInBooking: boolean;
 } = {
   name: '',
   description: '',
@@ -402,6 +506,8 @@ export const ADMIN_COLLABORATOR_PRODUCT_EMPTY_FORM: {
   includes: '',
   imageUrl: '',
   isActive: true,
+  visibleInDossier: true,
+  visibleInBooking: true,
 };
 
 export const ADMIN_FEATURE_DEFINITIONS = [
@@ -615,22 +721,11 @@ export const ADMIN_LEAD_TASK_SELECT = {
   completedAt: true,
 } as const;
 
-export function getAdminLeadPackOptions() {
-  const allPacks = getAllPacks();
-  const manual = { value: 'manual', label: 'Manual / Personalitzat ✍️', price: 0, hours: 0 };
-  const packOptions = allPacks.map((p) => ({
-    value: p.slug,
-    label: `${p.name} (${p.service}) ${p.badge || ''}`.trim(),
-    price: p.priceValue,
-    hours: p.durationHours,
-  }));
-  return [manual, ...packOptions];
-}
-
 export const ADMIN_PDF_STUDIO_SECTION_LABELS = {
   config: 'Configuració',
   client: 'Client i esdeveniment',
   brand: 'Marca i identitat',
+  transport: 'Transport',
   pack: 'Pack i condicions',
   'extras-catalog': 'Extres del catàleg',
   'extras-custom': 'Extres personalitzats',
@@ -638,7 +733,19 @@ export const ADMIN_PDF_STUDIO_SECTION_LABELS = {
 } as const;
 
 export const ADMIN_PDF_STUDIO_DEFAULT_SECTION_ORDER = [
-  'config', 'client', 'brand', 'pack', 'extras-catalog', 'extras-custom', 'contract',
+  'config', 'client', 'transport', 'brand', 'pack', 'extras-catalog', 'extras-custom', 'contract',
+] as const;
+
+export const ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_ORDER = [
+  'config', 'client', 'transport', 'pack',
+] as const;
+
+export const ADMIN_PDF_STUDIO_LEAD_BOLO_SECTION_LABELS = {
+  pack: 'Bolo i condicions',
+} as const;
+
+export const ADMIN_PDF_STUDIO_DEFAULT_COLLAPSED_SECTIONS = [
+  'brand', 'pack', 'extras-catalog', 'extras-custom', 'contract',
 ] as const;
 
 export const ADMIN_PDF_STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
@@ -692,20 +799,46 @@ export const ADMIN_PDF_STUDIO_SERVICE_LABELS = {
   animacion: 'Animació',
 } as const;
 
+export const ADMIN_POST_EVENT_CRON_STATUS_PREFIX = 'automation.postEvent' as const;
+export const ADMIN_LEGACY_POST_EVENT_CRON_STATUS_PREFIX = 'emails.cron' as const;
+export const ADMIN_POST_EVENT_CRON_SETTING_SUFFIXES = ['lastRun', 'lastStatus', 'lastSummary', 'lastMessage'] as const;
+export type AdminPostEventCronSettingSuffix = typeof ADMIN_POST_EVENT_CRON_SETTING_SUFFIXES[number];
+
+export function getAdminPostEventCronSettingKeys(options: { includeLegacy?: boolean } = {}) {
+  const prefixes = options.includeLegacy === false
+    ? [ADMIN_POST_EVENT_CRON_STATUS_PREFIX]
+    : [ADMIN_POST_EVENT_CRON_STATUS_PREFIX, ADMIN_LEGACY_POST_EVENT_CRON_STATUS_PREFIX];
+
+  return prefixes.flatMap((prefix) =>
+    ADMIN_POST_EVENT_CRON_SETTING_SUFFIXES.map((suffix) => `${prefix}.${suffix}`)
+  );
+}
+
+export function readAdminPostEventCronSetting(
+  settings: Record<string, string | null | undefined>,
+  suffix: AdminPostEventCronSettingSuffix,
+) {
+  return (
+    settings[`${ADMIN_POST_EVENT_CRON_STATUS_PREFIX}.${suffix}`] ||
+    settings[`${ADMIN_LEGACY_POST_EVENT_CRON_STATUS_PREFIX}.${suffix}`] ||
+    null
+  );
+}
+
 export const ADMIN_CRON_PREFIXES = [
-  { id: 'customerLifecycle', label: 'Lifecycle clients CRM', prefix: 'crm.customer-lifecycle', frequency: 'Diari' },
-  { id: 'taskAutomation', label: 'Tasques automàtiques', prefix: 'automation.tasks', frequency: 'Diari' },
-  { id: 'commercial', label: 'Comercial diari', prefix: 'automation.commercial', frequency: 'Diari' },
-  { id: 'fuel', label: 'Preu combustible', prefix: 'automation.fuel', frequency: 'Diari' },
-  { id: 'invoiceSync', label: 'Sync factures', prefix: 'automation.invoiceSync', frequency: 'Diari' },
-  { id: 'packPricing', label: 'Revisió preus packs', prefix: 'automation.packPricing', frequency: 'Diari' },
-  { id: 'postEvent', label: 'Emails post-event', prefix: 'automation.postEvent', frequency: 'Diari' },
-  { id: 'reviewsSync', label: 'Ressenyes Google', prefix: 'automation.reviewsSync', frequency: 'Diari' },
-  { id: 'weeklyBenchmark', label: 'Benchmark setmanal', prefix: 'benchmark.weekly', frequency: 'Setmanal (dl)' },
-  { id: 'urgentFollowUpAlerts', label: 'Alertes follow-up urgents', prefix: 'alerts.urgentFollowUp', frequency: '4x diari' },
-  { id: 'leadReengagement', label: 'Reengagement leads dormants', prefix: 'automation.leadReengagement', frequency: 'Diari' },
-  { id: 'dossierTrashPurge', label: 'Purga paperera dossiers', prefix: 'dossier.trash-purge', frequency: 'Diari' },
-  { id: 'calendarSync', label: 'Google Calendar complet', prefix: 'automation.calendarSync', frequency: 'Cada 15 min' },
+  { id: 'customerLifecycle', label: 'Lifecycle clients CRM', prefix: 'crm.customer-lifecycle', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'taskAutomation', label: 'Tasques automàtiques', prefix: 'automation.tasks', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'commercial', label: 'Comercial diari', prefix: 'automation.commercial', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'fuel', label: 'Preu combustible', prefix: 'automation.fuel', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'invoiceSync', label: 'Sync factures', prefix: 'automation.invoiceSync', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'packPricing', label: 'Revisió preus packs', prefix: 'automation.packPricing', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'postEvent', label: 'Emails post-event', prefix: ADMIN_POST_EVENT_CRON_STATUS_PREFIX, frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'reviewsSync', label: 'Ressenyes Google', prefix: 'automation.reviewsSync', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'weeklyBenchmark', label: 'Benchmark setmanal', prefix: 'benchmark.weekly', frequency: 'Setmanal (dl)', maxAgeHours: 192 },
+  { id: 'urgentFollowUpAlerts', label: 'Alertes follow-up urgents', prefix: 'alerts.urgentFollowUp', frequency: '4x diari', maxAgeHours: 8 },
+  { id: 'leadReengagement', label: 'Reengagement leads dormants', prefix: 'automation.leadReengagement', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'dossierTrashPurge', label: 'Purga paperera dossiers', prefix: 'dossier.trash-purge', frequency: 'Diari', maxAgeHours: 26 },
+  { id: 'calendarSync', label: 'Google Calendar complet', prefix: 'automation.calendarSync', frequency: 'Cada 15 min', maxAgeHours: 2 },
 ] as const;
 
 export const ADMIN_HEALTH_ACTIVE_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
@@ -744,12 +877,13 @@ export const ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS = [
 // ─── Pack Editor Tabs ────────────────────────────────────────────────────
 
 export type PackEditorTab = 'economic' | 'content' | 'texts' | 'publish';
+export type PackEditorTabIcon = 'banknote' | 'sliders' | 'languages' | 'check';
 
-export const ADMIN_PACK_EDITOR_TABS: ReadonlyArray<{ id: PackEditorTab; label: string; icon: string }> = [
-  { id: 'economic', label: 'Economia', icon: '💰' },
-  { id: 'content', label: 'Contingut', icon: '🎛️' },
-  { id: 'texts', label: 'Textos', icon: '🌐' },
-  { id: 'publish', label: 'Publicació', icon: '✅' },
+export const ADMIN_PACK_EDITOR_TABS: ReadonlyArray<{ id: PackEditorTab; label: string; icon: PackEditorTabIcon }> = [
+  { id: 'economic', label: 'Economia', icon: 'banknote' },
+  { id: 'content', label: 'Contingut', icon: 'sliders' },
+  { id: 'texts', label: 'Textos', icon: 'languages' },
+  { id: 'publish', label: 'Publicació', icon: 'check' },
 ] as const;
 
 // ─── PDF Studio Defaults ────────────────────────────────────────────────
@@ -768,7 +902,7 @@ export const ADMIN_PDF_STUDIO_DEFAULTS: Record<string, string> = {
 export const ADMIN_DASHBOARD_PILOT_STEPS = [
   { id: 'leads', step: 'Pas 1', title: 'Respondre entrades', href: '/admin/leads', cta: 'Anar a entrades' },
   { id: 'tasks', step: 'Pas 2', title: 'Executar tasques', href: '/admin/tasks', cta: 'Veure tasques' },
-  { id: 'postevent', step: 'Pas 3', title: 'Tancar post-esdeveniment', href: '/admin/emails', cta: 'Gestionar' },
+  { id: 'postevent', step: 'Pas 3', title: 'Tancar post-esdeveniment', href: '/admin/post-event', cta: 'Gestionar' },
   { id: 'bookings', step: 'Pas 4', title: 'Preparar reserves', href: '/admin/bookings', cta: 'Veure reserves' },
 ] as const;
 
@@ -784,13 +918,14 @@ export const ADMIN_DASHBOARD_INSIGHT_COLORS: Record<string, string> = {
 // ─── Pricing Tabs ───────────────────────────────────────────────────────
 
 export type PricingTab = 'overview' | 'tarifes' | 'extras' | 'packs' | 'inventory';
+export type PricingTabIcon = 'chart' | 'target' | 'sparkles' | 'package' | 'wrench';
 
-export const ADMIN_PRICING_TABS: ReadonlyArray<{ key: PricingTab; label: string; icon: string }> = [
-  { key: 'overview',  label: 'Resum',     icon: '📊' },
-  { key: 'tarifes',   label: 'Tarifes',   icon: '🎯' },
-  { key: 'extras',    label: 'Extras',    icon: '✨' },
-  { key: 'packs',     label: 'Packs',     icon: '📦' },
-  { key: 'inventory', label: 'Inventari', icon: '🔧' },
+export const ADMIN_PRICING_TABS: ReadonlyArray<{ key: PricingTab; label: string; icon: PricingTabIcon }> = [
+  { key: 'overview',  label: 'Resum',     icon: 'chart' },
+  { key: 'tarifes',   label: 'Tarifes',   icon: 'target' },
+  { key: 'extras',    label: 'Extras',    icon: 'sparkles' },
+  { key: 'packs',     label: 'Packs',     icon: 'package' },
+  { key: 'inventory', label: 'Inventari', icon: 'wrench' },
 ] as const;
 
 // ─── Health Status Visual Mapping (semàfor compartit) ───────────────────

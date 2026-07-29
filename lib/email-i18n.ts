@@ -193,7 +193,7 @@ export const TESTIMONIAL_COPY: Record<EmailLocale, {
     giftAlt: (pct) => `Your ${pct}% discount gift`,
     imgFallback: 'View gift',
     greeting: (name) => `Hi ${name}!`,
-    approved: 'Your review has been approved and published. We love reading your feedback.',
+    approved: 'Your review has been approved and published. We love reading your review.',
     exclusiveCode: 'Your exclusive code',
     discount: (pct) => `${pct}% DISCOUNT`,
     validity: 'Valid for 6 months for your next event',

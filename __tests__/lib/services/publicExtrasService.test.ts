@@ -115,6 +115,24 @@ describe('resolvePublicExtraDefinition', () => {
     expect(result.icon).toBe('☁️');
   });
 
+  it('resol el micro inalàmbric des del registre', () => {
+    const result = resolvePublicExtraDefinition(
+      {
+        slug: 'micro-inalambric',
+        price: 30,
+        priceType: 'FIXED',
+        translationName: 'services.mobile.extras.micro-inalambric.name',
+        translationDescription: 'services.mobile.extras.micro-inalambric.description',
+      },
+      'ca'
+    );
+
+    expect(result.name).toBe('Micròfon sense fils');
+    expect(result.description).toContain('discursos');
+    expect(result.icon).toBe('🎤');
+    expect(result.category).toBe('sound');
+  });
+
   it('retorna icona per defecte per slug desconegut', () => {
     const result = resolvePublicExtraDefinition(
       { slug: 'unknown-extra', price: 30, priceType: 'FIXED' },

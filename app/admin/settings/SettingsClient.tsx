@@ -139,7 +139,7 @@ export default function SettingsClient({
   return (
     <div className="space-y-8">
       {error && (
-        <div className="rounded-xl border p-4 text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger" role="alert">
+        <div className="ap-card p-4 text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger" role="alert">
           {error}
         </div>
       )}
@@ -148,7 +148,7 @@ export default function SettingsClient({
         const config = categoryConfig[category] || { label: category, icon: '??', description: '' };
 
         return (
-          <section key={category} className="overflow-hidden rounded-2xl border admin-card-glass">
+          <section key={category} className="ap-card overflow-hidden">
             <div className="border-b p-4">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>

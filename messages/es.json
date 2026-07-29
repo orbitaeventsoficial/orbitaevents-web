@@ -25,7 +25,7 @@
     "cta": {
       "reserve": "Quiero un Halloween inmersivo",
       "whatsapp": "WhatsApp directo",
-      "reserve2025": "Reserva tu Halloween {year}",
+      "reserve2025": "Solicita propuesta Halloween {year}",
       "requestInfo": "Elegir este formato"
     },
     "gallery": {
@@ -178,7 +178,7 @@
     },
     "urgency": {
       "title": "Halloween {year}",
-      "subtitle": "Los sábados de octubre vuelan. Reserva pronto.",
+      "subtitle": "Los sábados de octubre vuelan. Consulta disponibilidad pronto.",
       "octobrerDates": "Sábados de octubre:",
       "dates": [
         "4 oct",
@@ -253,12 +253,12 @@
       "select": "Seleccionar",
       "selected": "Seleccionado ✓",
       "goToConfigurator": "Ir al configurador",
-      "requestQuote": "RESERVA HOY",
+      "requestQuote": "PIDE PROPUESTA",
       "leaveReview": "Deja un comentario",
       "requestQuoteFree": "Solicitar presupuesto gratis",
       "calculate": "Calcula el precio",
       "calculatePrice": "Calcula el precio",
-      "reserveToday": "🔥 RESERVA HOY",
+      "reserveToday": "🔥 PIDE PROPUESTA HOY",
       "portfolio": "Ver Portfolio",
       "learnMore": "Más información",
       "getStarted": "Empieza",
@@ -459,14 +459,14 @@
     "commitmentText": "Más de 50 celebraciones exitosas y la opinión media es excelente."
   },
   "checkout": {
-    "title": "¡Último paso para tu evento!",
-    "subtitle": "Reserva ahora y ahorra {amount}€",
-    "laterPrice": "Si reservas más tarde:",
+    "title": "Último paso para recibir la propuesta",
+    "subtitle": "Pide propuesta ahora y ahorra {amount}€",
+    "laterPrice": "Si la pides más tarde:",
     "normalPrice": "precio normal",
-    "finalPrice": "Tu precio final:",
+    "finalPrice": "Precio estimado:",
     "savings": "Ahorras {amount}€",
     "whyOffer": "¿Por qué esta oferta?",
-    "offerReason": "Cuando reservas hoy, podemos confirmar tu fecha al instante y empezar a prepararte. Cuanto antes reserves, mejor podremos planificar."
+    "offerReason": "Cuando pides la propuesta hoy, podemos revisar disponibilidad y preparar el presupuesto final antes. Cuanto antes tengamos los detalles, mejor podremos planificar."
   },
   "notifications": {
     "newReservation": "Nueva reserva",
@@ -1892,7 +1892,7 @@
           "name": "Premium",
           "tagline": "Vuestro baile, con un espectáculo de luces que los invitados recordarán",
           "features": {
-            "f1": "DJ profesional 3 horas para disfrutar sin prisas",
+            "f1": "DJ profesional 5 horas para disfrutar sin prisas",
             "f2": "Sonido PRO 4000W EV + controladora Pioneer",
             "f3": "4 cabezas móviles que siguen el ritmo de la música",
             "f4": "Cabina DJ ampliada — el centro de la fiesta",
@@ -1918,7 +1918,7 @@
           "name": "Corporate Cocktail",
           "tagline": "El detalle sonoro que hace que tu cóctel sea diferente",
           "features": {
-            "f1": "Hilo musical o DJ ambiente 4 horas — ponemos el tono justo",
+            "f1": "Hilo musical o DJ ambiente 2 horas — ponemos el tono justo",
             "f2": "Sonido nítido EV ETX que acompaña sin molestar",
             "f3": "Iluminación decorativa que refuerza el ambiente",
             "f4": "1 micrófono inalámbrico por si hace falta un discurso",
@@ -1941,7 +1941,7 @@
           "name": "Corporate Gala",
           "tagline": "Producción a otro nivel — que tu marca brille",
           "features": {
-            "f1": "Servicio integral 6 horas con DJ + técnico de sonido dedicado",
+            "f1": "Servicio integral 5 horas con DJ + técnico de sonido dedicado",
             "f2": "Sonido reforzado + microfonía avanzada (4 micros)",
             "f3": "Diseño de iluminación corporativa a medida",
             "f4": "Coordinación directa con agencia o venue",
@@ -1982,17 +1982,17 @@
     "step4": {
       "offerExpires": "Oferta válida hoy",
       "title": "Tu propuesta está lista",
-      "subtitle": "Reserva ahora y ahorra {amount}€",
+      "subtitle": "Pide propuesta ahora y ahorra {amount}€",
       "laterPrice": "Precio estándar:",
-      "bookToday": "Reserva hoy",
+      "bookToday": "Solicitud hoy",
       "finalPrice": "Precio estimado:",
       "requestProposal": "Pedir propuesta final",
       "youSave": "Ahorras {amount}€",
       "normalPrice": "precio normal",
-      "guarantee": "Garantía de Satisfacción",
-      "guaranteeText": "Si cambias de opinión en las próximas 48 horas, te reembolsamos el 100% de tu dinero. Sin preguntas. Sin letra pequeña. Riesgo cero.",
+      "guarantee": "Sin compromiso",
+      "guaranteeText": "Enviar la solicitud no te compromete ni bloquea ningún pago. Revisaremos disponibilidad, encaje técnico y propuesta final antes de confirmar nada.",
       "whyOffer": "¿Por qué esta oferta?",
-      "whyOfferText": "Cuando reservas hoy, podemos confirmar tu fecha al instante y empezar a prepararte. Cuanto antes empecemos, mejor será tu evento. Cada día que pasa, perdemos tiempo de personalización.",
+      "whyOfferText": "Cuando envías la solicitud hoy, podemos revisar disponibilidad y preparar una propuesta final antes. Cuanto antes tengamos los detalles, mejor podremos personalizar el evento.",
       "reviewConfig": "← Volver a comprobar mi configuración",
       "lastStep": "Déjanos tus datos y te contactamos hoy",
       "yourName": "Tu nombre *",
@@ -2000,13 +2000,13 @@
       "emailOrPhone": "Email o teléfono *",
       "contactPlaceholder": "tu@email.com o 600 123 456",
       "sending": "Enviando...",
-      "reserveWithDiscount": "Reservar con {amount}€ de descuento",
+      "reserveWithDiscount": "Pedir propuesta con {amount}€ de descuento",
       "successTitle": "¡Solicitud enviada!",
       "successMessage": "Nos pondremos en contacto contigo en menos de 2 horas",
       "youSaved": "¡Has ahorrado {amount}€!",
-      "checkEmail": "Comprueba tu email/teléfono. Te hemos enviado la confirmación.",
+      "checkEmail": "Comprueba tu email o teléfono. Hemos recibido la solicitud y te contactaremos para validar disponibilidad y detalles.",
       "responseTime": "Respuesta en menos de 2 horas",
-      "satisfactionGuaranteed": "Satisfacción 100% garantizada",
+      "satisfactionGuaranteed": "Revisión humana antes de confirmar",
       "errorName": "Introduce tu nombre completo",
       "errorContact": "Introduce tu email o número de teléfono",
       "errorCaptcha": "Por favor, completa la verificación de seguridad",
@@ -2062,7 +2062,7 @@
       },
       "2": {
         "question": "¿Cuánto cuesta contratar Òrbita para mi boda/fiesta/evento?",
-        "answer": "Trabajamos con packs claros y configuradores según necesidades. Los precios se calculan automáticamente en función del horario, equipamiento y tipo de evento. Puedes ver todas las opciones en el configurador o solicitar un presupuesto personalizado a través de nuestro formulario y te responderemos en menos de 2 horas."
+        "answer": "Trabajamos con packs claros y configuradores según necesidades. El configurador calcula una estimación orientativa según horario, equipamiento y tipo de evento. Puedes ver todas las opciones en el configurador o solicitar un presupuesto personalizado a través de nuestro formulario y te responderemos en menos de 2 horas."
       },
       "3": {
         "question": "¿Trabajáis fuera de Barcelona? ¿Cubrís Girona y la Costa Brava?",
@@ -2228,6 +2228,7 @@
     "guests": "Invitados",
     "idealFor": "Ideal para",
     "configurePack": "Configura este pack",
+    "configureCustom": "Configura tu evento",
     "customNeeds": "¿Necesitas algo diferente?",
     "customNeedsSub": "Hacemos eventos a medida. Cuéntanos qué tienes en mente y te proponemos.",
     "contactUs": "Habla con nosotros",
@@ -2451,7 +2452,7 @@
       "title": "Algunos de nuestros eventos",
       "subtitle": "Cada fiesta es diferente. Mira lo que hemos hecho y hazte una idea de lo que podemos montar para ti.",
       "noCategories": "Aún no hay categorías de portfolio configuradas.",
-      "viewGallery": "Ver galería →",
+      "viewGallery": "Ver galería",
       "breadcrumb": "Portfolio",
       "categories": {
         "bodas": "Bodas",
@@ -2496,7 +2497,7 @@
         "imageAlt": "Servicios Orbita Events Barcelona"
       },
       "hero": {
-        "badge": "+2 anos · Barcelona y Girona",
+        "badge": "+3 años · Barcelona y Girona",
         "title": "Nuestros Servicios",
         "titleHighlight": "Para Tu Evento Inolvidable",
         "subtitle": "DJ profesional, luces sincronizadas y efectos especiales para que tu evento se recuerde.",
@@ -2512,49 +2513,49 @@
       "items": {
         "bodas": {
           "name": "Bodas",
-          "tagline": "El dia mas importante merece el mejor ambiente",
-          "desc": "Ceremonia emotiva, coctel elegante y fiesta memorable. Lo coordinamos todo para que tus invitados bailen hasta el final.",
+          "tagline": "El día más importante merece el mejor ambiente",
+          "desc": "Ceremonia emotiva, cóctel elegante y fiesta memorable. Lo coordinamos todo para que tus invitados bailen hasta el final.",
           "features": [
             "DJ que lee la sala",
             "Luces sincronizadas",
             "Efectos especiales",
-            "Coordinacion total"
+            "Coordinación total"
           ]
         },
         "discomovil": {
-          "name": "Discomovil",
+          "name": "Discomóvil",
           "tagline": "DJ profesional donde lo necesites",
-          "desc": "Llevamos la fiesta donde tu quieras: jardines, masias, playas o locales. Equipo completo y autónomo.",
+          "desc": "Llevamos la fiesta donde tú quieras: jardines, masías, playas o locales. Equipo completo y autónomo.",
           "features": [
-            "Equipo portatil completo",
-            "Autonomia total",
-            "Cualquier ubicacion"
+            "Equipo portátil completo",
+            "Autonomía total",
+            "Cualquier ubicación"
           ]
         },
         "fiestas": {
           "name": "Fiestas Privadas",
           "tagline": "La fiesta que tu gente va a recordar.",
-          "desc": "Cumpleanos, aniversarios, comuniones y graduaciones. Adaptamos la fiesta a cada celebracion.",
+          "desc": "Cumpleaños, aniversarios, comuniones y graduaciones. Adaptamos la fiesta a cada celebración.",
           "features": [
-            "Musica personalizada",
-            "Juegos y animacion",
+            "Música personalizada",
+            "Juegos y animación",
             "Efectos especiales"
           ]
         },
         "empresas": {
           "name": "Empresas",
           "tagline": "Eventos corporativos a la altura de tu marca",
-          "desc": "Team building, cenas de empresa, inauguraciones y presentaciones. Profesionalidad y coordinacion garantizadas.",
+          "desc": "Team building, cenas de empresa, inauguraciones y presentaciones. Profesionalidad y coordinación garantizadas.",
           "features": [
             "Imagen corporativa",
-            "Coordinacion total",
+            "Coordinación total",
             "Sonido profesional"
           ]
         },
         "animacionInfantil": {
-          "name": "Animacion Infantil",
-          "tagline": "Juegos, talleres, magia y diversion para los mas pequenos",
-          "desc": "Animadores profesionales para cumpleanos, comuniones y eventos familiares. Pintacaras, globoflexia, talleres y juegos adaptados por edades.",
+          "name": "Animación Infantil",
+          "tagline": "Juegos, talleres, magia y diversión para los más pequeños",
+          "desc": "Animadores profesionales para cumpleaños, comuniones y eventos familiares. Pintacaras, globoflexia, talleres y juegos adaptados por edades.",
           "features": [
             "Animadores profesionales",
             "Juegos y actividades",
@@ -2563,23 +2564,23 @@
           ]
         },
         "produccion": {
-          "name": "Produccion Tecnica",
-          "tagline": "Montaje, operacion y gestion sin sorpresas",
-          "desc": "Diseno tecnico, montaje profesional y operacion en directo para productoras y organizadores que necesitan cero problemas.",
+          "name": "Producción Técnica",
+          "tagline": "Montaje, operación y gestión sin sorpresas",
+          "desc": "Diseño técnico, montaje profesional y operación en directo para productoras y organizadores que necesitan cero problemas.",
           "features": [
-            "Equipo tecnico completo",
-            "Operacion in situ",
+            "Equipo técnico completo",
+            "Operación in situ",
             "Plan B garantizado",
             "Desde 700€"
           ]
         },
         "alquiler": {
           "name": "Alquiler",
-          "tagline": "Equipamiento profesional con o sin tecnico",
+          "tagline": "Equipamiento profesional con o sin técnico",
           "desc": "EV ETX-15P, B-150 LED y Pioneer DJ. Alquila el equipo que usamos en nuestros eventos, con entrega incluida.",
           "features": [
             "EV + Pioneer + B-150",
-            "Con/sin tecnico",
+            "Con/sin técnico",
             "Consultar"
           ]
         },
@@ -2592,19 +2593,20 @@
             "Batalla Musical",
             "DJ profesional",
             "Iluminación incluida",
-            "Desde 250€"
+            "Desde 240€"
           ]
         }
       },
       "viewService": "Ver servicio",
-      "mostPopular": "⭐ MAS POPULAR",
+      "mostPopular": "⭐ MÁS POPULAR",
+      "newBadge": "✨ NUEVO",
       "ctaWhatsappButton": "WhatsApp Directo",
       "cta": {
         "title": "¿No sabes qué servicio necesitas?",
         "subtitle": "Cuéntanos tu evento y te recomendamos la opción que mejor encaja.",
         "responseTime": "Respondemos en menos de 2 horas.",
         "button": "Pedir asesoramiento gratis",
-        "whatsappMessage": "Hola! Quiero informacion sobre vuestros servicios.",
+        "whatsappMessage": "¡Hola! Quiero información sobre vuestros servicios.",
         "whatsappButton": "WhatsApp"
       }
     },
@@ -2639,7 +2641,7 @@
       "badge": "Experiencia en bodas",
       "badgeYears": "3+ años en el sector",
       "heroTitle": "DJ para Bodas en Barcelona",
-      "heroSubtitle": "Experiencia personalizada completa: música, iluminación y efectos adaptados a tu historia. Presupuesto instantáneo.",
+      "heroSubtitle": "Experiencia personalizada completa: música, iluminación y efectos adaptados a tu historia. Estimación orientativa al momento.",
       "coverage": {
         "badge": "Cobertura en Catalunya",
         "title": "¿Dónde es tu boda?",
@@ -2846,7 +2848,7 @@
       "description": "Servicio completo de discomóvil con sonido e iluminación profesionales.",
       "badgeYears": "3+ años en el sector",
       "heroTitle": "Discomóvil Barcelona",
-      "heroSubtitle": "Música adaptada en tiempo real, iluminación de ambiente y efectos especiales. Mucho más que poner música. Presupuesto al instante.",
+      "heroSubtitle": "Música adaptada en tiempo real, iluminación de ambiente y efectos especiales. Mucho más que poner música. Estimación orientativa al momento.",
       "guestsQuestion": "¿Cuántas personas esperáis?",
       "people": "personas",
       "recommended": "Recomendado para ti:",
@@ -2882,7 +2884,7 @@
           "tagline": "Tu fiesta, tu sonido — nosotros ponemos el resto",
           "ideal": "Cumpleaños, celebraciones y fiestas privadas",
           "features": [
-            "DJ profesional 3 horas — elegimos juntos la música",
+            "DJ profesional 2 horas — elegimos juntos la música",
             "Sonido PRO 4000W EV que se escucha claro y limpio",
             "4 cabezas móviles + multiefectos que transforman el espacio",
             "Máquina de humo para los momentos clave",
@@ -2930,7 +2932,7 @@
           "tagline": "La fiesta de la que nadie quiere irse",
           "ideal": "Fiestas grandes donde quieres que sea inolvidable",
           "features": [
-            "DJ profesional 6 horas — toda la noche a tu servicio",
+            "DJ profesional 5 horas — toda la noche a tu servicio",
             "Sonido de club (4000W + subwoofer de refuerzo) — lo sentiréis en todo el cuerpo",
             "Show de luces completo con cabezas móviles sincronizadas",
             "Efectos VIP: humo, burbujas, chispas frías, confeti",
@@ -3205,7 +3207,7 @@
       "subtitle": "Equipos profesionales a tu alcance",
       "description": "Alquiler de equipos de sonido, iluminación y DJ para tu evento.",
       "heroTitle": "Alquiler de Equipo Profesional",
-      "heroSubtitle": "Selecciona el equipo que necesitas y recibe tu presupuesto al instante",
+      "heroSubtitle": "Selecciona el equipo que necesitas y recibe una estimación orientativa al momento",
       "categories": {
         "all": "Todos",
         "sound": "Sonido",
@@ -3935,13 +3937,13 @@
     "nextSaturday": "Próximo sábado en:",
     "saturdaysAvailable": "sábados disponibles",
     "nextMonths": "los próximos meses",
-    "cta": "Reserva ahora",
+    "cta": "Pide propuesta ahora",
     "defaultMessage": "Consulta nuestra disponibilidad",
     "loadingTitle": "Los fines de semana se llenan rápido",
     "loadingSubtitle": "Consulta la disponibilidad para tu fecha",
     "checkAvailability": "Consulta disponibilidad",
     "normalTitle": "¿Tienes una fecha en mente?",
-    "normalSubtitle": "Consulta disponibilidad y reserva tu evento",
+    "normalSubtitle": "Consulta disponibilidad y pide propuesta para tu evento",
     "requestQuote": "Solicitar presupuesto",
     "urgentTitle": "Solo quedan",
     "urgentTitleEnd": "en",
@@ -3951,7 +3953,7 @@
     "contactNow": "¡contacta AHORA!",
     "ifYouHave": "Si ya tienes tu evento en mente,",
     "responseTime": "Respuesta en menos de 2 horas",
-    "bookingTime": "Reserva con 48 horas de antelación",
+    "bookingTime": "Solicita con 48 horas de antelación",
     "ctaButton": "Pide tu presupuesto ahora",
     "lastBooking": "Última reserva: hace {time} · {type} en {location}"
   },
@@ -4093,10 +4095,10 @@
     "ariaLabel": "Oferta de última hora",
     "close": "Cerrar",
     "badge": "Oferta de última hora",
-    "title": "Reserva hoy y consigue",
+    "title": "Solicita propuesta hoy y consigue",
     "discount": "10% de descuento",
-    "description": "Válido para nuevas reservas confirmadas hoy. Producción técnica, discomóvil, DJ, tematización, FX.",
-    "cta": "Aprovecha ahora el 10%",
+    "description": "Válido para nuevas propuestas solicitadas hoy. Producción técnica, discomóvil, DJ, tematización, FX.",
+    "cta": "Pedir propuesta con el 10%",
     "later": "Después",
     "code": "Código: LAST10 · Descuento aplicado al presupuesto final."
   },
@@ -4110,7 +4112,7 @@
     "subtitle": "Los días en verde están disponibles; en rojo ya hay eventos cerrados.",
     "viewFullCalendar": "Ver calendario completo",
     "cta": {
-      "title": "¿Quieres reservar una fecha?",
+      "title": "¿Quieres comprobar una fecha?",
       "subtitle": "Cuéntanos cuándo celebras y te enviamos un presupuesto en menos de 2 horas."
     },
     "labels": {
@@ -4127,9 +4129,9 @@
     "viewCalendar": "Ver calendario completo",
     "socialPressure": "8 personas mirando fechas esta semana",
     "saturdaysWarning": "¡Solo quedan {count} sábados libres!",
-    "earlyBird": "Reserva en {days} días y ahorra un 15%",
+    "earlyBird": "Pide propuesta en {days} días y ahorra un 15%",
     "modal": {
-      "whatsappMsg": "Hola! Quiero reservar la fecha {date} para mi evento. ¿Podéis enviarme más información?"
+      "whatsappMsg": "Hola! Quiero comprobar disponibilidad para la fecha {date}. ¿Podéis enviarme más información?"
     }
   },
   "stickyCta": {
@@ -4275,7 +4277,7 @@
       "greeting": "Hola {name}",
       "body": "Han pasado unos días desde vuestro {eventoType} y nos gustaría saber de vosotros.",
       "time": "Solo te llevará 2 minutos.",
-      "cta": "Vuestros comentarios nos ayudan a mejorar y continuar creando experiencias increíbles.",
+      "cta": "Vuestra opinión nos ayuda a mejorar y a seguir creando experiencias increíbles.",
       "ctaButton": "Completar encuesta",
       "signature": "Gracias por tu tiempo,\nÒrbita Events"
     }
@@ -4459,7 +4461,7 @@
       },
       "q2": {
         "question": "¿Cuánto cuesta contratar Òrbita para mi boda/fiesta/evento?",
-        "answer": "Trabajamos con packs claros desde 250€. Los precios se calculan automáticamente según horas, equipo y tipo de evento en nuestro configurador."
+        "answer": "Trabajamos con packs claros desde 250€. El configurador calcula una estimación orientativa según horas, equipo y tipo de evento."
       },
       "q3": {
         "question": "¿Trabajáis fuera de Barcelona? ¿Cubrís Girona y Costa Brava?",
@@ -4469,7 +4471,7 @@
   },
   "flashOffer": {
     "badge": "⚡ OFERTA FLASH - TIEMPO LIMITADO",
-    "title": "¡Reserva antes de que se acabe el tiempo!",
+    "title": "¡Solicita antes de que se acabe el tiempo!",
     "description": "Fiesta privada completa: DJ + Sonido + Luces (hasta 50 personas)",
     "features": [
       "🎧 DJ profesional 2 horas",
@@ -4477,7 +4479,7 @@
       "💡 Iluminación LED",
       "✨ Máquina de humo incluida"
     ],
-    "cta": "Reserva ahora por {price}€",
+    "cta": "Pedir propuesta por {price}€",
     "finePrint": "*Oferta válida durante el tiempo indicado. Hasta 50 personas. Sujeto a disponibilidad.",
     "save": "Ahorra {amount}€!",
     "countdown": "La oferta termina en:",
@@ -4561,7 +4563,7 @@
       "trustYears": "🎯 +3 años de experiencia",
       "trustLocation": "📍 Barcelona y Girona",
       "trustResponse": "⚡ Respuesta en 2h",
-      "guarantee": "✓ Presupuesto sin compromiso · Devolución 100% si cancelas con +60 días · La fecha se reserva 48h"
+      "guarantee": "✓ Presupuesto sin compromiso · Política de cancelación clara · Revisamos disponibilidad antes de confirmar fecha"
     },
     "testimonis": {
       "0": {
@@ -4602,8 +4604,8 @@
   },
   "packsOffers": {
     "earlyBird": {
-      "name": "Reserva anticipada",
-      "description": "Reserva hoy y ahorra un 10% en tu pack",
+      "name": "Propuesta anticipada",
+      "description": "Pide propuesta hoy y ahorra un 10% en tu pack",
       "badge": "🔥 OFERTA LIMITADA"
     },
     "packsBadges": {
@@ -4696,6 +4698,29 @@
     }
   },
   "testimonialForm": {
+    "metadata": {
+      "title": "Valora tu experiencia | {brand}",
+      "description": "Cuéntanos cómo fue tu evento con {brand} y ayúdanos a cerrar el círculo post-evento."
+    },
+    "page": {
+      "eyebrow": "Post-evento",
+      "title": "¿Cómo fue tu evento?",
+      "description": "Tu opinión nos ayuda a cuidar mejor cada fiesta y te da un código de descuento para tu próximo evento.",
+      "signals": {
+        "trust": {
+          "title": "2 minutos",
+          "text": "Cuatro pasos cortos y sin registro."
+        },
+        "reward": {
+          "title": "Hasta el 25%",
+          "text": "Más descuento si añades foto, vídeo o Google."
+        },
+        "memory": {
+          "title": "Recuerdo real",
+          "text": "Nos ayuda a mejorar y a enseñar experiencias auténticas."
+        }
+      }
+    },
     "validation": {
       "emailInvalid": "Email no válido",
       "nameMin": "El nombre debe tener mínimo 2 caracteres",
@@ -4722,7 +4747,7 @@
       "fileType": "Tipo de archivo no permitido. Usa JPG, PNG, WebP o GIF.",
       "fileTooLarge": "La imagen es demasiado grande. Máximo 5MB.",
       "uploadError": "Error subiendo la imagen",
-      "submitError": "Error enviando la opinión",
+      "submitError": "No hemos podido enviar tu opinión. Inténtalo de nuevo.",
       "photoMax": "La foto debe ser máximo 5MB",
       "videoMax": "El vídeo debe ser máximo 50MB",
       "uploadPhotoError": "Error subiendo foto",
@@ -4754,6 +4779,7 @@
         "5": "¡Excelente!"
       },
       "name": "Nombre",
+      "email": "Email",
       "nameOptional": "Nombre (opcional)",
       "phoneOptional": "Teléfono (opcional)",
       "cityOptional": "Ciudad (opcional)",
@@ -4781,7 +4807,7 @@
       "emojiMessages": {
         "1": "¡Oh no! ¿Qué pasó?",
         "2": "Entendemos, podemos mejorar",
-        "3": "¡Gracias por el feedback!",
+        "3": "¡Gracias por tu opinión!",
         "4": "¡Genial! ¡Nos alegramos!",
         "5": "¡INCREÍBLE! ¡Esto nos hace muy felices! 🎉"
       },
@@ -4814,7 +4840,8 @@
       },
       "rating": {
         "title": "¿Cómo fue la experiencia?",
-        "subtitle": "Tu opinión nos ayuda a mejorar"
+        "subtitle": "Tu opinión nos ayuda a mejorar",
+        "starLabel": "Valoración {rating} de 5: {label}"
       },
       "comment": {
         "title": "Cuéntanos más",
@@ -4844,6 +4871,14 @@
         "dataProcessing": "Acepto el tratamiento de datos según la",
         "showName": "Mostrar mi nombre en la web (si no, aparecerá como \"Cliente verificado\")",
         "receiveOffers": "Quiero recibir ofertas exclusivas de Òrbita Events"
+      },
+      "rewards": {
+        "photo": "Foto +5%",
+        "video": "Vídeo +10%",
+        "google": "Google +5%",
+        "photoDone": "Foto añadida",
+        "videoDone": "Vídeo añadido",
+        "googleDone": "Google activado"
       },
       "navigation": {
         "previous": "Anterior",
@@ -5042,7 +5077,7 @@
       "q1": "¿Qué hace diferente a Òrbita de otros DJ/proveedores de eventos?",
       "a1": "Creamos experiencias completas personalizadas. No solo música: tematización + animación + música adaptada en tiempo real + juegos + efectos. Nuestro DJ lee el ambiente y ajusta sobre la marcha.",
       "q2": "¿Cuánto cuesta contratar Òrbita para mi boda/fiesta/evento?",
-      "a2": "Trabajamos con packs claros desde 250€. Los precios se calculan automáticamente según horas, equipo y tipo de evento en nuestro configurador.",
+      "a2": "Trabajamos con packs claros desde 250€. El configurador calcula una estimación orientativa según horas, equipo y tipo de evento.",
       "q3": "¿Trabajáis fuera de Barcelona? ¿Cubrís Girona y Costa Brava?",
       "a3": "Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Transporte GRATIS hasta 25km desde Granollers. Más allá, se añade según distancia.",
       "q4": "¿Qué equipo de sonido e iluminación utilizáis?",
@@ -5301,10 +5336,10 @@
   },
   "configuradorPage": {
     "meta": {
-      "title": "Calcula el Precio de tu DJ para Boda | Presupuesto Instantáneo | Òrbita Events",
-      "description": "Calcula el precio de tu DJ + sonido + luces al instante. Configura tu boda o evento paso a paso, compara packs y recibe presupuesto en 1 minuto. Sin registro. Totalmente gratis.",
-      "ogTitle": "Calcula el Precio de tu DJ | Presupuesto en 1 Minuto",
-      "ogDescription": "Configura tu evento y calcula el precio al instante. Compara packs, elige extras y recibe presupuesto personalizado. Sin compromiso."
+      "title": "Calcula el Precio de tu DJ para Boda | Estimación Orientativa | Òrbita Events",
+      "description": "Calcula una estimación del precio de tu DJ + sonido + luces al momento. Configura tu boda o evento paso a paso, compara packs y recibe una estimación en 1 minuto. Sin registro. Totalmente gratis.",
+      "ogTitle": "Calcula el Precio de tu DJ | Estimación en 1 Minuto",
+      "ogDescription": "Configura tu evento y calcula una estimación al momento. Compara packs, elige extras y recibe una estimación personalizada. Sin compromiso."
     },
     "breadcrumbs": {
       "home": "Inicio",
@@ -6320,7 +6355,7 @@
     "cta": {
       "title": "¿Preparado para crear",
       "titleHighlight": "magia",
-      "description": "Las fechas de fin de semana se acaban rápido. Reserva tu experiencia Hogwarts ahora.",
+      "description": "Las fechas de fin de semana se acaban rápido. Solicita propuesta para tu experiencia Hogwarts.",
       "buttons": {
         "quote": "Pide Presupuesto Gratis",
         "whatsapp": "WhatsApp Directo"
@@ -6445,7 +6480,7 @@
         "limited": "🔥 ¡Se acaba!",
         "available": "✓ Disponible"
       },
-      "guarantee": "✓ Presupuesto sin compromiso · Devolución 100% si cancelas con +60 días · La fecha se reserva 48h"
+      "guarantee": "✓ Presupuesto sin compromiso · Política de cancelación clara · Revisamos disponibilidad antes de confirmar fecha"
     },
     "heroVideo": {
       "badge": "✨ Creadores de Experiencias Inmersivas",
@@ -6485,7 +6520,7 @@
       "saturdaysFree": "{count} sábados libres {month}",
       "lastOnes": "¡Últimas fechas!",
       "soldOut": "Agotado",
-      "reserveNow": "Reserva ahora"
+      "reserveNow": "Consulta disponibilidad"
     },
     "nextDates": {
       "title": "Próximas fechas ({month} {year}):",
@@ -6495,11 +6530,11 @@
     "monMagic": {
       "title": "Mundo Mágico:",
       "available": "Disponible todo el año",
-      "bookNow": "Reserva tu experiencia",
+      "bookNow": "Solicita propuesta",
       "soldOut": "No disponible temporalmente"
     },
     "cta": {
-      "reserveNow": "Reserva ahora →"
+      "reserveNow": "Pedir propuesta →"
     }
   },
   "mobileHero": {
@@ -6771,9 +6806,9 @@
       }
     },
     "reserve": {
-      "title": "¿Quieres reservar?",
-      "description": "Si has encontrado una fecha disponible, no esperes más. Contáctanos para hacer tu reserva.",
-      "cta": "Reservar ahora"
+      "title": "¿Quieres solicitar esta fecha?",
+      "description": "Si has encontrado una fecha disponible, envíanos la solicitud y revisaremos disponibilidad y detalles.",
+      "cta": "Solicitar fecha"
     },
     "faq": {
       "title": "Preguntas Frecuentes",
@@ -6788,19 +6823,96 @@
         },
         "3": {
           "question": "¿Se actualiza en tiempo real?",
-          "answer": "El calendario se actualiza cada 15 minutos. Si acabas de hacer una consulta y no ves tu reserva reflejada, es normal. Recibirás una confirmación por email."
+          "answer": "El calendario se actualiza cada 15 minutos. Si acabas de enviar una solicitud y no la ves reflejada, es normal. Recibirás un email con la solicitud y los próximos pasos."
         }
       }
     }
   },
   "booking": {
     "meta": {
-      "title": "Reserva tu Evento | Òrbita Events",
-      "description": "Reserva tu DJ y servicios de eventos para bodas, fiestas y eventos corporativos. Sin compromiso."
+      "title": "Solicita tu Evento | Òrbita Events",
+      "description": "Solicita tu DJ y servicios de eventos para bodas, fiestas y eventos corporativos. Sin compromiso."
     },
     "hero": {
-      "title": "Reserva tu Evento",
-      "description": "Completa el formulario y reserva tu fecha. Te contactaremos en menos de 2 horas para confirmar todos los detalles."
+      "title": "Solicita tu Evento",
+      "description": "Completa el formulario y solicita tu fecha. Te contactaremos en menos de 2 horas para confirmar disponibilidad y detalles."
+    },
+    "form": {
+      "errors": {
+        "create": "Error al crear la reserva",
+        "processing": "Error al procesar la reserva. Por favor, intenta de nuevo."
+      },
+      "success": {
+        "title": "¡Solicitud recibida!",
+        "email": "Hemos recibido la solicitud y revisaremos disponibilidad y detalles antes de confirmarla.",
+        "redirecting": "Redirigiendo..."
+      },
+      "sections": {
+        "client": "Tus datos",
+        "event": "Detalles del evento",
+        "pack": "Selecciona tu pack",
+        "extras": "Extras (opcional)"
+      },
+      "labels": {
+        "clientName": "Nombre completo",
+        "email": "Email",
+        "phone": "Teléfono",
+        "eventType": "Tipo de evento",
+        "eventDate": "Fecha del evento",
+        "startTime": "Hora de inicio",
+        "endTime": "Hora de fin",
+        "location": "Ubicación",
+        "venue": "Local / recinto (opcional)",
+        "guestCount": "Número de invitados",
+        "extraHours": "Horas extra (opcional)",
+        "notes": "Notas adicionales (opcional)"
+      },
+      "placeholders": {
+        "clientName": "Tu nombre",
+        "email": "tu@email.com",
+        "phone": "+34 600 000 000",
+        "location": "Barcelona, Girona...",
+        "venue": "Nombre del local",
+        "notes": "Cuéntanos más detalles sobre tu evento..."
+      },
+      "eventTypes": {
+        "wedding": "Boda",
+        "birthday": "Cumpleaños",
+        "corporate": "Evento corporativo",
+        "privateParty": "Fiesta privada / temática",
+        "other": "Otro"
+      },
+      "pack": {
+        "serviceHours": "{hours} h de servicio",
+        "extraHourPrice": "+{price}/h extra"
+      },
+      "total": {
+        "base": "Base del servicio",
+        "vat": "IVA ({rate}%)",
+        "label": "Total final estimado:",
+        "note": "* Incluye IVA; sujeto a confirmación final de disponibilidad y detalles."
+      },
+      "actions": {
+        "processing": "Procesando...",
+        "submit": "Solicitar reserva"
+      },
+      "legal": {
+        "prefix": "Al enviar la solicitud, aceptas nuestros",
+        "terms": "términos y condiciones"
+      },
+      "serverErrors": {
+        "MISSING_REQUIRED_FIELDS": "Completa todos los campos obligatorios.",
+        "INVALID_EMAIL": "Indica un email válido.",
+        "INVALID_EVENT_TYPE": "Este tipo de evento no es válido. Vuelve a seleccionarlo.",
+        "INVALID_EVENT_DATE": "La fecha del evento no es válida.",
+        "EVENT_DATE_PAST": "La fecha del evento no puede estar en el pasado.",
+        "INVALID_GUEST_COUNT": "Indica un número de invitados válido.",
+        "INVALID_EXTRA_HOURS": "Las horas extra no pueden ser negativas.",
+        "INVALID_PACK": "Este pack ya no está disponible. Vuelve a seleccionarlo.",
+        "INVALID_EXTRAS": "Algún extra ya no está disponible. Revisa la selección.",
+        "DATE_UNAVAILABLE": "Esta fecha ya no está disponible. Elige otra.",
+        "BOOKING_CREATE_FAILED": "No se ha podido crear la reserva. Inténtalo de nuevo."
+      }
     },
     "trust": {
       "items": {
@@ -6810,7 +6922,7 @@
         },
         "2": {
           "title": "Sin compromiso",
-          "description": "Devolución 100% si cancelas con +60 días"
+          "description": "Revisión final antes de confirmar"
         },
         "3": {
           "title": "Valoración 5.0",
@@ -6822,6 +6934,37 @@
       "title": "¿Necesitas ayuda para decidir?",
       "contact": "Contáctanos",
       "availability": "Ver disponibilidad"
+    },
+    "confirmed": {
+      "meta": {
+        "title": "Solicitud de reserva recibida | Òrbita Events",
+        "description": "Hemos recibido tu solicitud de reserva y te enviaremos los próximos pasos."
+      },
+      "title": "Solicitud de reserva recibida",
+      "referenceLabel": "Referencia",
+      "message": "Hemos recibido tu solicitud de reserva y hemos bloqueado provisionalmente la fecha mientras revisamos disponibilidad y detalles.",
+      "nextSteps": {
+        "title": "Próximos pasos:",
+        "review": {
+          "title": "Revisión de disponibilidad",
+          "description": "Nuestro equipo revisará la solicitud, el encaje técnico y los detalles del evento durante las próximas 24 horas."
+        },
+        "finalConfirmation": {
+          "title": "Confirmación final",
+          "description": "Te enviaremos la propuesta o contrato con todos los detalles del servicio para que lo revises y confirmes."
+        },
+        "payment": {
+          "title": "Señal",
+          "description": "Cuando todo esté validado, recibirás las instrucciones para dejar la reserva confirmada con la señal."
+        }
+      },
+      "actions": {
+        "home": "Volver al inicio",
+        "portfolio": "Ver portfolio"
+      },
+      "contact": {
+        "question": "¿Tienes alguna pregunta?"
+      }
     }
   },
   "blog": {
@@ -7032,6 +7175,7 @@
     "intro": {
       "kicker": "Imaginémoslo juntos",
       "title": "Un anticipo de lo que podemos vivir juntos, antes de hablar de números.",
+      "greeting": "Hola {name},",
       "greetingDefault": "¡Gracias por pensar en nosotros! Hemos preparado estas páginas para que os imaginéis cómo sería vuestra fiesta con calma, sin tener que mirar todavía los precios.\n\nEn cada página os explicamos una propuesta: qué es, cómo se vive y qué encontraréis. Quedaos con las que más ilusión os hagan y, cuando lo tengáis claro, os pasamos el presupuesto a medida solo con lo que elijáis.",
       "offerCountOne": "1 propuesta para vosotros",
       "offerCountMany": "{count} propuestas para vosotros",
@@ -7053,26 +7197,22 @@
     "resum": {
       "kicker": "En resumen",
       "title": "Todo lo que os proponemos",
-      "lead": "Aquí tenéis, de un vistazo, todo lo que hemos pensado para vosotros. Los precios son un punto de partida —el «desde»—, todavía sin extras ni desplazamiento; lo acabamos de cerrar juntos cuando sepamos todos los detalles.",
-      "totalLabel": "La propuesta, a partir de",
-      "customSuffix": "+ propuestas a medida"
+      "lead": "Aquí tenéis el punto de partida de cada propuesta y, justo después, el desplazamiento calculado para esta ruta. No cerramos ningún total aquí: es una guía clara para decidir qué os encaja antes de preparar la propuesta definitiva."
     },
     "budget": {
-      "kicker": "El presupuesto",
-      "title": "Presupuesto orientativo",
-      "lead": "Aquí tenéis el desglose con el desplazamiento incluido hasta {includedKm} km desde Granollers. Como ya sabemos dónde será la fiesta, os mostramos toda la información, clara y sin sorpresas.",
-      "servicesLabel": "Servicios seleccionados",
+      "servicesLabel": "Las propuestas",
       "travelTitle": "Desplazamiento",
-      "travelTo": "Hasta {location}",
-      "travelTotalKm": "{km} km (ida y vuelta)",
-      "travelIncludedKm": "{km} km incluidos",
-      "travelBillableKm": "{km} km a facturar",
-      "travelBlocks": "{blocks} tramo(s) × {price}",
-      "travelIncludedAll": "Desplazamiento incluido — sin suplemento",
-      "travelLine": "Suplemento de desplazamiento",
-      "travelNote": "Incluido hasta {includedKm} km desde Granollers; después, {blockPrice} por cada {blockKm} km.",
-      "totalLabel": "Total orientativo",
-      "vatNote": "Precios orientativos. El IVA y los ajustes finales se cierran en la propuesta definitiva."
+      "travelNote": "Incluido hasta {includedKm} km de ida y vuelta desde Granollers. En rutas más largas, el desplazamiento se calcula de forma transparente según la distancia y el equipo que hay que mover.",
+      "travelRoute": "Vuestro evento es en {location}, a unos {km} km (ida y vuelta) desde Granollers. El desplazamiento se aplica sobre esta ruta.",
+      "travelRouteIncluded": "Vuestro evento es en {location}, a unos {km} km (ida y vuelta) desde Granollers: el desplazamiento os queda incluido.",
+      "travelPriceLabel": "Coste del desplazamiento",
+      "travelBreakdownLabel": "Desglose",
+      "travelBreakdownVehicle": "Vehículo y combustible",
+      "travelBreakdownVehicleDetail": "{km} km facturables · {rate}/km",
+      "travelBreakdownPeople": "{headcount} operarios en ruta · {hours} h",
+      "travelBreakdownTolls": "Peajes de ruta",
+      "travelBreakdownMeals": "Dietas de ruta larga",
+      "vatNote": "Precios sin IVA. El presupuesto definitivo desglosa IVA, transporte y total final."
     },
     "cta": {
       "label": "Cualquier duda o para mirar fechas, escribidnos cuando queráis"
@@ -7088,6 +7228,18 @@
           "DJ profesional",
           "Primera hora ({first})",
           "Cada hora de más (+{extra})"
+        ]
+      },
+      "dj-hora-equip-muntat": {
+        "nom": "Hora extra DJ con equipo montado",
+        "descripcio": [
+          "Una hora de DJ para alargar la fiesta cuando el sonido ya está montado por una animación, un bingo o una propuesta previa.",
+          "Es la forma correcta de sumar música después de un servicio que ya lleva equipo operativo: {continuation} por hora, sin volver a cobrar el arranque del DJ autónomo."
+        ],
+        "inclou": [
+          "DJ profesional",
+          "Hora adicional con equipo ya montado ({continuation})",
+          "Continuidad musical después de la actividad principal"
         ]
       },
       "bombolles": {

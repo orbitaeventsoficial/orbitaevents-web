@@ -14,6 +14,8 @@ type HistoryEntry = {
   after: ProfitabilityConfig;
 };
 
+type Notice = { type: 'success' | 'error'; text: string };
+
 function changedNumber(before: number, after: number): boolean {
   return Math.abs(before - after) > 0.000001;
 }
@@ -27,7 +29,7 @@ function formatDelta(before: number, after: number, suffix = ''): string {
 export default function ProfitabilityConfigHistory({ entries }: { entries: HistoryEntry[] }) {
   const router = useRouter();
   const [restoringId, setRestoringId] = useState<string | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'OWNER' | 'MANAGER' | 'VIEWER'>('ALL');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -68,7 +70,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
 
   async function restore(entry: HistoryEntry) {
     setRestoringId(entry.id);
-    setMsg(null);
+    setNotice(null);
     try {
       const res = await fetchWithCsrf('/api/admin/reports/profitability/config', {
         method: 'POST',
@@ -79,10 +81,10 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || 'No s\'ha pogut restaurar la versio');
       }
-      setMsg('Versio restaurada');
+      setNotice({ type: 'success', text: 'Versio restaurada' });
       router.refresh();
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Error restaurant');
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Error restaurant' });
     } finally {
       setRestoringId(null);
     }
@@ -201,7 +203,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
           <p className="text-sm">Encara no hi ha versions desades.</p>
         ) : (
           filteredEntries.map((entry) => (
-            <div key={entry.id} className="rounded-xl border border-white/10 p-3">
+            <div key={entry.id} className="rounded-xl border border-[var(--line)] p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">
                   {formatDateTimeFull(entry.createdAt)}
@@ -219,7 +221,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
                 Rol: {entry.role} · Cost fix: {entry.after.fixedOperationalCost}€ ·
                 {' '}Pack ratio: {(entry.after.packCostRatio * 100).toFixed(1)}%
               </p>
-              <div className="mt-2 rounded-md bg-white/5 p-2">
+              <div className="mt-2 rounded-md bg-[var(--raised)] p-2">
                 <p className="text-xs font-semibold">Canvis</p>
                 <div className="mt-1 grid gap-1 text-xs sm:grid-cols-2">
                   {changedNumber(entry.before.packCostRatio, entry.after.packCostRatio) && (
@@ -271,11 +273,18 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
           ))
         )}
       </div>
-      {msg && <p className="mt-3 text-sm">{msg}</p>}
+      {notice && (
+        <p
+          role={notice.type === 'error' ? 'alert' : 'status'}
+          aria-live={notice.type === 'error' ? 'assertive' : 'polite'}
+          className={`mt-3 text-sm ${notice.type === 'error' ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}
+        >
+          {notice.text}
+        </p>
+      )}
     </section>
   );
 }
-
 
 
 

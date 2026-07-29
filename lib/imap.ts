@@ -443,10 +443,6 @@ function cacheKey(uid: number, folder: string) {
   return `${folder}:${uid}`;
 }
 
-export function clearFetchEmailCache(): void {
-  FETCH_EMAIL_CACHE.clear();
-}
-
 export function invalidateFetchEmailCache(uid: number, folder: string = 'INBOX'): void {
   FETCH_EMAIL_CACHE.delete(cacheKey(uid, folder));
 }
@@ -897,7 +893,7 @@ export async function testConnection(): Promise<{ ok: boolean; error?: string }>
 
 /* ── Conversation linking — Message-ID & X-Orbita headers ───────────────── */
 
-export type OrbitaEntityKind = 'lead' | 'customer' | 'booking' | 'dossier' | 'admin';
+export type OrbitaEntityKind = 'lead' | 'customer' | 'booking' | 'dossier' | 'proposal' | 'admin';
 
 export interface OrbitaContext {
   kind: OrbitaEntityKind;
@@ -907,7 +903,7 @@ export interface OrbitaContext {
 }
 
 const ORBITA_MID_DOMAIN = (process.env.ORBITA_MAIL_DOMAIN || process.env.SMTP_DOMAIN || 'orbitaevents.com').trim();
-const ORBITA_MID_RX = /<orbita\.(lead|customer|booking|dossier|admin)\.([^.]+)\.[^@]+@[^>]+>/i;
+const ORBITA_MID_RX = /<orbita\.(lead|customer|booking|dossier|proposal|admin)\.([^.]+)\.[^@]+@[^>]+>/i;
 
 /**
  * Construeix un Message-ID estable amb codificació d'entitat. Permet matchejar
@@ -1087,11 +1083,6 @@ export async function discoverSpecialFolders(forceRefresh = false): Promise<Spec
   SPECIAL_FOLDERS_CACHE = result;
   SPECIAL_FOLDERS_CACHED_AT = now;
   return result;
-}
-
-export function clearSpecialFoldersCache(): void {
-  SPECIAL_FOLDERS_CACHE = null;
-  SPECIAL_FOLDERS_CACHED_AT = 0;
 }
 
 export interface AppendResult {

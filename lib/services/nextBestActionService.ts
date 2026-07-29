@@ -17,6 +17,7 @@ import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 import type { LeadStatus } from '@prisma/client';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -155,6 +156,32 @@ function extractLeadActions(leads: NBALeadInput[], now: Date): NextBestAction[] 
   const actions: NextBestAction[] = [];
 
   for (const lead of leads) {
+    // Lead GUANYAT però sense reserva creada: el bolo està tancat (sovint amb
+    // dipòsit cobrat) però no s'ha materialitzat en reserva → cau en un forat
+    // negre (no surt a economia ni a cobraments). Cal avisar perquè es creï.
+    if (lead.status === 'WON' && !lead.hasBooking) {
+      const dUntilEventWon = daysUntil(lead.eventDate, now);
+      actions.push({
+        rank: 0,
+        id: makeId('lead', 'WON_NO_BOOKING', lead.id),
+        domain: 'lead',
+        actionType: 'CLOSE_DEAL',
+        urgency: dUntilEventWon !== null && dUntilEventWon <= 14 ? 'CRITICAL' : 'HIGH',
+        icon: '⚠️',
+        title: `Crear reserva — ${lead.name}`,
+        subtitle: dUntilEventWon !== null
+          ? `Guanyat sense reserva · event en ${dUntilEventWon} dies`
+          : 'Guanyat sense reserva',
+        href: buildLeadWorkspaceHref(lead.id),
+        score: 0,
+        entity: { type: 'lead', id: lead.id, name: lead.name },
+        reasoning: 'El lead està guanyat però no té reserva: el bolo no apareix a economia ni a cobraments fins que es creï',
+        estimatedImpact: 'HIGH',
+        timeWindow: dUntilEventWon !== null && dUntilEventWon <= 7 ? 'Ara' : 'Aquesta setmana',
+      });
+      continue;
+    }
+
     if (['WON', 'LOST', 'DISQUALIFIED'].includes(lead.status)) continue;
 
     const hoursOld = (now.getTime() - lead.createdAt.getTime()) / (1000 * 60 * 60);
@@ -570,11 +597,21 @@ export function buildNBAReport(actions: NextBestAction[], now: Date): NBAReport 
 // WRAPPER — fetch paral·lel de totes les fonts
 // ───────────────────────────────────────────────────────────────────────────
 
-const ACTIVE_LEAD_STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'];
+// WON s'inclou per detectar leads guanyats SENSE reserva (forat negre: bolo
+// tancat que no s'ha materialitzat). extractLeadActions els filtra: només els
+// WON sense booking generen acció; els WON amb booking se salten (continue).
+const ACTIVE_LEAD_STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'];
 const EMPTY_FOLLOWUPS: FollowUpSummary = { generatedAt: '', total: 0, urgent: 0, normal: 0, low: 0, items: [] };
 const EMPTY_CAPACITY: CapacityConflictReport = { generatedAt: '', windowDays: 14, conflicts: [], verdict: '' };
 
-export async function loadNextBestActions(now: Date = new Date()): Promise<NBAReport> {
+export type LoadNextBestActionsOptions = {
+  capacity?: CapacityConflictReport;
+};
+
+export async function loadNextBestActions(
+  now: Date = new Date(),
+  options: LoadNextBestActionsOptions = {},
+): Promise<NBAReport> {
   const [leadsRaw, customersRaw, tasksRaw, followUps, capacity, pipelineSuggestions] = await Promise.all([
     // Active leads with overdue task count
     prisma.lead.findMany({
@@ -607,7 +644,14 @@ export async function loadNextBestActions(now: Date = new Date()): Promise<NBARe
         lastContactedAt: true, totalSpent: true,
         bookings: {
           where: { status: { in: ['CONFIRMED', 'PREPARING'] } },
-          select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true },
+          select: {
+            total: true,
+            depositAmount: true,
+            remainingAmount: true,
+            depositPaid: true,
+            remainingPaid: true,
+            cashAmount: true,
+          },
         },
         tasks: { where: { status: { notIn: ['DONE', 'CANCELLED'] } }, select: { id: true } },
       },
@@ -635,7 +679,7 @@ export async function loadNextBestActions(now: Date = new Date()): Promise<NBARe
     }).catch((err) => { log.error('NBA: tasks failed', err); return []; }),
 
     loadPendingFollowUps(now).catch((err) => { log.error('NBA: followUps failed', err); return EMPTY_FOLLOWUPS; }),
-    loadCapacityConflicts(now).catch((err) => { log.error('NBA: capacity failed', err); return EMPTY_CAPACITY; }),
+    options.capacity ?? loadCapacityConflicts(now).catch((err) => { log.error('NBA: capacity failed', err); return EMPTY_CAPACITY; }),
     loadPipelineSuggestions(now).catch((err) => { log.error('NBA: pipeline failed', err); return [] as PipelineSuggestion[]; }),
   ]);
 
@@ -668,17 +712,26 @@ export async function loadNextBestActions(now: Date = new Date()): Promise<NBARe
   const customers: NBACustomerInput[] = (customersRaw as Array<{
     id: string; name: string; lifecycleStage: string | null; healthScore: number | null;
     lastContactedAt: Date | null; totalSpent: number;
-    bookings: Array<{ total: number | null; depositAmount: number | null; depositPaid: boolean | null; remainingPaid: boolean | null }>;
+    bookings: Array<{
+      total: number | null;
+      depositAmount: number | null;
+      remainingAmount: number | null;
+      depositPaid: boolean | null;
+      remainingPaid: boolean | null;
+      cashAmount: number | null;
+    }>;
     tasks: { id: string }[];
   }>).map((c) => {
     let pendingPayment = 0;
     for (const b of c.bookings) {
-      const total = b.total || 0;
-      const deposit = b.depositAmount || 0;
-      let paid = 0;
-      if (b.depositPaid) paid += deposit;
-      if (b.remainingPaid) paid += total - deposit;
-      pendingPayment += Math.max(0, total - paid);
+      pendingPayment += bookingOutstandingAmount({
+        total: b.total || 0,
+        depositAmount: b.depositAmount || 0,
+        remainingAmount: b.remainingAmount,
+        depositPaid: Boolean(b.depositPaid),
+        remainingPaid: Boolean(b.remainingPaid),
+        cashAmount: b.cashAmount,
+      });
     }
     return {
       id: c.id,

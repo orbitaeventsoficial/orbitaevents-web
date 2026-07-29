@@ -69,6 +69,7 @@ describe('onProposalAccepted', () => {
     const result = await onProposalAccepted('p1');
 
     expect(result.triggered).toBe(true);
+    expect(result.detail).toBe('Contract pending generation for proposal p1');
     expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
       where: { id: 'p1' },
       data: { contractStatus: 'DRAFT', contractSentAt: null },
@@ -144,7 +145,7 @@ describe('onLeadCreated', () => {
     const result = await onLeadCreated('l1');
 
     expect(result.triggered).toBe(false);
-    expect(result.detail).toBe('Welcome email already queued');
+    expect(result.detail).toBe('Welcome email already handled');
   });
 
   it('no peta si prisma.task.createMany falla', async () => {

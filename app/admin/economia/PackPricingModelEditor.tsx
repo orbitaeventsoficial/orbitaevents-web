@@ -4,6 +4,8 @@ import { useState } from 'react';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { fetchWithCsrf } from '@/lib/csrf';
 
+type Notice = { type: 'success' | 'error'; text: string };
+
 function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;
 }
@@ -20,7 +22,7 @@ function statusBadge(value: number, warn: number, danger: number) {
 export default function PackPricingModelEditor({ initial }: { initial: PackPricingModelConfig }) {
   const [form, setForm] = useState<PackPricingModelConfig>(initial);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
 
   function update<K extends keyof PackPricingModelConfig>(key: K, value: PackPricingModelConfig[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -28,7 +30,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
 
   async function save() {
     setSaving(true);
-    setMsg(null);
+    setNotice(null);
     try {
       const res = await fetchWithCsrf('/api/admin/pricing/model-config', {
         method: 'POST',
@@ -39,9 +41,9 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || 'No s\'ha pogut desar la configuració');
       }
-      setMsg('Configuració de packs desada');
+      setNotice({ type: 'success', text: 'Configuració de packs desada' });
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Error en desar');
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Error en desar' });
     } finally {
       setSaving(false);
     }
@@ -74,7 +76,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
     <section className="ap-card p-5">
       <h2 className="ap-h2">Model econòmic de packs</h2>
       <p className="mt-1 text-xs">
-        Aquesta configuració calcula PVP recomanat, hora extra recomanada i alertes de divergència a packs.
+        Aquesta configuració calcula PVP recomanat, hora extra recomanada i alertes de divergència a packs. El recomanat comercial s'arrodoneix sempre amunt a desenes.
       </p>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.6fr,1fr]">
@@ -151,7 +153,15 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
             >
               {saving ? 'Desant...' : 'Desar model packs'}
             </button>
-            {msg && <p className="text-sm">{msg}</p>}
+            {notice && (
+              <p
+                role={notice.type === 'error' ? 'alert' : 'status'}
+                aria-live={notice.type === 'error' ? 'assertive' : 'polite'}
+                className={`text-sm ${notice.type === 'error' ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}
+              >
+                {notice.text}
+              </p>
+            )}
           </div>
         </div>
 
@@ -197,7 +207,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
             </div>
             <div className="rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
               <p>Cost equip/hora usat al càlcul = inventari/h + personal/h + cost fix.</p>
-              <p className="mt-1">PVP recomanat = cost / (1 - objectiu marge).</p>
+              <p className="mt-1">PVP recomanat = cost / (1 - objectiu marge), arrodonit amunt a acabat en 0.</p>
             </div>
           </div>
         </aside>

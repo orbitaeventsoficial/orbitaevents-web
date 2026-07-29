@@ -22,8 +22,6 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
-
 // ── Llindars de marge (% sobre preu net, sense IVA) ─────────────────────────
 export const PRICING_INTELLIGENCE = {
 
@@ -153,8 +151,6 @@ export function getEquipmentCostPerHour(
 // ── Tipus ────────────────────────────────────────────────────────────────────
 export type MarginKind = 'excellent' | 'good' | 'target' | 'fair' | 'low' | 'warn' | 'critical' | 'loss' | 'info';
 export type PriceTone = { hex: string; name: string; kind: MarginKind };
-export type AlertLevel = 'info' | 'warn' | 'critical';
-export interface PricingAlert { level: AlertLevel; code: string; message: string; }
 
 // ── Gradient tèrmic de marge (8 tonalitats) ──────────────────────────────────
 // A pitjor marge → vermell MÉS BRILLANT. Fosc = tranquil. Brillant = alarma.
@@ -171,144 +167,6 @@ export const MARGIN_TONES: { min: number; tone: PriceTone }[] = [
 
 export function getMarginColor(pct: number): PriceTone {
   return (MARGIN_TONES.find((t) => pct >= t.min) ?? MARGIN_TONES.at(-1)!).tone;
-}
-
-// ── Gradient tèrmic de preu per hora (6 tonalitats) ──────────────────────────
-const HOURLY_TONES: { min: number; tone: PriceTone }[] = [
-  { min: 220,       tone: { hex: '#16a34a', name: 'Premium',     kind: 'excellent' } },
-  { min: 160,       tone: { hex: '#65a30d', name: 'Mercat alt',  kind: 'good'      } },
-  { min: 110,       tone: { hex: '#a3a30d', name: 'Recomanat',   kind: 'target'    } },
-  { min: 90,        tone: { hex: '#ca8a04', name: 'Mínim',       kind: 'fair'      } },
-  { min: 60,        tone: { hex: '#d97706', name: 'Just',        kind: 'low'       } },
-  { min: -Infinity, tone: { hex: '#dc2626', name: 'Insuficient', kind: 'critical'  } },
-];
-
-export function getHourlyColor(eur: number): PriceTone {
-  return (HOURLY_TONES.find((t) => eur >= t.min) ?? HOURLY_TONES.at(-1)!).tone;
-}
-
-// ── Funció pura: càlcul complet de cost i marge d'un bolo ────────────────────
-export interface FullBookingCostInput {
-  total: number;
-  billableHours: number | null;
-  eventType?: string | null;
-  serviceKey?: ServicePricingKey | null;
-  hourlyRate?: { min: number; recommended: number; premium: number } | null;
-  targetMarginPct?: number | null;
-  alertThresholds?: {
-    priceDeviationAlertPct?: number;
-    priceDeviationCriticalPct?: number;
-    lowMarginPct?: number;
-    criticalMarginPct?: number;
-  } | null;
-  distanceKm?: number | null;
-  vehicleCostPerKm?: number | null;
-  travelCost?: number | null;
-  equipmentHourlyCost?: number | null; // suma de getEquipmentCostPerHour de l'inventari
-  extraCost?: number | null;
-  collaboratorCost?: number | null;
-}
-export interface FullBookingCostResult {
-  costTransport: number;
-  costEquip: number;
-  costExtras: number;
-  costCollab: number;
-  costTotal: number;
-  margin: number;
-  marginPct: number;
-  pricePerHour: number;
-  recommendedPrice: number;
-  deviationPct: number;
-  marginColor: PriceTone;
-  alerts: PricingAlert[];
-}
-
-export interface CollaboratorCostInput {
-  commissionAmount?: number | null;
-  collaborator?: { costPerHour?: number | null } | null;
-}
-
-export function computeCollaboratorCost(
-  collaborators: CollaboratorCostInput[],
-  billableHours: number | null,
-): { cost: number; source: 'hourly' | 'commission' | 'none' } {
-  const hours = billableHours && billableHours > 0 ? billableHours : 0;
-  let source: 'hourly' | 'commission' | 'none' = 'none';
-  const cost = collaborators.reduce((sum, booking) => {
-    const hourly = Number(booking.collaborator?.costPerHour ?? 0);
-    if (hours > 0 && hourly > 0) {
-      source = 'hourly';
-      return sum + hourly * hours;
-    }
-    const commission = Number(booking.commissionAmount ?? 0);
-    if (commission > 0 && source !== 'hourly') source = 'commission';
-    return sum + Math.max(0, commission);
-  }, 0);
-  return { cost: Math.round(cost * 100) / 100, source };
-}
-
-export function computeFullBookingCost(input: FullBookingCostInput): FullBookingCostResult {
-  const hours = input.billableHours && input.billableHours > 0 ? input.billableHours : 0;
-  const key = input.serviceKey ?? resolveServicePricingKey(input.eventType);
-  const rate = input.hourlyRate ?? SERVICE_HOURLY_RATES[key];
-  const m = PRICING_INTELLIGENCE.margin;
-  const dev = {
-    ALERT_PCT: input.alertThresholds?.priceDeviationAlertPct ?? PRICING_INTELLIGENCE.priceDeviation.ALERT_PCT,
-    CRITICAL_PCT: input.alertThresholds?.priceDeviationCriticalPct ?? PRICING_INTELLIGENCE.priceDeviation.CRITICAL_PCT,
-  };
-  const lowMarginPct = input.alertThresholds?.lowMarginPct ?? m.LOW_MARGIN_PCT;
-  const targetMarginPct = input.targetMarginPct ?? m.TARGET_MARGIN_PCT;
-
-  const costTransport = typeof input.travelCost === 'number' && input.travelCost > 0
-    ? input.travelCost
-    : calculateTravelCost(input.distanceKm ?? 0, input.vehicleCostPerKm ?? DEFAULT_VEHICLE_COST_PER_KM);
-  const costEquip = Math.round((input.equipmentHourlyCost ?? 0) * hours * 100) / 100;
-  const costExtras = Math.max(0, Math.round((input.extraCost ?? 0) * 100) / 100);
-  const costCollab = Math.max(0, input.collaboratorCost ?? 0);
-  const costTotal = Math.round((costTransport + costEquip + costExtras + costCollab) * 100) / 100;
-
-  const margin = Math.round((input.total - costTotal) * 100) / 100;
-  const marginPct = input.total > 0 ? Math.round((margin / input.total) * 100) : 0;
-  const pricePerHour = hours > 0 ? Math.round(input.total / hours) : 0;
-  const recommendedPrice = hours > 0 ? hours * rate.recommended : 0;
-  const deviationPct = recommendedPrice > 0
-    ? Math.round(((recommendedPrice - input.total) / recommendedPrice) * 100)
-    : 0;
-
-  const alerts: PricingAlert[] = [];
-  if (margin < 0)
-    alerts.push({ level: 'critical', code: 'MARGIN_LOSS', message: `Perdent ${Math.abs(margin).toFixed(0)}€. Preu per sota del cost.` });
-  else if (marginPct < lowMarginPct)
-    alerts.push({ level: 'critical', code: 'MARGIN_LOW', message: `Marge ${marginPct}% sota el llindar de risc (${lowMarginPct}%).` });
-  else if (marginPct < targetMarginPct)
-    alerts.push({ level: 'warn', code: 'MARGIN_BELOW_TARGET', message: `Marge ${marginPct}% sota l'objectiu (${targetMarginPct}%).` });
-
-  if (hours > 0 && pricePerHour > 0 && pricePerHour < rate.min)
-    alerts.push({ level: 'warn', code: 'RATE_BELOW_MIN', message: `${pricePerHour}€/h és sota el mínim per ${key} (${rate.min}€/h).` });
-
-  if (deviationPct > dev.CRITICAL_PCT)
-    alerts.push({ level: 'critical', code: 'PRICE_DEVIATION_CRITICAL', message: `Preu ${deviationPct}% per sota del recomanat (${recommendedPrice.toFixed(0)}€).` });
-  else if (deviationPct > dev.ALERT_PCT)
-    alerts.push({ level: 'warn', code: 'PRICE_DEVIATION', message: `Preu ${deviationPct}% per sota del recomanat.` });
-
-  if (costCollab > 0 && costCollab > margin && margin > 0)
-    alerts.push({ level: 'warn', code: 'COLLAB_HEAVY', message: 'El col·laborador s\'emporta més que el marge net.' });
-
-  return { costTransport, costEquip, costExtras, costCollab, costTotal, margin, marginPct,
-    pricePerHour, recommendedPrice, deviationPct, marginColor: getMarginColor(marginPct), alerts };
-}
-
-// ── Alerta desviació (compat amb codi existent) ───────────────────────────────
-export function getPriceDeviationAlert(
-  finalPrice: number,
-  hours: number | null,
-): { kind: 'none' | 'alert' | 'critical'; deviationPct: number; recommended: number } {
-  if (!hours || hours <= 0) return { kind: 'none', deviationPct: 0, recommended: 0 };
-  const recommended = hours * PRICING_INTELLIGENCE.hourlyRate.RECOMMENDED_MIN_EUR_PER_HOUR;
-  const deviationPct = Math.round(((recommended - finalPrice) / recommended) * 100);
-  const { ALERT_PCT, CRITICAL_PCT } = PRICING_INTELLIGENCE.priceDeviation;
-  const kind = deviationPct > CRITICAL_PCT ? 'critical' : deviationPct > ALERT_PCT ? 'alert' : 'none';
-  return { kind, deviationPct, recommended };
 }
 
 // ── Consells per nivell ───────────────────────────────────────────────────────

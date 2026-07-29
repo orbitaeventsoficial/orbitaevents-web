@@ -39,14 +39,14 @@ export interface QuoteData {
   billableTravelKm?: number;
   /** Nombre de trams de transport facturats. */
   travelBlocks?: number;
-  /** Recàrrec aplicat per regla temporal (€) — alta temporada, festiu, cap setmana, etc. */
-  seasonSurcharge?: number;
-  /** Etiqueta visible del recàrrec temporal (ja localitzada). */
-  seasonLabel?: string;
-  /** Percentatge del recàrrec sobre el preu base. */
-  seasonPct?: number;
   discount: number;
   discountReason: string;
+  /** Base imposable després de descompte, abans d'IVA. */
+  taxableBase?: number;
+  /** Percentatge d'IVA aplicat. 0 = sense IVA aplicat. */
+  vatRate?: number;
+  /** Import d'IVA aplicat. */
+  vatAmount?: number;
   total: number;
   clientName?: string;
   clientEmail?: string;
@@ -78,28 +78,31 @@ export async function generateQuotePDF(
       guests: 'Convidats',
       selectedPack: 'Pack seleccionat',
       hours: 'hores',
-      features: 'Que inclou',
+      features: 'Què inclou',
       extras: 'Extres',
-      priceSummary: 'Resum economic',
+      priceSummary: 'Resum econòmic',
       basePack: 'Pack base',
       extrasTotal: 'Extres',
       travel: 'Desplaçament',
       travelDetail: (km: number, billable: number, blocks: number) =>
         `${km.toFixed(1)} km totals · ${billable.toFixed(1)} km facturables · ${blocks} ${blocks === 1 ? 'tram' : 'trams'}`,
       discount: 'Descompte',
+      taxableBase: 'Base imposable',
+      vat: 'IVA',
       total: 'Total',
       validUntilPrefix: 'Validesa:',
       validUntilSuffix: 'dies',
       validSeal: 'VÀLID',
       from: 'des de',
-      ctaStep1: 'Accepta el pressupost',
-      ctaStep2: 'Reserva amb dipòsit',
-      ctaStep3: 'El teu event assegurat',
-      disclaimer: 'Preus sense IVA.',
+      ctaStep1: 'Accepta la proposta',
+      ctaStep2: 'Reserva amb paga i senyal',
+      ctaStep3: 'Esdeveniment assegurat',
+      disclaimerNoVat: 'Preus sense IVA aplicat.',
+      disclaimerVat: 'Preus amb IVA desglossat.',
       contact: 'Contacte',
       conditions: 'Condicions',
-      whyChooseUs: 'Per que escollir-nos',
-      quoteRef: 'Referencia',
+      whyChooseUs: 'Per què escollir-nos',
+      quoteRef: 'Referència',
       issueDate: 'Data',
     },
     es: {
@@ -111,27 +114,30 @@ export async function generateQuotePDF(
       guests: 'Invitados',
       selectedPack: 'Pack seleccionado',
       hours: 'horas',
-      features: 'Que incluye',
+      features: 'Qué incluye',
       extras: 'Extras',
-      priceSummary: 'Resumen economico',
+      priceSummary: 'Resumen económico',
       basePack: 'Pack base',
       extrasTotal: 'Extras',
       travel: 'Desplazamiento',
       travelDetail: (km: number, billable: number, blocks: number) =>
         `${km.toFixed(1)} km totales · ${billable.toFixed(1)} km facturables · ${blocks} ${blocks === 1 ? 'tramo' : 'tramos'}`,
       discount: 'Descuento',
+      taxableBase: 'Base imponible',
+      vat: 'IVA',
       total: 'Total',
       validUntilPrefix: 'Validez:',
-      validUntilSuffix: 'dias',
+      validUntilSuffix: 'días',
       validSeal: 'VÁLIDO',
       from: 'desde',
-      ctaStep1: 'Acepta el presupuesto',
+      ctaStep1: 'Acepta la propuesta',
       ctaStep2: 'Reserva con señal',
-      ctaStep3: 'Tu evento asegurado',
-      disclaimer: 'Precios sin IVA.',
+      ctaStep3: 'Evento asegurado',
+      disclaimerNoVat: 'Precios sin IVA aplicado.',
+      disclaimerVat: 'Precios con IVA desglosado.',
       contact: 'Contacto',
       conditions: 'Condiciones',
-      whyChooseUs: 'Por que elegirnos',
+      whyChooseUs: 'Por qué elegirnos',
       quoteRef: 'Referencia',
       issueDate: 'Fecha',
     },
@@ -153,6 +159,8 @@ export async function generateQuotePDF(
       travelDetail: (km: number, billable: number, blocks: number) =>
         `${km.toFixed(1)} km total · ${billable.toFixed(1)} km billable · ${blocks} ${blocks === 1 ? 'block' : 'blocks'}`,
       discount: 'Discount',
+      taxableBase: 'Taxable base',
+      vat: 'VAT',
       total: 'Total',
       validUntilPrefix: 'Validity:',
       validUntilSuffix: 'days',
@@ -161,7 +169,8 @@ export async function generateQuotePDF(
       ctaStep1: 'Accept the quote',
       ctaStep2: 'Reserve with deposit',
       ctaStep3: 'Your event secured',
-      disclaimer: 'Prices excl. VAT.',
+      disclaimerNoVat: 'Prices with no VAT applied.',
+      disclaimerVat: 'Prices with VAT breakdown.',
       contact: 'Contact',
       conditions: 'Conditions',
       whyChooseUs: 'Why choose us',
@@ -388,15 +397,15 @@ export async function generateQuotePDF(
       ? Math.min(2, doc.splitTextToSize(data.discountReason.trim(), 120).length)
       : 0;
   const hasTravel = (data.travelCharge ?? 0) > 0;
+  const vatRate = Number.isFinite(data.vatRate) ? Math.max(0, data.vatRate ?? 0) : 0;
+  const vatAmount = Number.isFinite(data.vatAmount) ? Math.max(0, data.vatAmount ?? 0) : 0;
+  const hasVat = vatRate > 0 || vatAmount > 0;
   const travelDetailVisible = hasTravel
     && typeof data.travelKm === 'number'
     && typeof data.billableTravelKm === 'number'
     && typeof data.travelBlocks === 'number';
-  const hasSeason = (data.seasonSurcharge ?? 0) > 0 && typeof data.seasonLabel === 'string';
-  const seasonDetailVisible = hasSeason && typeof data.seasonPct === 'number';
-  const summaryRows = 2 + (hasSeason ? 1 : 0) + (hasTravel ? 1 : 0) + (data.discount > 0 ? 1 : 0);
+  const summaryRows = 2 + (hasTravel ? 1 : 0) + (data.discount > 0 ? 1 : 0) + (hasVat ? 2 : 0);
   const travelDetailGap = travelDetailVisible ? 4.2 : 0;
-  const seasonDetailGap = seasonDetailVisible ? 4.2 : 0;
   const summaryTopPadding = 8;
   const summaryRowGap = 6;
   const summaryReasonGap = discountReasonLines > 0 ? 4.2 + discountReasonLines * 3.8 : 0;
@@ -407,7 +416,6 @@ export async function generateQuotePDF(
     summaryRows * summaryRowGap +
     summaryReasonGap +
     travelDetailGap +
-    seasonDetailGap +
     summaryTotalGap +
     summaryBottomPadding;
 
@@ -431,18 +439,6 @@ export async function generateQuotePDF(
   priceY += summaryRowGap;
   doc.text(t.extrasTotal, left + 4, priceY);
   doc.text(formatPdfMoney(data.extrasPrice, locale), left + contentWidth - 4, priceY, { align: 'right' });
-  if (hasSeason) {
-    priceY += summaryRowGap;
-    setStyleBody(doc);
-    doc.text(data.seasonLabel!, left + 4, priceY);
-    doc.text(`+${formatPdfMoney(data.seasonSurcharge ?? 0, locale)}`, left + contentWidth - 4, priceY, { align: 'right' });
-    if (seasonDetailVisible) {
-      priceY += 4.2;
-      setStyleCaption(doc);
-      doc.text(`+${data.seasonPct!.toFixed(0)}% sobre el preu base`, left + 4, priceY);
-      setStyleBody(doc);
-    }
-  }
   if (hasTravel) {
     priceY += summaryRowGap;
     setStyleBody(doc);
@@ -478,6 +474,15 @@ export async function generateQuotePDF(
       priceY += 3.8 * reasonLines.length;
     }
   }
+  if (hasVat) {
+    priceY += summaryRowGap;
+    setStyleBody(doc);
+    doc.text(t.taxableBase, left + 4, priceY);
+    doc.text(formatPdfMoney(data.taxableBase ?? Math.max(0, data.total - vatAmount), locale), left + contentWidth - 4, priceY, { align: 'right' });
+    priceY += summaryRowGap;
+    doc.text(`${t.vat} ${vatRate}%`, left + 4, priceY);
+    doc.text(formatPdfMoney(vatAmount, locale), left + contentWidth - 4, priceY, { align: 'right' });
+  }
   priceY += 6;
   doc.setDrawColor(...border);
   doc.line(left + 4, priceY - 3, left + contentWidth - 4, priceY - 3);
@@ -497,7 +502,7 @@ export async function generateQuotePDF(
   // Disclaimer fora del quadre negre — visible en ivori
   setStyleCaption(doc);
   doc.setTextColor(...COLORS.textMuted);
-  doc.text(t.disclaimer, left + 4, y);
+  doc.text(hasVat ? t.disclaimerVat : t.disclaimerNoVat, left + 4, y);
   y += 5;
 
   // Les condicions són un resum opcional: no han d'obrir un full gairebé buit.

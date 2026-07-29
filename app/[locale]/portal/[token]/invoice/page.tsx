@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import {
   findPortalAccessByRawToken,
   markPortalAccessHit,
@@ -13,12 +13,14 @@ import {
   type ClientPortalLocale,
 } from '@/lib/clientPortalMessages';
 import {
+  getClientPortalDeliveryNoteDocument,
   getClientPortalInvoiceSummary,
-  type ClientPortalInvoiceBooking,
-  type ClientPortalInvoiceProposal,
 } from '@/lib/clientPortalInvoice';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
+import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
+import ClientPortalPageHeader from '@/app/components/public/ClientPortalPageHeader';
+import { clientPortalPaymentTone } from '@/lib/constants/clientPortalTones';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -30,12 +32,14 @@ export default async function ClientPortalInvoicePage({
 }: {
   params: { locale: string; token: string };
 }) {
-  const locale = normalizePortalLocale(params.locale) as ClientPortalLocale;
+  const locale = normalizePortalLocale(params.locale);
   const t = CLIENT_PORTAL_MESSAGES[locale];
   const intlLocale = toIntlLocale(locale);
 
   const access = await findPortalAccessByRawToken(params.token);
   if (!access) notFound();
+  const visibility = getClientPortalVisibility(access.personalization);
+  if (!visibility.documents) notFound();
 
   const requestHeaders = headers();
   await markPortalAccessHit({
@@ -48,9 +52,10 @@ export default async function ClientPortalInvoicePage({
   const accentBorder = toRgba(accentHex, 0.35) || 'rgba(6,182,212,0.35)';
   const accentBg = toRgba(accentHex, 0.12) || 'rgba(6,182,212,0.12)';
 
-  const booking = access.booking as ClientPortalInvoiceBooking & { reference: string };
-  const proposals = (access.booking.proposals as ClientPortalInvoiceProposal[]);
-  const summary = getClientPortalInvoiceSummary(booking, proposals);
+  const booking = access.booking;
+  const proposals = access.booking.proposals;
+  const summary = getClientPortalInvoiceSummary(booking, proposals, access.booking.invoices ?? []);
+  const deliveryNoteDocument = getClientPortalDeliveryNoteDocument(booking.deliveryNotes ?? []);
 
   function formatDate(d: Date | null): string | null {
     if (!d) return null;
@@ -64,25 +69,22 @@ export default async function ClientPortalInvoicePage({
     : t.invoicePendingPayment;
 
   const paymentStatusColor = summary.allPaid
-    ? 'text-emerald-300'
+    ? clientPortalPaymentTone(true)
     : summary.deposit.paid
-    ? 'text-amber-300'
+    ? clientPortalPaymentTone(false)
     : 'text-white/50';
 
   return (
     <main className="min-h-screen pb-24 text-white/90 portal-shell-bg">
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <header className="mb-6">
-          <Link
-            href={`/${locale}/portal/${params.token}`}
-            className="mb-4 inline-flex items-center gap-1.5 text-xs text-white/35 hover:text-white/60 transition-colors"
-          >
-            ← {t.portalLabel}
-          </Link>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: accentHex }}>{t.invoiceLabel}</p>
-          <h1 className="text-2xl font-bold text-white">{t.invoicePageTitle}</h1>
-          <p className="text-sm text-white/40 mt-1">{booking.reference}</p>
-        </header>
+        <ClientPortalPageHeader
+          backHref={`/${locale}/portal/${params.token}`}
+          backLabel={t.portalLabel}
+          eyebrow={t.invoiceLabel}
+          title={t.invoicePageTitle}
+          reference={booking.reference}
+          accentColor={accentHex}
+        />
 
         {/* Total */}
         <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-6 mb-4">
@@ -102,8 +104,8 @@ export default async function ClientPortalInvoicePage({
               <p className="text-base font-bold text-white">{formatCurrency(summary.deposit.amount)}</p>
             </div>
             <div className="flex items-center justify-between">
-              <p className={`text-sm ${summary.deposit.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
-                {summary.deposit.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
+              <p className={`text-sm ${clientPortalPaymentTone(summary.deposit.paid)}`}>
+                <span aria-hidden="true">{summary.deposit.paid ? '✓' : '○'}</span> {summary.deposit.paid ? t.paid : t.pending}
               </p>
               {summary.deposit.paidAt && (
                 <p className="text-xs text-white/30">{formatDate(summary.deposit.paidAt)}</p>
@@ -118,6 +120,7 @@ export default async function ClientPortalInvoicePage({
                 style={{ borderColor: accentBorder, backgroundColor: accentBg }}
               >
                 {t.payDepositOnline}
+                <span className="sr-only"> ({t.opensInNewTab})</span>
               </a>
             )}
           </div>
@@ -129,8 +132,8 @@ export default async function ClientPortalInvoicePage({
               <p className="text-base font-bold text-white">{formatCurrency(summary.remaining.amount)}</p>
             </div>
             <div className="flex items-center justify-between">
-              <p className={`text-sm ${summary.remaining.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
-                {summary.remaining.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
+              <p className={`text-sm ${clientPortalPaymentTone(summary.remaining.paid)}`}>
+                <span aria-hidden="true">{summary.remaining.paid ? '✓' : '○'}</span> {summary.remaining.paid ? t.paid : t.pending}
               </p>
               {summary.remaining.paidAt && (
                 <p className="text-xs text-white/30">{formatDate(summary.remaining.paidAt)}</p>
@@ -145,41 +148,75 @@ export default async function ClientPortalInvoicePage({
                 style={{ borderColor: accentBorder, backgroundColor: accentBg }}
               >
                 {t.payRemainingOnline}
+                <span className="sr-only"> ({t.opensInNewTab})</span>
               </a>
             )}
           </div>
         </div>
 
-        {/* PDF download */}
-        {summary.pdfUrl && (
-          <a
-            href={summary.pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium text-white/75 hover:text-white transition-all"
-            style={{ borderColor: accentBorder, backgroundColor: accentBg }}
-          >
-            {t.invoiceDownloadPdf}
-            {summary.proposalReference && (
-              <span className="text-white/30 ml-1">({summary.proposalReference})</span>
+        {/* Documents */}
+        {(summary.pdfUrl || deliveryNoteDocument) && (
+          <div className="grid gap-2">
+            {summary.pdfUrl && (
+              <a
+                href={summary.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm text-white/75 hover:text-white transition-all"
+                style={{ borderColor: accentBorder, backgroundColor: accentBg }}
+              >
+                <span className="min-w-0">
+                  <span className="block font-medium">
+                    {summary.documentType === 'INVOICE' ? t.invoiceDownloadInvoicePdf : t.invoiceDownloadPdf}
+                  </span>
+                  {summary.documentReference && (
+                    <span className="block truncate text-xs text-white/35">{summary.documentReference}</span>
+                  )}
+                </span>
+                <span className="sr-only"> ({t.opensInNewTab})</span>
+              </a>
             )}
-          </a>
+            {deliveryNoteDocument && (
+              <a
+                href={deliveryNoteDocument.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm text-white/75 hover:text-white transition-all"
+                style={{ borderColor: accentBorder, backgroundColor: accentBg }}
+              >
+                <span className="min-w-0">
+                  <span className="block font-medium">{t.deliveryNoteDownloadPdf}</span>
+                  <span className="block text-xs text-white/35">
+                    {deliveryNoteDocument.reference}
+                    {deliveryNoteDocument.signedAt ? (
+                      <span className={clientPortalPaymentTone(true)}>
+                        {' '}· {t.deliveryNoteStatusSigned} · {formatDate(deliveryNoteDocument.signedAt)}
+                      </span>
+                    ) : null}
+                  </span>
+                </span>
+                <span className="sr-only"> ({t.opensInNewTab})</span>
+              </a>
+            )}
+          </div>
         )}
 
         <footer className="mt-10 text-center">
-          <p className="text-xs text-white/15">Òrbita Events</p>
+          <p className="text-xs text-white/15">{SITE_CONFIG.business.name}</p>
         </footer>
       </div>
       <PortalBottomNav
         basePath={`/${locale}/portal/${params.token}`}
         accentHex={accentHex}
         labels={{
+          ariaLabel: t.portalNavigationLabel,
           hub: t.portalLabel,
           payments: t.payments,
           timeline: t.timelineLabel,
           contract: t.contract,
           gallery: t.navGallery,
         }}
+        hiddenItems={getClientPortalHiddenNavItems(visibility)}
       />
     </main>
   );

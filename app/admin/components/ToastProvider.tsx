@@ -17,7 +17,7 @@ const TOAST_STYLES: Record<ToastType, { bg: string; icon: string }> = {
 function Toast({ type, message, onClose }: { type: ToastType; message: string; onClose?: () => void }) {
   const style = TOAST_STYLES[type];
   return (
-    <div className={`flex items-center gap-3 rounded-xl border ${style.bg} px-4 py-3 shadow-2xl admin-card-glass`}>
+    <div className={`flex items-center gap-3 rounded-xl border ${style.bg} px-4 py-3 shadow-2xl`}>
       <span className="text-lg">{style.icon}</span>
       <p className="text-sm">{message}</p>
       {onClose && (

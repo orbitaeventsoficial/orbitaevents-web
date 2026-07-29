@@ -153,23 +153,30 @@ describe('generateSmartTemplates', () => {
     const agr = templates.find((t) => t.key === 'agraiment-post-event')!;
     expect(agr.subject).toContain('Maria');
   });
+
+  it('genera plantilla referral per client sense lead', () => {
+    const templates = generateAllTemplates(BASE_CTX);
+    const referral = templates.find((t) => t.key === 'referral')!;
+    expect(referral.subject).toContain('Maria');
+    expect(referral.body).toContain('Òrbita Events');
+  });
 });
 
 describe('generateAllTemplates', () => {
-  it('retorna les 6 plantilles', () => {
+  it('retorna les 7 plantilles', () => {
     const templates = generateAllTemplates(BASE_CTX);
-    expect(templates).toHaveLength(6);
+    expect(templates).toHaveLength(7);
   });
 
-  it('les 6 keys són úniques', () => {
+  it('les 7 keys són úniques', () => {
     const templates = generateAllTemplates(BASE_CTX);
     const keys = templates.map((t) => t.key);
-    expect(new Set(keys).size).toBe(6);
+    expect(new Set(keys).size).toBe(7);
   });
 
   it('funciona sense context mínim', () => {
     const templates = generateAllTemplates({ name: 'Joan' });
-    expect(templates.length).toBe(6);
+    expect(templates.length).toBe(7);
     for (const t of templates) {
       expect(t.body).not.toContain('undefined');
       expect(t.body).not.toContain('null');

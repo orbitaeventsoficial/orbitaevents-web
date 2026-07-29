@@ -1,4 +1,14 @@
 import { prisma } from '@/lib/prisma';
+import { TRAVEL_COST_LINE_MARKER, withTravelHeadcountNote } from '@/lib/services/travelLaborCost';
+import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
+import {
+  BINGO_ASSISTANT_LINE_LABEL,
+  BINGO_ASSISTANT_LINE_NOTE,
+  bingoAssistantRequiredForGuestCount,
+  isAdultBingoMusicalName,
+  isBingoAssistantLine,
+} from '@/lib/constants/orbita-services';
 import type { BookingServiceLineKind } from '@prisma/client';
 
 const VALID_KINDS: readonly BookingServiceLineKind[] = ['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER'];
@@ -13,10 +23,89 @@ export type LeadServiceLineInput = {
   hours?: number | null;
   notes?: string | null;
   partyType?: string | null;
+  travelHeadcount?: number | null;
 };
 
 function normalizeKind(value?: string | null): BookingServiceLineKind {
   return value && (VALID_KINDS as readonly string[]).includes(value) ? (value as BookingServiceLineKind) : 'OTHER';
+}
+
+function sanitizeQuantity(value?: number | null): number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.floor(value) : 1;
+}
+
+function sanitizeHours(value?: number | null): number | null {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : null;
+}
+
+function isTravelCostLine(line: { notes?: string | null }): boolean {
+  return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
+}
+
+function isIncludedSoundRentalLine(line: { collaboratorId?: string | null; notes?: string | null; label?: string | null }): boolean {
+  const normalizedLabel = line.label?.toLowerCase() || '';
+  return Boolean(
+    line.notes?.includes(SOUND_RENTAL.notesMarker) ||
+    (line.collaboratorId === SOUND_RENTAL.collaboratorId && /so|altaveu|speaker/.test(normalizedLabel)),
+  );
+}
+
+function hasAdultBingoLine(lines: LeadServiceLineInput[]): boolean {
+  return lines.some((line) => (
+    normalizeKind(line.kind) === 'PROVIDER_SERVICE'
+    && isAdultBingoMusicalName(line.label)
+  ));
+}
+
+function isAutoBingoAssistantLine(line: LeadServiceLineInput): boolean {
+  return Boolean(
+    isBingoAssistantLine(line)
+    && line.notes?.includes('bingo-assistant-threshold')
+    && (line.revenueAmount ?? 0) === 0
+    && (line.costAmount == null || line.costAmount === 0)
+  );
+}
+
+export function syncLeadBingoAssistantForGuests(
+  lines: LeadServiceLineInput[],
+  guestCount?: number | null,
+): LeadServiceLineInput[] {
+  const required = bingoAssistantRequiredForGuestCount(guestCount) && hasAdultBingoLine(lines);
+  const hasAssistant = lines.some(isBingoAssistantLine);
+
+  if (required && !hasAssistant) {
+    return [
+      ...lines,
+      {
+        kind: 'OTHER',
+        label: BINGO_ASSISTANT_LINE_LABEL,
+        revenueAmount: 0,
+        costAmount: null,
+        quantity: 1,
+        notes: BINGO_ASSISTANT_LINE_NOTE,
+      },
+    ];
+  }
+
+  if (!required && hasAssistant) {
+    const next = lines.filter((line) => !isAutoBingoAssistantLine(line));
+    return next.length === lines.length ? lines : next;
+  }
+
+  return lines;
+}
+
+/**
+ * Cost intern de les línies [travel-cost] (temps de ruta de conductor/passatgers).
+ * S'amaguen de la llista de productes però el cost s'ha de REIMPUTAR al marge
+ * (si no, el marge menteix: veure docs/disseny-cost-desplacament.md).
+ */
+function sumTravelCostLines(
+  lines: Array<{ notes?: string | null; costAmount?: number | null; quantity?: number | null }>,
+): number {
+  return lines
+    .filter(isTravelCostLine)
+    .reduce((sum, l) => sum + Number(l.costAmount || 0) * (l.quantity || 1), 0);
 }
 
 /** Línies del bolo d'un lead, ordenades. */
@@ -33,57 +122,97 @@ export async function listLeadServiceLines(leadId: string) {
       },
     },
   });
-  if (lead?.booking) return { status: 200, body: { lines: lead.booking.serviceLines } };
+  if (lead?.booking) {
+    const lines = lead.booking.serviceLines;
+    return {
+      status: 200,
+      body: {
+        lines: lines.filter((line) => !isTravelCostLine(line) && !isIncludedSoundRentalLine(line)),
+        routeCostLines: lines.filter(isTravelCostLine),
+        internalTravelCost: sumTravelCostLines(lines),
+      },
+    };
+  }
 
   const lines = await prisma.leadServiceLine.findMany({
     where: { leadId },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
-  return { status: 200, body: { lines } };
+  return {
+    status: 200,
+    body: {
+      lines: lines.filter((line) => !isTravelCostLine(line) && !isIncludedSoundRentalLine(line)),
+      routeCostLines: lines.filter(isTravelCostLine),
+      // Lead pur (sense reserva): el cost de ruta viu a les línies [travel-cost],
+      // amagades de productes però reimputades al marge via aquest total.
+      internalTravelCost: sumTravelCostLines(lines),
+    },
+  };
 }
 
 /**
  * Replace-all de les línies del bolo (mateix patró que el booking editor).
  * Esborra les actuals i crea les noves dins una transacció.
  */
-export async function replaceLeadServiceLines(leadId: string, inputLines: LeadServiceLineInput[]) {
+export async function replaceLeadServiceLines(
+  leadId: string,
+  inputLines: LeadServiceLineInput[],
+  distanceKm?: number | null,
+  tollsEur?: number | null,
+) {
   const lead = await prisma.lead.findUnique({
     where: { id: leadId },
-    select: { id: true, booking: { select: { id: true } } },
+    select: { id: true, guestCount: true, booking: { select: { id: true } } },
   });
   if (!lead) return { status: 404, body: { error: 'Lead no trobat' } };
+  if (lead.booking) {
+    return {
+      status: 409,
+      body: {
+        error: 'Aquest lead ja és una reserva formalitzada. Edita el bolo des de la reserva.',
+        bookingId: lead.booking.id,
+      },
+    };
+  }
 
-  const clean = (Array.isArray(inputLines) ? inputLines : [])
+  // Km de ruta (mirall de Booking.distanceKm) per al càlcul de transport en viu (#1345).
+  if (distanceKm !== undefined) {
+    const km = typeof distanceKm === 'number' && Number.isFinite(distanceKm) && distanceKm > 0
+      ? Math.round(distanceKm * 10) / 10
+      : null;
+    await prisma.lead.update({ where: { id: leadId }, data: { distanceKm: km } });
+  }
+  // Peatges de la ruta (#1364): cost real que no deriva dels km.
+  if (tollsEur !== undefined) {
+    const tolls = typeof tollsEur === 'number' && Number.isFinite(tollsEur) && tollsEur > 0
+      ? Math.round(tollsEur * 100) / 100
+      : null;
+    await prisma.lead.update({ where: { id: leadId }, data: { tollsEur: tolls } });
+  }
+
+  const sourceLines = syncLeadBingoAssistantForGuests(
+    Array.isArray(inputLines) ? inputLines : [],
+    lead.guestCount,
+  );
+
+  const clean = sourceLines
     .filter((l) => (l.label?.trim() || '') !== '' || (l.revenueAmount ?? 0) > 0)
-    .map((l, idx) => ({
+    .map((l, idx) => {
+      const kind = normalizeKind(l.kind);
+      return ({
       leadId,
       collaboratorId: l.collaboratorId?.trim() || null,
-      kind: normalizeKind(l.kind),
+      kind,
       label: l.label?.trim() || '',
-      revenueAmount: l.revenueAmount != null ? Number(l.revenueAmount) : null,
-      costAmount: l.costAmount != null ? Number(l.costAmount) : null,
-      quantity: l.quantity != null ? Number(l.quantity) : 1,
-      hours: l.hours != null ? Number(l.hours) : null,
-      notes: l.notes?.trim() || null,
+      revenueAmount: sanitizeRevenueAmount(l.revenueAmount),
+      costAmount: sanitizeServiceLineCostAmount({ kind, label: l.label, costAmount: l.costAmount }),
+      quantity: sanitizeQuantity(l.quantity),
+      hours: sanitizeHours(l.hours),
+      notes: withTravelHeadcountNote(l.notes, l.travelHeadcount),
       partyType: l.partyType?.trim() || null,
       sortOrder: idx,
-    }));
-
-  if (lead.booking) {
-    await prisma.$transaction([
-      prisma.bookingServiceLine.deleteMany({ where: { bookingId: lead.booking.id } }),
-      ...(clean.length > 0
-        ? [prisma.bookingServiceLine.createMany({
-            data: clean.map(({ leadId: _leadId, ...line }) => ({
-              ...line,
-              bookingId: lead.booking!.id,
-            })),
-          })]
-        : []),
-    ]);
-
-    return { status: 200, body: { ok: true, count: clean.length, bookingId: lead.booking.id } };
-  }
+    });
+    });
 
   await prisma.$transaction([
     prisma.leadServiceLine.deleteMany({ where: { leadId } }),

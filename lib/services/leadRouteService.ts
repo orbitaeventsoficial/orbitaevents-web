@@ -8,6 +8,22 @@ type LeadRouteResult = {
   body: Record<string, unknown>;
 };
 
+function parseLeadEventDate(value: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+
+  const [year, month, day] = value.split('-').map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day, 12, 0, 0, 0));
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return parsed;
+}
+
 export async function getLeadDetail(id: string): Promise<LeadRouteResult> {
   const lead = await prisma.lead.findUnique({
     where: { id },
@@ -25,6 +41,8 @@ export async function getLeadDetail(id: string): Promise<LeadRouteResult> {
       eventLocation: true,
       eventPhone: true,
       eventAddress: true,
+      distanceKm: true,
+      tollsEur: true,
       guestCount: true,
       budget: true,
       message: true,
@@ -89,14 +107,24 @@ export async function updateLeadFromInput(id: string, input: LeadPatchInput): Pr
   if (body.preferredLocale === null) delete body.preferredLocale;
 
   if (body.eventDate && typeof body.eventDate === 'string') {
-    const parsedDate = new Date(body.eventDate);
-    if (Number.isNaN(parsedDate.getTime())) {
+    const parsedDate = parseLeadEventDate(body.eventDate);
+    if (!parsedDate) {
       return {
         status: 400,
-        body: { error: 'Data invàlida', details: { eventDate: 'Format de data incorrecte' } },
+        body: { error: 'Data invàlida', details: { eventDate: 'Format YYYY-MM-DD requerit' } },
       };
     }
     body.eventDate = parsedDate;
+  }
+
+  if (body.status === 'WON' && existing.status !== 'WON' && !existing.booking?.id) {
+    return {
+      status: 409,
+      body: {
+        error: 'No es pot marcar un lead com a guanyat sense reserva vinculada. Crea la reserva des del lead perquè Booking sigui la veritat operativa.',
+        nextAction: `/admin/bookings/new?leadId=${encodeURIComponent(id)}&prefill=lead`,
+      },
+    };
   }
 
   if (body.status === 'WON' && existing.status !== 'WON') {
@@ -112,8 +140,22 @@ export async function updateLeadFromInput(id: string, input: LeadPatchInput): Pr
     data: body,
     select: {
       id: true,
+      customerId: true,
       name: true,
       email: true,
+      phone: true,
+      eventDate: true,
+      eventStartTime: true,
+      eventEndTime: true,
+      eventLocation: true,
+      eventPhone: true,
+      eventAddress: true,
+      distanceKm: true,
+      tollsEur: true,
+      guestCount: true,
+      budget: true,
+      sourceCollaboratorId: true,
+      assignedTo: true,
       status: true,
       priority: true,
       updatedAt: true,

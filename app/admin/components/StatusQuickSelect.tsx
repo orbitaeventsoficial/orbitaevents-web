@@ -11,6 +11,16 @@ type StatusOption = {
   label: string;
 };
 
+type StatusUpdateErrorPayload = {
+  error?: string;
+  message?: string;
+};
+
+async function readStatusUpdateError(res: Response): Promise<string> {
+  const payload = (await res.json().catch(() => ({}))) as StatusUpdateErrorPayload;
+  return payload.error || payload.message || "No s'ha pogut actualitzar l'estat.";
+}
+
 export default function StatusQuickSelect({
   entityPath,
   currentStatus,
@@ -24,19 +34,22 @@ export default function StatusQuickSelect({
 }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const onChange = async (nextStatus: string) => {
     if (saving || nextStatus === currentStatus) return;
     setSaving(true);
+    setError('');
     try {
       const res = await fetchWithCsrf(entityPath, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await readStatusUpdateError(res));
       router.refresh();
     } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : "No s'ha pogut actualitzar l'estat.");
       log.error('Failed to update entity status', err);
     } finally {
       setSaving(false);
@@ -44,20 +57,27 @@ export default function StatusQuickSelect({
   };
 
   return (
-    <select
-      value={currentStatus}
-      onChange={(event) => onChange(event.target.value)}
-      disabled={saving}
-      className="rounded-xl border px-2 py-1 text-xs"
-      title={title}
-      aria-label={title}
-      {...helpAttrs(ADMIN_SHARED_HELP.statusQuickSelect(title))}
-    >
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
+    <div className="grid justify-items-end gap-1">
+      <select
+        value={currentStatus}
+        onChange={(event) => onChange(event.target.value)}
+        disabled={saving}
+        className="rounded-xl border px-2 py-1 text-xs"
+        title={title}
+        aria-label={title}
+        {...helpAttrs(ADMIN_SHARED_HELP.statusQuickSelect(title))}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {error && (
+        <span className="ap-inline-alert ap-inline-alert--danger max-w-48 text-xs" role="alert">
+          {error}
+        </span>
+      )}
+    </div>
   );
 }

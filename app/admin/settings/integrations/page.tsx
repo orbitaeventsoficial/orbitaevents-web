@@ -6,19 +6,23 @@ import { formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 import { EditorControlStrip } from '../../components/EditorControlStrip';
 import { getAppBaseUrl } from '@/lib/site';
+import {
+  getAdminPostEventCronSettingKeys,
+  readAdminPostEventCronSetting,
+} from '@/lib/constants/admin';
 
 export const dynamic = 'force-dynamic';
 
 function BoolBadge({ ok }: { ok: boolean }) {
   return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${ok ? 'admin-tone-soft-success admin-tone-text-success' : 'admin-tone-soft-warning admin-tone-text-warning'}`}>
+    <span className={`ap-badge ${ok ? 'ap-badge--success' : 'ap-badge--warning'}`}>
       {ok ? 'Connectat' : 'Pendent'}
     </span>
   );
 }
 
 const LINK_BUTTON = 'ap-btn ap-btn--secondary';
-const CARD = 'rounded-2xl border p-5 admin-card-glass';
+const CARD = 'ap-card p-5';
 
 export default async function IntegrationsPage() {
   const settings = await prisma.setting.findMany({
@@ -35,7 +39,7 @@ export default async function IntegrationsPage() {
           'integrations.googleCalendar.calendarId',
           'integrations.googleAds.refreshToken',
           'integrations.googleAds.connectedAt',
-          'emails.cron.lastStatus',
+          ...getAdminPostEventCronSettingKeys(),
         ],
       },
     },
@@ -53,7 +57,8 @@ export default async function IntegrationsPage() {
   const calendarFeedToken = map['integrations.calendar.feedToken'];
   const googleCalendarConnected = Boolean(map['integrations.googleCalendar.refreshToken']);
   const calendarIdConfigured = Boolean(map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID);
-  const cronActive = String(map['emails.cron.lastStatus'] || '').toUpperCase() === 'OK';
+  const postEventCronStatus = readAdminPostEventCronSetting(map, 'lastStatus');
+  const cronActive = String(postEventCronStatus || '').toUpperCase() === 'OK';
   const connectedCount = [
     Boolean(map['integrations.google.refreshToken']),
     Boolean(map['integrations.googleAds.refreshToken']),
@@ -208,7 +213,7 @@ export default async function IntegrationsPage() {
           <p>• Calendar token: {googleCalendarConnected ? 'OK' : 'Pendent'}</p>
           <p>• Calendar ID: {calendarIdConfigured ? 'OK' : 'Pendent'}</p>
           <p>• ICS token: {calendarFeedToken ? 'OK' : 'Pendent'}</p>
-          <p>• Cron estat: {map['emails.cron.lastStatus'] || 'Pendent'}</p>
+          <p>• Cron estat: {postEventCronStatus || 'Pendent'}</p>
         </div>
       </section>
     </AdminPage>

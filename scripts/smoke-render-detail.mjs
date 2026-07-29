@@ -14,10 +14,11 @@
  * Requereix dev server viu a localhost:3000 i accés a la BD (mateix que qa:smoke).
  * No va a validate:core (cal server + BD). Ús: pnpm run qa:smoke-detail
  */
-import { chromium } from 'playwright';
-import fs from 'node:fs';
-import path from 'node:path';
-import { PrismaClient } from '@prisma/client';
+const DIRECT_INVOCATION = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('smoke-render-detail.mjs');
+
+const fs = await import('node:fs');
+const path = await import('node:path');
+const { createRequire } = await import('node:module');
 
 const ROOT = process.cwd();
 const BASE = process.env.SMOKE_BASE || 'http://localhost:3000';
@@ -33,8 +34,6 @@ function loadEnv() {
   }
 }
 loadEnv();
-
-const prisma = new PrismaClient();
 
 /**
  * Rutes `[param]` cobertes per aquest smoke (font única). El guard estàtic
@@ -56,52 +55,57 @@ export const COVERED_PARAM_ROUTES = [
   '/admin/email-templates/[slug]',
 ];
 
+const DATA_TARGETS = [
+  ['/admin/bookings/[id]', 'bookings', (id) => `/admin/bookings/${id}`],
+  ['/admin/leads/[id]', 'leads', (id) => `/admin/leads/${id}`],
+  ['/admin/clientes/[id]', 'customers', (id) => `/admin/clientes/${id}`],
+  ['/admin/collaborators/[id]', 'collaborators', (id) => `/admin/collaborators/${id}`],
+  ['/admin/inventory/[id]', 'inventory_items', (id) => `/admin/inventory/${id}`],
+  ['/admin/packs/[id]', 'packs', (id) => `/admin/packs/${id}`],
+  ['/admin/blog/edit/[id]', 'blog_posts', (id) => `/admin/blog/edit/${id}`],
+  ['/admin/faq/[id]', 'faqs', (id) => `/admin/faq/${id}`],
+  ['/admin/presupuestos/[id]', 'proposals', (id) => `/admin/presupuestos/${id}`],
+  ['/admin/questionnaires/[id]', 'questionnaire_templates', (id) => `/admin/questionnaires/${id}`],
+];
+
 // Mapeig dir `[param]` → builder d'URL amb id real. Si el resolver torna null
 // (taula buida), la ruta s'OMET amb avís (no és fallada: és manca de dades).
-async function resolveTargets() {
-  const first = async (fn) => { try { return (await fn())?.id ?? null; } catch { return null; } };
-  const [booking, lead, customer, collaborator, inventory, pack, blogPost, faq, proposal, questionnaire] = await Promise.all([
-    first(() => prisma.booking.findFirst({ select: { id: true } })),
-    first(() => prisma.lead.findFirst({ select: { id: true } })),
-    first(() => prisma.customer.findFirst({ select: { id: true } })),
-    first(() => prisma.collaborator.findFirst({ select: { id: true } })),
-    first(() => prisma.inventoryItem.findFirst({ select: { id: true } })),
-    first(() => prisma.pack.findFirst({ select: { id: true } })),
-    first(() => prisma.blogPost.findFirst({ select: { id: true } })),
-    first(() => prisma.fAQ.findFirst({ select: { id: true } })),
-    first(() => prisma.proposal.findFirst({ select: { id: true } })),
-    first(() => prisma.questionnaireTemplate.findFirst({ select: { id: true } })),
-  ]);
-  // slug fix d'email-template (constant de domini, sempre vàlid)
-  const def = [
-    ['/admin/bookings/[id]', booking && `/admin/bookings/${booking}`],
-    ['/admin/leads/[id]', lead && `/admin/leads/${lead}`],
-    ['/admin/clientes/[id]', customer && `/admin/clientes/${customer}`],
-    ['/admin/collaborators/[id]', collaborator && `/admin/collaborators/${collaborator}`],
-    ['/admin/inventory/[id]', inventory && `/admin/inventory/${inventory}`],
-    ['/admin/packs/[id]', pack && `/admin/packs/${pack}`],
-    ['/admin/blog/edit/[id]', blogPost && `/admin/blog/edit/${blogPost}`],
-    ['/admin/faq/[id]', faq && `/admin/faq/${faq}`],
-    ['/admin/presupuestos/[id]', proposal && `/admin/presupuestos/${proposal}`],
-    ['/admin/questionnaires/[id]', questionnaire && `/admin/questionnaires/${questionnaire}`],
+export async function resolveTargets() {
+  const require = createRequire(import.meta.url);
+  const { Client } = require('pg');
+  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+
+  const targets = [];
+  try {
+    for (const [label, table, buildUrl] of DATA_TARGETS) {
+      const result = await client.query(`SELECT id FROM ${table} LIMIT 1`);
+      const id = result.rows[0]?.id ?? null;
+      targets.push([label, id ? buildUrl(id) : null]);
+    }
+  } finally {
+    await client.end();
+  }
+
+  return [
+    ...targets,
     ['/admin/email-templates/[slug]', '/admin/email-templates/booking_confirmation'],
   ];
-  return def;
 }
 
 const VIEWPORTS = [[1440, 'desktop'], [768, 'tablet'], [390, 'mobile']];
 
 // Només executa el render quan s'invoca directament (no quan s'importa
 // `COVERED_PARAM_ROUTES` des del guard de cobertura).
-const INVOKED_DIRECTLY = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('smoke-render-detail.mjs');
+const INVOKED_DIRECTLY = DIRECT_INVOCATION;
 
 async function run() {
   const targets = await resolveTargets();
-  await prisma.$disconnect();
 
   const token = Buffer.from(
     `${process.env.ADMIN_USER || 'orbita'}:${process.env.ADMIN_PASS || ''}`,
   ).toString('base64');
+  const { chromium } = await import('playwright');
   const browser = await chromium.launch();
   const ctx = await browser.newContext({
     viewport: { width: 1440, height: 900 },
@@ -110,9 +114,14 @@ async function run() {
 
   const failures = [];
   const skipped = [];
+  const allowedEmpty = new Set(['/admin/questionnaires/[id]']);
   let rendered = 0;
   for (const [label, url] of targets) {
-    if (!url) { skipped.push(label); continue; }
+    if (!url) {
+      skipped.push(label);
+      if (!allowedEmpty.has(label)) failures.push(`${label} -> sense id de dades de prova`);
+      continue;
+    }
     const page = await ctx.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message.split('\n')[0].slice(0, 80)));
@@ -147,6 +156,5 @@ async function run() {
 if (INVOKED_DIRECTLY) {
   run();
 } else {
-  // Importat només per la constant de cobertura: tanca el client Prisma obert.
-  prisma.$disconnect().catch(() => {});
+  // Importat només per la constant de cobertura: no obre cap connexió Prisma.
 }

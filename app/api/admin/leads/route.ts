@@ -1,6 +1,7 @@
 // app/api/admin/leads/route.ts
 // API per gestionar leads (nou model)
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
@@ -8,7 +9,13 @@ import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 import { countNewAdminLeads, createAdminLead, listAdminLeads } from '@/lib/services/leadAdminService';
 import { linkLeadToCustomer, previewLeadCustomerLink } from '@/lib/services/leads/leadCustomerLinkService';
-import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VALUES } from '@/lib/constants';
+import {
+  EVENT_TYPE_VALUES,
+  LEAD_SOURCE_VALUES,
+  LEAD_STATUS_VALUES,
+  PLACEHOLDER_EMAIL_DOMAIN,
+  PRIORITY_VALUES,
+} from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,12 +68,38 @@ function isValidPriority(value: string | null): value is Priority {
   return value !== null && PRIORITY_VALUES.includes(value as Priority);
 }
 
+function normalizeEnumValue(value: unknown) {
+  if (typeof value !== 'string') return value;
+  const normalized = value.trim().toUpperCase();
+  return normalized || undefined;
+}
+
+function normalizeLeadSourceValue(value: unknown) {
+  const normalized = normalizeEnumValue(value);
+  return normalized === 'EMAIL' ? 'OTHER' : normalized;
+}
+
+function normalizeEventTypeValue(value: unknown) {
+  const normalized = normalizeEnumValue(value);
+  if (typeof normalized !== 'string') return normalized;
+  return EVENT_TYPE_VALUES.includes(normalized as EventType) ? normalized : 'OTHER';
+}
+
+function normalizePriorityValue(value: unknown) {
+  const normalized = normalizeEnumValue(value);
+  if (typeof normalized !== 'string') return normalized;
+  return PRIORITY_VALUES.includes(normalized as Priority) ? normalized : undefined;
+}
+
 const leadSchema = z.object({
   name: z.string().min(1),
-  email: z.string().email(),
+  email: z.preprocess(
+    (value) => typeof value === 'string' && value.trim() === '' ? undefined : value,
+    z.string().trim().email().optional(),
+  ),
   phone: z.string().optional(),
-  eventType: z.enum(EVENT_TYPE_VALUES),
-  eventDate: z.string().optional(),
+  eventType: z.preprocess(normalizeEventTypeValue, z.enum(EVENT_TYPE_VALUES)),
+  eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format YYYY-MM-DD requerit').optional(),
   eventStartTime: z.string().optional(),
   eventEndTime: z.string().optional(),
   eventLocation: z.string().optional(),
@@ -78,13 +111,17 @@ const leadSchema = z.object({
   interestedPackId: z.string().optional(),
   interestedExtras: z.array(z.string()).optional(),
   assignedTo: z.string().optional(),
-  source: z.enum(LEAD_SOURCE_VALUES).optional(),
+  source: z.preprocess(normalizeLeadSourceValue, z.enum(LEAD_SOURCE_VALUES).optional()),
   utmSource: z.string().optional(),
   utmMedium: z.string().optional(),
   utmCampaign: z.string().optional(),
-  priority: z.enum(PRIORITY_VALUES).optional(),
+  priority: z.preprocess(normalizePriorityValue, z.enum(PRIORITY_VALUES).optional()),
   customerId: z.string().optional(),
 });
+
+function buildManualPlaceholderEmail() {
+  return `manual-${randomUUID()}${PLACEHOLDER_EMAIL_DOMAIN}`;
+}
 
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
@@ -145,7 +182,11 @@ export async function POST(req: NextRequest) {
     }
 
     const { customerId, ...leadInput } = parsed.data;
-    const result = await createAdminLead({ ...leadInput, status: 'CONTACTED' });
+    const result = await createAdminLead({
+      ...leadInput,
+      email: leadInput.email || buildManualPlaceholderEmail(),
+      status: 'CONTACTED',
+    });
 
     const customerLink = result?.lead?.id
       ? customerId

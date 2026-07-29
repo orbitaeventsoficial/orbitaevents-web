@@ -1,14 +1,17 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockSendAdminEmail } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockSendAdminEmail } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockSendAdminEmail: vi.fn(),
 }));
 
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
 vi.mock('@/lib/services/adminEmailSendService', () => ({ sendAdminEmail: mockSendAdminEmail }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn() } }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { POST } from '@/app/api/admin/emails/send/route';
 
@@ -19,7 +22,7 @@ function makeReq(body: Record<string, unknown>) {
 }
 
 describe('POST /api/admin/emails/send', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockSendAdminEmail.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockSendAdminEmail.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));

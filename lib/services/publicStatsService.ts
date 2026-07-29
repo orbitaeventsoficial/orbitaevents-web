@@ -13,6 +13,20 @@ function formatYearsExperience(locale: PublicStatsLocale, yearsCount: number): s
   return `+${yearsCount} ${PUBLIC_STATS_LOCALE_TEXT[locale].yearsSuffix}`;
 }
 
+function readNonNegativeNumber(settings: Record<string, string>, keys: string[]): number | null {
+  for (const key of keys) {
+    if (!(key in settings)) continue;
+    const value = Number(settings[key]);
+    if (Number.isFinite(value) && value >= 0) return value;
+  }
+  return null;
+}
+
+function readNonNegativeInteger(settings: Record<string, string>, keys: string[]): number | null {
+  const value = readNonNegativeNumber(settings, keys);
+  return value === null ? null : Math.floor(value);
+}
+
 export function getFallbackPublicStats(locale: PublicStatsLocale) {
   const startDate = new Date(Date.UTC(PUBLIC_STATS_COMPANY_START_YEAR, 0, 1));
   const yearsCount = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)));
@@ -60,18 +74,34 @@ export async function getPublicStats(locale: PublicStatsLocale) {
     cachedQuery('public:stats:events:parties', () => prisma.booking.count({ where: { status: 'COMPLETED', eventType: { in: ['BIRTHDAY', 'PRIVATE_PARTY', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY'] } } }), CacheTTL.LONG),
   ]);
 
-  const yearStartedSetting = parseInt(settingsMap['stats.yearStarted'] || String(PUBLIC_STATS_COMPANY_START_YEAR), 10);
-  const yearStarted = Number.isNaN(yearStartedSetting) ? PUBLIC_STATS_COMPANY_START_YEAR : yearStartedSetting;
+  const yearStarted = readNonNegativeInteger(settingsMap, ['stats.yearStarted']) ?? PUBLIC_STATS_COMPANY_START_YEAR;
   const startDate = new Date(Date.UTC(yearStarted, 0, 1));
-  const yearsCount = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)));
+  const calculatedYearsCount = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)));
+  const manualYearsCount = readNonNegativeInteger(settingsMap, ['stats.years_experience']);
+  const yearsCount = manualYearsCount === null ? calculatedYearsCount : Math.max(1, manualYearsCount);
   const yearsExperience = formatYearsExperience(locale, yearsCount);
   const coverage = settingsMap['coverage'] || PUBLIC_STATS_LOCALE_TEXT[locale].coverage;
   const responseTime = settingsMap['response_time'] || '2h';
-  const googleRating = settingsMap['google_rating'] ? parseFloat(settingsMap['google_rating']) : 5.0;
-  const googleReviewsCount = settingsMap['google_reviews_count'] ? parseInt(settingsMap['google_reviews_count']) : 1;
-  const minEvents = parseInt(settingsMap['stats.eventsCompleted'] || String(fallbackStats.totalEvents), 10);
-  const peopleEntertainedSetting = parseInt(settingsMap['stats.peopleEntertained'] || String(fallbackStats.peopleEntertained), 10);
-  const technicalIncidentsSetting = parseInt(settingsMap['stats.technicalIncidents'] || String(fallbackStats.technicalIncidents), 10);
+  const googleRating = readNonNegativeNumber(settingsMap, [
+    'stats.rating_average',
+    'stats.googleRating',
+    'google_rating',
+  ]) ?? 5.0;
+  const googleReviewsCount = readNonNegativeInteger(settingsMap, [
+    'stats.googleReviewCount',
+    'google_reviews_count',
+  ]) ?? 1;
+  const minEvents = readNonNegativeInteger(settingsMap, [
+    'stats.events_completed',
+    'stats.eventsCompleted',
+  ]) ?? fallbackStats.totalEvents;
+  const peopleEntertainedSetting = readNonNegativeInteger(settingsMap, [
+    'stats.people_entertained',
+    'stats.peopleEntertained',
+  ]) ?? fallbackStats.peopleEntertained;
+  const technicalIncidentsSetting = readNonNegativeInteger(settingsMap, [
+    'stats.technicalIncidents',
+  ]) ?? fallbackStats.technicalIncidents;
 
   return {
     ok: true as const,
@@ -80,9 +110,9 @@ export async function getPublicStats(locale: PublicStatsLocale) {
       coverage,
       responseTime,
       yearStarted,
-      peopleEntertained: Number.isNaN(peopleEntertainedSetting) ? fallbackStats.peopleEntertained : peopleEntertainedSetting,
-      technicalIncidents: Number.isNaN(technicalIncidentsSetting) ? fallbackStats.technicalIncidents : technicalIncidentsSetting,
-      totalEvents: Math.max(totalEvents || 0, Number.isNaN(minEvents) ? fallbackStats.totalEvents : minEvents),
+      peopleEntertained: peopleEntertainedSetting,
+      technicalIncidents: technicalIncidentsSetting,
+      totalEvents: Math.max(totalEvents || 0, minEvents),
       totalWeddings: weddingCount || fallbackStats.totalWeddings,
       totalCorporate: corporateCount || fallbackStats.totalCorporate,
       totalParties: partyCount || fallbackStats.totalParties,

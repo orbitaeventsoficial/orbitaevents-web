@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockRequirePermission, mockGetAdminRole, mockGetActive, mockIssue, mockNormalizeLocale, mockRevoke } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockRequirePermission, mockGetAdminRole, mockGetActive, mockIssue, mockNormalizeLocale, mockRevoke } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockRequirePermission: vi.fn(),
   mockGetAdminRole: vi.fn(),
   mockGetActive: vi.fn(),
@@ -20,6 +21,8 @@ vi.mock('@/lib/services/clientPortalAccess', () => ({
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { GET, POST, DELETE } from '@/app/api/admin/bookings/[id]/portal-access/route';
 
 function makeGetReq(id = 'book-1') {
@@ -33,12 +36,20 @@ function makePostReq(id: string, body: Record<string, unknown> = {}) {
     params: { params: { id } },
   };
 }
+function makeRawPostReq(id: string, body: string) {
+  return {
+    req: new NextRequest(`http://localhost/api/admin/bookings/${id}/portal-access`, {
+      method: 'POST', body, headers: { 'Content-Type': 'application/json' },
+    }),
+    params: { params: { id } },
+  };
+}
 function makeDeleteReq(id = 'book-1') {
   return { req: new NextRequest(`http://localhost/api/admin/bookings/${id}/portal-access`, { method: 'DELETE' }), params: { params: { id } } };
 }
 
 describe('GET /api/admin/bookings/[id]/portal-access', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockRequirePermission.mockReturnValue(null); mockGetActive.mockResolvedValue({ id: 'pa-1', active: true }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockRequirePermission.mockReturnValue(null); mockGetActive.mockResolvedValue({ id: 'pa-1', active: true }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -68,7 +79,7 @@ describe('GET /api/admin/bookings/[id]/portal-access', () => {
 describe('POST /api/admin/bookings/[id]/portal-access', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockGetAdminRole.mockReturnValue('ADMIN');
     mockNormalizeLocale.mockReturnValue('ca');
@@ -90,6 +101,95 @@ describe('POST /api/admin/bookings/[id]/portal-access', () => {
     expect(body.token).toBe('tok-1');
   });
 
+  it('tolera body JSON no objecte sense trencar la route', async () => {
+    const { req, params } = makeRawPostReq('book-1', 'null');
+
+    const res = await POST(req, params);
+
+    expect(res.status).toBe(200);
+    expect(mockNormalizeLocale).toHaveBeenCalledWith(undefined);
+    expect(mockIssue).toHaveBeenCalledWith(expect.objectContaining({
+      expiresInDays: undefined,
+      personalization: undefined,
+    }));
+  });
+
+  it('preserva la visibilitat del qüestionari dins la personalització', async () => {
+    const { req, params } = makePostReq('book-1', {
+      locale: 'ca',
+      personalization: { showQuestionnaire: false },
+    });
+
+    await POST(req, params);
+
+    expect(mockIssue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        personalization: expect.objectContaining({
+          showQuestionnaire: false,
+        }),
+      }),
+    );
+  });
+
+  it('no persisteix flags visibles perquè true és el default del portal', async () => {
+    const { req, params } = makePostReq('book-1', {
+      locale: 'ca',
+      personalization: {
+        showTimeline: true,
+        showPayments: true,
+        showDocuments: true,
+        showPostEvent: true,
+        showQuestionnaire: true,
+      },
+    });
+
+    await POST(req, params);
+
+    expect(mockIssue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        personalization: undefined,
+      }),
+    );
+  });
+
+  it('normalitza el color accent abans de guardar-lo', async () => {
+    const { req, params } = makePostReq('book-1', {
+      locale: 'ca',
+      personalization: {
+        accentColor: ' 06b6d4 ',
+      },
+    });
+
+    await POST(req, params);
+
+    expect(mockIssue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        personalization: expect.objectContaining({
+          accentColor: '#06b6d4',
+        }),
+      }),
+    );
+  });
+
+  it('descarta el color accent invàlid', async () => {
+    const { req, params } = makePostReq('book-1', {
+      locale: 'ca',
+      personalization: {
+        accentColor: '#1234',
+      },
+    });
+
+    await POST(req, params);
+
+    expect(mockIssue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        personalization: expect.not.objectContaining({
+          accentColor: expect.any(String),
+        }),
+      }),
+    );
+  });
+
   it('retorna 404 si booking no existeix', async () => {
     mockIssue.mockRejectedValueOnce(new Error('BOOKING_NOT_FOUND'));
     const { req, params } = makePostReq('book-xxx');
@@ -104,7 +204,7 @@ describe('POST /api/admin/bookings/[id]/portal-access', () => {
 });
 
 describe('DELETE /api/admin/bookings/[id]/portal-access', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockRequirePermission.mockReturnValue(null); mockRevoke.mockResolvedValue(1); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockRequirePermission.mockReturnValue(null); mockRevoke.mockResolvedValue(1); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));

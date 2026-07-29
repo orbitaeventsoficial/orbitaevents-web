@@ -250,8 +250,8 @@ describe('buildPipelineForecast', () => {
       .mockResolvedValueOnce([])
       // confirmedFuture — 2 reserves confirmades al mateix mes futur
       .mockResolvedValueOnce([
-        { eventDate: futureMonth, total: 3000 },
-        { eventDate: futureMonth, total: 2500 },
+        { eventDate: futureMonth, total: 3000.25 },
+        { eventDate: futureMonth, total: 2500.4 },
       ]);
 
     const result = await buildPipelineForecast(3);
@@ -260,7 +260,7 @@ describe('buildPipelineForecast', () => {
     const targetMonth = result.find((m) => m.month === targetKey);
     expect(targetMonth).toBeDefined();
     expect(targetMonth!.confirmedBookings).toBe(2);
-    expect(targetMonth!.confirmedRevenue).toBe(5500);
+    expect(targetMonth!.confirmedRevenue).toBe(5500.65);
   });
 
   it('previousYearActual i confirmedBookings a 0 quan no hi ha dades', async () => {

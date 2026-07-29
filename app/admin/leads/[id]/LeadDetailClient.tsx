@@ -1,7 +1,7 @@
 'use client';
 
 // ─────────────────────────────────────────────────────────
-// ✅ TANCAT CHARLIE — validat pel propietari (2026-06-15)
+// ✅ TANCAT CHARLIE — revalidat pel propietari (2026-07-09, Canvi #1759)
 // Fitxa de lead (/admin/leads/[id]). Zenit: header ledger en
 // una sola pantalla (nom protagonista + rail de fets + marge
 // real via computeBookingFinancialSummary), bolo canònic
@@ -9,14 +9,18 @@
 // RESERVA (no al lead), històric comercial al peu. Helpers
 // monocapa (formatCurrency, buildLeadWhatsAppHref). A11y:
 // aria-label a inputs/botons d'icona. Patró de referència per
-// a la resta de fitxes de l'admin. Millorar sense reobrir.
+// a la resta de fitxes de l'admin. Zona protegida: millorar sense reobrir,
+// excepte ordre explícita del propietari o regressió demostrable.
 // ─────────────────────────────────────────────────────────
 
 import Link from 'next/link';
 import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadBookingPrefillHref, buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
+import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
+import { getDossierHistoryKindLabel, getLeadDocumentHistoryMeta } from '@/lib/admin/commercialDocumentHistory';
 import LeadBoloSection, { type BoloEconomia } from './LeadBoloSection';
 import CommercialDocumentsHistory, { type CommercialDocumentHistoryItem } from '@/app/admin/components/CommercialDocumentsHistory';
 import { buildLeadWhatsAppHref } from '../leadWhatsApp';
@@ -26,597 +30,716 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
 import { SOURCE_LABELS, formatCurrency, formatDateFull, getContractStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { TEAM_MEMBERS } from '@/lib/constants/admin';
-import { INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR } from '@/lib/services/travelCost';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 
 type Stage = 'nou' | 'contactat' | 'guanyat' | 'perdut';
-type PayState = 'none' | 'part' | 'full' | null;
 
 const STAGE_LABEL: Record<Stage, string> = {
-  nou: 'Nou', contactat: 'Contactat', guanyat: 'Guanyat', perdut: 'Perdut',
+ nou: 'Nou', contactat: 'Contactat', guanyat: 'Guanyat', perdut: 'Perdut',
 };
 const PIPELINE_STAGES: Stage[] = ['nou', 'contactat', 'guanyat', 'perdut'];
 const PAY_LABEL: Record<string, string> = {
-  none: 'Pendent', part: 'Senyal pagat', full: 'Pagat',
+ none: 'Pendent', part: 'Senyal pagat', full: 'Pagat',
 };
 const PRIORITY_LABEL: Record<string, string> = {
-  LOW: 'Baixa', MEDIUM: 'Mitjana', HIGH: 'Alta', URGENT: 'Urgent',
+ LOW: 'Baixa', MEDIUM: 'Mitjana', HIGH: 'Alta', URGENT: 'Urgent',
 };
 
 function fullDate(iso: string) {
-  return formatDateFull(iso);
+ return formatDateFull(iso);
 }
 
 function durationLabel(start: string | null, end: string | null): string {
-  if (!start || !end) return '—';
-  const [sh, sm] = start.split(':').map(Number);
-  const [eh, em] = end.split(':').map(Number);
-  if (![sh, sm, eh, em].every(Number.isFinite)) return '—';
-  const startMin = sh * 60 + sm;
-  let endMin = eh * 60 + em;
-  if (endMin <= startMin) endMin += 24 * 60;
-  const total = endMin - startMin;
-  const hours = Math.floor(total / 60);
-  const minutes = total % 60;
-  return minutes === 0 ? `${hours} h` : `${hours} h ${minutes} min`;
+ if (!start || !end) return '—';
+ const [sh, sm] = start.split(':').map(Number);
+ const [eh, em] = end.split(':').map(Number);
+ if (![sh, sm, eh, em].every(Number.isFinite)) return '—';
+ const startMin = sh * 60 + sm;
+ let endMin = eh * 60 + em;
+ if (endMin <= startMin) endMin += 24 * 60;
+ const total = endMin - startMin;
+ const hours = Math.floor(total / 60);
+ const minutes = total % 60;
+ return minutes === 0 ? `${hours} h` : `${hours} h ${minutes} min`;
 }
 
 function sourceLabel(source: string | null): string {
-  if (!source) return '—';
-  return SOURCE_LABELS[source] ?? source;
+ if (!source) return '—';
+ return SOURCE_LABELS[source] ?? source;
 }
 
 export type LeadDetailData = {
-  id: string;
-  name: string;
-  stage: Stage;
-  type: string;
-  dateISO: string | null;
-  time: string | null;
-  endTime: string | null;
-  location: string | null;
-  value: number | null;
-  pax: number | null;
-  priority: string;
-  phone: string | null;
-  email: string | null;
-  channel: string | null;
-  owner: string | null;
-  sourceCollaboratorId: string | null;
-  last: string | null;
-  product: string | null;
-  lostReason: string | null;
-  wx: WxData | null;
-  eventPhone: string | null;
-  eventAddress: string | null;
-  booking: {
-    id: string;
-    reference: string;
-    depositPaid: boolean;
-    remainingPaid: boolean;
-    depositAmount: number;
-    remainingAmount: number;
-    paymentMethod: string;
-    invoiceRequired: boolean;
-    cashAmount: number | null;
-    total: number;
-    totalHours: number;
-    contractedProducts: Array<{
-      id: string;
-      kind: string;
-      label: string;
-      quantity: number;
-      amount: number | null;
-      meta?: string | null;
-    }>;
-    collaboratorCost: { amount: number; name: string } | null;
-    costFloor: number | null;
-  } | null;
+ id: string;
+ name: string;
+ stage: Stage;
+ type: string;
+ dateISO: string | null;
+ time: string | null;
+ endTime: string | null;
+ location: string | null;
+ value: number | null;
+ pax: number | null;
+ priority: string;
+ phone: string | null;
+ email: string | null;
+ channel: string | null;
+ owner: string | null;
+ sourceCollaboratorId: string | null;
+ last: string | null;
+ product: string | null;
+ lostReason: string | null;
+ wx: WxData | null;
+ eventPhone: string | null;
+ eventAddress: string | null;
+ booking: {
+ id: string;
+ reference: string;
+ depositPaid: boolean;
+ remainingPaid: boolean;
+ depositAmount: number;
+ remainingAmount: number;
+ paymentMethod: string;
+ invoiceRequired: boolean;
+ cashAmount: number | null;
+ total: number;
+ totalHours: number;
+ contractedProducts: Array<{
+ id: string;
+ kind: string;
+ label: string;
+ quantity: number;
+ amount: number | null;
+ meta?: string | null;
+ }>;
+ collaboratorCost: { amount: number; name: string } | null;
+ costFloor: number | null;
+ } | null;
 };
 
-function paymentState(booking: LeadDetailData['booking']): PayState {
-  if (!booking) return null;
-  if (booking.depositPaid && booking.remainingPaid) return 'full';
-  if (booking.depositPaid) return 'part';
-  return 'none';
-}
-
 function leadSummary(lead: LeadDetailData): string {
-  if (lead.stage === 'perdut') return 'Lead perdut. Considera reengagement si el motiu era timing.';
-  if (lead.stage === 'guanyat' && lead.booking) return 'Reserva activa. Gestiona cobraments i preparació.';
-  if (lead.stage === 'guanyat') return 'Crear reserva, contracte i pagament inicial.';
-  if (lead.stage === 'contactat') return 'Enviar pressupost i fer seguiment en 48h.';
-  return 'Contactar el client avui.';
-}
-
-function nextStageFor(stage: Stage): Stage | null {
-  if (stage === 'nou') return 'contactat';
-  if (stage === 'contactat') return 'guanyat';
-  return null;
+ if (lead.stage === 'perdut') return 'Lead perdut. Considera reengagement si el motiu era timing.';
+ if (lead.stage === 'guanyat' && lead.booking) return `Reserva ${lead.booking.reference} formalitzada. Canvis operatius a la reserva.`;
+ if (lead.stage === 'guanyat') return 'Crear reserva, contracte i pagament inicial.';
+ if (lead.stage === 'contactat') return 'Enviar pressupost i fer seguiment en 48h.';
+ return 'Contactar el client avui.';
 }
 
 type EditableField = 'phone' | 'email' | 'eventPhone' | 'eventAddress' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'guestCount' | 'budget';
+type EditableFieldValues = Record<EditableField, string>;
+type EditableLeadSource = Partial<{
+ phone: string | null;
+ email: string | null;
+ eventPhone: string | null;
+ eventAddress: string | null;
+ eventDate: string | Date | null;
+ dateISO: string | null;
+ eventStartTime: string | null;
+ time: string | null;
+ eventEndTime: string | null;
+ endTime: string | null;
+ eventLocation: string | null;
+ location: string | null;
+ guestCount: number | string | null;
+ pax: number | string | null;
+ budget: number | string | null;
+ value: number | string | null;
+}>;
+
+const EDITABLE_FIELD_RESPONSE_KEYS: Record<EditableField, Array<keyof EditableLeadSource>> = {
+ phone: ['phone'],
+ email: ['email'],
+ eventPhone: ['eventPhone'],
+ eventAddress: ['eventAddress'],
+ eventDate: ['eventDate', 'dateISO'],
+ eventStartTime: ['eventStartTime', 'time'],
+ eventEndTime: ['eventEndTime', 'endTime'],
+ eventLocation: ['eventLocation', 'location'],
+ guestCount: ['guestCount', 'pax'],
+ budget: ['budget', 'value'],
+};
+
+function stringInputValue(value: unknown): string {
+ return value === null || value === undefined ? '' : String(value);
+}
+
+function dateInputValue(value: unknown): string {
+ if (!value) return '';
+ if (value instanceof Date) return value.toISOString().slice(0, 10);
+ if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
+ return '';
+}
+
+export function editableFieldsFromLeadSource(source: EditableLeadSource): EditableFieldValues {
+ return {
+ phone: stringInputValue(source.phone),
+ email: stringInputValue(source.email),
+ eventPhone: stringInputValue(source.eventPhone),
+ eventAddress: stringInputValue(source.eventAddress),
+ eventDate: dateInputValue(source.eventDate ?? source.dateISO),
+ eventStartTime: stringInputValue(source.eventStartTime ?? source.time),
+ eventEndTime: stringInputValue(source.eventEndTime ?? source.endTime),
+ eventLocation: stringInputValue(source.eventLocation ?? source.location),
+ guestCount: stringInputValue(source.guestCount ?? source.pax),
+ budget: stringInputValue(source.budget ?? source.value),
+ };
+}
+
+export function fieldValueFromLeadPatchResponse(
+ responseLead: unknown,
+ field: EditableField,
+ fallback: string,
+): string {
+ if (!responseLead || typeof responseLead !== 'object') return fallback;
+ const source = responseLead as EditableLeadSource;
+ const hasCanonicalValue = EDITABLE_FIELD_RESPONSE_KEYS[field].some((key) => key in source);
+ if (!hasCanonicalValue) return fallback;
+ return editableFieldsFromLeadSource(source)[field];
+}
 
 type ProposalItem = {
-  id: string;
-  reference: string;
-  status: string;
-  total: number;
-  sentAt: string | null;
-  acceptedAt?: string | null;
-  createdAt: string;
-  pdfUrl?: string | null;
-  contractReference?: string | null;
-  contractStatus?: string | null;
-  contractPdfUrl?: string | null;
-  contractSignedAt?: string | null;
+ id: string;
+ reference: string;
+ status: string;
+ total: number;
+ sentAt: string | null;
+ acceptedAt?: string | null;
+ createdAt: string;
+ pdfUrl?: string | null;
+ contractReference?: string | null;
+ contractStatus?: string | null;
+ contractPdfUrl?: string | null;
+ contractSignedAt?: string | null;
 };
 type DossierItem = { id: string; nom: string; estat: string; mode: string | null; sentAt: string | null; sentTo?: string | null; createdAt: string };
 type LeadDocumentItem = { id: string; type: string; title: string; fileUrl: string; createdAt: string };
 
-export default function LeadDetailClient({ lead, proposals, dossiers, documents, vehicleCostPerKm, bookingEconomia = null }: {
-  lead: LeadDetailData;
-  proposals: ProposalItem[];
-  dossiers: DossierItem[];
-  documents: LeadDocumentItem[];
-  vehicleCostPerKm: number;
-  /** Economia REAL de la reserva vinculada (font canònica). Quan existeix, mana
-   *  sobre el `boloEcon` provisional del configurador (el lead amb reserva mostra
-   *  la veritat de la reserva, no el bolo). */
-  bookingEconomia?: BoloEconomia | null;
+export default function LeadDetailClient({ lead, proposals, dossiers, documents, vehicleCostPerKm, initialDistanceKm = null, initialTollsEur = null, bookingEconomia = null }: {
+ lead: LeadDetailData;
+ proposals: ProposalItem[];
+ dossiers: DossierItem[];
+ documents: LeadDocumentItem[];
+ vehicleCostPerKm: number;
+ initialDistanceKm?: number | null;
+ initialTollsEur?: number | null;
+ /** Economia REAL de la reserva vinculada (font canònica). Quan existeix, mana
+ * sobre el `boloEcon` provisional del configurador (el lead amb reserva mostra
+ * la veritat de la reserva, no el bolo). */
+ bookingEconomia?: BoloEconomia | null;
 }) {
-  const router = useRouter();
-  const toast = useToast();
-  const { confirm, dialogProps } = useConfirmDialog();
-  const [stage, setStage] = useState<Stage>(lead.stage);
-  const [pending, setPending] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  // Només col·laboradors amb rol REFERRER (els que ens passen bolos).
-  const [referrers, setReferrers] = useState<{ id: string; name: string }[]>([]);
-  const [editField, setEditField] = useState<EditableField | null>(null);
-  const [editValue, setEditValue] = useState('');
-  const [savePending, setSavePending] = useState(false);
-  // Economia del bolo elevada des de LeadBoloSection per al rail financer compacte.
-  const [boloEcon, setBoloEcon] = useState<BoloEconomia | null>(null);
-  const handleEconomia = useCallback((e: BoloEconomia | null) => setBoloEcon(e), []);
-  // Si el lead té reserva, mana l'economia REAL de la reserva (font canònica del
-  // servidor); si no, el net provisional del configurador del bolo (cas Cristina).
-  const econ = bookingEconomia ?? boloEcon;
+ const router = useRouter();
+ const toast = useToast();
+ const { confirm, dialogProps } = useConfirmDialog();
+ const [stage, setStage] = useState<Stage>(lead.stage);
+ const [pending, setPending] = useState(false);
+ const [isPending, startTransition] = useTransition();
+ // Només col·laboradors amb rol REFERRER (els que ens passen bolos).
+ const [referrers, setReferrers] = useState<{ id: string; name: string }[]>([]);
+ const [editField, setEditField] = useState<EditableField | null>(null);
+ const [editValue, setEditValue] = useState('');
+ const [savePending, setSavePending] = useState(false);
+ // Economia del bolo elevada des de LeadBoloSection per al rail financer compacte.
+ const [boloEcon, setBoloEcon] = useState<BoloEconomia | null>(null);
+ const isFormalizedLead = Boolean(lead.booking);
+ const formalizedBooking = lead.booking
+ ? { href: buildBookingHref(lead.booking.id), reference: lead.booking.reference }
+ : null;
+ const handleEconomia = useCallback((e: BoloEconomia | null) => {
+ setBoloEcon((prev) => {
+ if (!prev && !e) return prev;
+ if (!prev || !e) return e;
+ const same =
+ prev.net === e.net &&
+ prev.marginPct === e.marginPct &&
+ prev.total === e.total &&
+ prev.travelCharge === e.travelCharge &&
+ prev.travelCost === e.travelCost &&
+ prev.directCost === e.directCost &&
+ prev.acquisitionCost === e.acquisitionCost &&
+ prev.serviceLinesCost === e.serviceLinesCost &&
+ prev.fixedOperationalCost === e.fixedOperationalCost &&
+ prev.tone === e.tone &&
+ prev.label === e.label &&
+ prev.ownServiceRevenue === e.ownServiceRevenue &&
+ prev.ownServiceCost === e.ownServiceCost &&
+ prev.ownServiceMarginAmount === e.ownServiceMarginAmount &&
+ prev.ownServiceMarginPct === e.ownServiceMarginPct &&
+ prev.subcontractedCost === e.subcontractedCost &&
+ prev.subcontractedMarkupAmount === e.subcontractedMarkupAmount &&
+ prev.subcontractedMarkupPct === e.subcontractedMarkupPct &&
+ prev.subcontractedMarkupOk === e.subcontractedMarkupOk &&
+ prev.transportMarginAmount === e.transportMarginAmount &&
+ prev.transportMarginPct === e.transportMarginPct &&
+ prev.orbitaTechIncome === e.orbitaTechIncome;
+ return same ? prev : e;
+ });
+ }, []);
+ // Si el lead té reserva, mana l'economia REAL de la reserva (font canònica del
+ // servidor); si no, el net provisional del configurador del bolo (cas Cristina).
+ const econ = bookingEconomia ?? boloEcon;
 
-  const documentHistoryItems: CommercialDocumentHistoryItem[] = [
-    ...proposals.flatMap((p) => {
-      const items: CommercialDocumentHistoryItem[] = [{
-        id: `proposal-${p.id}`,
-        kindLabel: 'Pressupost',
-        title: p.reference,
-        reference: p.reference,
-        statusLabel: getProposalStatusDisplay(p.status).label,
-        amount: p.total,
-        createdAt: p.createdAt,
-        sentAt: p.sentAt,
-        href: buildProposalHref(p.id),
-      }];
-      if (p.contractReference || p.contractStatus || p.contractPdfUrl) {
-        items.push({
-          id: `contract-${p.id}`,
-          kindLabel: 'Contracte',
-          title: p.contractReference || p.reference,
-          reference: p.contractReference || null,
-          statusLabel: getContractStatusLabel(p.contractStatus ?? null),
-          amount: p.total,
-          createdAt: p.contractSignedAt || p.sentAt || p.createdAt,
-          href: p.contractPdfUrl || buildProposalHref(p.id),
-          targetBlank: Boolean(p.contractPdfUrl),
-        });
-      }
-      return items;
-    }),
-    ...dossiers.map((d) => ({
-      id: `dossier-${d.id}`,
-      kindLabel: d.mode === 'quote' ? 'Pressupost dossier' : 'Dossier',
-      title: d.nom,
-      statusLabel: d.estat,
-      createdAt: d.createdAt,
-      sentAt: d.sentAt,
-      href: `/api/admin/dossiers/${d.id}/composite`,
-      targetBlank: true,
-    })),
-    ...documents.map((doc) => ({
-      id: `lead-document-${doc.id}`,
-      kindLabel: doc.type === 'QUOTE' ? 'Pressupost antic' : doc.type === 'CONTRACT' ? 'Contracte antic' : 'Document',
-      title: doc.title,
-      statusLabel: doc.type,
-      createdAt: doc.createdAt,
-      href: doc.fileUrl,
-      targetBlank: true,
-    })),
-  ];
+ const documentHistoryItems: CommercialDocumentHistoryItem[] = [
+ ...proposals.flatMap((p) => {
+ const items: CommercialDocumentHistoryItem[] = [{
+ id: `proposal-${p.id}`,
+ kindLabel: 'Pressupost',
+ title: p.reference,
+ reference: p.reference,
+ statusLabel: getProposalStatusDisplay(p.status).label,
+ amount: p.total,
+ createdAt: p.createdAt,
+ sentAt: p.sentAt,
+ href: buildProposalHref(p.id),
+ }];
+ if (p.contractReference || p.contractStatus || p.contractPdfUrl) {
+ items.push({
+ id: `contract-${p.id}`,
+ kindLabel: 'Contracte',
+ title: p.contractReference || p.reference,
+ reference: p.contractReference || null,
+ statusLabel: getContractStatusLabel(p.contractStatus ?? null),
+ amount: p.total,
+ createdAt: p.contractSignedAt || p.sentAt || p.createdAt,
+ href: p.contractPdfUrl || buildProposalHref(p.id),
+ targetBlank: Boolean(p.contractPdfUrl),
+ });
+ }
+ return items;
+ }),
+ ...dossiers.map((d) => ({
+ id: `dossier-${d.id}`,
+ kindLabel: getDossierHistoryKindLabel(d.mode),
+ title: d.nom,
+ statusLabel: d.estat,
+ createdAt: d.createdAt,
+ sentAt: d.sentAt,
+ href: buildDossierCompositePdfHref(d.id),
+ targetBlank: true,
+ })),
+ ...documents.map((doc) => {
+ const meta = getLeadDocumentHistoryMeta(doc.type, doc.fileUrl);
+ return {
+ id: `lead-document-${doc.id}`,
+ kindLabel: meta.kindLabel,
+ title: doc.title,
+ statusLabel: meta.statusLabel,
+ createdAt: doc.createdAt,
+ href: meta.href,
+ targetBlank: meta.targetBlank,
+ };
+ }),
+ ];
 
-  const [fields, setFields] = useState({
-    phone: lead.phone ?? '',
-    email: lead.email ?? '',
-    eventPhone: lead.eventPhone ?? '',
-    eventAddress: lead.eventAddress ?? '',
-    eventDate: lead.dateISO ? lead.dateISO.slice(0, 10) : '',
-    eventStartTime: lead.time ?? '',
-    eventEndTime: lead.endTime ?? '',
-    eventLocation: lead.location ?? '',
-    guestCount: lead.pax ? String(lead.pax) : '',
-    budget: lead.value ? String(lead.value) : '',
-  });
+ const [fields, setFields] = useState(() => editableFieldsFromLeadSource(lead));
 
-  useEffect(() => {
-    fetch('/api/admin/collaborators')
-      .then((r) => r.json())
-      .then((data) => {
-        const list = Array.isArray(data) ? data : Array.isArray(data?.collaborators) ? data.collaborators : [];
-        // Només els que poden derivar bolos (rol REFERRER).
-        setReferrers(
-          list
-            .filter((c: { roles?: string[] }) => Array.isArray(c.roles) && c.roles.includes('REFERRER'))
-            .map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }))
-        );
-      })
-      .catch((error) => {
-        console.error('[LeadDetailClient] Error loading collaborators', error);
-      });
-  }, []);
+ useEffect(() => {
+ setFields(editableFieldsFromLeadSource(lead));
+ }, [
+ lead.phone,
+ lead.email,
+ lead.eventPhone,
+ lead.eventAddress,
+ lead.dateISO,
+ lead.time,
+ lead.endTime,
+ lead.location,
+ lead.pax,
+ lead.value,
+ ]);
 
-  async function saveAssignedTo(name: string) {
-    try {
-      await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assignedTo: name || null }),
-      });
-      setFields((f) => ({ ...f }));
-      toast.success('Assignat desat.');
-      startTransition(() => router.refresh());
-    } catch (error) {
-      console.error('[LeadDetailClient] Error saving assignee', error);
-      toast.error('Error desant l\'assignació.');
-    }
-  }
+ useEffect(() => {
+ fetch('/api/admin/collaborators')
+ .then((r) => r.json())
+ .then((data) => {
+ const list = Array.isArray(data) ? data : Array.isArray(data?.collaborators) ? data.collaborators : [];
+ // Només els que poden derivar bolos (rol REFERRER).
+ setReferrers(
+ list
+ .filter((c: { roles?: string[] }) => Array.isArray(c.roles) && c.roles.includes('REFERRER'))
+ .map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }))
+ );
+ })
+ .catch((error) => {
+ console.error('[LeadDetailClient] Error loading collaborators', error);
+ });
+ }, []);
 
-  async function handleDeleteLead() {
-    const ok = await confirm({
-      title: 'Eliminar lead',
-      message: `Segur que vols eliminar "${lead.name}"? S'eliminaran notes, activitats, tasques i documents associats. Acció irreversible.`,
-      variant: 'danger',
-      confirmLabel: 'Eliminar',
-    });
-    if (!ok) return;
-    try {
-      const res = await fetchWithCsrf(`/api/admin/leads/${lead.id}`, { method: 'DELETE' });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'No s\'ha pogut eliminar');
-      }
-      toast.success('Lead eliminat.');
-      router.push('/admin/leads');
-    } catch (error) {
-      console.error('[LeadDetailClient] Error eliminant lead', error);
-      toast.error(error instanceof Error ? error.message : 'Error eliminant el lead.');
-    }
-  }
+ async function saveAssignedTo(name: string) {
+ if (isFormalizedLead) return;
+ try {
+ await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
+ method: 'PATCH',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ assignedTo: name || null }),
+ });
+ setFields((f) => ({ ...f }));
+ toast.success('Assignat desat.');
+ startTransition(() => router.refresh());
+ } catch (error) {
+ console.error('[LeadDetailClient] Error saving assignee', error);
+ toast.error('Error desant l\'assignació.');
+ }
+ }
 
-  async function saveSourceCollaborator(id: string) {
-    try {
-      await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sourceCollaboratorId: id || null }),
-      });
-      toast.success('Origen del bolo desat.');
-      startTransition(() => router.refresh());
-    } catch (error) {
-      console.error('[LeadDetailClient] Error saving source collaborator', error);
-      toast.error('Error desant l\'origen del bolo.');
-    }
-  }
+ async function handleDeleteLead() {
+ const ok = await confirm({
+ title: 'Eliminar lead',
+ message: `Segur que vols eliminar "${lead.name}"? S'eliminaran notes, activitats, tasques i documents associats. Acció irreversible.`,
+ variant: 'danger',
+ confirmLabel: 'Eliminar',
+ });
+ if (!ok) return;
+ try {
+ const res = await fetchWithCsrf(`/api/admin/leads/${lead.id}`, { method: 'DELETE' });
+ if (!res.ok) {
+ const data = await res.json().catch(() => ({}));
+ throw new Error(data.error || 'No s\'ha pogut eliminar');
+ }
+ toast.success('Lead eliminat.');
+ router.push('/admin/leads');
+ } catch (error) {
+ console.error('[LeadDetailClient] Error eliminant lead', error);
+ toast.error(error instanceof Error ? error.message : 'Error eliminant el lead.');
+ }
+ }
 
-  function startEdit(field: EditableField) {
-    setEditField(field);
-    setEditValue(fields[field]);
-  }
+ async function saveSourceCollaborator(id: string) {
+ if (isFormalizedLead) return;
+ try {
+ await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
+ method: 'PATCH',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ sourceCollaboratorId: id || null }),
+ });
+ toast.success('Origen del bolo desat.');
+ startTransition(() => router.refresh());
+ } catch (error) {
+ console.error('[LeadDetailClient] Error saving source collaborator', error);
+ toast.error('Error desant l\'origen del bolo.');
+ }
+ }
 
-  async function saveEdit() {
-    if (!editField || savePending) return;
-    setSavePending(true);
-    try {
-      const value = editField === 'guestCount'
-        ? (editValue ? parseInt(editValue, 10) : null)
-        : editValue || null;
-      await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [editField]: value }),
-      });
-      setFields((f) => ({ ...f, [editField!]: editValue }));
-      toast.success('Desat.');
-      setEditField(null);
-    } catch (error) {
-      console.error('[LeadDetailClient] Error saving field', error);
-      toast.error('Error desant el camp.');
-    } finally {
-      setSavePending(false);
-    }
-  }
+ function startEdit(field: EditableField) {
+ if (isFormalizedLead) {
+ toast.info('Aquest lead ja és una reserva formalitzada. Edita les dades operatives des de la reserva.');
+ return;
+ }
+ setEditField(field);
+ setEditValue(fields[field]);
+ }
 
-  function cancelEdit() {
-    setEditField(null);
-    setEditValue('');
-  }
+ async function saveEdit() {
+ if (!editField || savePending) return;
+ setSavePending(true);
+ try {
+ const field = editField;
+ const value = editField === 'guestCount'
+ ? (editValue ? parseInt(editValue, 10) : null)
+ : editValue || null;
+ const res = await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
+ method: 'PATCH',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ [field]: value }),
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) {
+ throw new Error(typeof data?.error === 'string' ? data.error : 'No s\'ha pogut desar el camp.');
+ }
+ setFields((f) => ({
+ ...f,
+ [field]: fieldValueFromLeadPatchResponse(data?.lead, field, editValue),
+ }));
+ toast.success('Desat.');
+ setEditField(null);
+ startTransition(() => router.refresh());
+ } catch (error) {
+ console.error('[LeadDetailClient] Error saving field', error);
+ toast.error(error instanceof Error ? error.message : 'Error desant el camp.');
+ } finally {
+ setSavePending(false);
+ }
+ }
 
-  const pay = paymentState(lead.booking ? { ...lead.booking } : null);
-  const nextStage = nextStageFor(stage);
-  const editable = stage !== 'guanyat' || !lead.booking;
-
-  async function moveLead(target: Stage) {
-    if (pending || target === stage) return;
-    if (target === 'perdut') {
-      // Per ara redirigim a l'Agenda per usar el modal de motiu perdut
-      router.push(`/admin/leads?lost=${lead.id}`);
-      return;
-    }
-    setPending(true);
-    const previous = stage;
-    setStage(target);
-    try {
-      await patchLeadStatus({ leadId: lead.id, status: target === 'nou' ? 'NEW' : target === 'contactat' ? 'CONTACTED' : 'WON' });
-      toast.success(`Mogut a ${STAGE_LABEL[target]}.`);
-      if (target === 'guanyat' && !lead.booking) {
-        startTransition(() => router.push(`/admin/bookings/new?leadId=${encodeURIComponent(lead.id)}`));
-        return;
-      }
-      startTransition(() => router.refresh());
-    } catch (error) {
-      console.error('[LeadDetailClient] Error moving lead', error);
-      setStage(previous);
-      toast.error("No s'ha pogut canviar l'estat.");
-    } finally {
-      setPending(false);
-    }
-  }
+ function cancelEdit() {
+ setEditField(null);
+ setEditValue('');
+ }
 
 
-  return (
-    <div className="fxd__fullpage" data-stage={stage}>
+ async function moveLead(target: Stage) {
+ if (pending || target === stage) return;
+ if (target === 'perdut') {
+ // Per ara redirigim a l'Agenda per usar el modal de motiu perdut
+ router.push(`/admin/leads?lost=${lead.id}`);
+ return;
+ }
+ setPending(true);
+ const previous = stage;
+ setStage(target);
+ try {
+ await patchLeadStatus({ leadId: lead.id, status: target === 'nou' ? 'NEW' : target === 'contactat' ? 'CONTACTED' : 'WON' });
+ toast.success(`Mogut a ${STAGE_LABEL[target]}.`);
+ if (target === 'guanyat' && !lead.booking) {
+ const createBooking = await confirm({
+ title: 'Crear reserva ara?',
+ message: 'Aquest lead ja està marcat com a guanyat. Vols obrir la nova reserva amb les dades i el bolo heretats del lead?',
+ variant: 'info',
+ confirmLabel: 'Crear reserva',
+ });
+ if (createBooking) {
+ startTransition(() => router.push(buildLeadBookingPrefillHref(lead.id)));
+ return;
+ }
+ }
+ startTransition(() => router.refresh());
+ } catch (error) {
+ console.error('[LeadDetailClient] Error moving lead', error);
+ setStage(previous);
+ toast.error("No s'ha pogut canviar l'estat.");
+ } finally {
+ setPending(false);
+ }
+ }
 
-      {/* Barra superior */}
-      <header className="ap-detail-bar">
-        <Link href="/admin/leads" className="ap-detail-bar-btn">← Temporada</Link>
-      </header>
 
-      {/* BAND 1 · Identitat refeta — nom protagonista sol + rail de fets horitzontal */}
-      <section className="fxd__hd">
-        <div className="fxd__hd-top">
-          <div className="fxd__hd-ident">
-            <p className="fxd__hd-eyebrow">{STAGE_LABEL[stage]} · {lead.type} · {sourceLabel(lead.channel)}</p>
-            <h2 className="fxd__hd-name">{lead.name}</h2>
-          </div>
-          <div className="fxd__hd-reach" aria-label="Contacte ràpid">
-            {(['phone', 'email'] as EditableField[]).map((f) => (
-              editField === f ? (
-                <span key={f} className="fxd__editrow fxd__hd-reachedit">
-                  <input className="fxd__editinput" value={editValue} type={f === 'email' ? 'email' : 'tel'}
-                    aria-label={f === 'phone' ? 'Telèfon del lead' : 'Email del lead'}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} autoFocus />
-                  <button type="button" className="fxd__savebtn" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
-                  <button type="button" className="fxd__cancelbtn" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
-                </span>
-              ) : (
-                <button key={f} type="button" className="fxd__hd-reachitem" onClick={() => startEdit(f)} aria-label={f === 'phone' ? 'Editar telèfon' : 'Editar email'}>
-                  <span className="fxd__hd-reachlbl">{f === 'phone' ? 'Tel.' : 'Email'}</span>
-                  <span className="fxd__hd-reachval">{fields[f] || <em className="fxd__empty">Afegir</em>}</span>
-                </button>
-              )
-            ))}
-            <span className="fxd__hd-reachbtns">
-              {(() => {
-                const waHref = buildLeadWhatsAppHref(fields.phone, lead.name);
-                return waHref ? (
-                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp fxd__btn--sm">WhatsApp</a>
-                ) : null;
-              })()}
-              <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn fxd__btn--mail fxd__btn--sm">Correu</Link>
-            </span>
-          </div>
-        </div>
+ return (
+ <div className="ap-ledger-fullpage" data-stage={stage}>
 
-        {/* Rail de fets — una sola línia ledger amb columnes separades per hairline */}
-        <div className="fxd__hd-rail" aria-label="Dades del bolo">
-          {([
-            { f: 'eventDate' as EditableField, lbl: 'Data', type: 'date', show: (v: string) => v ? fullDate(v) : '' },
-            { f: 'eventStartTime' as EditableField, lbl: 'Inici', type: 'time', show: (v: string) => v },
-            { f: 'eventEndTime' as EditableField, lbl: 'Fi', type: 'time', show: (v: string) => v },
-            { f: 'eventLocation' as EditableField, lbl: 'Lloc', type: 'text', show: (v: string) => v },
-            { f: 'guestCount' as EditableField, lbl: 'Pax', type: 'number', show: (v: string) => v ? `${v}` : '' },
-          ]).map(({ f, lbl, type, show }) => (
-            <div key={f} className="fxd__fact">
-              <span className="fxd__fact-lbl">{lbl}</span>
-              {editField === f ? (
-                <span className="fxd__editrow">
-                  <input className="fxd__editinput" type={type} value={editValue} autoFocus min={type === 'number' ? 1 : undefined}
-                    aria-label={lbl}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
-                  <button type="button" className="fxd__savebtn" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
-                  <button type="button" className="fxd__cancelbtn" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
-                </span>
-              ) : (
-                <button type="button" className="fxd__fact-val" onClick={() => startEdit(f)} aria-label={`Editar ${lbl}`}>
-                  {show(String(fields[f] ?? '')) || <em className="fxd__empty">+</em>}
-                </button>
-              )}
-            </div>
-          ))}
-          <div className="fxd__fact">
-            <span className="fxd__fact-lbl">Durada</span>
-            <span className="fxd__fact-val fxd__fact-val--ro">{durationLabel(fields.eventStartTime, fields.eventEndTime)}</span>
-          </div>
-          <div className="fxd__fact">
-            <span className="fxd__fact-lbl">Prioritat</span>
-            <span className={`fxd__fact-val fxd__fact-val--ro fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</span>
-          </div>
-          {lead.wx && (
-            <div className="fxd__fact">
-              <span className="fxd__fact-lbl">Temps</span>
-              <span className="fxd__fact-val fxd__fact-val--ro fxd__fact-wx">
-                <WxBadge wx={lead.wx} size="sm" />
-                {lead.dateISO && <span className="fxd__fact-wxdate">{fullDate(lead.dateISO.slice(0, 10))}</span>}
-              </span>
-            </div>
-          )}
-          <div className="fxd__fact fxd__fact--value">
-            <span className="fxd__fact-lbl">Valor</span>
-            {editField === 'budget' ? (
-              <span className="fxd__editrow">
-                <input className="fxd__editinput" type="number" min={0} value={editValue}
-                  aria-label="Valor del lead"
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
-                  autoFocus />
-                <button type="button" className="fxd__savebtn" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
-                <button type="button" className="fxd__cancelbtn" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
-              </span>
-            ) : (
-              <button type="button" className="fxd__fact-val fxd__fact-val--big" onClick={() => startEdit('budget')} aria-label="Editar valor">
-                {fields.budget
-                    ? formatCurrency(Number(fields.budget))
-                    : (() => {
-                        // Només un pressupost REALMENT enviat compta com a valor del lead;
-                        // un esborrany (DRAFT, sense sentAt) no és un valor real.
-                        const prop = proposals.find((p) => p.sentAt && Number.isFinite(p.total) && p.total > 0)?.total;
-                        return prop ? formatCurrency(prop) : <em className="fxd__empty">Afegir</em>;
-                      })()}
-              </button>
-            )}
-          </div>
-        </div>
+ {/* Barra superior */}
+ <header className="ap-detail-bar">
+ <Link href="/admin/leads" className="ap-detail-bar-btn">← Temporada</Link>
+ </header>
 
-        {lead.lostReason && <p className="fxd__hd-lost">{lead.lostReason}</p>}
+ {/* BAND 1 · Identitat refeta — nom protagonista sol + rail de fets horitzontal */}
+ <section className="ap-ledger-hd">
+ <div className="ap-ledger-hd-top">
+ <div className="ap-ledger-hd-ident">
+ <p className="ap-ledger-hd-eyebrow">{[
+ STAGE_LABEL[stage],
+ lead.type && !/^altre/i.test(lead.type) ? lead.type : null,
+ (() => { const s = sourceLabel(lead.channel); return s && s !== '—' && !/^altre/i.test(s) ? s : null; })(),
+ ].filter(Boolean).join(' · ')}</p>
+ <h2 className="ap-ledger-hd-name">{lead.name}</h2>
+ <p className="ap-ledger-hd-next" aria-label="Següent pas recomanat"><span className="ap-ledger-hd-next-tag">Següent pas</span>{leadSummary(lead)}</p>
+ </div>
+ <div className="ap-ledger-hd-reach" aria-label="Contacte ràpid">
+ {(['phone', 'email'] as EditableField[]).map((f) => (
+ editField === f ? (
+ <span key={f} className="ap-ledger-editrow ap-ledger-hd-reachedit">
+ <input className="adm-input" value={editValue} type={f === 'email' ? 'email' : 'tel'}
+ aria-label={f === 'phone' ? 'Telèfon del lead' : 'Email del lead'}
+ onChange={(e) => setEditValue(e.target.value)}
+ onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} autoFocus />
+ <button type="button" className="ap-btn ap-btn--primary ap-btn--xs" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
+ <button type="button" className="ap-btn ap-btn--xs" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
+ </span>
+ ) : (
+ <button key={f} type="button" className="ap-ledger-hd-reachitem" onClick={() => startEdit(f)} aria-label={f === 'phone' ? 'Editar telèfon' : 'Editar email'}>
+ <span className="ap-ledger-hd-reachlbl">{f === 'phone' ? 'Tel.' : 'Email'}</span>
+ <span className="ap-ledger-hd-reachval">{fields[f] || <em className="ap-ledger-empty">Afegir</em>}</span>
+ </button>
+ )
+ ))}
+ <span className="ap-ledger-hd-reachbtns">
+ {(() => {
+ const waHref = buildLeadWhatsAppHref(fields.phone, lead.name);
+ return waHref ? (
+ <a href={waHref} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--xs">WhatsApp</a>
+ ) : null;
+ })()}
+ <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="ap-btn ap-btn--xs">Correu</Link>
+ </span>
+ </div>
+ </div>
 
-        <div className="fxd__phasebar" aria-label="Fase del lead">
-          <div className="fxd__stagepick">
-            {PIPELINE_STAGES.map((s) => (
-              <button key={s} type="button" data-stage={s}
-                className={s === stage ? 'is-on' : ''}
-                aria-current={s === stage ? 'step' : undefined}
-                disabled={pending || s === stage || (s === 'guanyat' && !!lead.booking)}
-                onClick={() => moveLead(s)}
-              >
-                <span className="fx__dot" data-stage={s} />{STAGE_LABEL[s]}
-              </button>
-            ))}
-          </div>
-          <div className="fxd__phaseright">
-            {stage === 'perdut' && (
-              <button type="button" className="fxd__btn fxd__btn--danger" onClick={handleDeleteLead}>Eliminar lead</button>
-            )}
-            <div className="fxd__profitmanage" aria-label="Gestió del lead">
-              <label className="fxd__profitfield">
-                <span>Responsable</span>
-                <select className="fxd__editinput" value={lead.owner ?? ''} onChange={(e) => saveAssignedTo(e.target.value)} aria-label="Responsable intern del lead">
-                  <option value="">Sense assignar</option>
-                  {TEAM_MEMBERS.map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                  {lead.owner && !TEAM_MEMBERS.includes(lead.owner as typeof TEAM_MEMBERS[number]) && (
-                    <option value={lead.owner}>{lead.owner}</option>
-                  )}
-                </select>
-              </label>
-              <label className="fxd__profitfield">
-                <span>Derivat per</span>
-                <select className="fxd__editinput" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} aria-label="Col·laborador que ha derivat el bolo">
-                  <option value="">Client directe</option>
-                  {referrers.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </div>
-        </div>
+ {/* Rail de fets — una sola línia ledger amb columnes separades per hairline */}
+ <div className="ap-ledger-hd-rail" aria-label="Dades del bolo">
+ {([
+ { f: 'eventDate' as EditableField, lbl: 'Data', type: 'date', show: (v: string) => v ? fullDate(v) : '' },
+ { f: 'eventStartTime' as EditableField, lbl: 'Inici', type: 'time', show: (v: string) => v },
+ { f: 'eventEndTime' as EditableField, lbl: 'Fi', type: 'time', show: (v: string) => v },
+ { f: 'eventLocation' as EditableField, lbl: 'Lloc', type: 'text', show: (v: string) => v },
+ { f: 'guestCount' as EditableField, lbl: 'Pax', type: 'number', show: (v: string) => v ? `${v}` : '' },
+ ]).map(({ f, lbl, type, show }) => (
+ <div key={f} className="ap-ledger-fact">
+ <span className="ap-ledger-fact-lbl">{lbl}</span>
+ {editField === f ? (
+ <span className="ap-ledger-editrow">
+ <input className="adm-input" type={type} value={editValue} autoFocus min={type === 'number' ? 1 : undefined}
+ aria-label={lbl}
+ onChange={(e) => setEditValue(e.target.value)}
+ onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
+ <button type="button" className="ap-btn ap-btn--primary ap-btn--xs" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
+ <button type="button" className="ap-btn ap-btn--xs" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
+ </span>
+ ) : (
+ <button type="button" className="ap-ledger-fact-val" onClick={() => startEdit(f)} aria-label={`Editar ${lbl}`}>
+ {show(String(fields[f] ?? '')) || <em className="ap-ledger-empty">+</em>}
+ </button>
+ )}
+ </div>
+ ))}
+ <div className="ap-ledger-fact">
+ <span className="ap-ledger-fact-lbl">Durada</span>
+ <span className="ap-ledger-fact-val ap-ledger-fact-val--ro">{durationLabel(fields.eventStartTime, fields.eventEndTime)}</span>
+ </div>
+ <div className="ap-ledger-fact">
+ <span className="ap-ledger-fact-lbl">Prioritat</span>
+ <span className={`ap-ledger-fact-val ap-ledger-fact-val--ro ap-ledger-pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</span>
+ </div>
+ {lead.wx && (
+ <div className="ap-ledger-fact">
+ <span className="ap-ledger-fact-lbl">Temps</span>
+ <span className="ap-ledger-fact-val ap-ledger-fact-val--ro ap-ledger-fact-wx">
+ <WxBadge wx={lead.wx} size="sm" />
+ {fields.eventDate && <span className="ap-ledger-fact-wxdate">{fullDate(fields.eventDate)}</span>}
+ </span>
+ </div>
+ )}
+ <div className="ap-ledger-fact ap-ledger-fact--value">
+ <span className="ap-ledger-fact-lbl">Valor</span>
+ {editField === 'budget' ? (
+ <span className="ap-ledger-editrow">
+ <input className="adm-input" type="number" min={0} value={editValue}
+ aria-label="Valor del lead"
+ onChange={(e) => setEditValue(e.target.value)}
+ onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+ autoFocus />
+ <button type="button" className="ap-btn ap-btn--primary ap-btn--xs" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
+ <button type="button" className="ap-btn ap-btn--xs" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
+ </span>
+ ) : (
+ <button type="button" className="ap-ledger-fact-val ap-ledger-fact-val--big" onClick={() => startEdit('budget')} aria-label="Editar valor">
+ {fields.budget
+ ? formatCurrency(Number(fields.budget))
+ : (() => {
+ // Cadena de valor del lead (#1752, Manolo): manual → pressupost REALMENT
+ // enviat (un esborrany DRAFT sense sentAt no és valor real) → total client
+ // COMPUTAT del bolo (el mateix número que la banda del pressupost; la
+ // pantalla no pot demanar «Afegir» un valor que ella mateixa ja calcula).
+ const prop = proposals.find((p) => p.sentAt && Number.isFinite(p.total) && p.total > 0)?.total;
+ const computed = prop ?? (econ && econ.total > 0 ? econ.total : null);
+ return computed ? formatCurrency(computed) : <em className="ap-ledger-empty">Afegir</em>;
+ })()}
+ </button>
+ )}
+ </div>
+ </div>
 
-        <div className="fxd__profitbar" aria-label="Marge del bolo i rendibilitat">
-          <span className="fxd__profitbar-title">
-            {bookingEconomia ? 'Marge de la reserva' : 'Marge del bolo'}
-          </span>
-          {econ ? (
-            <>
-              <span className="fxd__profitpill">
-                <span>Cost serveis</span>
-                <strong>{formatCurrency(econ.serviceLinesCost)}</strong>
-              </span>
-              <span className="fxd__profitpill">
-                <span>Operatiu</span>
-                <strong>{formatCurrency(econ.fixedOperationalCost)}</strong>
-              </span>
-              <span className="fxd__profitpill">
-                <span>Cost origen</span>
-                <strong>{formatCurrency(econ.acquisitionCost)}</strong>
-              </span>
-              <span className="fxd__profitpill" data-tone={econ.tone}>
-                <span>{bookingEconomia ? 'Net real' : 'Net estimat'}</span>
-                <strong>{formatCurrency(econ.net)}</strong>
-              </span>
-              <span className="fxd__profitpill" data-tone={econ.tone}>
-                <span>Marge</span>
-                <strong>{Math.round(econ.marginPct)}%</strong>
-              </span>
-              <span className="fxd__profitpill" title={`El pack base inclou ${INCLUDED_TRAVEL_KM / 2} km per sentit des de Granollers. A partir d'aquí, cada ${TRAVEL_BLOCK_KM} km de més es cobren a ${TRAVEL_BLOCK_EUR} € i se sumen al pressupost per trams.`}>
-                <span>Desplaçament</span>
-                <strong>{INCLUDED_TRAVEL_KM / 2} km incl. · +{TRAVEL_BLOCK_EUR}€/{TRAVEL_BLOCK_KM}km</strong>
-              </span>
-            </>
-          ) : (
-            <span className="fxd__profitpill">
-              <span>Net estimat</span>
-              <strong>pendent</strong>
-            </span>
-          )}
-        </div>
+ {lead.lostReason && <p className="ap-ledger-hd-lost">{lead.lostReason}</p>}
 
-      </section>
+ <div className="ap-ledger-phasebar" aria-label="Fase del lead">
+ <div className="ap-ledger-stagepick">
+ {PIPELINE_STAGES.map((s) => (
+ <button key={s} type="button" data-stage={s}
+ className={s === stage ? 'is-on' : ''}
+ aria-current={s === stage ? 'step' : undefined}
+ disabled={pending || s === stage || isFormalizedLead}
+ onClick={() => moveLead(s)}
+ >
+ <span className="ap-leads-dot" data-stage={s} />{STAGE_LABEL[s]}
+ </button>
+ ))}
+ </div>
+ <div className="ap-ledger-phaseright">
+ {stage === 'perdut' && (
+ <button type="button" className="ap-btn ap-btn--danger" onClick={handleDeleteLead}>Eliminar lead</button>
+ )}
+ <div className="ap-ledger-profitmanage" aria-label="Gestió del lead">
+ <label className="ap-ledger-profitfield">
+ <span>Responsable</span>
+ <select className="adm-input" value={lead.owner ?? ''} onChange={(e) => saveAssignedTo(e.target.value)} disabled={isFormalizedLead} aria-label="Responsable intern del lead">
+ <option value="">Sense assignar</option>
+ {TEAM_MEMBERS.map((m) => (
+ <option key={m} value={m}>{m}</option>
+ ))}
+ {lead.owner && !TEAM_MEMBERS.includes(lead.owner as typeof TEAM_MEMBERS[number]) && (
+ <option value={lead.owner}>{lead.owner}</option>
+ )}
+ </select>
+ </label>
+ <label className="ap-ledger-profitfield">
+ <span>Derivat per</span>
+ <select className="adm-input" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} disabled={isFormalizedLead} aria-label="Col·laborador que ha derivat el bolo">
+ <option value="">Client directe</option>
+ {referrers.map((c) => (
+ <option key={c.id} value={c.id}>{c.name}</option>
+ ))}
+ </select>
+ </label>
+ </div>
+ </div>
+ </div>
 
-      {/* Àrea zenit CANÒNICA: igual per a TOTS els leads (com Cristina). El bolo
-          ocupa tot l'ample. Els cobraments NO viuen al lead: es gestionen a la
-          fitxa de reserva (accés des de l'històric comercial al peu). */}
-      <div className="fxd__zenith fxd__zenith--solo">
+ </section>
 
-      <main className="fxd__zenith-main" aria-label="Configuració del bolo">
-        <LeadBoloSection
-          leadId={lead.id}
-          documentContext={{
-            name: lead.name,
-            email: fields.email,
-            phone: fields.phone,
-            eventDate: fields.eventDate,
-            eventStartTime: fields.eventStartTime,
-            eventEndTime: fields.eventEndTime,
-            eventLocation: fields.eventLocation,
-            eventAddress: fields.eventAddress,
-            guestCount: fields.guestCount,
-          }}
-          contractedProducts={lead.booking?.contractedProducts ?? []}
-          source={lead.channel}
-          vehicleCostPerKm={vehicleCostPerKm}
-          onEconomiaChange={handleEconomia}
-          compactEconomia
-        />
-      </main>
-      </div>{/* /fxd__zenith */}
+ {/* Àrea zenit CANÒNICA: igual per a TOTS els leads (com Cristina). El bolo
+ ocupa tot l'ample. Els cobraments NO viuen al lead: es gestionen a la
+ fitxa de reserva (accés des de l'històric comercial al peu). */}
+ <div className="ap-ledger-zenith ap-ledger-zenith--railed">
 
-      <CommercialDocumentsHistory
-        items={documentHistoryItems}
-        className="fxd__document-history"
-      />
+ <main className="ap-ledger-zenith-main" aria-label="Configuració del bolo">
+ <LeadBoloSection
+ leadId={lead.id}
+ documentContext={{
+ name: lead.name,
+ email: fields.email,
+ phone: fields.phone,
+ eventDate: fields.eventDate,
+ eventStartTime: fields.eventStartTime,
+ eventEndTime: fields.eventEndTime,
+ eventLocation: fields.eventLocation,
+ eventAddress: fields.eventAddress,
+ guestCount: fields.guestCount,
+ }}
+ contractedProducts={lead.booking?.contractedProducts ?? []}
+ source={lead.channel}
+ vehicleCostPerKm={vehicleCostPerKm}
+ initialDistanceKm={initialDistanceKm}
+ initialTollsEur={initialTollsEur}
+ onEconomiaChange={handleEconomia}
+ compactEconomia
+ formalizedBooking={formalizedBooking}
+ />
+ </main>
 
-      <ConfirmDialog {...dialogProps} />
-    </div>
-  );
+ <aside className="ap-ledger-rail ap-ledger-rail--summary" aria-label="Resum financer del bolo">
+ <div className="ap-ledger-summary">
+ <div className="ap-ledger-summary-head">{bookingEconomia ? 'Marge de la reserva' : 'Marge del bolo'}</div>
+ {econ ? (
+ <>
+ <div className="ap-ledger-summary-net" data-tone={econ.tone}>
+ <span className="ap-ledger-summary-net-lbl">{bookingEconomia ? 'Net real' : 'Net estimat'}</span>
+ <strong className="ap-ledger-summary-net-val">{formatCurrency(econ.net)}</strong>
+ <span className="ap-ledger-summary-net-pct">{Math.round(econ.marginPct)}% marge global{econ.label ? ` · ${econ.label}` : ''}</span>
+ </div>
+ <div className="ap-ledger-summary-rows">
+ {econ.ownServiceRevenue > 0 && (
+ <div><span>Producte propi</span><strong>{formatCurrency(econ.ownServiceMarginAmount)} net</strong></div>
+ )}
+ {econ.subcontractedCost > 0 && (
+ <div><span>Col·laborador</span><strong>{econ.subcontractedMarkupOk ? 'OK' : 'Revisar'} · {formatCurrency(econ.subcontractedMarkupAmount + econ.orbitaTechIncome)} marge</strong></div>
+ )}
+ {econ.travelCharge != null && (
+ <div><span>Transport</span><strong>{formatCurrency(econ.travelCharge)} · {Math.abs(econ.transportMarginAmount) < 0.01 ? 'sense marge' : `${formatCurrency(econ.transportMarginAmount)} marge`}</strong></div>
+ )}
+ <div><span>Cost total estimat</span><strong>{formatCurrency(econ.directCost)}</strong></div>
+ </div>
+ {econ.subcontractedCost > 0 && <a className="ap-ledger-summary-jump" href="#lead-repartiment">Veure cost col·laborador</a>}
+ </>
+ ) : (
+ <p className="ap-ledger-econonote">Afegeix línies al bolo per veure el net estimat.</p>
+ )}
+ </div>
+ </aside>
+ </div>{/* /ap-ledger-zenith */}
+
+ <CommercialDocumentsHistory
+ items={documentHistoryItems}
+ className="ap-ledger-document-history"
+ />
+
+ <ConfirmDialog {...dialogProps} />
+ </div>
+ );
 }

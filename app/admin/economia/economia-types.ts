@@ -4,12 +4,14 @@
  */
 
 import { formatCurrency } from '@/lib/constants';
+import { getMarginTextClass, getMarginBarClass } from '@/lib/margin-utils';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type Tab = 'resum' | 'cobraments' | 'rendibilitat' | 'tresoreria' | 'previsions' | 'config';
+export type TabIcon = 'dashboard' | 'banknote' | 'trend' | 'wallet' | 'forecast' | 'settings';
 
 export interface PaymentRow {
   id: string;
@@ -25,6 +27,12 @@ export interface PaymentRow {
   remainingAmount: number;
   remainingPaid: boolean;
   remainingPaidAt: string | null;
+  cashAmount: number | null;
+  depositOutstandingAmount: number;
+  remainingOutstandingAmount: number;
+  outstandingAmount: number;
+  depositSettled: boolean;
+  remainingSettled: boolean;
   depositDueAt: string;
   remainingDueAt: string;
   overdueDeposit: boolean;
@@ -109,6 +117,7 @@ export interface CacChannelRow {
   wonLeads: number;
   conversionRate: number;
   estimatedCac: number;
+  realSpend: number | null;
   realCac: number | null;
 }
 
@@ -167,24 +176,18 @@ export function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;
 }
 
+// Semàfor de marge canònic (4 bandes: Excel·lent/Acceptable/Vigilar/Crític),
+// font única getMarginBand. pctValue és fracció (0-1) → percent.
 export function marginColor(pctValue: number): string {
-  const p = pctValue * 100;
-  if (p >= 50) return 'admin-tone-text-success';
-  if (p >= 30) return 'admin-tone-text-warning';
-  if (p >= 15) return 'admin-tone-text-warning';
-  return 'admin-tone-text-danger';
+  return getMarginTextClass(pctValue * 100);
 }
 
 export function marginBg(pctValue: number): string {
-  const p = pctValue * 100;
-  if (p >= 50) return 'admin-tone-bg-success';
-  if (p >= 30) return 'admin-tone-bg-warning';
-  if (p >= 15) return 'admin-tone-bg-warning';
-  return 'admin-tone-bg-danger';
+  return getMarginBarClass(pctValue * 100);
 }
 
-export function paymentStateBadge(paid: boolean) {
-  return paid
+export function paymentStateBadge(settled: boolean) {
+  return settled
     ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
     : 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger';
 }
@@ -213,13 +216,13 @@ export function packMarginBadge(marginPct: number, targetMarginPct: number) {
 
 // ─── Tabs ───────────────────────────────────────────────────────────────────
 
-export const TABS: { id: Tab; label: string; icon: string; mobileLabel: string }[] = [
-  { id: 'resum', label: 'Resum general', icon: '📊', mobileLabel: 'Resum' },
-  { id: 'cobraments', label: 'Cobraments', icon: '💶', mobileLabel: 'Cobrar' },
-  { id: 'rendibilitat', label: 'Rendibilitat', icon: '📈', mobileLabel: 'Marge' },
-  { id: 'tresoreria', label: 'Tresoreria', icon: '💰', mobileLabel: 'Caixa' },
-  { id: 'previsions', label: 'Previsions', icon: '🔮', mobileLabel: 'Previsió' },
-  { id: 'config', label: 'Configuració', icon: '⚙️', mobileLabel: 'Config' },
+export const TABS: { id: Tab; label: string; icon: TabIcon; mobileLabel: string }[] = [
+  { id: 'resum', label: 'Resum general', icon: 'dashboard', mobileLabel: 'Resum' },
+  { id: 'cobraments', label: 'Cobraments', icon: 'banknote', mobileLabel: 'Cobrar' },
+  { id: 'rendibilitat', label: 'Rendibilitat', icon: 'trend', mobileLabel: 'Marge' },
+  { id: 'tresoreria', label: 'Tresoreria', icon: 'wallet', mobileLabel: 'Caixa' },
+  { id: 'previsions', label: 'Previsions', icon: 'forecast', mobileLabel: 'Previsió' },
+  { id: 'config', label: 'Configuració', icon: 'settings', mobileLabel: 'Config' },
 ];
 
 export type { ProfitabilityConfig, PackPricingModelConfig };

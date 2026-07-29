@@ -1,0 +1,14 @@
+{
+  "emailDueDays": 2,
+  "startDueDays": 3,
+  "catchupWindowDays": 90,
+  "pendingTake": 50,
+  "automationTake": 20,
+  "playbookTake": 100,
+  "actionDueDays": {
+    "thank_you": 3,
+    "testimonial": 7,
+    "social_post": 14,
+    "referral_ask": 30
+  }
+}

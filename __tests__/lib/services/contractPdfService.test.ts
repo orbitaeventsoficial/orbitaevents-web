@@ -6,6 +6,10 @@ vi.mock('@/lib/logo-lockup-light-base64', () => ({
 
 import { generateContractPDF, type ContractPdfData } from '@/lib/services/contractPdfService';
 
+function pdfText(doc: Awaited<ReturnType<typeof generateContractPDF>>): string {
+  return String((doc as unknown as { internal: { pages: unknown[][] } }).internal.pages.flat().join('\n'));
+}
+
 function makeContractData(overrides: Partial<ContractPdfData> = {}): ContractPdfData {
   return {
     contractReference: 'CT-2026-001',
@@ -104,5 +108,13 @@ describe('generateContractPDF', () => {
     const output = doc.output('arraybuffer');
     expect(output).toBeInstanceOf(ArrayBuffer);
     expect(output.byteLength).toBeGreaterThan(500);
+  });
+
+  it('usa llenguatge comercial clar per la paga i senyal en català', async () => {
+    const doc = await generateContractPDF(makeContractData(), 'ca');
+    const text = pdfText(doc);
+    expect(text).toContain('Paga i senyal');
+    expect(text).toContain('Venciment paga i senyal');
+    expect(text).not.toContain('Aval (dipòsit)');
   });
 });

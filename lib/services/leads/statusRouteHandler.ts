@@ -65,11 +65,19 @@ export async function handleLeadStatusPatch(req: NextRequest, leadId: string) {
         utmMedium: true,
         utmCampaign: true,
         landingPage: true,
+        booking: { select: { id: true } },
       },
     });
 
     if (!existingLead) {
       return NextResponse.json({ error: 'Lead no trobat' }, { status: 404 });
+    }
+
+    if (status === 'WON' && existingLead.status !== 'WON' && !existingLead.booking?.id) {
+      return NextResponse.json({
+        error: 'No es pot marcar un lead com a guanyat sense reserva vinculada. Crea la reserva des del lead perquè Booking sigui la veritat operativa.',
+        nextAction: `/admin/bookings/new?leadId=${encodeURIComponent(leadId)}&prefill=lead`,
+      }, { status: 409 });
     }
 
     let linkedCustomerId = existingLead.customerId ?? null;

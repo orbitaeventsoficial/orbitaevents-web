@@ -295,6 +295,7 @@ export async function loadReactivationCandidates(
 ): Promise<ReactivationCandidate[]> {
   const rows = await prisma.customer.findMany({
     where: {
+      mergedIntoId: null,
       OR: [
         { lifecycleStage: { in: ['DORMANT', 'CHURNED', 'VIP', 'RETURNING', 'FIRST_TIME'] } },
         { healthScore: { lte: 40 } },

@@ -8,7 +8,11 @@ import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmD
 import { getProposalStatusDisplay, PROPOSAL_FILTERABLE_STATUSES, formatDate, formatCurrency } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildCustomerProposalHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
-import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildProposalBookingCreateHref, buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
+import { isAdminTestArtifactFromParts } from '@/lib/admin/testArtifacts';
+import { isSentLikeProposalStatus } from '@/lib/proposals/status';
+import { AdminEmptyState } from '@/app/admin/components/AdminPage';
 
 type ProposalItem = {
   id: string;
@@ -17,18 +21,12 @@ type ProposalItem = {
   total: number;
   createdAt: string;
   sentAt: string | null;
+  pdfUrl: string | null;
+  pdfKey: string | null;
   customerId: string | null;
   leadId: string | null;
+  bookingId: string | null;
   customer: { name: string; email: string } | null;
-};
-
-type QuoteItem = {
-  id: string;
-  title: string;
-  fileUrl: string;
-  createdAt: string;
-  leadId: string;
-  lead: { name: string; email: string } | null;
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -50,13 +48,29 @@ function relativeDate(dateStr: string): string {
   return formatDate(dateStr);
 }
 
+function isProposalTestArtifact(proposal: ProposalItem): boolean {
+  return isAdminTestArtifactFromParts([
+    proposal.reference,
+    proposal.customer?.name,
+    proposal.customer?.email,
+  ]);
+}
+
+function hasCanonicalSentProposalArtifact(proposal: ProposalItem): boolean {
+  return Boolean(proposal.sentAt && proposal.pdfUrl?.trim() && proposal.pdfKey?.trim());
+}
+
+function matchesProposalStatusFilter(proposal: ProposalItem, statusFilter: string): boolean {
+  if (!statusFilter) return true;
+  if (statusFilter === 'SENT') return isSentLikeProposalStatus(proposal.status);
+  return proposal.status === statusFilter;
+}
+
 export default function ProposalsList({
   proposals,
-  quotes,
   initialStatusFilter = '',
 }: {
   proposals: ProposalItem[];
-  quotes: QuoteItem[];
   initialStatusFilter?: string;
 }) {
   const router = useRouter();
@@ -65,10 +79,17 @@ export default function ProposalsList({
   const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showTestProposals, setShowTestProposals] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const { confirm, dialogProps } = useConfirmDialog();
 
-  const filtered = proposals.filter((proposal) => {
-    if (statusFilter && proposal.status !== statusFilter) return false;
+  const testProposalArtifacts = proposals.filter(isProposalTestArtifact);
+  const visibleProposals = showTestProposals ? proposals : proposals.filter((proposal) => !isProposalTestArtifact(proposal));
+  const hiddenTestProposals = testProposalArtifacts.length;
+
+  const filtered = visibleProposals.filter((proposal) => {
+    if (!matchesProposalStatusFilter(proposal, statusFilter)) return false;
     if (!search) return true;
 
     const query = search.toLowerCase();
@@ -80,22 +101,39 @@ export default function ProposalsList({
   });
 
   const stats = {
-    total: proposals.length,
-    DRAFT: proposals.filter((proposal) => proposal.status === 'DRAFT').length,
-    SENT: proposals.filter((proposal) => proposal.status === 'SENT').length,
-    ACCEPTED: proposals.filter((proposal) => proposal.status === 'ACCEPTED').length,
-    REJECTED: proposals.filter((proposal) => proposal.status === 'REJECTED').length,
+    total: visibleProposals.length,
+    DRAFT: visibleProposals.filter((proposal) => proposal.status === 'DRAFT').length,
+    SENT: visibleProposals.filter((proposal) => isSentLikeProposalStatus(proposal.status)).length,
+    ACCEPTED: visibleProposals.filter((proposal) => proposal.status === 'ACCEPTED').length,
+    REJECTED: visibleProposals.filter((proposal) => proposal.status === 'REJECTED').length,
   };
 
-  const totalValue = proposals
+  const totalValue = visibleProposals
     .filter((proposal) => proposal.status === 'ACCEPTED')
     .reduce((sum, proposal) => sum + proposal.total, 0);
+  const selectedCount = selectedIds.size;
+  const filteredIds = filtered.map((proposal) => proposal.id);
+  const allFilteredSelected = filteredIds.length > 0 && filteredIds.every((id) => selectedIds.has(id));
 
   const getProposalHref = (proposal: ProposalItem) =>
     proposal.customerId
       ? buildCustomerProposalHref(proposal.customerId, proposal.id)
       : buildProposalHref(proposal.id);
   const getProposalDetailHref = (proposal: ProposalItem) => buildProposalHref(proposal.id);
+  const getBookingAction = (proposal: ProposalItem) => {
+    if (proposal.bookingId) {
+      return { href: buildBookingHref(proposal.bookingId), label: 'Reserva' };
+    }
+    if (proposal.status !== 'ACCEPTED' || !hasCanonicalSentProposalArtifact(proposal)) return null;
+    return {
+      href: buildProposalBookingCreateHref({
+        proposalId: proposal.id,
+        leadId: proposal.leadId,
+        customerId: proposal.customerId,
+      }),
+      label: 'Crear reserva',
+    };
+  };
 
   async function handleSend(proposalId: string) {
     setSendingId(proposalId);
@@ -143,6 +181,62 @@ export default function ProposalsList({
     }
   }
 
+  function toggleProposalSelection(proposalId: string) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(proposalId)) next.delete(proposalId);
+      else next.add(proposalId);
+      return next;
+    });
+  }
+
+  function toggleFilteredSelection() {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (allFilteredSelected) {
+        for (const id of filteredIds) next.delete(id);
+      } else {
+        for (const id of filteredIds) next.add(id);
+      }
+      return next;
+    });
+  }
+
+  async function handleBulkDelete() {
+    const ids = [...selectedIds];
+    if (ids.length === 0 || bulkDeleting) return;
+    const ok = await confirm({
+      title: 'Eliminar pressupostos',
+      message: `S'eliminaran ${ids.length} pressupostos seleccionats. Aquesta acció no es pot desfer.`,
+      variant: 'danger',
+      confirmLabel: 'Eliminar seleccionats',
+    });
+    if (!ok) return;
+
+    setBulkDeleting(true);
+    const failed: string[] = [];
+    try {
+      for (const id of ids) {
+        const res = await fetchWithCsrf(`/api/admin/proposals/${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          failed.push(data?.error || 'Error eliminant');
+        }
+      }
+      const deleted = ids.length - failed.length;
+      if (deleted > 0) setActionMsg(`${deleted} pressupostos eliminats`);
+      if (failed.length > 0) setActionMsg(`${failed.length} pressupostos no s'han pogut eliminar`);
+      setSelectedIds(new Set());
+      setTimeout(() => setActionMsg(null), failed.length > 0 ? 4000 : 3000);
+      router.refresh();
+    } catch {
+      setActionMsg('Error de connexió');
+      setTimeout(() => setActionMsg(null), 4000);
+    } finally {
+      setBulkDeleting(false);
+    }
+  }
+
   async function handleStatus(proposalId: string, status: string) {
     try {
       const res = await fetchWithCsrf(`/api/admin/proposals/${proposalId}`, {
@@ -154,6 +248,10 @@ export default function ProposalsList({
         setActionMsg(`Estat canviat a ${getProposalStatusDisplay(status).label}`);
         setTimeout(() => setActionMsg(null), 3000);
         router.refresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setActionMsg(data?.error || 'Error canviant estat');
+        setTimeout(() => setActionMsg(null), 4000);
       }
     } catch {
       setActionMsg('Error canviant estat');
@@ -162,15 +260,15 @@ export default function ProposalsList({
   }
 
   return (
-    <section className="pr__list">
-      <div className="pr__statGrid">
+    <section className="grid gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <button
           onClick={() => setStatusFilter('')}
-          className="pr__stat"
+          className={`ap-kpi cursor-pointer text-left hover:border-[var(--line2)] ${!statusFilter ? 'ap-kpi--info' : ''}`}
           aria-pressed={!statusFilter}
         >
-          <span className="pr__statValue">{stats.total}</span>
-          <span className="pr__statLabel">Total</span>
+          <span className="ap-kpi-label">Total</span>
+          <span className="ap-kpi-value">{stats.total}</span>
         </button>
         {PROPOSAL_FILTERABLE_STATUSES.map((status) => {
           const cfg = getProposalStatusDisplay(status);
@@ -181,38 +279,53 @@ export default function ProposalsList({
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className="pr__stat"
+              className={`ap-kpi cursor-pointer text-left hover:border-[var(--line2)] ${isActive ? 'ap-kpi--info' : ''}`}
               aria-pressed={isActive}
             >
-              <span className="pr__statValue">{count}</span>
-              <span className="pr__statLabel">{cfg.label}s</span>
+              <span className="ap-kpi-label">{cfg.label}s</span>
+              <span className="ap-kpi-value">{count}</span>
             </button>
           );
         })}
       </div>
 
       {totalValue > 0 && (
-        <div className="pr__metric">
-          Valor acceptat: <strong>{formatCurrency(totalValue)}</strong>
+        <div className="ap-kpi ap-kpi--warning w-fit">
+          <span className="ap-kpi-label">Valor acceptat</span>
+          <span className="ap-kpi-value">{formatCurrency(totalValue)}</span>
         </div>
       )}
 
-      {actionMsg && (
-        <div className="pr__notice">
-          {actionMsg}
+      {actionMsg && <div className="ap-alert">{actionMsg}</div>}
+
+      {hiddenTestProposals > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
+          <span className="ap-badge">
+            {showTestProposals ? `${hiddenTestProposals} pressupostos de prova visibles` : `${hiddenTestProposals} pressupostos de prova ocults`}
+          </span>
+          <button
+            type="button"
+            className="ap-btn ap-btn--xs"
+            onClick={() => {
+              setSelectedIds(new Set());
+              setShowTestProposals((value) => !value);
+            }}
+          >
+            {showTestProposals ? 'Ocultar proves' : 'Mostrar proves'}
+          </button>
         </div>
       )}
 
-      <div className="pr__toolbar">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <input
           type="search"
           placeholder="Cerca per client, referència..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="adm-input min-w-[200px] flex-1"
+          className="adm-input flex-1"
           aria-label="Cercar pressupostos"
         />
-        <div className="pr__actionRow">
+        <div className="flex flex-wrap items-center gap-2">
           {statusFilter && (
             <button
               onClick={() => setStatusFilter('')}
@@ -230,26 +343,63 @@ export default function ProposalsList({
         </div>
       </div>
 
-      <div className="pr__cards">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
+        <label className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--t2)]">
+          <input
+            type="checkbox"
+            checked={allFilteredSelected}
+            onChange={toggleFilteredSelection}
+            className="h-4 w-4"
+            aria-label="Seleccionar pressupostos visibles"
+          />
+          Seleccionar visibles
+        </label>
+        <div className="flex flex-wrap items-center gap-2">
+          {selectedCount > 0 && <span className="ap-badge">{selectedCount} seleccionats</span>}
+          {selectedCount > 0 && (
+            <button type="button" className="ap-btn ap-btn--xs" onClick={() => setSelectedIds(new Set())}>
+              Netejar
+            </button>
+          )}
+          <button
+            type="button"
+            className="ap-btn ap-btn--danger ap-btn--xs"
+            onClick={handleBulkDelete}
+            disabled={selectedCount === 0 || bulkDeleting}
+          >
+            {bulkDeleting ? 'Eliminant...' : 'Eliminar seleccionats'}
+          </button>
+        </div>
+      </div>
+
+      <div className="grid gap-3 lg:hidden">
         {filtered.length === 0 ? (
-          <p className="pr__empty">
-            {search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
-          </p>
+          <AdminEmptyState
+            icon="📄"
+            title={search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
+          />
         ) : (
           filtered.map((proposal) => (
             <article
               key={proposal.id}
-              className="ap-card pr__proposalCard adm-row-hover"
+              className="ap-card adm-row-hover grid gap-3 p-4"
             >
-              <div className="pr__proposalTop">
+              <div className="flex items-start justify-between gap-3">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(proposal.id)}
+                  onChange={() => toggleProposalSelection(proposal.id)}
+                  className="mt-1 h-4 w-4 shrink-0"
+                  aria-label={`Seleccionar pressupost ${proposal.reference}`}
+                />
                 <div className="min-w-0 flex-1">
                   <Link
                     href={getProposalHref(proposal)}
-                    className="pr__ref hover:underline"
+                    className="font-bold text-[var(--t)] hover:underline"
                   >
                     {proposal.reference}
                   </Link>
-                  <p className="pr__muted truncate text-sm">
+                  <p className="truncate text-sm text-[var(--t3)]">
                     {proposal.customerId ? (
                       <Link href={buildCustomerHubHref(proposal.customerId)} className="hover:underline">
                         {proposal.customer?.name || 'Sense nom'}
@@ -262,12 +412,12 @@ export default function ProposalsList({
                 <StatusBadge status={proposal.status} />
               </div>
 
-              <div className="pr__statusLine">
-                <span className="pr__amount">{formatCurrency(proposal.total)}</span>
-                <span className="pr__muted">{relativeDate(proposal.createdAt)}</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="[font-family:var(--display)] font-bold tabular-nums text-[var(--t)]">{formatCurrency(proposal.total)}</span>
+                <span className="text-[var(--t3)]">{relativeDate(proposal.createdAt)}</span>
               </div>
 
-              <div className="pr__rowActions">
+              <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={getProposalHref(proposal)}
                   className="ap-btn ap-btn--primary ap-btn--xs"
@@ -283,7 +433,7 @@ export default function ProposalsList({
                     {sendingId === proposal.id ? 'Enviant...' : 'Enviar'}
                   </button>
                 )}
-                {proposal.status === 'SENT' && (
+                {isSentLikeProposalStatus(proposal.status) && hasCanonicalSentProposalArtifact(proposal) && (
                   <>
                     <button
                       onClick={() => handleStatus(proposal.id, 'ACCEPTED')}
@@ -298,6 +448,15 @@ export default function ProposalsList({
                       Rebutjat
                     </button>
                   </>
+                )}
+                {isSentLikeProposalStatus(proposal.status) && !hasCanonicalSentProposalArtifact(proposal) && (
+                  <button
+                    onClick={() => handleSend(proposal.id)}
+                    disabled={sendingId === proposal.id}
+                    className="ap-btn ap-btn--xs"
+                  >
+                    {sendingId === proposal.id ? 'Reparant...' : 'Reparar PDF'}
+                  </button>
                 )}
                 {proposal.customer && proposal.customerId && (
                   <Link
@@ -321,38 +480,64 @@ export default function ProposalsList({
                     Entrada
                   </Link>
                 )}
+                {getBookingAction(proposal) && (
+                  <Link
+                    href={getBookingAction(proposal)!.href}
+                    className="ap-btn ap-btn--primary ap-btn--xs"
+                  >
+                    {getBookingAction(proposal)!.label}
+                  </Link>
+                )}
               </div>
             </article>
           ))
         )}
       </div>
 
-      <div className="pr__tableShell">
-        <table className="pr__table" aria-label="Llistat de pressupostos">
-          <thead>
+      <div className="ap-table-wrap hidden lg:block">
+        <table className="ap-table" aria-label="Llistat de pressupostos">
+          <thead className="ap-table-head">
             <tr>
-              <th scope="col">Ref.</th>
-              <th scope="col">Client</th>
-              <th scope="col">Estat</th>
-              <th scope="col" className="pr__num">Import</th>
-              <th scope="col" className="pr__num">Data</th>
-              <th scope="col" className="pr__num">Accions</th>
+              <th scope="col" className="ap-table-th">
+                <input
+                  type="checkbox"
+                  checked={allFilteredSelected}
+                  onChange={toggleFilteredSelection}
+                  className="h-4 w-4"
+                  aria-label="Seleccionar pressupostos visibles"
+                />
+              </th>
+              <th scope="col" className="ap-table-th">Ref.</th>
+              <th scope="col" className="ap-table-th">Client</th>
+              <th scope="col" className="ap-table-th">Estat</th>
+              <th scope="col" className="ap-table-th"><div className="text-right">Import</div></th>
+              <th scope="col" className="ap-table-th"><div className="text-right">Data</div></th>
+              <th scope="col" className="ap-table-th"><div className="text-right">Accions</div></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="ap-table-body">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="pr__empty">
+                <td colSpan={7} className="px-4 py-8 text-center text-[var(--t3)]">
                   {search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
                 </td>
               </tr>
             ) : (
               filtered.map((proposal) => (
-                <tr key={proposal.id} className="transition-colors adm-row-hover">
+                <tr key={proposal.id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(proposal.id)}
+                      onChange={() => toggleProposalSelection(proposal.id)}
+                      className="h-4 w-4"
+                      aria-label={`Seleccionar pressupost ${proposal.reference}`}
+                    />
+                  </td>
                   <td>
                     <Link
                       href={getProposalHref(proposal)}
-                      className="pr__ref hover:underline"
+                      className="font-bold text-[var(--t)] hover:underline"
                     >
                       {proposal.reference}
                     </Link>
@@ -363,20 +548,24 @@ export default function ProposalsList({
                         {proposal.customer?.name || 'Sense nom'}
                       </Link>
                     ) : (
-                      <span className="pr__muted">Sense client assignat</span>
+                      <span className="text-[var(--t3)]">Sense client assignat</span>
                     )}
-                    <p className="pr__muted max-w-[200px] truncate text-xs">{proposal.customer?.email}</p>
+                    <p className="max-w-[200px] truncate text-xs text-[var(--t3)]">{proposal.customer?.email}</p>
                   </td>
                   <td>
                     <StatusBadge status={proposal.status} />
                   </td>
-                  <td className="pr__num pr__amount">
-                    {formatCurrency(proposal.total)}
+                  <td>
+                    <div className="text-right [font-family:var(--display)] font-bold tabular-nums text-[var(--t)]">
+                      {formatCurrency(proposal.total)}
+                    </div>
                   </td>
-                  <td className="pr__num pr__muted">
-                    {relativeDate(proposal.createdAt)}
+                  <td>
+                    <div className="text-right text-[var(--t3)]">
+                      {relativeDate(proposal.createdAt)}
+                    </div>
                   </td>
-                  <td className="pr__num">
+                  <td>
                     <div className="flex items-center justify-end gap-1">
                       <Link
                         href={getProposalHref(proposal)}
@@ -392,6 +581,15 @@ export default function ProposalsList({
                           title="Fitxa client"
                         >
                           Client
+                        </Link>
+                      )}
+                      {getBookingAction(proposal) && (
+                        <Link
+                          href={getBookingAction(proposal)!.href}
+                          className="ap-btn ap-btn--primary ap-btn--xs"
+                          title={getBookingAction(proposal)!.label}
+                        >
+                          {getBookingAction(proposal)!.label}
                         </Link>
                       )}
                       {proposal.status === 'DRAFT' && (
@@ -420,34 +618,6 @@ export default function ProposalsList({
           </tbody>
         </table>
       </div>
-
-      {quotes.length > 0 && (
-        <details className="pr__legacy">
-          <summary>
-            Pressupostos antics (LeadDocument) — {quotes.length}
-          </summary>
-          <div className="pr__legacyList">
-            {quotes.map((quote) => (
-              <div key={quote.id} className="pr__legacyItem">
-                <div>
-                  <a href={quote.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
-                    {quote.title}
-                  </a>
-                  <p className="pr__muted text-xs">
-                    {quote.lead?.name || 'Lead'} · {relativeDate(quote.createdAt)}
-                  </p>
-                </div>
-                <Link
-                  href={buildLeadWorkspaceHref(quote.leadId)}
-                  className="ap-btn ap-btn--xs"
-                >
-                  Veure lead
-                </Link>
-              </div>
-            ))}
-          </div>
-        </details>
-      )}
       <ConfirmDialog {...dialogProps} />
     </section>
   );

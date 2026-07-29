@@ -81,6 +81,66 @@ describe('getClientPortalPaymentSummary', () => {
     expect(result.nextPayment).toBeNull();
     expect(result.notice).toBe('all_paid');
   });
+
+  it('tracta cashAmount complet com a pagament complet encara que els flags siguin falsos', () => {
+    const result = getClientPortalPaymentSummary({
+      total: 1000,
+      depositAmount: 300,
+      depositPaid: false,
+      depositPaymentUrl: 'https://checkout.stripe.com/c/pay_deposit',
+      remainingAmount: 700,
+      remainingPaid: false,
+      remainingPaymentUrl: 'https://checkout.stripe.com/c/pay_remaining',
+      cashAmount: 1000,
+    });
+
+    expect(result.deposit.paid).toBe(true);
+    expect(result.remaining.paid).toBe(true);
+    expect(result.deposit.payableOnline).toBe(false);
+    expect(result.remaining.payableOnline).toBe(false);
+    expect(result.nextPayment).toBeNull();
+    expect(result.notice).toBe('all_paid');
+  });
+
+  it('si cashAmount cobreix la bestreta, activa la resta com a proper pagament', () => {
+    const result = getClientPortalPaymentSummary({
+      total: 1000,
+      depositAmount: 300,
+      depositPaid: false,
+      depositPaymentUrl: 'https://checkout.stripe.com/c/pay_deposit',
+      remainingAmount: 700,
+      remainingPaid: false,
+      remainingPaymentUrl: 'https://checkout.stripe.com/c/pay_remaining',
+      cashAmount: 300,
+    });
+
+    expect(result.deposit.paid).toBe(true);
+    expect(result.remaining.paid).toBe(false);
+    expect(result.deposit.payableOnline).toBe(false);
+    expect(result.remaining.payableOnline).toBe(true);
+    expect(result.nextPayment).toBe('remaining');
+    expect(result.notice).toBe('remaining_payable');
+  });
+
+  it('no exposa un link online antic si cashAmount redueix parcialment la bestreta', () => {
+    const result = getClientPortalPaymentSummary({
+      total: 1000,
+      depositAmount: 300,
+      depositPaid: false,
+      depositPaymentUrl: 'https://checkout.stripe.com/c/pay_deposit',
+      remainingAmount: 700,
+      remainingPaid: false,
+      remainingPaymentUrl: 'https://checkout.stripe.com/c/pay_remaining',
+      cashAmount: 100,
+    });
+
+    expect(result.deposit.amount).toBe(200);
+    expect(result.deposit.paid).toBe(false);
+    expect(result.deposit.payableOnline).toBe(false);
+    expect(result.remaining.payableOnline).toBe(false);
+    expect(result.nextPayment).toBeNull();
+    expect(result.notice).toBe('manual_pending');
+  });
 });
 
 describe('buildClientPortalPaymentsPath', () => {

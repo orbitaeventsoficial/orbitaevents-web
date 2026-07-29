@@ -14,26 +14,3 @@ export function buildLeadCustomerHref(input: {
   }
   return buildLeadWorkspaceHref(input.leadId);
 }
-
-export function buildLeadCustomerContinuityTarget(input: {
-  leadId: string;
-  customerId?: string | null;
-}): { href: string; label: string; title: string } {
-  if (input.customerId) {
-    return {
-      href: buildLeadCustomerHref({
-        leadId: input.leadId,
-        customerId: input.customerId,
-        customerTab: 'leads',
-      }),
-      label: 'Fitxa 360',
-      title: 'Obrir Fitxa 360 del client',
-    };
-  }
-
-  return {
-    href: buildLeadWorkspaceHref(input.leadId),
-    label: 'Fitxa lead',
-    title: 'Obrir fitxa del lead',
-  };
-}

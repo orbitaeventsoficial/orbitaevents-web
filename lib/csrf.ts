@@ -286,33 +286,3 @@ export async function fetchWithCsrf(
     headers,
   });
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// UTILITY FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Check if CSRF protection should be enforced
- * Skip in development or for specific paths
- */
-export function shouldEnforceCsrf(request: NextRequest): boolean {
-  const { pathname } = request.nextUrl;
-
-  // Skip CSRF for public API routes
-  const publicPaths = [
-    '/api/health',
-    '/api/contact',
-    '/api/google-reviews',
-  ];
-
-  if (publicPaths.some(path => pathname.startsWith(path))) {
-    return false;
-  }
-
-  // Enforce for all admin routes
-  if (pathname.startsWith('/api/admin')) {
-    return true;
-  }
-
-  return false;
-}

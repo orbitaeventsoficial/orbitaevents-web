@@ -12,6 +12,7 @@ type PersistContactLeadInput = {
   clientPhone?: string;
   eventType: EventType;
   eventDate?: string;
+  eventLocation?: string;
   eventStartTime?: string;
   eventEndTime?: string;
   guestCount?: number;
@@ -51,6 +52,7 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
           phone: input.clientPhone || existingLead.phone,
           eventType: input.eventType,
           eventDate: input.eventDate ? new Date(input.eventDate) : existingLead.eventDate,
+          eventLocation: input.eventLocation || existingLead.eventLocation,
           eventStartTime: input.eventStartTime || existingLead.eventStartTime,
           eventEndTime: input.eventEndTime || existingLead.eventEndTime,
           guestCount: input.guestCount || existingLead.guestCount,
@@ -95,6 +97,7 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
           phone: input.clientPhone,
           eventType: input.eventType,
           eventDate: input.eventDate ? new Date(input.eventDate) : null,
+          eventLocation: input.eventLocation || null,
           eventStartTime: input.eventStartTime || null,
           eventEndTime: input.eventEndTime || null,
           guestCount: input.guestCount,

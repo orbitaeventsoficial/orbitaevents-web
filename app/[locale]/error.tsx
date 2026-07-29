@@ -53,7 +53,7 @@ export default function Error({
         </h1>
 
         <p className="text-xl text-text-muted mb-8 leading-relaxed">
-          {error?.message || t('defaultMessage')}
+          {t('defaultMessage')}
           <br />
           <span className="text-oe-gold font-bold">
             {t('reassurance')}

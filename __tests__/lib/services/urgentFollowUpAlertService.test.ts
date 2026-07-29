@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 
 // ── Hoisted mocks ──────────────────────────────────────────────────────────
-const { mockPrisma, mockSendEmail, mockSendWhatsApp, mockSaveCronRunStatus, mockGetRecipientsAsString } = vi.hoisted(() => ({
+const { mockPrisma, mockSendTrackedStandaloneEmail, mockSendWhatsApp, mockSaveCronRunStatus, mockGetRecipientsAsString } = vi.hoisted(() => ({
   mockPrisma: {
     lead: { findMany: vi.fn() },
     setting: { findMany: vi.fn(), upsert: vi.fn() },
     adminLog: { create: vi.fn() },
   },
-  mockSendEmail: vi.fn(),
+  mockSendTrackedStandaloneEmail: vi.fn(),
   mockSendWhatsApp: vi.fn(),
   mockSaveCronRunStatus: vi.fn(),
   mockGetRecipientsAsString: vi.fn(),
@@ -17,7 +17,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/logger', () => ({
   log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
-vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
+vi.mock('@/lib/email', () => ({ sendTrackedStandaloneEmail: mockSendTrackedStandaloneEmail }));
 vi.mock('@/lib/services/whatsappService', () => ({ sendWhatsAppText: mockSendWhatsApp }));
 vi.mock('@/lib/services/cronRunStatusService', () => ({ saveCronRunStatus: mockSaveCronRunStatus }));
 vi.mock('@/lib/services/notificationRecipientsService', () => ({
@@ -66,7 +66,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.adminLog.create.mockResolvedValue({});
   mockPrisma.setting.upsert.mockResolvedValue({});
-  mockSendEmail.mockResolvedValue({});
+  mockSendTrackedStandaloneEmail.mockResolvedValue({});
   mockSendWhatsApp.mockResolvedValue({ ok: true });
   mockGetRecipientsAsString.mockResolvedValue('admin@test.com');
   process.env.CONTACT_TO = 'admin@test.com';
@@ -240,7 +240,11 @@ describe('runUrgentFollowUpAlerts', () => {
     expect(result.newAlerts).toBe(1);
     expect(result.emailSent).toBe(true);
     expect(result.whatsappSent).toBe(true);
-    expect(mockSendEmail).toHaveBeenCalledOnce();
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledOnce();
+    expect(mockSendTrackedStandaloneEmail).toHaveBeenCalledWith(expect.objectContaining({
+      templateKey: 'urgent-follow-up-alert',
+      orbita: expect.objectContaining({ kind: 'admin', origin: 'urgent-follow-up-alert' }),
+    }));
     expect(mockSendWhatsApp).toHaveBeenCalledOnce();
     expect(mockPrisma.setting.upsert).toHaveBeenCalled();
     expect(mockPrisma.adminLog.create).toHaveBeenCalled();
@@ -277,7 +281,7 @@ describe('runUrgentFollowUpAlerts', () => {
     expect(result.newAlerts).toBe(0);
     expect(result.alreadyAlerted).toBe(1);
     expect(result.emailSent).toBe(false);
-    expect(mockSendEmail).not.toHaveBeenCalled();
+    expect(mockSendTrackedStandaloneEmail).not.toHaveBeenCalled();
   });
 
   it('permet re-alerta si la finestra de 24h ha expirat', async () => {
@@ -329,7 +333,7 @@ describe('runUrgentFollowUpAlerts', () => {
       },
     ]);
     mockPrisma.setting.findMany.mockResolvedValue([]);
-    mockSendEmail.mockRejectedValueOnce(new Error('SMTP fail'));
+    mockSendTrackedStandaloneEmail.mockRejectedValueOnce(new Error('SMTP fail'));
 
     const result = await runUrgentFollowUpAlerts(now);
 

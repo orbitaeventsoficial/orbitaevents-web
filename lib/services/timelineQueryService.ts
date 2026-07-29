@@ -5,6 +5,7 @@ import type { TimelineEventDTO } from '@/lib/customer-hub/dto';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildDossierStoredPreviewHref } from '@/lib/admin/dossierWorkspaceHref';
 
 export type CanonicalTimelineEvent = {
   id: string;
@@ -95,14 +96,62 @@ function mapCustomerActionToTimelineType(action: string): TimelineEventDTO['type
   return 'ACTIVITY';
 }
 
-function labelCustomerAction(action: string): string {
+function labelPostEventDecision(metadata: TimelineMetadata): string {
+  const actionKey = getMetadataValue(metadata, 'actionKey');
+  if (actionKey === 'testimonial') return 'Testimoni sol.licitat';
+  if (actionKey === 'referral_ask') return 'Referral sol.licitat';
+  if (actionKey === 'social_post') return 'Social preparat';
+  return 'Decisio post-event registrada';
+}
+
+function truncateTimelineText(value: string, maxLength = 160): string {
+  const clean = value.trim().replace(/\s+/g, ' ');
+  return clean.length > maxLength ? `${clean.slice(0, maxLength - 1)}…` : clean;
+}
+
+function labelCustomerAction(action: string, metadata?: TimelineMetadata): string {
   if (action === 'NOTE_ADDED') return 'Nota interna afegida';
   if (action === 'MESSAGE_SENT') return 'Missatge enviat';
   if (action === 'TASK_CREATED') return 'Tasca creada';
   if (action === 'TASK_DONE') return 'Tasca completada';
   if (action === 'PROPOSAL_SENT') return 'Pressupost enviat';
   if (action === 'BOOKING_CONFIRMED') return 'Reserva confirmada';
+  if (action === 'POST_EVENT_RECURRENCE_DECIDED') return labelPostEventDecision(metadata);
+  if (action === 'TESTIMONIAL_APPROVED') return 'Testimoni aprovat';
+  if (action === 'TESTIMONIAL_HIDDEN') return 'Testimoni amagat';
+  if (action === 'TESTIMONIAL_DELETED') return 'Testimoni eliminat';
+  if (action === 'REFERRAL_ASK_PREPARED') return 'Referral preparat';
+  if (action === 'REACTIVATION_PREPARED') return 'Reactivacio preparada';
   return action;
+}
+
+function describeCustomerActivity(action: string, metadata?: TimelineMetadata): string | undefined {
+  if (action === 'TESTIMONIAL_APPROVED' || action === 'TESTIMONIAL_HIDDEN' || action === 'TESTIMONIAL_DELETED') {
+    const rating = typeof metadata?.rating === 'number' ? `${metadata.rating}/5` : undefined;
+    const eventType = getMetadataValue(metadata, 'eventType');
+    const textPreview = getMetadataValue(metadata, 'textPreview');
+    return [rating, eventType, textPreview ? truncateTimelineText(textPreview) : null].filter(Boolean).join(' · ') || undefined;
+  }
+  if (action === 'REFERRAL_ASK_PREPARED' || action === 'REACTIVATION_PREPARED') {
+    const note = getMetadataValue(metadata, 'note');
+    return note ? truncateTimelineText(note) : undefined;
+  }
+  if (action !== 'POST_EVENT_RECURRENCE_DECIDED') return undefined;
+  const bookingRef = getMetadataValue(metadata, 'bookingRef');
+  const safety = getMetadataValue(metadata, 'safety');
+  const draft = getMetadataValue(metadata, 'draft');
+  const socialPostId = getMetadataValue(metadata, 'socialPostId');
+  const safetyLabel = safety === 'DECIDED_NOT_SENT'
+    ? 'Registrat, no enviat'
+    : safety === 'DRAFT_NOT_PUBLISHED'
+      ? 'Esborrany social, no publicat'
+      : safety;
+  return [
+    bookingRef ? `Ref. ${bookingRef}` : null,
+    safetyLabel,
+    safety === 'DRAFT_NOT_PUBLISHED' && socialPostId ? `Esborrany social ${socialPostId}` : null,
+    draft ? `Esborrany: ${truncateTimelineText(draft)}` : null,
+  ].filter(Boolean).join(' · ') || undefined;
 }
 
 function mapAdminEntityToKind(entity: string): CanonicalTimelineEvent['kind'] {
@@ -127,6 +176,11 @@ function getMetadataValue(metadata: TimelineMetadata, key: string): string | und
   return typeof value === 'string' && value.trim().length > 0 ? value : undefined;
 }
 
+function getMetadataNumber(metadata: TimelineMetadata, key: string): number | undefined {
+  const value = Number(metadata?.[key]);
+  return Number.isFinite(value) ? value : undefined;
+}
+
 function getMetadataArray(metadata: TimelineMetadata, key: string): string[] {
   const value = metadata?.[key];
   if (!Array.isArray(value)) return [];
@@ -138,6 +192,7 @@ function getEntityLabel(entity: string): string {
   if (entity === 'pricing') return 'preus';
   if (entity === 'booking') return 'reserva';
   if (entity === 'proposal') return 'pressupost';
+  if (entity === 'dossier') return 'dossier';
   if (entity === 'task') return 'tasca';
   if (entity === 'lead') return 'entrada';
   if (entity === 'customer') return 'client';
@@ -186,6 +241,9 @@ function describeAdminLog(log: AdminLogLike, metadata: TimelineMetadata): string
   const to = getMetadataValue(metadata, 'to');
   if (log.action === 'STATUS_CHANGE' && from && to) return `${from} -> ${to}`;
 
+  const documentDescription = describeDocumentAdminLog(log, metadata);
+  if (documentDescription) return documentDescription;
+
   const fields = getMetadataArray(metadata, 'fields');
   if (log.action === 'UPDATE' && fields.length > 0) return `Camps: ${fields.join(', ')}`;
 
@@ -209,22 +267,79 @@ function describeAdminLog(log: AdminLogLike, metadata: TimelineMetadata): string
   return getEntityLabel(log.entity);
 }
 
+function describeDocumentAdminLog(log: AdminLogLike, metadata: TimelineMetadata): string | undefined {
+  if (!log.action.startsWith('DOCUMENT_')) return undefined;
+  const reference = getMetadataValue(metadata, 'proposalReference')
+    || getMetadataValue(metadata, 'contractReference')
+    || getMetadataValue(metadata, 'reference');
+  const to = getMetadataValue(metadata, 'to');
+  const source = getMetadataValue(metadata, 'source');
+  const total = getMetadataNumber(metadata, 'total');
+  return [
+    reference ? `Ref. ${reference}` : null,
+    to ? `a ${to}` : null,
+    total !== undefined ? `${total.toFixed(2)} EUR` : null,
+    source,
+  ].filter(Boolean).join(' · ') || undefined;
+}
+
 function mapAdminLogToTimelineType(log: AdminLogLike): TimelineEventDTO['type'] {
   if (log.entity === 'booking') {
     return log.action === 'STATUS_CHANGE' || log.action === 'CREATE' ? 'BOOKING_CONFIRMED' : 'BOOKING_CREATED';
   }
   if (log.entity === 'proposal' && log.action === 'CREATE') return 'PROPOSAL_CREATED';
   if (log.entity === 'proposal' && (log.action === 'SEND' || log.action === 'COMM_SENT')) return 'PROPOSAL_SENT';
+  if (log.entity === 'proposal' && log.action === 'DOCUMENT_PROPOSAL_SENT') return 'PROPOSAL_SENT';
   if (log.entity === 'task' && log.action === 'DELETE') return 'TASK_DONE';
   return 'ACTIVITY';
 }
 
-function buildAdminLogLink(log: AdminLogLike): CanonicalTimelineEvent['link'] {
+function isContractDocumentLog(log: AdminLogLike, metadata: TimelineMetadata): boolean {
+  const documentType = getMetadataValue(metadata, 'documentType')?.toUpperCase();
+  return log.action.startsWith('DOCUMENT_CONTRACT_')
+    || documentType === 'CONTRACT'
+    || Boolean(getMetadataValue(metadata, 'contractReference'));
+}
+
+function isProposalDocumentLog(log: AdminLogLike, metadata: TimelineMetadata): boolean {
+  const documentType = getMetadataValue(metadata, 'documentType')?.toUpperCase();
+  return log.action === 'DOCUMENT_PROPOSAL_SENT'
+    || documentType === 'PROPOSAL'
+    || Boolean(getMetadataValue(metadata, 'proposalReference'));
+}
+
+function buildAdminLogLink(log: AdminLogLike, metadata: TimelineMetadata): CanonicalTimelineEvent['link'] {
+  if (log.entity === 'dossier') {
+    const dossierId = log.entityId || getMetadataValue(metadata, 'dossierId');
+    return dossierId
+      ? { label: 'Obrir dossier', href: buildDossierStoredPreviewHref(dossierId) }
+      : { label: 'Obrir dossiers', href: '/admin/dossiers' };
+  }
+  if (log.entity === 'invoice') {
+    const pdfUrl = getMetadataValue(metadata, 'pdfUrl');
+    if (pdfUrl) return { label: 'Obrir factura', href: pdfUrl };
+    const bookingId = getMetadataValue(metadata, 'bookingId');
+    return bookingId ? { label: 'Veure documents', href: buildBookingHref(bookingId, 'sec-documents') } : undefined;
+  }
+  if (log.entity === 'deliveryNote') {
+    const pdfUrl = getMetadataValue(metadata, 'pdfUrl');
+    if (pdfUrl) return { label: 'Obrir albarà', href: pdfUrl };
+    const bookingId = getMetadataValue(metadata, 'bookingId');
+    return bookingId ? { label: 'Veure documents', href: buildBookingHref(bookingId, 'sec-documents') } : undefined;
+  }
   if (!log.entityId) return undefined;
   if (log.entity === 'booking') return { label: 'Veure reserva', href: buildBookingHref(log.entityId) };
   if (log.entity === 'lead') return { label: 'Veure entrada', href: buildLeadWorkspaceHref(log.entityId) };
   if (log.entity === 'customer') return { label: 'Veure client', href: buildCustomerHubHref(log.entityId) };
-  if (log.entity === 'proposal') return { label: 'Obrir', href: `/admin/presupuestos?proposalId=${log.entityId}` };
+  if (log.entity === 'proposal') {
+    if (isContractDocumentLog(log, metadata)) {
+      return { label: 'Obrir contracte', href: `/admin/presupuestos?proposalId=${log.entityId}` };
+    }
+    if (isProposalDocumentLog(log, metadata)) {
+      return { label: 'Obrir pressupost', href: `/admin/presupuestos?proposalId=${log.entityId}` };
+    }
+    return { label: 'Obrir', href: `/admin/presupuestos?proposalId=${log.entityId}` };
+  }
   return undefined;
 }
 
@@ -238,7 +353,8 @@ export function mapCustomerActivityToCanonicalEvent(activity: CustomerActivityLi
     source: 'customerActivity',
     entityType: 'customer',
     kind: 'activity',
-    title: labelCustomerAction(activity.action),
+    title: labelCustomerAction(activity.action, metadata),
+    body: describeCustomerActivity(activity.action, metadata),
     occurredAt: activity.createdAt.toISOString(),
     metadata,
     timelineType: mapCustomerActionToTimelineType(activity.action),
@@ -293,7 +409,7 @@ export function mapAdminLogToCanonicalEvent(log: AdminLogLike): CanonicalTimelin
     occurredAt: log.createdAt.toISOString(),
     metadata: details,
     timelineType: mapAdminLogToTimelineType(log),
-    link: buildAdminLogLink(log),
+    link: buildAdminLogLink(log, details),
   };
 }
 
@@ -649,7 +765,9 @@ export async function fetchCanonicalEventsForCustomer(
           where: {
             OR: [
               { entity: 'customer', entityId: customerId },
+              { entity: 'dossier', details: { path: ['customerId'], equals: customerId } },
               ...(leadIds.length > 0 ? [{ entity: 'lead', entityId: { in: leadIds } }] : []),
+              ...leadIds.map((leadId) => ({ entity: 'dossier', details: { path: ['leadId'], equals: leadId } })),
               ...(bookingIds.length > 0 ? [{ entity: 'booking', entityId: { in: bookingIds } }] : []),
             ],
           },
@@ -716,7 +834,12 @@ export async function fetchCanonicalEventsForLead(
     safeFetch(
       () =>
         prisma.adminLog.findMany({
-          where: { entity: 'lead', entityId: leadId },
+          where: {
+            OR: [
+              { entity: 'lead', entityId: leadId },
+              { entity: 'dossier', details: { path: ['leadId'], equals: leadId } },
+            ],
+          },
           orderBy: { createdAt: 'desc' },
           take: limit,
         }),
@@ -770,8 +893,8 @@ export async function fetchCanonicalEventsForBooking(
 
   const leadId = booking?.leadId ?? null;
 
-  // Parallel: booking adminLogs + inventory adminLogs + lead activities (if lead exists)
-  const [bookingLogs, inventoryLogs, leadActivities] = await Promise.all([
+  // Parallel: booking adminLogs + document adminLogs + inventory adminLogs + lead activities (if lead exists)
+  const [bookingLogs, inventoryLogs, documentLogs, leadActivities] = await Promise.all([
     safeFetch(
       () =>
         prisma.adminLog.findMany({
@@ -794,6 +917,21 @@ export async function fetchCanonicalEventsForBooking(
         }),
       [],
       'fetchCanonicalEventsForBooking:inventoryLog'
+    ),
+    safeFetch(
+      () =>
+        prisma.adminLog.findMany({
+          where: {
+            OR: [
+              { entity: 'invoice', details: { path: ['bookingId'], equals: bookingId } },
+              { entity: 'deliveryNote', details: { path: ['bookingId'], equals: bookingId } },
+            ],
+          },
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+        }),
+      [],
+      'fetchCanonicalEventsForBooking:documentLog'
     ),
     leadId
       ? safeFetch(
@@ -822,6 +960,17 @@ export async function fetchCanonicalEventsForBooking(
       })
     ),
     ...inventoryLogs.map((logRow) =>
+      mapAdminLogToCanonicalEvent({
+        id: logRow.id,
+        action: logRow.action,
+        entity: logRow.entity,
+        entityId: logRow.entityId ?? null,
+        details: logRow.details ?? undefined,
+        createdAt: logRow.createdAt,
+        userId: logRow.userId ?? null,
+      })
+    ),
+    ...documentLogs.map((logRow) =>
       mapAdminLogToCanonicalEvent({
         id: logRow.id,
         action: logRow.action,

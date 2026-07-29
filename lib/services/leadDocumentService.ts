@@ -28,6 +28,15 @@ export async function uploadLeadDocument(leadId: string, formData: FormData) {
   if (!(LEAD_DOCUMENT_TYPE_VALUES as readonly string[]).includes(rawType)) {
     return { status: 400, body: { error: 'Tipus de document no permès' } };
   }
+  if (rawType === 'QUOTE') {
+    return {
+      status: 410,
+      body: {
+        error: 'Els pressupostos LeadDocument estan desactivats. Fes servir Proposal per crear o enviar pressupostos.',
+        canonicalRoute: '/admin/presupuestos',
+      },
+    };
+  }
 
   const type = rawType as LeadDocumentType;
   if (!(LEAD_DOCUMENT_ALLOWED_MIME_TYPES as readonly string[]).includes(file.type)) {

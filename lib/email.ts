@@ -22,6 +22,11 @@ import { buildMime } from '@/lib/mailComposerLoader';
 import { type EmailLocale, normalizeEmailLocale, toIntlLocaleEmail, PRIVACY_REQUEST_LABELS, PRIVACY_COPY, TESTIMONIAL_COPY } from '@/lib/email-i18n';
 import { getEmailSignatureHtml, getEmailSignatureText } from '@/lib/services/signatureService';
 import { EMAIL_CONTACT } from '@/lib/constants/email';
+import {
+  recordEmailSend,
+  updateEmailSendResult,
+  wrapLinksForTracking,
+} from '@/lib/services/emailTrackingService';
 
 interface SendEmailOptions {
   to: string;
@@ -47,6 +52,28 @@ interface SendEmailOptions {
   skipImapAppend?: boolean;
 }
 
+export type TrackedStandaloneEmailInput = {
+  templateKey: string;
+  to: string;
+  subject: string;
+  html: string;
+  locale?: string | null;
+  leadId?: string | null;
+  customerId?: string | null;
+  replyTo?: string;
+  from?: string;
+  text?: string;
+  attachments?: SendEmailOptions['attachments'];
+  brandingStyle?: SendEmailOptions['brandingStyle'];
+  headers?: SendEmailOptions['headers'];
+  skipImapAppend?: boolean;
+  orbita?: OrbitaContext;
+};
+
+export type TrackedStandaloneEmailResult = {
+  emailSendId: string;
+};
+
 type BookingEmailTranslation = {
   locale: string;
   name: string;
@@ -71,6 +98,7 @@ type BookingEmailExtraLine = {
 
 type BookingEmailModel = {
   id: string;
+  customerId?: string | null;
   reference: string;
   preferredLocale: string;
   eventDate: string | Date;
@@ -303,8 +331,9 @@ function createTransporter() {
  * IMAP perquè la safata d'admin pugui mostrar "Acceptat per SMTP + Arxivat a
  * Sent UID 5" en lloc d'un genèric "Email enviat" que no diu res.
  *
- * Tots els callers actuals (18) que feien `await sendEmail(...)` segueixen
- * funcionant — només ignoren el retorn.
+ * Els callers canònics creen primer `EmailSend.htmlBody` i només després fan
+ * aquest enviament SMTP/IMAP per conservar el cos reconstruïble i l'estat real
+ * del canal.
  */
 export interface SendEmailResult {
   /** True si SMTP ha acceptat almenys un destinatari. */
@@ -429,29 +458,6 @@ async function appendBuiltMimeToSent(mailOpts: nodemailer.SendMailOptions): Prom
   return { ok: res.ok, folder: res.folder, uid: res.uid, error: res.error };
 }
 
-export async function sendEmailWithTimeout(
-  options: SendEmailOptions,
-  timeoutMs = 8000
-): Promise<void> {
-  let timeoutId: NodeJS.Timeout | null = null;
-
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => {
-      reject(new Error(`Email send timed out after ${timeoutMs}ms`));
-    }, timeoutMs);
-  });
-
-  try {
-    await Promise.race([sendEmail(options), timeoutPromise]);
-  } finally {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-  }
-}
-
-
-
 export async function sendPrivacyVerificationEmail(params: {
   to: string;
   name: string;
@@ -469,79 +475,84 @@ export async function sendPrivacyVerificationEmail(params: {
 
   const verificationUrl = `${getAppBaseUrl()}/api/privacy/verify?token=${verificationToken}`;
   const requestLabel = labels[requestType] || requestType;
-
-  await sendEmail({
-    to,
-    subject: sanitizeHeader(`${t.verifyTitle} — ${requestLabel} — Òrbita Events`),
-    html: `
-      <!DOCTYPE html>
-      <html lang="${locale}">
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
-        <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
-          <div style="background: linear-gradient(135deg, #DAA520, #B8860B); padding: 30px; text-align: center;">
-            <h1 style="color: #000; margin: 0; font-size: 24px;">Òrbita Events</h1>
-            <p style="color: rgba(0,0,0,0.7); margin: 8px 0 0 0; font-size: 14px;">${escapeHtml(t.portalTitle)}</p>
-          </div>
-
-          <div style="padding: 30px; color: #e5e5e5;">
-            <h2 style="color: #DAA520; margin-top: 0;">${escapeHtml(t.verifyTitle)}</h2>
-
-            <p style="font-size: 16px; line-height: 1.6;">${t.greeting(name)}</p>
-
-            <p style="font-size: 16px; line-height: 1.6;">${t.received(requestLabel)}</p>
-
-            <p style="font-size: 16px; line-height: 1.6;">${escapeHtml(t.verifyInstructions)}</p>
-
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${verificationUrl}"
-                 style="background: linear-gradient(135deg, #DAA520, #B8860B);
-                        color: #000;
-                        padding: 16px 32px;
-                        text-decoration: none;
-                        border-radius: 12px;
-                        font-weight: bold;
-                        font-size: 16px;
-                        display: inline-block;">
-                ${escapeHtml(t.verifyCta)}
-              </a>
-            </div>
-
-            <p style="color: #a3a3a3; font-size: 14px; line-height: 1.6;">
-              ${t.linkValid}
-              ${escapeHtml(t.linkIgnore)}
-            </p>
-
-            <div style="background: rgba(218,165,32,0.1); border: 1px solid rgba(218,165,32,0.3); border-radius: 12px; padding: 16px; margin: 24px 0;">
-              <p style="margin: 0 0 8px 0; font-size: 12px; color: #a3a3a3;">
-                <strong style="color: #DAA520;">${escapeHtml(t.reference)}</strong> ${escapeHtml(requestId)}
-              </p>
-              <p style="margin: 0; font-size: 12px; color: #a3a3a3;">
-                <strong style="color: #DAA520;">${escapeHtml(t.legalDeadline)}</strong> ${legalDeadline.toLocaleDateString(intlLocale, { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
-            </div>
-
-            <p style="color: #666; font-size: 12px; word-break: break-all;">
-              ${escapeHtml(t.linkFallback)}<br>
-              <a href="${verificationUrl}" style="color: #DAA520;">${verificationUrl}</a>
-            </p>
-          </div>
-
-          <div style="padding: 20px; background: #0a0a0a; text-align: center;">
-            <p style="margin: 0; font-size: 12px; color: #666;">
-              ${new Date().getFullYear()} ${escapeHtml(t.allRights)}
-            </p>
-            <p style="margin: 8px 0 0 0; font-size: 11px; color: #444;">
-              ${escapeHtml(t.gdprNote)}
-            </p>
-          </div>
+  const subject = sanitizeHeader(`${t.verifyTitle} — ${requestLabel} — Òrbita Events`);
+  const html = `
+    <!DOCTYPE html>
+    <html lang="${locale}">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
+      <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #DAA520, #B8860B); padding: 30px; text-align: center;">
+          <h1 style="color: #000; margin: 0; font-size: 24px;">Òrbita Events</h1>
+          <p style="color: rgba(0,0,0,0.7); margin: 8px 0 0 0; font-size: 14px;">${escapeHtml(t.portalTitle)}</p>
         </div>
-      </body>
-      </html>
-    `,
+
+        <div style="padding: 30px; color: #e5e5e5;">
+          <h2 style="color: #DAA520; margin-top: 0;">${escapeHtml(t.verifyTitle)}</h2>
+
+          <p style="font-size: 16px; line-height: 1.6;">${t.greeting(name)}</p>
+
+          <p style="font-size: 16px; line-height: 1.6;">${t.received(requestLabel)}</p>
+
+          <p style="font-size: 16px; line-height: 1.6;">${escapeHtml(t.verifyInstructions)}</p>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}"
+               style="background: linear-gradient(135deg, #DAA520, #B8860B);
+                      color: #000;
+                      padding: 16px 32px;
+                      text-decoration: none;
+                      border-radius: 12px;
+                      font-weight: bold;
+                      font-size: 16px;
+                      display: inline-block;">
+              ${escapeHtml(t.verifyCta)}
+            </a>
+          </div>
+
+          <p style="color: #a3a3a3; font-size: 14px; line-height: 1.6;">
+            ${t.linkValid}
+            ${escapeHtml(t.linkIgnore)}
+          </p>
+
+          <div style="background: rgba(218,165,32,0.1); border: 1px solid rgba(218,165,32,0.3); border-radius: 12px; padding: 16px; margin: 24px 0;">
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #a3a3a3;">
+              <strong style="color: #DAA520;">${escapeHtml(t.reference)}</strong> ${escapeHtml(requestId)}
+            </p>
+            <p style="margin: 0; font-size: 12px; color: #a3a3a3;">
+              <strong style="color: #DAA520;">${escapeHtml(t.legalDeadline)}</strong> ${legalDeadline.toLocaleDateString(intlLocale, { day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+          </div>
+
+          <p style="color: #666; font-size: 12px; word-break: break-all;">
+            ${escapeHtml(t.linkFallback)}<br>
+            <a href="${verificationUrl}" style="color: #DAA520;">${verificationUrl}</a>
+          </p>
+        </div>
+
+        <div style="padding: 20px; background: #0a0a0a; text-align: center;">
+          <p style="margin: 0; font-size: 12px; color: #666;">
+            ${new Date().getFullYear()} ${escapeHtml(t.allRights)}
+          </p>
+          <p style="margin: 8px 0 0 0; font-size: 11px; color: #444;">
+            ${escapeHtml(t.gdprNote)}
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  await sendTrackedStandaloneEmail({
+    templateKey: 'privacy-verification',
+    to,
+    subject,
+    html,
+    locale,
+    orbita: { kind: 'admin', id: `privacy-${requestId}`, origin: 'privacy-verification' },
   });
 }
 
@@ -549,12 +560,13 @@ export async function sendPrivacyRequestCompletedEmail(params: {
   to: string;
   name: string;
   requestType: string;
+  requestId: string;
   result: 'approved' | 'rejected';
   notes?: string;
   downloadUrl?: string;
   locale?: string;
 }): Promise<void> {
-  const { to, name, requestType, result, notes, downloadUrl } = params;
+  const { to, name, requestType, requestId, result, notes, downloadUrl } = params;
   const locale = normalizeEmailLocale(params.locale);
   const t = PRIVACY_COPY[locale];
   const labels = PRIVACY_REQUEST_LABELS[locale];
@@ -563,75 +575,82 @@ export async function sendPrivacyRequestCompletedEmail(params: {
   const isApproved = result === 'approved';
   const headerTitle = isApproved ? t.processed : t.rejected;
   const bodyText = isApproved ? t.processedBody(requestLabel) : t.rejectedBody(requestLabel);
-
-  await sendEmail({
-    to,
-    subject: sanitizeHeader(`${headerTitle} — ${requestLabel} — Òrbita Events`),
-    html: `
-      <!DOCTYPE html>
-      <html lang="${locale}">
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
-        <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
-          <div style="background: ${isApproved ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'linear-gradient(135deg, #ef4444, #dc2626)'}; padding: 30px; text-align: center;">
-            <h1 style="color: #fff; margin: 0; font-size: 24px;">
-              ${escapeHtml(headerTitle)}
-            </h1>
-          </div>
-
-          <div style="padding: 30px; color: #e5e5e5;">
-            <p style="font-size: 16px; line-height: 1.6;">${t.greeting(name)}</p>
-
-            <p style="font-size: 16px; line-height: 1.6;">${bodyText}</p>
-
-            ${notes ? `
-            <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; margin: 24px 0;">
-              <p style="margin: 0; font-size: 14px; color: #a3a3a3;">
-                <strong style="color: #fff;">${escapeHtml(t.notes)}</strong><br>
-                ${escapeHtml(notes)}
-              </p>
-            </div>
-            ` : ''}
-
-            ${downloadUrl ? `
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${escapeHtml(downloadUrl)}"
-                 style="background: linear-gradient(135deg, #DAA520, #B8860B);
-                        color: #000;
-                        padding: 16px 32px;
-                        text-decoration: none;
-                        border-radius: 12px;
-                        font-weight: bold;
-                        font-size: 16px;
-                        display: inline-block;">
-                ${escapeHtml(t.downloadCta)}
-              </a>
-            </div>
-            ` : ''}
-
-            <p style="font-size: 14px; line-height: 1.6; color: #a3a3a3;">
-              ${escapeHtml(t.contactNote)}
-              <a href="mailto:${SITE_CONFIG.business.email}" style="color: #DAA520;">${SITE_CONFIG.business.email}</a>
-            </p>
-          </div>
-
-          <div style="padding: 20px; background: #0a0a0a; text-align: center;">
-            <p style="margin: 0; font-size: 12px; color: #666;">
-              ${new Date().getFullYear()} ${escapeHtml(t.allRights)}
-            </p>
-          </div>
+  const subject = sanitizeHeader(`${headerTitle} — ${requestLabel} — Òrbita Events`);
+  const html = `
+    <!DOCTYPE html>
+    <html lang="${locale}">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
+      <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
+        <div style="background: ${isApproved ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'linear-gradient(135deg, #ef4444, #dc2626)'}; padding: 30px; text-align: center;">
+          <h1 style="color: #fff; margin: 0; font-size: 24px;">
+            ${escapeHtml(headerTitle)}
+          </h1>
         </div>
-      </body>
-      </html>
-    `,
+
+        <div style="padding: 30px; color: #e5e5e5;">
+          <p style="font-size: 16px; line-height: 1.6;">${t.greeting(name)}</p>
+
+          <p style="font-size: 16px; line-height: 1.6;">${bodyText}</p>
+
+          ${notes ? `
+          <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; margin: 24px 0;">
+            <p style="margin: 0; font-size: 14px; color: #a3a3a3;">
+              <strong style="color: #fff;">${escapeHtml(t.notes)}</strong><br>
+              ${escapeHtml(notes)}
+            </p>
+          </div>
+          ` : ''}
+
+          ${downloadUrl ? `
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${escapeHtml(downloadUrl)}"
+               style="background: linear-gradient(135deg, #DAA520, #B8860B);
+                      color: #000;
+                      padding: 16px 32px;
+                      text-decoration: none;
+                      border-radius: 12px;
+                      font-weight: bold;
+                      font-size: 16px;
+                      display: inline-block;">
+              ${escapeHtml(t.downloadCta)}
+            </a>
+          </div>
+          ` : ''}
+
+          <p style="font-size: 14px; line-height: 1.6; color: #a3a3a3;">
+            ${escapeHtml(t.contactNote)}
+            <a href="mailto:${SITE_CONFIG.business.email}" style="color: #DAA520;">${SITE_CONFIG.business.email}</a>
+          </p>
+        </div>
+
+        <div style="padding: 20px; background: #0a0a0a; text-align: center;">
+          <p style="margin: 0; font-size: 12px; color: #666;">
+            ${new Date().getFullYear()} ${escapeHtml(t.allRights)}
+          </p>
+          <p style="margin: 8px 0 0 0; font-size: 11px; color: #444;">
+            ${escapeHtml(t.gdprNote)}
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  await sendTrackedStandaloneEmail({
+    templateKey: 'privacy-request-completed',
+    to,
+    subject,
+    html,
+    locale,
+    orbita: { kind: 'admin', id: `privacy-${requestId}`, origin: 'privacy-request-completed' },
   });
 }
 
-
-export async function sendTestimonialApprovedEmail(params: {
+export type TestimonialApprovedEmailParams = {
   to: string;
   name: string;
   rating: number;
@@ -639,7 +658,18 @@ export async function sendTestimonialApprovedEmail(params: {
   discountPercent?: number;
   eventType?: string;
   locale?: string;
-}): Promise<void> {
+};
+
+export type TestimonialApprovedEmailPayload = {
+  to: string;
+  subject: string;
+  html: string;
+  locale: EmailLocale;
+};
+
+export function buildTestimonialApprovedEmailPayload(
+  params: TestimonialApprovedEmailParams
+): TestimonialApprovedEmailPayload {
   const { to, name, rating, discountCode, discountPercent = 10, eventType } = params;
   const locale = normalizeEmailLocale(params.locale);
   const t = TESTIMONIAL_COPY[locale];
@@ -656,7 +686,7 @@ export async function sendTestimonialApprovedEmail(params: {
   const canvasUrl = `${baseUrl}/api/canvas/rating?${canvasParams.toString()}`;
   const firstName = name.split(' ')[0] || name;
 
-  await sendEmail({
+  return {
     to,
     subject: t.subject(discountPercent),
     html: `
@@ -737,285 +767,129 @@ export async function sendTestimonialApprovedEmail(params: {
       </body>
       </html>
     `,
+    locale,
+  };
+}
+
+export async function sendTestimonialApprovedEmail(
+  params: TestimonialApprovedEmailParams
+): Promise<void> {
+  const payload = buildTestimonialApprovedEmailPayload(params);
+  await sendTrackedStandaloneEmail({
+    templateKey: 'testimonial-approved',
+    to: payload.to,
+    subject: payload.subject,
+    html: payload.html,
+    locale: payload.locale,
+    orbita: { kind: 'customer', origin: 'testimonial-approved' },
   });
 }
 
-export async function sendTestimonialAdminNotification(params: {
-  customerName: string;
-  customerEmail: string;
-  rating: number;
-  comment: string;
-  discountCode: string;
-  discountPercent: number;
-  hasPhoto: boolean;
-  hasVideo: boolean;
-}): Promise<void> {
-  const { customerName, customerEmail, rating, comment, discountCode, discountPercent, hasPhoto, hasVideo } = params;
-  const adminEmail = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
-  const baseUrl = getAppBaseUrl();
+type PublicBookingRequestEmailCopy = {
+  subject: (reference: string) => string;
+  title: string;
+  referenceLabel: string;
+  greeting: string;
+  intro: string;
+  eventDetailsTitle: string;
+  dateLabel: string;
+  timeLabel: string;
+  locationLabel: string;
+  venueLabel: string;
+  guestsLabel: string;
+  guestsUnit: string;
+  servicesTitle: string;
+  extraHoursLabel: string;
+  totalLabel: string;
+  nextStepsTitle: string;
+  nextSteps: string[];
+  contactPrompt: string;
+  footer: string;
+};
 
-  const stars = '*'.repeat(Math.min(5, Math.max(1, rating)));
-  const mediaIndicators = [
-    hasPhoto ? 'Foto' : null,
-    hasVideo ? 'Video' : null,
-  ].filter(Boolean).join(' y ') || 'Sin media';
+const PUBLIC_BOOKING_REQUEST_EMAIL_COPY: Record<EmailLocale, PublicBookingRequestEmailCopy> = {
+  ca: {
+    subject: (reference) => `Sol·licitud de reserva rebuda #${reference} - Òrbita Events`,
+    title: 'Sol·licitud de reserva rebuda',
+    referenceLabel: 'Referència',
+    greeting: 'Hola',
+    intro: 'Hem rebut la teva sol·licitud de reserva. La data queda bloquejada provisionalment mentre revisem disponibilitat, encaix tècnic i detalls.',
+    eventDetailsTitle: "Detalls de l'esdeveniment",
+    dateLabel: 'Data',
+    timeLabel: 'Horari',
+    locationLabel: 'Ubicació',
+    venueLabel: 'Local',
+    guestsLabel: 'Convidats',
+    guestsUnit: 'persones',
+    servicesTitle: 'Serveis sol·licitats',
+    extraHoursLabel: 'Hores extra',
+    totalLabel: 'Total estimat',
+    nextStepsTitle: 'Propers passos',
+    nextSteps: [
+      'Revisarem la disponibilitat i els detalls tècnics durant les properes 24 h.',
+      'T\'enviarem la proposta o contracte amb les condicions del servei.',
+      'Quan tot estigui validat, podràs deixar la reserva confirmada amb la paga i senyal.',
+    ],
+    contactPrompt: 'Si tens qualsevol pregunta, respon aquest email o contacta amb nosaltres:',
+    footer: 'Òrbita Events - Barcelona i Girona',
+  },
+  es: {
+    subject: (reference) => `Solicitud de reserva recibida #${reference} - Òrbita Events`,
+    title: 'Solicitud de reserva recibida',
+    referenceLabel: 'Referencia',
+    greeting: 'Hola',
+    intro: 'Hemos recibido tu solicitud de reserva. La fecha queda bloqueada provisionalmente mientras revisamos disponibilidad, encaje técnico y detalles.',
+    eventDetailsTitle: 'Detalles del evento',
+    dateLabel: 'Fecha',
+    timeLabel: 'Horario',
+    locationLabel: 'Ubicación',
+    venueLabel: 'Local',
+    guestsLabel: 'Invitados',
+    guestsUnit: 'personas',
+    servicesTitle: 'Servicios solicitados',
+    extraHoursLabel: 'Horas extra',
+    totalLabel: 'Total estimado',
+    nextStepsTitle: 'Próximos pasos',
+    nextSteps: [
+      'Revisaremos la disponibilidad y los detalles técnicos durante las próximas 24 h.',
+      'Te enviaremos la propuesta o contrato con las condiciones del servicio.',
+      'Cuando todo esté validado, podrás dejar la reserva confirmada con la señal.',
+    ],
+    contactPrompt: 'Si tienes cualquier pregunta, responde a este email o contacta con nosotros:',
+    footer: 'Òrbita Events - Barcelona y Girona',
+  },
+  en: {
+    subject: (reference) => `Booking request received #${reference} - Orbita Events`,
+    title: 'Booking request received',
+    referenceLabel: 'Reference',
+    greeting: 'Hi',
+    intro: 'We have received your booking request. The date is provisionally blocked while we review availability, technical fit and details.',
+    eventDetailsTitle: 'Event details',
+    dateLabel: 'Date',
+    timeLabel: 'Time',
+    locationLabel: 'Location',
+    venueLabel: 'Venue',
+    guestsLabel: 'Guests',
+    guestsUnit: 'people',
+    servicesTitle: 'Requested services',
+    extraHoursLabel: 'Extra hours',
+    totalLabel: 'Estimated total',
+    nextStepsTitle: 'Next steps',
+    nextSteps: [
+      'We will review availability and technical details within the next 24 h.',
+      'We will send you the proposal or contract with the service terms.',
+      'Once everything is validated, you can confirm the booking with the deposit.',
+    ],
+    contactPrompt: 'If you have any questions, reply to this email or contact us:',
+    footer: 'Orbita Events - Barcelona and Girona',
+  },
+};
 
-  await sendEmail({
-    to: adminEmail,
-    subject: sanitizeHeader(`Nueva opinion: ${customerName} ${stars} - Pendiente de aprobar`),
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
-        <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
-          <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 30px; text-align: center;">
-            <h1 style="color: #fff; margin: 0; font-size: 24px;">Nueva opinion recibida</h1>
-            <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0 0;">Pendiente de revision y aprobacion</p>
-          </div>
-
-          <div style="padding: 30px;">
-            <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-              <p style="margin: 0 0 8px 0; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;">Cliente</p>
-              <p style="margin: 0; font-size: 20px; font-weight: bold; color: #fff;">${escapeHtml(customerName)}</p>
-              <p style="margin: 4px 0 0 0; font-size: 14px; color: #60a5fa;">${escapeHtml(customerEmail)}</p>
-            </div>
-
-            <div style="text-align: center; margin: 24px 0;">
-              <p style="margin: 0; font-size: 36px;">${stars}</p>
-              <p style="margin: 4px 0 0 0; font-size: 14px; color: #888;">${rating}/5 estrellas</p>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); border-left: 3px solid #FFB800; padding: 16px; border-radius: 0 12px 12px 0; margin: 20px 0;">
-              <p style="margin: 0; font-size: 15px; color: #e5e5e5; line-height: 1.6; font-style: italic;">
-                "${escapeHtml(comment.length > 300 ? comment.substring(0, 300) + '...' : comment)}"
-              </p>
-            </div>
-
-            <div style="display: flex; gap: 16px; margin: 20px 0;">
-              <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; text-align: center;">
-                <p style="margin: 0 0 4px 0; font-size: 12px; color: #888;">Media</p>
-                <p style="margin: 0; font-size: 14px; color: #fff;">${mediaIndicators}</p>
-              </div>
-              <div style="flex: 1; background: rgba(255,184,0,0.1); border-radius: 12px; padding: 16px; text-align: center;">
-                <p style="margin: 0 0 4px 0; font-size: 12px; color: #888;">Descuento generado</p>
-                <p style="margin: 0; font-size: 14px; color: #FFB800; font-weight: bold;">${escapeHtml(discountCode)} (${discountPercent}%)</p>
-              </div>
-            </div>
-
-            <div style="text-align: center; margin: 30px 0 10px;">
-              <a href="${baseUrl}/admin/ressenyes"
-                 style="background: linear-gradient(135deg, #22c55e, #16a34a);  
-                        color: #fff;
-                        padding: 16px 32px;
-                        text-decoration: none;
-                        border-radius: 12px;
-                        font-weight: bold;
-                        font-size: 16px;
-                        display: inline-block;">
-                Revisar y aprobar
-              </a>
-            </div>
-          </div>
-
-          <div style="padding: 20px; background: #0a0a0a; text-align: center;">
-            <p style="margin: 0; font-size: 12px; color: #666;">
-              Orbita Events | Sistema de opiniones automatizado
-            </p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-    replyTo: customerEmail,
-  });
-}
-
-export async function sendTestimonialsReminderEmail(params: {
-  to: string;
-  pendingCount: number;
-  testimonials: Array<{
-    name: string;
-    rating: number;
-    comment: string;
-    createdAt: Date;
-  }>;
-  dashboardUrl: string;
-}): Promise<void> {
-  const { to, pendingCount, testimonials, dashboardUrl } = params;
-  const previewRows = testimonials
-    .map((t) => {
-      const date = t.createdAt.toLocaleDateString('ca-ES', {
-        day: '2-digit',
-        month: 'short',
-      });
-      return `
-        <tr>
-          <td style="padding: 8px 0; color: #fff; font-size: 14px;">${escapeHtml(t.name)}</td>
-          <td style="padding: 8px 0; color: #FFB800; font-size: 14px;">⭐ ${t.rating}/5</td>
-          <td style="padding: 8px 0; color: #9ca3af; font-size: 12px;">${date}</td>
-        </tr>
-        <tr>
-          <td colspan="3" style="padding: 0 0 12px 0; color: #d1d5db; font-size: 13px;">
-            "${escapeHtml(t.comment.slice(0, 140))}${t.comment.length > 140 ? '…' : ''}"
-          </td>
-        </tr>
-      `;
-    })
-    .join('');
-
-  await sendEmail({
-    to,
-    subject: sanitizeHeader(
-      `Tienes ${pendingCount} testimonio${pendingCount === 1 ? '' : 's'} pendiente${pendingCount === 1 ? '' : 's'}`
-    ),
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
-        <div style="max-width: 600px; margin: 0 auto; background: #111; border-radius: 16px; overflow: hidden;">
-          <div style="background: linear-gradient(135deg, #1f2937, #111827); padding: 32px; text-align: center;">
-            <h1 style="color: #FFB800; margin: 0; font-size: 24px;">Testimonios pendientes</h1>
-            <p style="color: rgba(255,255,255,0.6); margin: 10px 0 0;">${pendingCount} en espera de revisión</p>
-          </div>
-          <div style="padding: 24px 32px; color: #e5e7eb;">
-            <p style="margin: 0 0 20px;">Aquí tienes un resumen rápido de los últimos testimonios:</p>
-            <table style="width: 100%; border-collapse: collapse;">
-              ${previewRows}
-            </table>
-            <div style="text-align: center; margin: 24px 0;">
-              <a href="${dashboardUrl}"
-                 style="background: linear-gradient(135deg, #FFB800, #CC9600);
-                        color: #000;
-                        padding: 14px 28px;
-                        text-decoration: none;
-                        border-radius: 999px;
-                        font-weight: bold;
-                        font-size: 14px;
-                        display: inline-block;">
-                Revisar testimonios
-              </a>
-            </div>
-          </div>
-          <div style="padding: 16px; background: #0a0a0a; text-align: center;">
-            <p style="margin: 0; font-size: 11px; color: #6b7280;">
-              ${new Date().getFullYear()} Òrbita Events
-            </p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-  });
-}
-
-export async function sendTestimonialReceivedEmail(params: {
-  to: string;
-  name: string;
-  rating: number;
-  discountCode: string;
-  discountPercent: number;
-}): Promise<void> {
-  const { to, name, rating, discountCode, discountPercent } = params;
-  const baseUrl = getAppBaseUrl();
-  const firstName = name.split(' ')[0];
-
-  const ratingBadge = rating >= 5 ? 'Excelente' : rating >= 4 ? 'Genial' : rating >= 3 ? 'Bien' : 'Gracias';
-  const stars = '*'.repeat(Math.min(5, Math.max(1, rating)));
-
-  await sendEmail({
-    to,
-    subject: sanitizeHeader(`${firstName}, aqui tienes tu ${discountPercent}% de descuento! - Orbita Events`),
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
-        <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
-          <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d1f00 50%, #3d2800 100%); padding: 40px; text-align: center;">
-            <div style="font-size: 12px; margin-bottom: 12px; letter-spacing: 2px; color: #FFB800; text-transform: uppercase;">${ratingBadge}</div>
-            <h1 style="color: #FFB800; margin: 0; font-size: 28px; font-weight: 300;">
-              <span style="font-weight: 800;">GRACIAS</span> ${firstName.toUpperCase()}!
-            </h1>
-            <p style="color: rgba(255,255,255,0.6); margin: 12px 0 0 0; font-size: 14px;">
-              ${stars} Tu opinion nos hace muy felices
-            </p>
-          </div>
-
-          <div style="padding: 30px;">
-            <div style="background: linear-gradient(135deg, rgba(255,184,0,0.15), rgba(255,140,0,0.1)); border: 2px solid rgba(255,184,0,0.4); border-radius: 20px; padding: 32px; text-align: center;">
-              <p style="margin: 0 0 8px 0; font-size: 14px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 2px;">
-                TU CODIGO DE DESCUENTO
-              </p>
-              <p style="margin: 8px 0; font-size: 42px; font-weight: 800; color: #FFB800; letter-spacing: 4px; font-family: monospace;">
-                ${escapeHtml(discountCode)}
-              </p>
-              <div style="background: linear-gradient(135deg, #FFB800, #FF8C00); color: #000; display: inline-block; padding: 12px 24px; border-radius: 50px; margin-top: 12px;">
-                <span style="font-size: 28px; font-weight: 900;">${discountPercent}% DESCUENTO</span>
-              </div>
-              <p style="margin: 16px 0 0 0; font-size: 13px; color: rgba(255,255,255,0.5);">
-                Valido durante 1 ano - Para tu proximo evento
-              </p>
-            </div>
-          </div>
-
-          <div style="padding: 0 30px 30px; color: #e5e5e5;">
-            <p style="font-size: 16px; line-height: 1.7; margin: 0;">
-              Hemos recibido tu valoracion y la revisaremos pronto. Mientras tanto, <strong style="color: #FFB800;">puedes usar tu codigo de descuento</strong> en cualquiera de nuestros servicios.
-            </p>
-
-            <div style="margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 3px solid #FFB800;">
-              <p style="margin: 0; font-size: 14px; color: #a3a3a3;">
-                <strong style="color: #fff;">Consejo:</strong> Guarda este email o haz una captura del codigo. Lo necesitaras cuando reserves.
-              </p>
-            </div>
-
-            <div style="text-align: center; margin: 30px 0 10px;">
-              <a href="${baseUrl}/contacto"
-                 style="background: linear-gradient(135deg, #FFB800, #CC9600);
-                        color: #000;
-                        padding: 16px 32px;
-                        text-decoration: none;
-                        border-radius: 12px;
-                        font-weight: bold;
-                        font-size: 16px;
-                        display: inline-block;">
-                Reservar con descuento
-              </a>
-            </div>
-          </div>
-
-          <div style="padding: 20px; background: #0a0a0a; text-align: center;">
-            <p style="margin: 0; font-size: 12px; color: #666;">
-              ${new Date().getFullYear()} Orbita Events - Barcelona y Girona
-            </p>
-            <p style="margin: 8px 0 0 0; font-size: 11px; color: #444;">
-              ${SITE_CONFIG.business.phone} - ${SITE_CONFIG.business.email}
-            </p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-  });
-}
-
-/**
- * Send booking confirmation email to client
- */
-export async function sendBookingConfirmation(booking: BookingEmailModel): Promise<void> {
+export function buildPublicBookingRequestEmail(booking: BookingEmailModel): { subject: string; html: string } {
+  const locale = normalizeEmailLocale(booking.preferredLocale);
+  const copy = PUBLIC_BOOKING_REQUEST_EMAIL_COPY[locale];
   const eventDate = new Date(booking.eventDate);
-  const formattedDate = eventDate.toLocaleDateString(toIntlLocaleEmail((booking.preferredLocale || 'ca') as EmailLocale), {
+  const formattedDate = eventDate.toLocaleDateString(toIntlLocaleEmail(locale), {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -1023,7 +897,7 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
   });
 
   const packName =
-    booking.pack.translations.find((t: BookingEmailTranslation) => t.locale === booking.preferredLocale)?.name ||
+    booking.pack.translations.find((t: BookingEmailTranslation) => t.locale === locale)?.name ||
     booking.pack.slug;
 
   let extrasHtml = '';
@@ -1031,19 +905,22 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
     extrasHtml = booking.extras
       .map((extra: BookingEmailExtraLine) => {
         const extraName =
-          extra.extra.translations.find((t: BookingEmailTranslation) => t.locale === booking.preferredLocale)?.name ||
+          extra.extra.translations.find((t: BookingEmailTranslation) => t.locale === locale)?.name ||
           extra.extra.slug;
         return `<li>${escapeHtml(extraName)} - ${extra.price}€</li>`;
       })
       .join('');
   }
 
-  await sendEmail({
-    to: booking.clientEmail,
-    subject: `Confirmación de Reserva #${booking.reference} - Òrbita Events`,
+  const nextStepsHtml = copy.nextSteps
+    .map((step) => `<li>${escapeHtml(step)}</li>`)
+    .join('');
+
+  return {
+    subject: copy.subject(booking.reference),
     html: `
       <!DOCTYPE html>
-      <html>
+      <html lang="${locale}">
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1053,59 +930,59 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
           <!-- Header -->
           <div style="padding: 32px 20px; background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%); text-align: center;">
             <h1 style="margin: 0; font-size: 28px; color: #fff; font-weight: bold;">
-              ¡Reserva Confirmada! 🎉
+              ${escapeHtml(copy.title)}
             </h1>
             <p style="margin: 12px 0 0 0; font-size: 14px; color: rgba(255,255,255,0.9);">
-              Referencia: <strong>${escapeHtml(booking.reference)}</strong>
+              ${escapeHtml(copy.referenceLabel)}: <strong>${escapeHtml(booking.reference)}</strong>
             </p>
           </div>
 
           <!-- Content -->
           <div style="padding: 32px 20px;">
             <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #ccc;">
-              Hola <strong>${escapeHtml(booking.clientName)}</strong>,
+              ${escapeHtml(copy.greeting)} <strong>${escapeHtml(booking.clientName)}</strong>,
             </p>
 
             <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #ccc;">
-              Tu reserva ha sido confirmada. A continuación encontrarás todos los detalles:
+              ${escapeHtml(copy.intro)}
             </p>
 
             <!-- Event Details -->
             <div style="background: #1a1a1a; border-left: 4px solid #7C3AED; padding: 20px; margin-bottom: 24px;">
-              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">📅 Detalles del Evento</h2>
+              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">${escapeHtml(copy.eventDetailsTitle)}</h2>
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Fecha:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.dateLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; font-weight: bold; text-align: right;">
-                    ${formattedDate}
+                    ${escapeHtml(formattedDate)}
                   </td>
                 </tr>
                 ${booking.eventStartTime ? `
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Horario:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.timeLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
                     ${escapeHtml(booking.eventStartTime)}${booking.eventEndTime ? ` - ${escapeHtml(booking.eventEndTime)}` : ''}
                   </td>
                 </tr>
                 ` : ''}
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Ubicación:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.locationLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
                     ${escapeHtml(booking.eventLocation)}
                   </td>
                 </tr>
                 ${booking.eventVenue ? `
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Local:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.venueLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
                     ${escapeHtml(booking.eventVenue)}
                   </td>
                 </tr>
                 ` : ''}
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Invitados:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.guestsLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
-                    ${booking.guestCount} personas
+                    ${booking.guestCount} ${escapeHtml(copy.guestsUnit)}
                   </td>
                 </tr>
               </table>
@@ -1113,18 +990,18 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
 
             <!-- Services -->
             <div style="background: #1a1a1a; border-left: 4px solid #EC4899; padding: 20px; margin-bottom: 24px;">
-              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">🎵 Servicios Contratados</h2>
+              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">${escapeHtml(copy.servicesTitle)}</h2>
               <ul style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
                 <li><strong>${escapeHtml(packName)}</strong> - ${booking.pack.price}€</li>
                 ${extrasHtml}
                 ${booking.extraHours > 0 && booking.pack.extraHourPrice
-                  ? `<li>Horas extra (${booking.extraHours}h) - ${booking.pack.extraHourPrice * booking.extraHours}€</li>`
+                  ? `<li>${escapeHtml(copy.extraHoursLabel)} (${booking.extraHours}h) - ${booking.pack.extraHourPrice * booking.extraHours}€</li>`
                   : ''}
               </ul>
 
               <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 18px; color: #999;">Total:</span>
+                  <span style="font-size: 18px; color: #999;">${escapeHtml(copy.totalLabel)}:</span>
                   <span style="font-size: 24px; font-weight: bold; color: #7C3AED;">
                     ${booking.total}€
                   </span>
@@ -1134,16 +1011,14 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
 
             <!-- Next Steps -->
             <div style="background: #1a1a1a; padding: 20px; margin-bottom: 24px;">
-              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">📋 Próximos Pasos</h2>
+              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">${escapeHtml(copy.nextStepsTitle)}</h2>
               <ol style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
-                <li>Nos pondremos en contacto contigo en las próximas 24h para confirmar todos los detalles</li>
-                <li>Recibirás un contrato con las condiciones del servicio</li>
-                <li>Te informaremos sobre las modalidades de pago disponibles</li>
+                ${nextStepsHtml}
               </ol>
             </div>
 
             <p style="margin: 24px 0 0 0; font-size: 14px; line-height: 1.6; color: #999;">
-              Si tienes cualquier pregunta, no dudes en contactarnos:
+              ${escapeHtml(copy.contactPrompt)}
             </p>
             <p style="margin: 8px 0 0 0; font-size: 14px; color: #ccc;">
               📧 ${SITE_CONFIG.business.email}<br>
@@ -1154,13 +1029,122 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
           <!-- Footer -->
           <div style="padding: 20px; background: #0a0a0a; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #666;">
-              ${new Date().getFullYear()} Òrbita Events - Barcelona y Girona
+              ${new Date().getFullYear()} ${escapeHtml(copy.footer)}
             </p>
           </div>
         </div>
       </body>
       </html>
     `,
+  };
+}
+
+const PUBLIC_BOOKING_REQUEST_TEMPLATE_KEY = 'public-booking-request';
+const PUBLIC_BOOKING_REQUEST_ORBITA_ORIGIN = 'public-booking-request';
+
+function buildTrackedStandaloneEmailHtml(html: string, trackingToken: string, baseUrl: string): string {
+  const trackedHtml = wrapLinksForTracking(html, trackingToken, baseUrl);
+  const pixel = `<img src="${baseUrl}/api/tracking/open/${trackingToken}" width="1" height="1" alt="" style="display:none" />`;
+  if (/<\/body>/i.test(trackedHtml)) {
+    return trackedHtml.replace(/<\/body>/i, `${pixel}</body>`);
+  }
+  return `${trackedHtml}${pixel}`;
+}
+
+function emailSendUpdateFromResult(result: SendEmailResult) {
+  return {
+    smtpAccepted: result.smtp.accepted,
+    smtpRejected: result.smtp.rejected,
+    smtpResponse: result.smtp.response,
+    smtpMessageId: result.smtp.messageId,
+    imapAppendOk: result.imapSent.attempted ? result.imapSent.ok : null,
+    imapSentFolder: result.imapSent.folder,
+    imapSentUid: result.imapSent.uid ?? null,
+    imapError: result.imapSent.error ?? null,
+  };
+}
+
+export async function sendTrackedStandaloneEmail(input: TrackedStandaloneEmailInput): Promise<TrackedStandaloneEmailResult> {
+  const baseUrl = getAppBaseUrl().replace(/\/+$/, '');
+  const trackingRecord = await recordEmailSend({
+    templateKey: input.templateKey,
+    to: input.to,
+    subject: input.subject,
+    leadId: input.leadId ?? null,
+    customerId: input.customerId ?? null,
+    locale: input.locale ?? null,
+    htmlBody: input.html,
+    orbitaKind: input.orbita?.kind ?? null,
+    orbitaId: input.orbita?.id ?? null,
+    orbitaOrigin: input.orbita?.origin ?? null,
+  });
+  try {
+    const result = await sendEmail({
+      to: input.to,
+      subject: input.subject,
+      html: buildTrackedStandaloneEmailHtml(input.html, trackingRecord.trackingToken, baseUrl),
+      replyTo: input.replyTo,
+      from: input.from,
+      text: input.text,
+      attachments: input.attachments,
+      brandingStyle: input.brandingStyle,
+      headers: input.headers,
+      skipImapAppend: input.skipImapAppend,
+      orbita: input.orbita,
+    });
+    await updateEmailSendResult(trackingRecord.id, emailSendUpdateFromResult(result)).catch(() => undefined);
+    return { emailSendId: trackingRecord.id };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await updateEmailSendResult(trackingRecord.id, {
+      smtpAccepted: [],
+      smtpRejected: [input.to],
+      smtpResponse: message,
+      smtpMessageId: '',
+      imapAppendOk: null,
+      imapSentFolder: null,
+      imapSentUid: null,
+      imapError: null,
+    }).catch(() => undefined);
+    throw error;
+  }
+}
+
+export async function sendTrackedStandaloneEmailWithTimeout(
+  input: TrackedStandaloneEmailInput,
+  timeoutMs = 8000
+): Promise<void> {
+  let timeoutId: NodeJS.Timeout | null = null;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`Email send timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+  });
+
+  try {
+    await Promise.race([sendTrackedStandaloneEmail(input), timeoutPromise]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
+}
+
+/**
+ * Send public booking request email to client.
+ */
+export async function sendBookingConfirmation(booking: BookingEmailModel): Promise<void> {
+  const email = buildPublicBookingRequestEmail(booking);
+  const locale = normalizeEmailLocale(booking.preferredLocale);
+  await sendTrackedStandaloneEmail({
+    templateKey: PUBLIC_BOOKING_REQUEST_TEMPLATE_KEY,
+    to: booking.clientEmail,
+    subject: email.subject,
+    customerId: booking.customerId ?? null,
+    locale,
+    html: email.html,
+    orbita: { kind: 'booking', id: booking.id, origin: PUBLIC_BOOKING_REQUEST_ORBITA_ORIGIN },
   });
 }
 
@@ -1178,9 +1162,10 @@ export async function sendBookingNotificationToAdmin(booking: BookingEmailModel)
 
   const adminEmail = process.env.EMAIL_TO || SITE_CONFIG.business.email;
 
-  await sendEmail({
+  await sendTrackedStandaloneEmail({
+    templateKey: 'booking-admin-notification',
     to: adminEmail,
-    subject: `🎉 Nueva Reserva #${booking.reference} - ${booking.clientName}`,
+    subject: `Nueva solicitud de reserva #${booking.reference} - ${booking.clientName}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -1189,9 +1174,10 @@ export async function sendBookingNotificationToAdmin(booking: BookingEmailModel)
       </head>
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #7C3AED;">Nueva Reserva Recibida</h1>
+          <h1 style="color: #7C3AED;">Nueva solicitud de reserva recibida</h1>
 
           <p><strong>Referencia:</strong> ${escapeHtml(booking.reference)}</p>
+          <p><strong>Estado:</strong> PENDING · revisión necesaria antes de confirmación final</p>
 
           <h2>Cliente</h2>
           <ul>
@@ -1230,10 +1216,7 @@ export async function sendBookingNotificationToAdmin(booking: BookingEmailModel)
       </body>
       </html>
     `,
+    customerId: booking.customerId ?? null,
+    orbita: { kind: 'booking', id: booking.id, origin: 'booking-admin-notification' },
   });
 }
-
-
-
-
-

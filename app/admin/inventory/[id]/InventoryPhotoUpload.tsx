@@ -174,11 +174,11 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
   }, [itemId, router]);
 
   return (
-    <div className="rounded-2xl border p-5 space-y-4">
+    <div className="ap-card p-5 space-y-4">
       <h2 className="text-sm font-semibold">Foto</h2>
 
       {error && (
-        <div className="rounded-xl border p-2">
+        <div className="ap-card p-2">
           <p className="text-xs">{error}</p>
         </div>
       )}
@@ -206,7 +206,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
                 type="button"
                 onClick={handleRemovePhoto}
                 disabled={uploading}
-                className="rounded-xl px-2 py-1 text-xs backdrop-blur-sm"
+                className="ap-btn ap-btn--xs"
               >
                 Treure
               </button>
@@ -225,7 +225,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
           className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all ${
             dragActive
               ? 'admin-tone-border-info admin-tone-bg-info'
-              : 'border-[var(--line)] bg-[var(--panel)] hover:border-white/20'
+              : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--line)]'
           }`}
         >
           {uploading ? (

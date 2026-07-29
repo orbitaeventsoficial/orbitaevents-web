@@ -1,7 +1,7 @@
 import { Prisma, type CustomerDiscountCode, type Proposal, type Task } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { findTaskLinkByTaskOrLegacyId } from '@/lib/services/tasks/leadScopedTaskService';
+import { findTaskLinkByTaskId } from '@/lib/services/tasks/leadScopedTaskService';
 import { readCustomerActivityLog, type CustomerActivityLogEntry } from '@/lib/services/customerActivityService';
 
 export type CustomerHubCustomer = Prisma.CustomerGetPayload<{
@@ -34,12 +34,57 @@ export type CustomerHubLead = Prisma.LeadGetPayload<{
   include: {
     activities: true;
     universalTasks: true;
-    booking: { select: { id: true; reference: true; status: true; total: true; depositAmount: true; remainingAmount: true; discountCode: true; eventType: true; eventDate: true; eventStartTime: true; eventEndTime: true; eventLocation: true; eventVenue: true; distanceKm: true; guestCount: true; depositPaid: true; remainingPaid: true } };
+    booking: { select: { id: true; reference: true; status: true; total: true; depositAmount: true; remainingAmount: true; cashAmount: true; discountCode: true; eventType: true; eventDate: true; eventStartTime: true; eventEndTime: true; eventLocation: true; eventVenue: true; distanceKm: true; guestCount: true; depositPaid: true; remainingPaid: true } };
   };
 }>;
 
 export type CustomerHubBooking = Prisma.BookingGetPayload<{
-  include: { pack: { include: { translations: true } } };
+  include: {
+    pack: { include: { translations: true } };
+    invoices: {
+      select: {
+        id: true;
+        reference: true;
+        status: true;
+        total: true;
+        pdfUrl: true;
+        holdedInvoiceUrl: true;
+        createdAt: true;
+      };
+    };
+    deliveryNotes: {
+      select: {
+        id: true;
+        reference: true;
+        status: true;
+        pdfUrl: true;
+        deliveredAt: true;
+        signedAt: true;
+        createdAt: true;
+      };
+    };
+    postEventReport: {
+      select: {
+        id: true;
+        status: true;
+        completedAt: true;
+        createdAt: true;
+        soundQuality: true;
+        maxDancefloor: true;
+        hadIncidents: true;
+      };
+    };
+    clientSurvey: {
+      select: {
+        id: true;
+        submittedAt: true;
+        overallRating: true;
+        npsScore: true;
+        testimonialPermission: true;
+        createdTestimonialId: true;
+      };
+    };
+  };
 }>;
 
 export type CustomerHubActivityLite = CustomerActivityLogEntry;
@@ -53,39 +98,72 @@ export type CustomerHubTaskLite = {
   leadId: string | null;
 };
 
+async function resolveCustomerIdFromLeadId(leadId: string): Promise<string | null> {
+  const lead = await safeQuery(
+    () => prisma.lead.findUnique({ where: { id: leadId }, select: { customerId: true } }),
+    null
+  );
+  return lead?.customerId || null;
+}
+
+async function resolveCustomerIdFromBookingId(bookingId: string): Promise<string | null> {
+  const booking = await safeQuery(
+    () => prisma.booking.findUnique({ where: { id: bookingId }, select: { customerId: true, leadId: true } }),
+    null
+  );
+  if (booking?.customerId) return booking.customerId;
+  if (booking?.leadId) return resolveCustomerIdFromLeadId(booking.leadId);
+  return null;
+}
+
 export async function resolveCustomerHubCustomerId(entityId: string): Promise<string | null> {
   const customer = await prisma.customer.findUnique({
     where: { id: entityId },
-    select: { id: true },
+    select: { id: true, mergedIntoId: true },
   });
+  if (customer?.mergedIntoId) return customer.mergedIntoId;
   if (customer?.id) return customer.id;
 
-  const lead = await safeQuery(
-    () => prisma.lead.findUnique({ where: { id: entityId }, select: { customerId: true } }),
-    null
-  );
-  if (lead?.customerId) return lead.customerId;
+  const leadCustomerId = await resolveCustomerIdFromLeadId(entityId);
+  if (leadCustomerId) return leadCustomerId;
 
-  const booking = await safeQuery(
-    () => prisma.booking.findUnique({ where: { id: entityId }, select: { leadId: true } }),
-    null
-  );
-  if (booking?.leadId) {
-    const bookingLeadId = booking.leadId;
-    const bookingLead = await safeQuery(
-      () => prisma.lead.findUnique({ where: { id: bookingLeadId }, select: { customerId: true } }),
-      null
-    );
-    if (bookingLead?.customerId) return bookingLead.customerId;
-  }
+  const bookingCustomerId = await resolveCustomerIdFromBookingId(entityId);
+  if (bookingCustomerId) return bookingCustomerId;
 
   const proposal = await safeQuery(
-    () => prisma.proposal.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    () => prisma.proposal.findUnique({ where: { id: entityId }, select: { customerId: true, leadId: true, bookingId: true } }),
     null
   );
   if (proposal?.customerId) return proposal.customerId;
+  if (proposal?.leadId) {
+    const proposalLeadCustomerId = await resolveCustomerIdFromLeadId(proposal.leadId);
+    if (proposalLeadCustomerId) return proposalLeadCustomerId;
+  }
+  if (proposal?.bookingId) {
+    const proposalBookingCustomerId = await resolveCustomerIdFromBookingId(proposal.bookingId);
+    if (proposalBookingCustomerId) return proposalBookingCustomerId;
+  }
 
-  const taskLink = await safeQuery(() => findTaskLinkByTaskOrLegacyId(entityId), null);
+  const dossier = await safeQuery(
+    () => prisma.dossier.findUnique({ where: { id: entityId }, select: { leadId: true } }),
+    null
+  );
+  if (dossier?.leadId) {
+    const dossierLeadCustomerId = await resolveCustomerIdFromLeadId(dossier.leadId);
+    if (dossierLeadCustomerId) return dossierLeadCustomerId;
+  }
+
+  const invoice = await safeQuery(
+    () => prisma.invoice.findUnique({ where: { id: entityId }, select: { customerId: true, bookingId: true } }),
+    null
+  );
+  if (invoice?.customerId) return invoice.customerId;
+  if (invoice?.bookingId) {
+    const invoiceBookingCustomerId = await resolveCustomerIdFromBookingId(invoice.bookingId);
+    if (invoiceBookingCustomerId) return invoiceBookingCustomerId;
+  }
+
+  const taskLink = await safeQuery(() => findTaskLinkByTaskId(entityId), null);
   if (taskLink?.customerId) return taskLink.customerId;
 
   const [leadActivity, leadDocument] = await Promise.all([
@@ -150,7 +228,7 @@ export async function fetchCustomerHubLeads(customerId: string): Promise<Custome
         include: {
           activities: { orderBy: { createdAt: 'desc' }, take: 60 },
           universalTasks: { orderBy: { createdAt: 'desc' }, take: 60 },
-          booking: { select: { id: true, reference: true, status: true, total: true, depositAmount: true, remainingAmount: true, discountCode: true, eventType: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true, eventVenue: true, distanceKm: true, guestCount: true, depositPaid: true, remainingPaid: true } },
+          booking: { select: { id: true, reference: true, status: true, total: true, depositAmount: true, remainingAmount: true, cashAmount: true, discountCode: true, eventType: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true, eventVenue: true, distanceKm: true, guestCount: true, depositPaid: true, remainingPaid: true } },
         },
       }),
     []
@@ -158,10 +236,14 @@ export async function fetchCustomerHubLeads(customerId: string): Promise<Custome
 }
 
 export async function fetchCustomerHubCollections(customerId: string, leadIds: string[]) {
+  const customerOrLeadWhere = leadIds.length > 0
+    ? { OR: [{ customerId }, { leadId: { in: leadIds } }] }
+    : { customerId };
+
   const proposals: Proposal[] = await safeQuery(
     () =>
       prisma.proposal.findMany({
-        where: { customerId },
+        where: customerOrLeadWhere,
         orderBy: { createdAt: 'desc' },
         take: 80,
       }),
@@ -171,29 +253,60 @@ export async function fetchCustomerHubCollections(customerId: string, leadIds: s
   const bookingsRaw: CustomerHubBooking[] = await safeQuery(
     () =>
       prisma.booking.findMany({
-        where: { customerId },
+        where: customerOrLeadWhere,
         orderBy: { createdAt: 'desc' },
         take: 80,
-        include: { pack: { include: { translations: true } } },
+        include: {
+          pack: { include: { translations: true } },
+          invoices: {
+            orderBy: { createdAt: 'desc' },
+            select: {
+              id: true,
+              reference: true,
+              status: true,
+              total: true,
+              pdfUrl: true,
+              holdedInvoiceUrl: true,
+              createdAt: true,
+            },
+          },
+          deliveryNotes: {
+            orderBy: [{ signedAt: 'desc' }, { createdAt: 'desc' }],
+            select: {
+              id: true,
+              reference: true,
+              status: true,
+              pdfUrl: true,
+              deliveredAt: true,
+              signedAt: true,
+              createdAt: true,
+            },
+          },
+          postEventReport: {
+            select: {
+              id: true,
+              status: true,
+              completedAt: true,
+              createdAt: true,
+              soundQuality: true,
+              maxDancefloor: true,
+              hadIncidents: true,
+            },
+          },
+          clientSurvey: {
+            select: {
+              id: true,
+              submittedAt: true,
+              overallRating: true,
+              npsScore: true,
+              testimonialPermission: true,
+              createdTestimonialId: true,
+            },
+          },
+        },
       }),
     []
   );
-
-  const bookingsFallbackRaw: CustomerHubBooking[] =
-    bookingsRaw.length > 0 || leadIds.length === 0
-      ? []
-      : await safeQuery(
-          () =>
-            prisma.booking.findMany({
-              where: { leadId: { in: leadIds } },
-              orderBy: { createdAt: 'desc' },
-              take: 80,
-              include: { pack: { include: { translations: true } } },
-            }),
-          []
-        );
-
-  const bookingsRows = bookingsRaw.length > 0 ? bookingsRaw : bookingsFallbackRaw;
 
   const customerTasks: Task[] = await safeQuery(
     () =>
@@ -222,7 +335,7 @@ export async function fetchCustomerHubCollections(customerId: string, leadIds: s
 
   return {
     proposals,
-    bookingsRows,
+    bookingsRows: bookingsRaw,
     customerTasks,
     activityLog,
     customerDiscountCodes,

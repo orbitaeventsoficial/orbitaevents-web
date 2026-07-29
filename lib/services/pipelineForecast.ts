@@ -185,7 +185,7 @@ export async function buildPipelineForecast(monthsAhead = 6, now: Date = new Dat
       combinedHigh,
       previousYearActual: Math.round(previousYearActual),
       confirmedBookings: confirmedSlot.count,
-      confirmedRevenue: Math.round(confirmedSlot.revenue),
+      confirmedRevenue: Math.round(confirmedSlot.revenue * 100) / 100,
     });
   }
 

@@ -5,10 +5,12 @@ import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { formatCurrency } from '@/lib/constants';
 
+type Notice = { type: 'success' | 'error'; text: string };
+
 export default function ProfitabilityConfigEditor({ initial }: { initial: ProfitabilityConfig }) {
   const [form, setForm] = useState<ProfitabilityConfig>(initial);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
 
   function update<K extends keyof ProfitabilityConfig>(key: K, value: ProfitabilityConfig[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -26,7 +28,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
 
   async function save() {
     setSaving(true);
-    setMsg(null);
+    setNotice(null);
     try {
       const res = await fetchWithCsrf('/api/admin/reports/profitability/config', {
         method: 'POST',
@@ -37,9 +39,9 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || 'No s\'ha pogut desar la configuració');
       }
-      setMsg('Configuració desada');
+      setNotice({ type: 'success', text: 'Configuració desada' });
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Error en desar');
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Error en desar' });
     } finally {
       setSaving(false);
     }
@@ -74,7 +76,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
     <section className="ap-card p-5">
       <h2 className="ap-h2">Configuració de costos i CAC</h2>
       {criticalIssues.length > 0 && (
-        <div className="mt-3 rounded-xl border p-3 text-xs">
+        <div className="mt-3 ap-card p-3 text-xs">
           <p className="font-semibold">Dades crítiques pendents</p>
           <p className="mt-1">{criticalIssues.join(' · ')}</p>
         </div>
@@ -159,11 +161,19 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
             >
               {saving ? 'Desant...' : 'Desar configuració'}
             </button>
-            {msg && <p className="text-sm">{msg}</p>}
+            {notice && (
+              <p
+                role={notice.type === 'error' ? 'alert' : 'status'}
+                aria-live={notice.type === 'error' ? 'assertive' : 'polite'}
+                className={`text-sm ${notice.type === 'error' ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}
+              >
+                {notice.text}
+              </p>
+            )}
           </div>
         </div>
 
-        <aside className="rounded-xl border border-white/10 p-4">
+        <aside className="rounded-xl border border-[var(--line)] p-4">
           <h3 className="text-sm font-semibold">Guia ràpida de coeficients</h3>
           <p className="mt-1 text-xs">
             Cada ratio és un coeficient de cost. A més ratio, menys marge.

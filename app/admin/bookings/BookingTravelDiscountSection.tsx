@@ -1,37 +1,35 @@
 /* ============================================================================
-   ÒRBITA ADMIN — NewBookingForm · Secció Viatge + Descompte (Brass & Obsidian)
+   ÒRBITA ADMIN — NewBookingForm · Secció Viatge + Descompte
    ----------------------------------------------------------------------------
-   Reescrit al sistema visual nb-* (Canvi #842). Viatge resumit en una graella
-   compacta de 3 cel·les; descompte amb codi i camp de notes.
+   Canònic: AdminSection + .adm-input + .ap-btn + Tailwind/tokens (canonització
+   2026-06-30, sistema propi `nb-*` eradicat). Viatge resumit en una graella de 3 cel·les.
 ============================================================================ */
 
 import { formatCurrencyExact } from '@/lib/constants';
+import { AdminSection } from '../components/AdminPage';
+import { NB_FIELD, NB_LABEL, NB_HINT, NB_HINT_OK, NB_HINT_WARN, NB_HINT_INFO } from './booking-form-classes';
 import type { BookingDiscountValidation, BookingFormData } from './booking-form.types';
 
 interface BookingTravelDiscountSectionProps {
-  form: Pick<BookingFormData, 'distanceKm' | 'discount' | 'discountCode' | 'notes'>;
-  travelBlocks: number;
+  form: Pick<BookingFormData, 'distanceKm' | 'tollsEur' | 'discount' | 'discountCode' | 'notes'>;
   travelCharge: number;
-  billableKm: number;
+  travelHeadcount: number;
+  chargeableHours: number;
   includedTravelKm: number;
-  travelBlockKm: number;
-  travelBlockEur: number;
   fuelReferenceInfo: string | null;
   validatingCode: boolean;
   discountValidation: BookingDiscountValidation | null;
-  onFieldChange: (field: 'distanceKm' | 'discount' | 'discountCode' | 'notes', value: string) => void;
+  onFieldChange: (field: 'distanceKm' | 'tollsEur' | 'discount' | 'discountCode' | 'notes', value: string) => void;
   onResetDiscountValidation: () => void;
   onValidateDiscountCode: () => void;
 }
 
 export default function BookingTravelDiscountSection({
   form,
-  travelBlocks,
   travelCharge,
-  billableKm,
+  travelHeadcount,
+  chargeableHours,
   includedTravelKm,
-  travelBlockKm,
-  travelBlockEur,
   fuelReferenceInfo,
   validatingCode,
   discountValidation,
@@ -43,14 +41,10 @@ export default function BookingTravelDiscountSection({
 
   return (
     <>
-      <section className="nb__panel">
-        <div className="nb__phead">
-          <h2 className="nb__h2">Desplaçament</h2>
-          <span className="nb__pintro">Opcional</span>
-        </div>
-        <div className="nb__row">
-          <div className="nb__field">
-            <label htmlFor="nb-km" className="nb__label">Km totals (anada + tornada)</label>
+      <AdminSection title="Desplaçament" description="Opcional">
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+          <div className={NB_FIELD}>
+            <label htmlFor="nb-km" className={NB_LABEL}>Km totals (anada + tornada)</label>
             <input
               id="nb-km"
               type="number"
@@ -59,57 +53,67 @@ export default function BookingTravelDiscountSection({
               value={form.distanceKm}
               onChange={(e) => onFieldChange('distanceKm', e.target.value)}
               placeholder="0"
-              className="nb__input"
+              className="adm-input"
             />
-            <p className="nb__hint">Inclòs al pack: {includedTravelKm} km</p>
+            <p className={NB_HINT}>La 1a hora de ruta va inclosa</p>
+            <label htmlFor="nb-tolls" className={`${NB_LABEL} mt-3`}>Peatges (€)</label>
+            <input
+              id="nb-tolls"
+              type="number"
+              min={0}
+              step="0.01"
+              value={form.tollsEur}
+              onChange={(e) => onFieldChange('tollsEur', e.target.value)}
+              placeholder="0"
+              className="adm-input"
+            />
+            <p className={NB_HINT}>Cost real de peatges (p. ex. Túnel del Cadí). Es reparteix a qui posa el cotxe.</p>
           </div>
-          <div className="nb__field">
-            <label className="nb__label">Resum del càrrec</label>
-            <dl className="nb__travel" aria-label="Resum del cost de desplaçament">
-              <div>
-                <dt>Trams aplicats</dt>
-                <dd>{travelBlocks}</dd>
-              </div>
-              <div>
-                <dt>Km facturables</dt>
-                <dd>{billableKm}</dd>
-              </div>
-              <div>
-                <dt>Càrrec</dt>
-                <dd>{travelCharge > 0 ? formatCurrencyExact(travelCharge) : '— €'}</dd>
-              </div>
+          <div className={NB_FIELD}>
+            <span className={NB_LABEL}>Resum del càrrec</span>
+            <dl
+              className="grid grid-cols-1 gap-px overflow-hidden rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--line)] sm:grid-cols-3"
+              aria-label="Resum del cost de desplaçament"
+            >
+              {[
+                { dt: 'Persones', dd: travelHeadcount },
+                { dt: 'Hores tripulació', dd: `${chargeableHours} h` },
+                { dt: 'Càrrec', dd: travelCharge > 0 ? formatCurrencyExact(travelCharge) : '— €' },
+              ].map((cell) => (
+                <div key={cell.dt} className="flex flex-col gap-1 bg-[var(--panel)] px-3.5 py-3">
+                  <dt className="font-mono text-[length:var(--o-text-2xs)] font-bold uppercase tracking-[0.09em] text-[var(--t3)]">{cell.dt}</dt>
+                  <dd className="m-0 font-mono text-sm font-bold tabular-nums text-[var(--t)]">{cell.dd}</dd>
+                </div>
+              ))}
             </dl>
             {travelCharge > 0 && (
-              <p className="nb__hint">{travelBlockEur} € per cada {travelBlockKm} km extra</p>
+              <p className={NB_HINT}>Cost real: cotxe (km) + tripulació (15 €/h, 1a hora inclosa)</p>
             )}
             {travelCharge === 0 && enteredKm > 0 && (
-              <p className="nb__hint nb__hint--ok">Dins el tram inclòs · cap cost extra</p>
+              <p className={`${NB_HINT} ${NB_HINT_OK}`}>Dins la 1a hora inclosa · cap cost extra</p>
             )}
-            {fuelReferenceInfo && <p className="nb__hint nb__hint--info">{fuelReferenceInfo}</p>}
+            {fuelReferenceInfo && <p className={`${NB_HINT} ${NB_HINT_INFO}`}>{fuelReferenceInfo}</p>}
           </div>
         </div>
-      </section>
+      </AdminSection>
 
-      <section className="nb__panel">
-        <div className="nb__phead">
-          <h2 className="nb__h2">Descompte i notes</h2>
-        </div>
-        <div className="nb__row">
-          <div className="nb__field">
-            <label htmlFor="nb-discount" className="nb__label">Descompte (€)</label>
+      <AdminSection title="Descompte i notes">
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+          <div className={NB_FIELD}>
+            <label htmlFor="nb-discount" className={NB_LABEL}>Descompte (€)</label>
             <input
               id="nb-discount"
               type="number"
               min={0}
               value={form.discount}
               onChange={(e) => onFieldChange('discount', e.target.value)}
-              className="nb__input"
+              className="adm-input"
               placeholder="0"
             />
           </div>
-          <div className="nb__field">
-            <label htmlFor="nb-discount-code" className="nb__label">Codi descompte</label>
-            <div className="nb__discount-code-row">
+          <div className={NB_FIELD}>
+            <label htmlFor="nb-discount-code" className={NB_LABEL}>Codi descompte</label>
+            <div className="flex gap-2">
               <input
                 id="nb-discount-code"
                 type="text"
@@ -119,19 +123,19 @@ export default function BookingTravelDiscountSection({
                   onResetDiscountValidation();
                 }}
                 placeholder="Ex: BODA2026"
-                className="nb__input nb__input--code"
+                className="adm-input font-mono uppercase"
               />
               <button
                 type="button"
                 onClick={onValidateDiscountCode}
                 disabled={validatingCode || !form.discountCode}
-                className="nb__btn--sec nb__btn--compact"
+                className="ap-btn shrink-0 whitespace-nowrap"
               >
                 {validatingCode ? 'Validant…' : 'Validar'}
               </button>
             </div>
             {discountValidation && (
-              <p className={`nb__hint ${discountValidation.valid ? 'nb__hint--ok' : 'nb__hint--warn'}`}>
+              <p className={`${NB_HINT} ${discountValidation.valid ? NB_HINT_OK : NB_HINT_WARN}`}>
                 {discountValidation.valid
                   ? `Vàlid · ${discountValidation.type === 'PERCENTAGE' ? `${discountValidation.value}%` : `${discountValidation.value}€`} (${discountValidation.source})`
                   : `Invàlid: ${discountValidation.reason}`}
@@ -139,18 +143,18 @@ export default function BookingTravelDiscountSection({
             )}
           </div>
         </div>
-        <div className="nb__field nb__field--spaced">
-          <label htmlFor="nb-notes" className="nb__label">Notes internes</label>
+        <div className={`${NB_FIELD} mt-3`}>
+          <label htmlFor="nb-notes" className={NB_LABEL}>Notes internes</label>
           <textarea
             id="nb-notes"
             value={form.notes}
             onChange={(e) => onFieldChange('notes', e.target.value)}
             rows={3}
             placeholder="Notes internes sobre la reserva (no es mostren al client)…"
-            className="nb__textarea"
+            className="adm-input adm-input--textarea"
           />
         </div>
-      </section>
+      </AdminSection>
     </>
   );
 }

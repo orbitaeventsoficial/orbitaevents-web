@@ -6,6 +6,15 @@
 // següent acció. Part pura + wrapper que carrega des de Prisma.
 // ═══════════════════════════════════════════════════════════════════════════
 
+import {
+  CUSTOMER_ACTIVITY_ACTIONS,
+  SOCIAL_POST_ORIGIN_TYPES,
+} from '@/lib/constants';
+import {
+  POST_EVENT_DAY_MS,
+  POST_EVENT_WORKFLOW,
+  getPostEventWorkflowDates,
+} from '@/lib/constants/postEventWorkflow';
 import { prisma } from '@/lib/prisma';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -22,6 +31,7 @@ export type PlaybookAction = {
   status: PlaybookActionStatus;
   daysSinceEvent: number;
   note: string | null;
+  socialPostId?: string | null;
 };
 
 export type PlaybookPriority = 'ALTA' | 'MITJANA' | 'BAIXA' | 'DONE';
@@ -37,7 +47,10 @@ export type PlaybookBookingInput = {
   postEventEmailSent: boolean;
   postEventEmailSentAt: Date | null;
   hasTestimonial: boolean;
+  hasTestimonialAskDecision: boolean;
   hasPublishedSocialPost: boolean;
+  hasSocialPostDecision: boolean;
+  socialPostId?: string | null;
   hasReferralAskTask: boolean;
 };
 
@@ -76,10 +89,8 @@ export type PlaybookSummary = {
 // HELPERS
 // ───────────────────────────────────────────────────────────────────────────
 
-const DAY_MS = 1000 * 60 * 60 * 24;
-
 function daysBetween(a: Date, b: Date): number {
-  return Math.floor((a.getTime() - b.getTime()) / DAY_MS);
+  return Math.floor((a.getTime() - b.getTime()) / POST_EVENT_DAY_MS);
 }
 
 const ACTION_LABELS: Record<PlaybookActionKey, string> = {
@@ -89,13 +100,8 @@ const ACTION_LABELS: Record<PlaybookActionKey, string> = {
   referral_ask: 'Demanar referral',
 };
 
-// Dies dins dels quals es considera que una acció està encara "a temps"
-const ACTION_DUE_DAYS: Record<PlaybookActionKey, number> = {
-  thank_you: 3,
-  testimonial: 7,
-  social_post: 14,
-  referral_ask: 30,
-};
+// Dies dins dels quals es considera que una acció està encara "a temps".
+const ACTION_DUE_DAYS: Record<PlaybookActionKey, number> = POST_EVENT_WORKFLOW.actionDueDays;
 
 // ───────────────────────────────────────────────────────────────────────────
 // PURE FUNCTION
@@ -127,12 +133,13 @@ export function buildPostEventPlaybook(input: PlaybookInput): PlaybookSummary {
     });
 
     // 2. Testimonial
+    const testimonialDone = booking.hasTestimonial || booking.hasTestimonialAskDecision;
     actions.push({
       key: 'testimonial',
       label: ACTION_LABELS.testimonial,
-      status: computeStatus(booking.hasTestimonial, daysSinceEvent, ACTION_DUE_DAYS.testimonial),
+      status: computeStatus(testimonialDone, daysSinceEvent, ACTION_DUE_DAYS.testimonial),
       daysSinceEvent,
-      note: booking.hasTestimonial ? 'Rebut' : null,
+      note: booking.hasTestimonial ? 'Rebut' : booking.hasTestimonialAskDecision ? 'Sol.licitat' : null,
     });
 
     // 3. Social post
@@ -145,7 +152,8 @@ export function buildPostEventPlaybook(input: PlaybookInput): PlaybookSummary {
         ACTION_DUE_DAYS.social_post
       ),
       daysSinceEvent,
-      note: booking.hasPublishedSocialPost ? 'Publicat' : null,
+      note: booking.hasPublishedSocialPost ? 'Publicat' : booking.hasSocialPostDecision ? 'Preparat, no publicat' : null,
+      socialPostId: booking.socialPostId ?? null,
     });
 
     // 4. Referral ask — només si hi ha customerId
@@ -257,15 +265,14 @@ function computeStatus(
 // ───────────────────────────────────────────────────────────────────────────
 
 export async function loadPostEventPlaybook(
-  now: Date = new Date(),
-  daysWindow = 90
+  now: Date = new Date()
 ): Promise<PlaybookSummary> {
-  const from = new Date(now.getTime() - daysWindow * DAY_MS);
+  const { catchupFrom } = getPostEventWorkflowDates(now);
 
   const rows = await prisma.booking.findMany({
     where: {
       status: 'COMPLETED',
-      eventDate: { gte: from, lte: now },
+      eventDate: { gte: catchupFrom, lte: now },
     },
     select: {
       id: true,
@@ -279,7 +286,7 @@ export async function loadPostEventPlaybook(
       postEventEmailSentAt: true,
     },
     orderBy: { eventDate: 'desc' },
-    take: 100,
+    take: POST_EVENT_WORKFLOW.playbookTake,
   });
 
   if (rows.length === 0) {
@@ -290,11 +297,12 @@ export async function loadPostEventPlaybook(
     new Set(rows.map((r) => r.customerId).filter((id): id is string => !!id))
   );
   const bookingIds = rows.map((r) => r.id);
+  const bookingIdSet = new Set(bookingIds);
 
   // Testimonis per customer (comparem eventDate)
   const testimonials = customerIds.length > 0
     ? await prisma.customerTestimonial.findMany({
-        where: { customerId: { in: customerIds } },
+        where: { customerId: { in: customerIds }, isApproved: true },
         select: { customerId: true, eventDate: true },
       })
     : [];
@@ -302,28 +310,81 @@ export async function loadPostEventPlaybook(
   // Social posts per booking
   const socialPosts = await prisma.socialPost.findMany({
     where: {
-      bookingId: { in: bookingIds },
       status: 'PUBLISHED',
+      OR: [
+        { bookingId: { in: bookingIds } },
+        { originType: SOCIAL_POST_ORIGIN_TYPES.BOOKING, originId: { in: bookingIds } },
+      ],
     },
-    select: { bookingId: true },
+    select: { bookingId: true, originId: true },
   });
 
-  // Tasks de tipus referral_ask — usem title/description per detectar
+  // Tasks de tipus referral_ask — sempre vinculades a booking per no tapar altres bolos del mateix client.
   const referralTasks = customerIds.length > 0
     ? await prisma.task.findMany({
         where: {
           customerId: { in: customerIds },
+          status: { not: 'CANCELLED' },
           OR: [
             { title: { contains: 'referral', mode: 'insensitive' } },
             { description: { contains: 'referral', mode: 'insensitive' } },
           ],
         },
-        select: { customerId: true },
+        select: { customerId: true, bookingId: true },
       })
     : [];
 
-  const publishedSocialByBooking = new Set(socialPosts.map((p) => p.bookingId));
-  const referralByCustomer = new Set(referralTasks.map((t) => t.customerId).filter((x): x is string => !!x));
+  const recurrenceDecisions = customerIds.length > 0
+    ? await prisma.customerActivity.findMany({
+        where: {
+          customerId: { in: customerIds },
+          action: CUSTOMER_ACTIVITY_ACTIONS.POST_EVENT_RECURRENCE_DECIDED,
+        },
+        select: { customerId: true, details: true },
+      })
+    : [];
+
+  const publishedSocialByBooking = new Set(
+    socialPosts.flatMap((post) => [post.bookingId, post.originId])
+      .filter((id): id is string => !!id && bookingIdSet.has(id))
+  );
+  const referralTaskByCustomerBooking = new Set(
+    referralTasks
+      .map((task) => {
+        if (!task.customerId || !task.bookingId) return null;
+        return `${task.customerId}:${task.bookingId}`;
+      })
+      .filter((key): key is string => !!key)
+  );
+  const referralDecisionByCustomerBooking = new Set(
+    recurrenceDecisions
+      .filter((activity) => isReferralAskDecision(activity.details))
+      .map((activity) => {
+        const details = activity.details as Record<string, unknown>;
+        return `${activity.customerId}:${String(details.bookingId ?? '')}`;
+      })
+      .filter((key) => !key.endsWith(':'))
+  );
+  const testimonialAskByCustomerBooking = new Set(
+    recurrenceDecisions
+      .filter((activity) => isTestimonialAskDecision(activity.details))
+      .map((activity) => {
+        const details = activity.details as Record<string, unknown>;
+        return `${activity.customerId}:${String(details.bookingId ?? '')}`;
+      })
+      .filter((key) => !key.endsWith(':'))
+  );
+  const socialPostByCustomerBooking = new Map<string, string | null>();
+  for (const activity of recurrenceDecisions) {
+    if (!isSocialPostDecision(activity.details)) continue;
+    const details = activity.details as Record<string, unknown>;
+    const bookingId = typeof details.bookingId === 'string' ? details.bookingId.trim() : '';
+    if (!bookingId) continue;
+    const socialPostId = typeof details.socialPostId === 'string' && details.socialPostId.trim()
+      ? details.socialPostId
+      : null;
+    socialPostByCustomerBooking.set(`${activity.customerId}:${bookingId}`, socialPostId);
+  }
 
   const bookings: PlaybookBookingInput[] = rows.map((r) => {
     // Ha rebut testimoni? Mirem testimonis del customer amb eventDate propera (±7 dies)
@@ -331,8 +392,10 @@ export async function loadPostEventPlaybook(
       if (t.customerId !== r.customerId) return false;
       if (!t.eventDate) return false;
       const delta = Math.abs(t.eventDate.getTime() - r.eventDate.getTime());
-      return delta <= 7 * DAY_MS;
+      return delta <= 7 * POST_EVENT_DAY_MS;
     });
+
+    const customerBookingKey = r.customerId ? `${r.customerId}:${r.id}` : null;
 
     return {
       id: r.id,
@@ -345,10 +408,31 @@ export async function loadPostEventPlaybook(
       postEventEmailSent: r.postEventEmailSent,
       postEventEmailSentAt: r.postEventEmailSentAt,
       hasTestimonial,
+      hasTestimonialAskDecision: !!r.customerId && testimonialAskByCustomerBooking.has(`${r.customerId}:${r.id}`),
       hasPublishedSocialPost: publishedSocialByBooking.has(r.id),
-      hasReferralAskTask: !!r.customerId && referralByCustomer.has(r.customerId),
+      hasSocialPostDecision: !!customerBookingKey && socialPostByCustomerBooking.has(customerBookingKey),
+      socialPostId: customerBookingKey ? socialPostByCustomerBooking.get(customerBookingKey) ?? null : null,
+      hasReferralAskTask: !!r.customerId && (
+        referralTaskByCustomerBooking.has(`${r.customerId}:${r.id}`) ||
+        referralDecisionByCustomerBooking.has(`${r.customerId}:${r.id}`)
+      ),
     };
   });
 
   return buildPostEventPlaybook({ bookings, now });
+}
+
+function isReferralAskDecision(details: unknown): boolean {
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return false;
+  return (details as Record<string, unknown>).actionKey === 'referral_ask';
+}
+
+function isTestimonialAskDecision(details: unknown): boolean {
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return false;
+  return (details as Record<string, unknown>).actionKey === 'testimonial';
+}
+
+function isSocialPostDecision(details: unknown): boolean {
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return false;
+  return (details as Record<string, unknown>).actionKey === 'social_post';
 }
