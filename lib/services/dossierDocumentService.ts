@@ -180,8 +180,21 @@ export async function buildDossierHtmlFor(input: {
  * diferent del que s'ha aprovat seria pitjor que no enviar-ne cap.
  */
 export async function renderDossierPdf(html: string): Promise<Buffer> {
-  const { chromium } = await import('playwright');
-  const browser = await chromium.launch({ args: ['--no-sandbox'] });
+  const { chromium } = await import('playwright-core');
+
+  /**
+   * El navegador és el del sistema, no un de descarregat.
+   *
+   * A producció el posa Nix i arriba per `CHROMIUM_PATH` (vegeu
+   * `railway.toml`). En local, si ningú l'ha declarat, s'agafa el Chrome que ja
+   * hi ha instal·lat. Així el desplegament no engreixa 150 MB per fer un PDF.
+   */
+  const executablePath = process.env.CHROMIUM_PATH;
+  const browser = await chromium.launch(
+    executablePath
+      ? { executablePath, args: ['--no-sandbox'] }
+      : { channel: 'chrome', args: ['--no-sandbox'] },
+  );
   try {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle' });

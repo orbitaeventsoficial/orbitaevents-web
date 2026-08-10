@@ -2,7 +2,14 @@
 builder = "nixpacks"
 
 [build.nixpacksPlan.phases.setup]
-nixPkgs = ["nodejs_22"]
+# `chromium` hi és perquè el dossier del client es genera **imprimint** la
+# mateixa pàgina que es previsualitza. Sense navegador al servidor, l'enviament
+# es nega a sortir en lloc d'enviar un document diferent del que s'ha aprovat.
+# S'agafa del sistema i no es descarrega: uns 150 MB menys a cada desplegament.
+nixPkgs = ["nodejs_22", "chromium"]
+
+[build.nixpacksPlan.phases.setup.variables]
+CHROMIUM_PATH = "chromium"
 
 [deploy]
 startCommand = "node_modules/.bin/next start -p ${PORT:-3000}"

@@ -67,6 +67,9 @@ importers:
       nodemailer:
         specifier: ^7.0.10
         version: 7.0.13
+      playwright-core:
+        specifier: ^1.57.0
+        version: 1.58.2
       postcss:
         specifier: 8.4.38
         version: 8.4.38
