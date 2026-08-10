@@ -4,10 +4,10 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
-import { getEventLabel } from '@/lib/constants';
+import { getEventLabel, toIntlLocale } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
-import { buildDossierHtml, type DossierCopy } from '@/lib/utils/dossier-html-builder';
+import { buildDossierHtml, type DossierCopy, type DossierQuoteLine } from '@/lib/utils/dossier-html-builder';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import './dossiers.css';
 
@@ -16,6 +16,10 @@ const DJ_FIRST_PRODUCT_ID = 'orbita:dj-primera-hora';
 interface Props {
   products: AnimacioProduct[];
   dossierCopy: DossierCopy;
+  /** Llengua del client: mana com es formaten els imports del dossier. */
+  locale: string;
+  /** El bolo muntat a la fitxa. Si n'hi ha, el pressupost són aquestes línies. */
+  quoteLines?: DossierQuoteLine[];
   logoDataUri?: string;
   leadId?: string;
   initialNom?: string;
@@ -281,7 +285,7 @@ function productIdsFromServiceLines(lines: DossierServiceLine[], products: Anima
   return Array.from(new Set(ids));
 }
 
-export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialProductIds }: Props) {
+export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLines, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialProductIds }: Props) {
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
   const productGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
@@ -576,7 +580,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       const html = buildDossierHtml(clientInfo, selected, dossierCopy, {
         autoPrint: mode === 'pdf',
         logoDataUri,
-        locale: 'ca-ES',
+        locale: toIntlLocale(locale),
+        quoteLines,
         travelKm: Number.isFinite(km) && km > 0 ? km : undefined,
         location: eventDesc.trim() || undefined,
       });

@@ -3,7 +3,7 @@ import { join } from 'path';
 import { requireAuth } from '@/lib/auth';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
-import { getDossierById } from '@/lib/services/dossierService';
+import { getDossierById, dossierLocaleForLead } from '@/lib/services/dossierService';
 import { generateDossierCompositePDF } from '@/lib/services/dossierCompositePdfService';
 import { getDossierCollaboratorProductsByIds } from '@/lib/services/collaboratorProductService';
 import type { DossierClientInfo } from '@/lib/utils/dossier-html-builder';
@@ -25,7 +25,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const dossier = await getDossierById(params.id);
   if (!dossier) return NextResponse.json({ error: 'No trobat' }, { status: 404 });
 
-  const allProducts = await getAnimacioProducts('ca');
+  // El PDF surt en la llengua del client, la que marca la fitxa de l'entrada.
+  const locale = await dossierLocaleForLead(dossier.leadId);
+  const allProducts = await getAnimacioProducts(locale);
   const collaboratorProducts = await getDossierCollaboratorProductsByIds(dossier.productIds);
   // Només productes propis d'animació aquí; els de col·laborador entren via
   // `collaboratorProducts` (el generador ja els converteix). Evita duplicats.
@@ -57,7 +59,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     productIds: dossier.productIds,
     collaboratorProducts,
     extras,
-    locale: 'ca',
+    locale,
     logoDataUri: readLogoDataUri(),
   });
   const pdf = Buffer.from(doc.output('arraybuffer'));

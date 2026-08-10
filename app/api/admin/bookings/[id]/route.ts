@@ -63,6 +63,8 @@ const updateBookingSchema = z.object({
   eventAddress: z.string().nullable().optional(),
   eventStartTime: z.string().nullable().optional(),
   eventEndTime: z.string().nullable().optional(),
+  // Llengua en què el client rep correus, pressupostos i dossiers.
+  preferredLocale: z.enum(['ca', 'es', 'en']).optional(),
   serviceLines: z.array(z.object({
     collaboratorId: z.string().nullable().optional(),
     sortOrder: z.number().int().optional(),

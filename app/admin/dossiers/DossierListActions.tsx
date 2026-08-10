@@ -6,6 +6,7 @@ import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { buildDossierHtml, type DossierClientInfo, type DossierCopy } from '@/lib/utils/dossier-html-builder';
+import { toIntlLocale } from '@/lib/constants';
 
 interface Props {
   dossierId: string;
@@ -15,12 +16,14 @@ interface Props {
   products: AnimacioProduct[];
   clientInfo: DossierClientInfo;
   dossierCopy: DossierCopy;
+  /** Llengua del client: mana com es formaten els imports de la vista prèvia. */
+  locale: string;
   alreadySent: boolean;
   logoDataUri?: string;
   isDeleted?: boolean;
 }
 
-export function DossierListActions({ dossierId, email, nom, productIds, products, clientInfo, dossierCopy, alreadySent, logoDataUri, isDeleted }: Props) {
+export function DossierListActions({ dossierId, email, nom, productIds, products, clientInfo, dossierCopy, locale, alreadySent, logoDataUri, isDeleted }: Props) {
   const toast = useToast();
   const router = useRouter();
   const [sending, setSending] = useState(false);
@@ -31,7 +34,7 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   function preview() {
     try {
       const filteredProducts = products.filter((p) => productIds.includes(p.id));
-      const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, { logoDataUri, locale: 'ca-ES' });
+      const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, { logoDataUri, locale: toIntlLocale(locale) });
       const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
       window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
     } catch (err) {

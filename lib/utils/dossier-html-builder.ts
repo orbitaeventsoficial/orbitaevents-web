@@ -24,6 +24,9 @@ export type DossierClientInfo = {
  * (editables a /admin/text-manager → secció Dossiers). El builder no porta cap
  * string hardcoded; sempre rep aquest objecte resolt al servidor.
  */
+/** Una línia del bolo tal com està muntat a la fitxa: el que el client pagarà. */
+export type DossierQuoteLine = { label: string; amount: number };
+
 export type DossierCopy = {
   portada: { eyebrow: string; clientLabel: string; bottom: string };
   intro: {
@@ -220,24 +223,35 @@ function buildBudgetBlock(
   locale: string,
   travelKm: number,
   location?: string,
+  quoteLines?: DossierQuoteLine[],
 ): string {
-  if (products.length === 0 || travelKm <= 0) return '';
+  const hasQuote = Boolean(quoteLines && quoteLines.length > 0);
+  if ((products.length === 0 && !hasQuote) || travelKm <= 0) return '';
 
   const money = (n: number) => escHtml(formatCurrency(n, locale));
   const includedOneWay = Math.round(INCLUDED_TRAVEL_KM / 2);
   const fill = (tpl: string, vars: Record<string, string>) =>
     escHtml(Object.entries(vars).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), tpl));
 
-  // Serveis amb preu → línies + subtotal.
-  const priced = products.filter((p) => typeof p.priceFrom === 'number');
+  /**
+   * Quan el bolo ja està muntat a la fitxa, el pressupost són **les seves
+   * línies**, no els preus «des de» del catàleg: el client ha de veure el que
+   * pagarà de veritat. Sense bolo muntat encara val la orientació de catàleg.
+   */
+  const rows: DossierQuoteLine[] = hasQuote
+    ? quoteLines!
+    : products
+        .filter((p) => typeof p.priceFrom === 'number')
+        .map((p) => ({ label: p.nom, amount: p.priceFrom as number }));
+
   let servicesSubtotal = 0;
-  const serviceRows = priced
-    .map((p) => {
-      servicesSubtotal += p.priceFrom as number;
+  const serviceRows = rows
+    .map((line) => {
+      servicesSubtotal += line.amount;
       return `<li class="bud-row">
-        <span class="bud-row-nom">${escHtml(p.nom)}</span>
+        <span class="bud-row-nom">${escHtml(line.label)}</span>
         <span class="bud-row-dots" aria-hidden="true"></span>
-        <span class="bud-row-val">${money(p.priceFrom as number)}</span>
+        <span class="bud-row-val">${money(line.amount)}</span>
       </li>`;
     })
     .join('\n      ');
@@ -294,7 +308,7 @@ export function buildDossierHtml(
   client: DossierClientInfo,
   products: AnimacioProduct[],
   copy: DossierCopy,
-  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; location?: string } = {},
+  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; location?: string; quoteLines?: DossierQuoteLine[] } = {},
 ): string {
   const locale = options.locale || 'ca-ES';
   const nomPrincipal = escHtml(client.nom);
@@ -307,7 +321,7 @@ export function buildDossierHtml(
     .join('\n');
 
   const resumBloc = buildResumBlock(products, copy, locale);
-  const budgetBloc = buildBudgetBlock(products, copy, locale, options.travelKm ?? 0, options.location);
+  const budgetBloc = buildBudgetBlock(products, copy, locale, options.travelKm ?? 0, options.location, options.quoteLines);
 
   const salutacioHtml = escHtml(salutacio).replace(/\n\n/g, '<br><br>');
 

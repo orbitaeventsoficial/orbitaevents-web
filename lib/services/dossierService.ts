@@ -4,6 +4,7 @@ import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver'
 import { getDossierCopy, getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
 import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { sendEmail } from '@/lib/email';
+import { toIntlLocale } from '@/lib/constants';
 import { EMAIL_CONTACT } from '@/lib/constants/email';
 import { recordEmailSend } from '@/lib/services/emailTrackingService';
 import {
@@ -48,7 +49,8 @@ export async function getAllDossiers(limit = 50) {
   return prisma.$queryRaw<unknown[]>`
     SELECT d.*,
       CASE WHEN d."leadId" IS NOT NULL THEN
-        jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status)
+        jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status,
+                           'preferredLocale', l."preferredLocale")
       END AS lead
     FROM "dossiers" d
     LEFT JOIN "leads" l ON l.id = d."leadId"
@@ -56,6 +58,31 @@ export async function getAllDossiers(limit = 50) {
     ORDER BY d."createdAt" DESC
     LIMIT ${limit}
   `;
+}
+
+/**
+ * En quina llengua es fa un dossier.
+ *
+ * La resposta la dona la fitxa de l'entrada, que és on el propietari tria
+ * l'idioma del client. Un dossier sense entrada cau al castellà, que és el
+ * mateix valor per defecte que fa servir la base de dades.
+ */
+export const DOSSIER_LOCALES = ['ca', 'es', 'en'] as const;
+export type DossierLocale = (typeof DOSSIER_LOCALES)[number];
+
+export function dossierLocaleOf(preferredLocale?: string | null): DossierLocale {
+  return (DOSSIER_LOCALES as readonly string[]).includes(preferredLocale ?? '')
+    ? (preferredLocale as DossierLocale)
+    : 'es';
+}
+
+export async function dossierLocaleForLead(leadId?: string | null): Promise<DossierLocale> {
+  if (!leadId) return 'es';
+  const lead = await prisma.lead.findUnique({
+    where: { id: leadId },
+    select: { preferredLocale: true },
+  });
+  return dossierLocaleOf(lead?.preferredLocale);
 }
 
 export async function getDossierById(id: string) {
@@ -104,10 +131,11 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   if (!dossier) return { ok: false, error: 'Dossier no trobat' };
   if (!dossier.email) return { ok: false, error: 'El dossier no té email de destinatari' };
 
+  const locale = await dossierLocaleForLead(dossier.leadId);
   const [allProducts, orbitaProducts, dossierCopy] = await Promise.all([
-    getAnimacioProducts('ca'),
-    getOrbitaDossierProducts('ca'),
-    getDossierCopy('ca'),
+    getAnimacioProducts(locale),
+    getOrbitaDossierProducts(locale),
+    getDossierCopy(locale),
   ]);
   const collaboratorProducts = await getDossierCollaboratorProductsByIds(dossier.productIds);
   const products = [
@@ -124,7 +152,7 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
     eventDesc: dossier.eventDesc ?? undefined,
     salutacio: dossier.salutacio ?? undefined,
   };
-  const html = buildDossierHtml(clientInfo, products, dossierCopy, { locale: 'ca-ES' });
+  const html = buildDossierHtml(clientInfo, products, dossierCopy, { locale: toIntlLocale(locale) });
 
   const productsLabel = products.map((p) => p.nom).join(', ');
   const subject = `Dossier Òrbita Events — ${dossier.nom}`;

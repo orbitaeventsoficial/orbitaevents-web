@@ -90,6 +90,7 @@ export type LeadDetailData = {
   wx: WxData | null;
   eventPhone: string | null;
   eventAddress: string | null;
+  preferredLocale: string | null;
   booking: {
     id: string;
     reference: string;
@@ -136,7 +137,18 @@ function nextStageFor(stage: Stage): Stage | null {
   return null;
 }
 
-type EditableField = 'phone' | 'email' | 'eventPhone' | 'eventAddress' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'guestCount' | 'budget';
+type EditableField = 'name' | 'phone' | 'email' | 'eventPhone' | 'eventAddress' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'guestCount' | 'budget' | 'preferredLocale';
+
+/** Les llengües en què el negoci escriu al client. Mateixa llista que la fitxa de client. */
+const LOCALE_OPTIONS = [
+  { value: 'ca', label: 'Català' },
+  { value: 'es', label: 'Castellà' },
+  { value: 'en', label: 'Anglès' },
+] as const;
+
+function localeLabel(value: string): string {
+  return LOCALE_OPTIONS.find((option) => option.value === value)?.label ?? value.toUpperCase();
+}
 
 type ProposalItem = {
   id: string;
@@ -234,6 +246,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
   ];
 
   const [fields, setFields] = useState({
+    name: lead.name ?? '',
     phone: lead.phone ?? '',
     email: lead.email ?? '',
     eventPhone: lead.eventPhone ?? '',
@@ -244,6 +257,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
     eventLocation: lead.location ?? '',
     guestCount: lead.pax ? String(lead.pax) : '',
     budget: lead.value ? String(lead.value) : '',
+    preferredLocale: lead.preferredLocale ?? 'es',
   });
 
   useEffect(() => {
@@ -321,19 +335,19 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
     setEditValue(fields[field]);
   }
 
-  async function saveEdit() {
-    if (!editField || savePending) return;
+  async function saveField(field: EditableField, rawValue: string) {
+    if (savePending) return;
     setSavePending(true);
     try {
-      const value = editField === 'guestCount'
-        ? (editValue ? parseInt(editValue, 10) : null)
-        : editValue || null;
+      const value = field === 'guestCount'
+        ? (rawValue ? parseInt(rawValue, 10) : null)
+        : rawValue || null;
       await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [editField]: value }),
+        body: JSON.stringify({ [field]: value }),
       });
-      setFields((f) => ({ ...f, [editField!]: editValue }));
+      setFields((f) => ({ ...f, [field]: rawValue }));
       toast.success('Desat.');
       setEditField(null);
     } catch (error) {
@@ -342,6 +356,11 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
     } finally {
       setSavePending(false);
     }
+  }
+
+  async function saveEdit() {
+    if (!editField) return;
+    await saveField(editField, editValue);
   }
 
   function cancelEdit() {
@@ -394,7 +413,29 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
         <div className="fxd__hd-top">
           <div className="fxd__hd-ident">
             <p className="fxd__hd-eyebrow">{STAGE_LABEL[stage]} · {lead.type} · {sourceLabel(lead.channel)}</p>
-            <h2 className="fxd__hd-name">{lead.name}</h2>
+            {/* El nom era l'únic camp de la capçalera que es podia veure i no
+                corregir. Un formulari web que troba un client amb el mateix
+                correu escriu a sobre del lead existent, i sense aquest botó el
+                nom equivocat es queda per sempre. L'API ja acceptava `name`;
+                només faltava per on tocar-lo. */}
+            {editField === 'name' ? (
+              <span className="fxd__editrow">
+                <input className="adm-input" type="text" value={editValue}
+                  aria-label="Nom del lead"
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                  autoFocus />
+                <button type="button" className="ap-btn ap-btn--primary ap-btn--xs" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
+                <button type="button" className="ap-btn ap-btn--xs" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
+              </span>
+            ) : (
+              <h2 className="fxd__hd-name">
+                <button type="button" onClick={() => startEdit('name')} aria-label="Editar nom"
+                  style={{ font: 'inherit', color: 'inherit', letterSpacing: 'inherit', background: 'none', border: 0, padding: 0, margin: 0, textAlign: 'left', cursor: 'pointer' }}>
+                  {fields.name || lead.name}
+                </button>
+              </h2>
+            )}
           </div>
           <div className="fxd__hd-reach" aria-label="Contacte ràpid">
             {(['phone', 'email'] as EditableField[]).map((f) => (
@@ -460,6 +501,32 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
           <div className="fxd__fact">
             <span className="fxd__fact-lbl">Prioritat</span>
             <span className={`fxd__fact-val fxd__fact-val--ro fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</span>
+          </div>
+          {/* L'idioma decideix en quina llengua li arriben els correus, els
+              pressupostos i els dossiers. Fins ara només es podia canviar des de
+              la fitxa de client, i els leads que no en tenen quedaven clavats al
+              valor per defecte. L'API ja acceptava `preferredLocale`; faltava
+              per on tocar-lo. */}
+          <div className="fxd__fact">
+            <span className="fxd__fact-lbl">Idioma</span>
+            {editField === 'preferredLocale' ? (
+              <span className="fxd__editrow">
+                <select className="fxd__editinput" value={editValue} autoFocus
+                  aria-label="Idioma del client"
+                  disabled={savePending}
+                  onChange={(e) => { setEditValue(e.target.value); void saveField('preferredLocale', e.target.value); }}
+                  onKeyDown={(e) => { if (e.key === 'Escape') cancelEdit(); }}>
+                  {LOCALE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+                <button type="button" className="fxd__cancelbtn" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
+              </span>
+            ) : (
+              <button type="button" className="fxd__fact-val" onClick={() => startEdit('preferredLocale')} aria-label="Editar idioma del client">
+                {localeLabel(fields.preferredLocale)}
+              </button>
+            )}
           </div>
           {lead.wx && (
             <div className="fxd__fact">

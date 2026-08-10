@@ -13,8 +13,16 @@ import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 import { getDossierCopy, getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
-import { getAllDossiers, getDeletedDossiers } from '@/lib/services/dossierService';
+import {
+  getAllDossiers,
+  getDeletedDossiers,
+  dossierLocaleOf,
+  dossierLocaleForLead,
+  DOSSIER_LOCALES,
+  type DossierLocale,
+} from '@/lib/services/dossierService';
 import { listLeadServiceLines } from '@/lib/services/leadServiceLineService';
+import type { DossierQuoteLine } from '@/lib/utils/dossier-html-builder';
 import {
   collaboratorProductToAnimacioProduct,
   listDossierCollaboratorProducts,
@@ -53,11 +61,28 @@ type DossierRow = {
   createdAt: Date | string; sentAt?: Date | string | null; sentTo?: string | null;
   email?: string | null; eventDesc?: string | null; telefon?: string | null;
   salutacio?: string | null; deletedAt?: Date | string | null;
-  lead?: { id: string; name: string; status: string } | null;
+  lead?: { id: string; name: string; status: string; preferredLocale?: string | null } | null;
 };
 
 function toDossierProductId(id: string): string {
   return id.startsWith('collab:') ? id : `collab:${id}`;
+}
+
+/**
+ * El bolo tal com està muntat a la fitxa. El pressupost del dossier ha de dir
+ * el que el client pagarà de veritat, no els preus «des de» del catàleg.
+ * Mateixa regla que el total de la fitxa: import × quantitat, i només les
+ * línies que cobren (les de cost intern no li surten al client).
+ */
+async function resolveQuoteLines(leadId?: string): Promise<DossierQuoteLine[]> {
+  if (!leadId) return [];
+  const result = await listLeadServiceLines(leadId);
+  return (result.body.lines ?? [])
+    .map((line: { label: string; revenueAmount?: number | null; quantity?: number | null }) => ({
+      label: line.label,
+      amount: (line.revenueAmount ?? 0) * (line.quantity || 1),
+    }))
+    .filter((line) => line.amount > 0);
 }
 
 async function resolveInitialProductIds(leadId?: string, explicitProductIds?: string): Promise<string | undefined> {
@@ -73,34 +98,52 @@ async function resolveInitialProductIds(leadId?: string, explicitProductIds?: st
 
 export default async function DossiersPage({ searchParams }: PageProps) {
   const logoDataUri = readLogoDataUri();
-  const [dossiers, deletedDossiers, legacyAnimacioProducts, collaboratorProducts, orbitaProducts, dossierCopy, initialProductIds] = await Promise.all([
+  // El dossier es fa en la llengua del client, i cada dossier de la llista pot
+  // tenir la seva. Per això el catàleg i els textos es carreguen en les tres
+  // llengües i després cadascú agafa la que li toca; abans tot estava clavat al
+  // català i un client castellanoparlant rebia el dossier en català.
+  const [dossiers, deletedDossiers, collaboratorProducts, byLocale, generatorLocale, initialProductIds, quoteLines] = await Promise.all([
     getAllDossiers(50),
     getDeletedDossiers(),
-    getAnimacioProducts('ca'),
     listDossierCollaboratorProducts(),
-    getOrbitaDossierProducts('ca'),
-    getDossierCopy('ca'),
+    Promise.all(DOSSIER_LOCALES.map(async (locale) => [
+      locale,
+      {
+        legacy: await getAnimacioProducts(locale),
+        orbita: await getOrbitaDossierProducts(locale),
+        copy: await getDossierCopy(locale),
+      },
+    ] as const)).then((entries) => Object.fromEntries(entries)),
+    dossierLocaleForLead(searchParams?.leadId),
     resolveInitialProductIds(searchParams?.leadId, searchParams?.productIds),
+    resolveQuoteLines(searchParams?.leadId),
   ]) as [
     DossierRow[],
     DossierRow[],
-    Awaited<ReturnType<typeof getAnimacioProducts>>,
     Awaited<ReturnType<typeof listDossierCollaboratorProducts>>,
-    Awaited<ReturnType<typeof getOrbitaDossierProducts>>,
-    Awaited<ReturnType<typeof getDossierCopy>>,
+    Record<DossierLocale, {
+      legacy: Awaited<ReturnType<typeof getAnimacioProducts>>;
+      orbita: Awaited<ReturnType<typeof getOrbitaDossierProducts>>;
+      copy: Awaited<ReturnType<typeof getDossierCopy>>;
+    }>,
+    DossierLocale,
     string | undefined,
+    DossierQuoteLine[],
   ];
+
+  const catalogFor = (locale: DossierLocale) => {
+    const pack = byLocale[locale];
+    const generator = [
+      ...pack.orbita,
+      ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
+    ];
+    return { copy: pack.copy, generator, lookup: [...generator, ...pack.legacy] };
+  };
   // Bingo/Batalla Musical són productes de MASQUERADE (col·laborador), no propis:
   // surten via `collaboratorProducts`. (El #968 els havia afegit com a propis per
   // error; corregit al #969 — la causa real és que el seed #956 els va desactivar.)
-  const generatorProducts = [
-    ...orbitaProducts,
-    ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
-  ];
-  const lookupProducts = [
-    ...generatorProducts,
-    ...legacyAnimacioProducts,
-  ];
+  const generatorCatalog = catalogFor(generatorLocale);
+  const generatorProducts = generatorCatalog.generator;
 
   return (
     <AdminPage
@@ -123,7 +166,9 @@ export default async function DossiersPage({ searchParams }: PageProps) {
         </header>
         <DossierGeneratorClient
           products={generatorProducts}
-          dossierCopy={dossierCopy}
+          dossierCopy={generatorCatalog.copy}
+          locale={generatorLocale}
+          quoteLines={quoteLines}
           logoDataUri={logoDataUri}
           leadId={searchParams?.leadId}
           initialNom={searchParams?.nom}
@@ -141,7 +186,9 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           <h2 className="dg__section-title">Dossiers desats ({dossiers.length})</h2>
           <div className="dg__list">
             {dossiers.map((d) => {
-              const productNames = lookupProducts
+              const rowLocale = dossierLocaleOf(d.lead?.preferredLocale);
+              const rowCatalog = catalogFor(rowLocale);
+              const productNames = rowCatalog.lookup
                 .filter((p) => d.productIds.includes(p.id))
                 .map((p) => p.nom)
                 .join(' · ');
@@ -170,8 +217,9 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     email={d.email ?? undefined}
                     nom={d.nom}
                     productIds={d.productIds}
-                    products={lookupProducts}
-                    dossierCopy={dossierCopy}
+                    products={rowCatalog.lookup}
+                    dossierCopy={rowCatalog.copy}
+                    locale={rowLocale}
                     clientInfo={{
                       nom: d.nom,
                       empresa: d.empresa ?? undefined,
@@ -197,7 +245,9 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           <p className="dg__section-hint">Els dossiers eliminats es purgen automàticament als 30 dies.</p>
           <div className="dg__list">
             {deletedDossiers.map((d) => {
-              const productNames = lookupProducts
+              const rowLocale = dossierLocaleOf(d.lead?.preferredLocale);
+              const rowCatalog = catalogFor(rowLocale);
+              const productNames = rowCatalog.lookup
                 .filter((p) => d.productIds.includes(p.id))
                 .map((p) => p.nom)
                 .join(' · ');
@@ -216,8 +266,9 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     email={d.email ?? undefined}
                     nom={d.nom}
                     productIds={d.productIds}
-                    products={lookupProducts}
-                    dossierCopy={dossierCopy}
+                    products={rowCatalog.lookup}
+                    dossierCopy={rowCatalog.copy}
+                    locale={rowLocale}
                     clientInfo={{
                       nom: d.nom,
                       empresa: d.empresa ?? undefined,

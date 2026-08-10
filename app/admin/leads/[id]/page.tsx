@@ -56,6 +56,7 @@ export default async function LeadDetailPage({ params }: Props) {
       eventAddress: true,
       eventStartTime: true,
       eventEndTime: true,
+      preferredLocale: true,
       sourceCollaboratorId: true,
       proposals: {
         select: {
@@ -268,6 +269,7 @@ export default async function LeadDetailPage({ params }: Props) {
         wx: leadWx,
         eventPhone: lead.eventPhone ?? null,
         eventAddress: lead.eventAddress ?? null,
+        preferredLocale: lead.preferredLocale ?? null,
         booking: lead.booking ? {
           id: lead.booking.id,
           reference: lead.booking.reference,

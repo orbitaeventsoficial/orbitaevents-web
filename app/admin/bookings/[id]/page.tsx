@@ -26,6 +26,7 @@ import BookingSectionNav from './BookingSectionNav';
 import BookingGallery from './BookingGallery';
 import BookingFieldNotesComposer from './BookingFieldNotesComposer';
 import BookingCustomerLinkPanel from './BookingCustomerLinkPanel';
+import BookingLocaleSelector from './BookingLocaleSelector';
 import BookingQuestionnaireSection from './BookingQuestionnaireSection';
 import { getBookingOperationalSnapshot } from '@/lib/services/bookingOperationalService';
 import { getWeatherForEvent } from '@/lib/services/weatherService';
@@ -383,6 +384,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
                       <p className="bd__field-label">Telèfon</p>
                       <a href={`tel:${displayPhone}`} className="bd__field-link">{displayPhone}</a>
                     </div>
+                    <BookingLocaleSelector
+                      bookingId={booking.id}
+                      preferredLocale={booking.preferredLocale || 'es'}
+                    />
                   </div>
                 </>
               );
