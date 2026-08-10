@@ -184,6 +184,15 @@ const nextConfig = {
   // Esto evita errores raros con rutas dinamicas grandes
   experimental: {
     largePageDataBytes: 500 * 1000, // 500KB
+    /**
+     * El motor d'impressió del dossier no s'empaqueta: es carrega del servidor.
+     *
+     * `playwright-core` porta dins suport per a protocols que no fem servir i
+     * que depenen de paquets opcionals; si el bundler intenta seguir-los, la
+     * compilació peta buscant `chromium-bidi`. Com que això només s'executa al
+     * servidor, es deixa fora del paquet i es carrega de `node_modules`.
+     */
+    serverComponentsExternalPackages: ['playwright-core'],
   },
 
 };
