@@ -4,20 +4,17 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { DOSSIER_LOCALE_OPTIONS } from '@/lib/constants/dossier-locales';
 
 /**
  * L'idioma decideix en quina llengua li arriben al client els correus, els
  * pressupostos i els dossiers. La reserva en guarda un de propi, però fins ara
  * només es podia veure —mai corregir— des d'aquesta fitxa.
  *
- * Mateixa llista que la fitxa de client i la d'entrada, perquè les tres parlin
- * del mateix.
+ * La llista viu a `lib/constants/dossier-locales`: la fitxa de client, la
+ * d'entrada i aquesta han de parlar del mateix.
  */
-const LOCALE_OPTIONS = [
-  { value: 'ca', label: 'Català' },
-  { value: 'es', label: 'Castellà' },
-  { value: 'en', label: 'Anglès' },
-] as const;
+const LOCALE_OPTIONS = DOSSIER_LOCALE_OPTIONS;
 
 export default function BookingLocaleSelector({
   bookingId,

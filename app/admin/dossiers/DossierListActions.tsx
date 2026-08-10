@@ -4,26 +4,22 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
-import type { AnimacioProduct } from '@/lib/constants/animacio-products';
-import { buildDossierHtml, type DossierClientInfo, type DossierCopy } from '@/lib/utils/dossier-html-builder';
-import { toIntlLocale } from '@/lib/constants';
 
+/**
+ * Els botons d'una fila de la llista de dossiers.
+ *
+ * Ja no rep productes, textos, logo ni idioma: el document el fabrica el
+ * servidor a partir del dossier desat, i aquí només cal saber quin dossier és.
+ */
 interface Props {
   dossierId: string;
   email?: string;
   nom: string;
-  productIds: string[];
-  products: AnimacioProduct[];
-  clientInfo: DossierClientInfo;
-  dossierCopy: DossierCopy;
-  /** Llengua del client: mana com es formaten els imports de la vista prèvia. */
-  locale: string;
   alreadySent: boolean;
-  logoDataUri?: string;
   isDeleted?: boolean;
 }
 
-export function DossierListActions({ dossierId, email, nom, productIds, products, clientInfo, dossierCopy, locale, alreadySent, logoDataUri, isDeleted }: Props) {
+export function DossierListActions({ dossierId, email, nom, alreadySent, isDeleted }: Props) {
   const toast = useToast();
   const router = useRouter();
   const [sending, setSending] = useState(false);
@@ -31,20 +27,19 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   const [restoring, setRestoring] = useState(false);
   const [purging, setPurging] = useState(false);
 
+  /**
+   * La vista prèvia del dossier **desat**, servida pel servidor.
+   *
+   * Abans es tornava a muntar l'HTML aquí, al navegador, amb els productes que
+   * la llista tenia a mà. Era una segona versió del document i podia no
+   * coincidir amb el que s'enviava. Ara mira el mateix que rebrà el client.
+   */
   function preview() {
-    try {
-      const filteredProducts = products.filter((p) => productIds.includes(p.id));
-      const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, { logoDataUri, locale: toIntlLocale(locale) });
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
-    } catch (err) {
-      console.error('[DossierListActions] preview error:', err);
-      toast.error('No he pogut obrir la previsualització.');
-    }
+    window.open(`/api/admin/dossiers/${dossierId}/document`, '_blank', 'noopener,noreferrer');
   }
 
-  function openCompositePdf() {
-    window.open(`/api/admin/dossiers/${dossierId}/composite`, '_blank', 'noopener,noreferrer');
+  function openPdf() {
+    window.open(`/api/admin/dossiers/${dossierId}/document?format=pdf`, '_blank', 'noopener,noreferrer');
   }
 
   async function send() {
@@ -122,8 +117,8 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
         <button type="button" onClick={preview} className="dg__btn dg__btn--preview" title="Previsualitzar">
           Vista
         </button>
-        <button type="button" onClick={openCompositePdf} className="dg__btn dg__btn--pdf" title="Obrir dossier + fitxes en un sol PDF">
-          PDF complet
+        <button type="button" onClick={openPdf} className="dg__btn dg__btn--pdf" title="Obrir el PDF del dossier">
+          PDF
         </button>
         <button type="button" onClick={restore} disabled={restoring} className="dg__btn dg__btn--save" title="Restaurar de la paperera">
           {restoring ? '…' : '↩ Restaurar'}
@@ -140,8 +135,8 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
       <button type="button" onClick={preview} className="dg__btn dg__btn--preview" title="Previsualitzar">
         Vista
       </button>
-      <button type="button" onClick={openCompositePdf} className="dg__btn dg__btn--pdf" title="Obrir dossier + fitxes en un sol PDF">
-        PDF complet
+      <button type="button" onClick={openPdf} className="dg__btn dg__btn--pdf" title="Obrir el PDF del dossier">
+        PDF
       </button>
       {email && (
         <button

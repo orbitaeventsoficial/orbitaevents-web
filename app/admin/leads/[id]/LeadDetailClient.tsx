@@ -29,6 +29,7 @@ import { TEAM_MEMBERS } from '@/lib/constants/admin';
 import { INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR } from '@/lib/services/travelCost';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
+import { DOSSIER_LOCALE_OPTIONS, dossierLocaleLabel } from '@/lib/constants/dossier-locales';
 
 type Stage = 'nou' | 'contactat' | 'guanyat' | 'perdut';
 type PayState = 'none' | 'part' | 'full' | null;
@@ -139,16 +140,10 @@ function nextStageFor(stage: Stage): Stage | null {
 
 type EditableField = 'name' | 'phone' | 'email' | 'eventPhone' | 'eventAddress' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'guestCount' | 'budget' | 'preferredLocale';
 
-/** Les llengües en què el negoci escriu al client. Mateixa llista que la fitxa de client. */
-const LOCALE_OPTIONS = [
-  { value: 'ca', label: 'Català' },
-  { value: 'es', label: 'Castellà' },
-  { value: 'en', label: 'Anglès' },
-] as const;
+/** Les llengües en què el negoci escriu al client. Autoritat única. */
+const LOCALE_OPTIONS = DOSSIER_LOCALE_OPTIONS;
 
-function localeLabel(value: string): string {
-  return LOCALE_OPTIONS.find((option) => option.value === value)?.label ?? value.toUpperCase();
-}
+const localeLabel = dossierLocaleLabel;
 
 type ProposalItem = {
   id: string;
@@ -231,7 +226,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
       statusLabel: d.estat,
       createdAt: d.createdAt,
       sentAt: d.sentAt,
-      href: `/api/admin/dossiers/${d.id}/composite`,
+      href: `/api/admin/dossiers/${d.id}/document?format=pdf`,
       targetBlank: true,
     })),
     ...documents.map((doc) => ({

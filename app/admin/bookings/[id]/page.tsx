@@ -246,7 +246,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       statusLabel: d.sentAt ? 'enviat' : 'esborrany',
       createdAt: d.createdAt,
       sentAt: d.sentAt,
-      href: `/api/admin/dossiers/${d.id}/composite`,
+      href: `/api/admin/dossiers/${d.id}/document?format=pdf`,
       targetBlank: true,
     })),
     ...(booking.lead?.documents || []).map((doc) => ({

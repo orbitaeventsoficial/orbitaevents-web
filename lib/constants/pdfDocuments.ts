@@ -76,7 +76,7 @@ export const PDF_DOCUMENT_CATALOG = [
   {
     id: 'dossier',
     name: 'Dossier comercial',
-    generator: 'generateDossierCompositePDF',
+    generator: 'buildDossierDocument',
     previewUrl: '/api/admin/studio/preview/dossier',
     previewTitle: 'Dossier comercial PDF real',
     theme: 'portada carbon + cos editorial clar + or',

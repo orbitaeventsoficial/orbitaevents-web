@@ -11,6 +11,12 @@ import {
   collaboratorProductToAnimacioProduct,
   getDossierCollaboratorProductsByIds,
 } from '@/lib/services/collaboratorProductService';
+import { DOSSIER_LOCALES, type DossierLocale } from '@/lib/constants/dossier-locales';
+import {
+  buildDossierDocument,
+  renderDossierPdf,
+  type DossierLineSnapshot,
+} from '@/lib/services/dossierDocumentService';
 
 export type CreateDossierInput = {
   leadId?: string;
@@ -21,6 +27,12 @@ export type CreateDossierInput = {
   eventDesc?: string;
   salutacio?: string;
   productIds: string[];
+  /**
+   * La foto del bolo: línies de preu acordades i quilòmetres de desplaçament.
+   * Sense això el document que refà el servidor no és el que s'ha vist a la
+   * pantalla, perquè li falten els preus.
+   */
+  lineSnapshot?: DossierLineSnapshot;
 };
 
 export async function createDossier(input: CreateDossierInput) {
@@ -34,6 +46,7 @@ export async function createDossier(input: CreateDossierInput) {
       eventDesc: input.eventDesc || null,
       salutacio: input.salutacio || null,
       productIds: input.productIds,
+      lineSnapshot: input.lineSnapshot ? { ...input.lineSnapshot } : undefined,
     },
   });
 }
@@ -67,8 +80,7 @@ export async function getAllDossiers(limit = 50) {
  * l'idioma del client. Un dossier sense entrada cau al castellà, que és el
  * mateix valor per defecte que fa servir la base de dades.
  */
-export const DOSSIER_LOCALES = ['ca', 'es', 'en'] as const;
-export type DossierLocale = (typeof DOSSIER_LOCALES)[number];
+export type { DossierLocale };
 
 export function dossierLocaleOf(preferredLocale?: string | null): DossierLocale {
   return (DOSSIER_LOCALES as readonly string[]).includes(preferredLocale ?? '')
@@ -126,36 +138,64 @@ export async function deleteDossier(id: string) {
   return softDeleteDossier(id);
 }
 
+/**
+ * El cos del correu, que ja no és el dossier.
+ *
+ * El dossier viatja adjunt en PDF. El cos només ha de dir qui escriu, què
+ * s'envia i com contestar: un correu amb un document sencer enganxat a dins es
+ * veu trencat a la meitat dels clients de correu i no es pot desar ni reenviar.
+ */
+function buildDossierEmailBody(nom: string, productsLabel: string): string {
+  const esc = (value: string) => value
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `<!DOCTYPE html>
+<html lang="ca"><body style="margin:0;padding:24px;background:#fbf8f1;font-family:Georgia,'Times New Roman',serif;color:#211d16;">
+  <div style="max-width:520px;margin:0 auto;">
+    <p style="font-size:16px;line-height:1.6;margin:0 0 16px;">Hola ${esc(nom)},</p>
+    <p style="font-size:16px;line-height:1.6;margin:0 0 16px;">
+      T'enviem adjunt el dossier amb les nostres propostes: ${esc(productsLabel)}.
+    </p>
+    <p style="font-size:16px;line-height:1.6;margin:0 0 24px;">
+      Qualsevol dubte, respon aquest correu o truca'ns al
+      <a href="tel:${esc(EMAIL_CONTACT.phone)}" style="color:#a9863f;">${esc(EMAIL_CONTACT.phone)}</a>.
+    </p>
+    <p style="font-size:14px;line-height:1.6;margin:0;color:#7a7264;">Òrbita Events</p>
+  </div>
+</body></html>`;
+}
+
 export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; error?: string }> {
   const dossier = await prisma.dossier.findUnique({ where: { id } });
   if (!dossier) return { ok: false, error: 'Dossier no trobat' };
   if (!dossier.email) return { ok: false, error: 'El dossier no té email de destinatari' };
 
-  const locale = await dossierLocaleForLead(dossier.leadId);
-  const [allProducts, orbitaProducts, dossierCopy] = await Promise.all([
-    getAnimacioProducts(locale),
-    getOrbitaDossierProducts(locale),
-    getDossierCopy(locale),
-  ]);
-  const collaboratorProducts = await getDossierCollaboratorProductsByIds(dossier.productIds);
-  const products = [
-    ...orbitaProducts.filter((p) => dossier.productIds.includes(p.id)),
-    ...allProducts.filter((p) => dossier.productIds.includes(p.id)),
-    ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
-  ];
   const recipientEmail = dossier.email!;
-  const clientInfo: DossierClientInfo = {
-    nom: dossier.nom,
-    empresa: dossier.empresa ?? undefined,
-    telefon: dossier.telefon ?? undefined,
-    email: recipientEmail,
-    eventDesc: dossier.eventDesc ?? undefined,
-    salutacio: dossier.salutacio ?? undefined,
-  };
-  const html = buildDossierHtml(clientInfo, products, dossierCopy, { locale: toIntlLocale(locale) });
 
-  const productsLabel = products.map((p) => p.nom).join(', ');
+  /**
+   * El mateix document que es previsualitza, sense excepcions.
+   *
+   * Abans aquí es tornava a muntar l'HTML a mà i es cridava el constructor
+   * només amb l'idioma: el client rebia el dossier sense logo i sense les
+   * línies de preu que s'havien aprovat a la pantalla.
+   */
+  const document = await buildDossierDocument(id);
+  if (!document) return { ok: false, error: 'Dossier no trobat' };
+
+  let pdf: Buffer;
+  try {
+    pdf = await renderDossierPdf(document.html);
+  } catch (err) {
+    console.error('[dossierService] no s\'ha pogut imprimir el dossier a PDF:', err);
+    return {
+      ok: false,
+      error: 'No s\'ha pogut generar el PDF del dossier. No s\'ha enviat res: '
+        + 'val més no enviar-lo que enviar-ne un de diferent del que has aprovat.',
+    };
+  }
+
+  const productsLabel = document.productNames.join(', ');
   const subject = `Dossier Òrbita Events — ${dossier.nom}`;
+  const html = buildDossierEmailBody(dossier.nom, productsLabel);
 
   try {
     // Vinculació X-Orbita: si el dossier ve d'un lead, el client respon i el
@@ -168,7 +208,8 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
       to: recipientEmail,
       subject,
       html,
-      text: `Hola ${dossier.nom},\n\nT'enviem el dossier amb les nostres propostes: ${productsLabel}.\n\nQualsevol dubte, contacta'ns al ${EMAIL_CONTACT.phone} o ${EMAIL_CONTACT.email}\n\nÒrbita Events`,
+      text: `Hola ${dossier.nom},\n\nT'enviem adjunt el dossier amb les nostres propostes: ${productsLabel}.\n\nQualsevol dubte, contacta'ns al ${EMAIL_CONTACT.phone} o ${EMAIL_CONTACT.email}\n\nÒrbita Events`,
+      attachments: [{ filename: document.filename, content: pdf, contentType: 'application/pdf' }],
       orbita: orbitaCtx,
     });
 

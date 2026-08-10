@@ -1,7 +1,10 @@
 import { NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { generateDossierCompositePDF } from '@/lib/services/dossierCompositePdfService';
-import { listDossierCollaboratorProducts } from '@/lib/services/collaboratorProductService';
+import { buildDossierHtmlFor, renderDossierPdf } from '@/lib/services/dossierDocumentService';
+import {
+  collaboratorProductToAnimacioProduct,
+  listDossierCollaboratorProducts,
+} from '@/lib/services/collaboratorProductService';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 import { PDF_PREVIEW_PLACEHOLDER } from '@/lib/constants/pdfDocuments';
 import { COLLABORATOR_EXTRA_CATEGORY } from '@/lib/constants/admin';
@@ -30,21 +33,19 @@ export async function GET(req: NextRequest) {
     const collaboratorNames = new Set(collaboratorProducts.map((product) => normalize(product.nom)));
     const ownProducts = animacioProducts.filter((product) => !collaboratorNames.has(normalize(product.nom)));
 
-    const doc = await generateDossierCompositePDF({
+    const html = await buildDossierHtmlFor({
       client: {
         nom: PDF_PREVIEW_PLACEHOLDER,
         empresa: PDF_PREVIEW_PLACEHOLDER,
         email: PDF_PREVIEW_PLACEHOLDER,
       },
-      products: ownProducts,
-      productIds: [
-        ...ownProducts.map((product) => product.id),
-        ...collaboratorProducts.map((product) => product.id),
+      products: [
+        ...ownProducts,
+        ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
       ],
-      collaboratorProducts,
       locale: 'ca',
     });
 
-    return Buffer.from(doc.output('arraybuffer'));
+    return renderDossierPdf(html);
   });
 }

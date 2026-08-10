@@ -566,42 +566,21 @@ export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLin
     }
   }
 
-  function generate(mode: 'preview' | 'pdf' | 'download') {
-    if (!nom.trim()) return;
-    setGenerating(true);
-    try {
-      const selected = dossierProducts;
-      const clientInfo = {
-        nom: nom.trim(), empresa: empresa.trim(), telefon: telefon.trim(),
-        email: email.trim(), eventDesc: eventDesc.trim(),
-        salutacio: salutacio.trim() || undefined,
-      };
-      const km = Number(travelKm);
-      const html = buildDossierHtml(clientInfo, selected, dossierCopy, {
-        autoPrint: mode === 'pdf',
-        logoDataUri,
-        locale: toIntlLocale(locale),
-        quoteLines,
-        travelKm: Number.isFinite(km) && km > 0 ? km : undefined,
-        location: eventDesc.trim() || undefined,
-      });
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      if (mode === 'download') {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `dossier-${nom.trim().toLowerCase().replace(/[^a-z0-9àáèéíïòóúüç]+/gi, '-')}.html`;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-      } else {
-        window.open(url, '_blank', 'noopener,noreferrer');
-      }
-    } catch (err) {
-      console.error('[DossierGenerator] generate error:', err);
-      toast.error('No he pogut generar el dossier.');
-    } finally {
-      setGenerating(false);
+  /**
+   * El dossier real, el que està desat.
+   *
+   * Abans aquí es fabricava un document al navegador amb el que hi havia a la
+   * pantalla: es podia veure una cosa i enviar-ne una altra. Ordre del
+   * propietari: el previsualitzador ha de previsualitzar una cosa creada de
+   * veritat. Per això demana desar primer.
+   */
+  function openSavedDocument(format: 'html' | 'pdf') {
+    if (!savedId) {
+      toast.error('Desa el dossier primer: la vista prèvia ensenya el dossier de veritat.');
+      return;
     }
+    const suffix = format === 'pdf' ? '?format=pdf' : '';
+    window.open(`/api/admin/dossiers/${savedId}/document${suffix}`, '_blank', 'noopener,noreferrer');
   }
 
   async function saveDossier() {
@@ -668,6 +647,19 @@ export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLin
           eventDesc: eventDesc.trim() || undefined,
           salutacio: salutacio.trim() || undefined,
           productIds: Array.from(selectedIds),
+          /**
+           * La foto del bolo va amb el dossier.
+           *
+           * Sense això el servidor no pot refer el document que s'acaba de
+           * veure: li faltarien els preus acordats i els quilòmetres, i el
+           * client rebria una versió diferent de l'aprovada.
+           */
+          lineSnapshot: {
+            travelKm: Number.isFinite(Number(travelKm)) && Number(travelKm) > 0
+              ? Number(travelKm)
+              : undefined,
+            lines: quoteLines && quoteLines.length > 0 ? quoteLines : undefined,
+          },
         }),
       });
       if (!res.ok) throw new Error('Error desant');
@@ -963,20 +955,23 @@ export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLin
           </div>
 
           <div className="dg__actions">
-            <button type="button" className="dg__btn dg__btn--preview" onClick={() => generate('preview')} disabled={!canGenerate || generating}>
-              Previsualitzar
-            </button>
-            <button type="button" className="dg__btn dg__btn--pdf" onClick={() => generate('pdf')} disabled={!canGenerate || generating}>
-              Obrir PDF
-            </button>
             <button type="button" className="dg__btn dg__btn--save" onClick={saveDossier} disabled={!canGenerate || saving}>
               {saving ? 'Desant…' : savedId ? '✓ Desat' : 'Desar al sistema'}
             </button>
-            <button type="button" className="dg__btn dg__btn--download" onClick={() => generate('download')} disabled={!canGenerate || generating}>
-              Descarregar peça HTML
+            <button type="button" className="dg__btn dg__btn--preview" onClick={() => openSavedDocument('html')} disabled={!savedId}>
+              Previsualitzar
+            </button>
+            <button type="button" className="dg__btn dg__btn--pdf" onClick={() => openSavedDocument('pdf')} disabled={!savedId}>
+              Obrir PDF
             </button>
             <span className="dg__hint">
-              {!nom.trim() ? 'Omple el nom del client per continuar' : selectedProducts.length === 0 ? 'Selecciona almenys un producte' : `${selectedProducts.length} producte${selectedProducts.length > 1 ? 's' : ''} · ${formatEuro(selectedTotal)}`}
+              {!nom.trim()
+                ? 'Omple el nom del client per continuar'
+                : selectedProducts.length === 0
+                  ? 'Selecciona almenys un producte'
+                  : !savedId
+                    ? `${selectedProducts.length} producte${selectedProducts.length > 1 ? 's' : ''} · ${formatEuro(selectedTotal)} · desa'l per veure el dossier de veritat`
+                    : `${selectedProducts.length} producte${selectedProducts.length > 1 ? 's' : ''} · ${formatEuro(selectedTotal)} · el que veus és el que rebrà el client`}
             </span>
           </div>
         </aside>

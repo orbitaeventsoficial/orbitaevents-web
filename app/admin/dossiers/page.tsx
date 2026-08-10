@@ -18,9 +18,8 @@ import {
   getDeletedDossiers,
   dossierLocaleOf,
   dossierLocaleForLead,
-  DOSSIER_LOCALES,
-  type DossierLocale,
 } from '@/lib/services/dossierService';
+import { DOSSIER_LOCALES, type DossierLocale } from '@/lib/constants/dossier-locales';
 import { listLeadServiceLines } from '@/lib/services/leadServiceLineService';
 import type { DossierQuoteLine } from '@/lib/utils/dossier-html-builder';
 import {
@@ -216,20 +215,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     dossierId={d.id}
                     email={d.email ?? undefined}
                     nom={d.nom}
-                    productIds={d.productIds}
-                    products={rowCatalog.lookup}
-                    dossierCopy={rowCatalog.copy}
-                    locale={rowLocale}
-                    clientInfo={{
-                      nom: d.nom,
-                      empresa: d.empresa ?? undefined,
-                      telefon: d.telefon ?? undefined,
-                      email: d.email ?? undefined,
-                      eventDesc: d.eventDesc ?? undefined,
-                      salutacio: d.salutacio ?? undefined,
-                    }}
                     alreadySent={!!d.sentAt}
-                    logoDataUri={logoDataUri}
                   />
                 </div>
               );
@@ -265,20 +251,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     dossierId={d.id}
                     email={d.email ?? undefined}
                     nom={d.nom}
-                    productIds={d.productIds}
-                    products={rowCatalog.lookup}
-                    dossierCopy={rowCatalog.copy}
-                    locale={rowLocale}
-                    clientInfo={{
-                      nom: d.nom,
-                      empresa: d.empresa ?? undefined,
-                      telefon: d.telefon ?? undefined,
-                      email: d.email ?? undefined,
-                      eventDesc: d.eventDesc ?? undefined,
-                      salutacio: d.salutacio ?? undefined,
-                    }}
                     alreadySent={!!d.sentAt}
-                    logoDataUri={logoDataUri}
                     isDeleted
                   />
                 </div>
