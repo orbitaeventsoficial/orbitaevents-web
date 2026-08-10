@@ -3,11 +3,13 @@ import { describe, it, expect, vi } from 'vitest';
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: {
     business: {
+      phone: '+34654467087',
       phoneDisplay: '654 46 70 87',
       email: 'info@orbitaevents.com',
     },
     web: {
       url: 'https://www.orbitaevents.com',
+      domain: 'orbitaevents.com',
     },
   },
 }));
@@ -68,6 +70,9 @@ const copy: DossierCopy = {
     travelNote: 'Inclòs fins a {includedKm} km; després {blockPrice} per {blockKm} km.',
     totalLabel: 'Total orientatiu',
     vatNote: "Preus orientatius; l'IVA es tanca a la proposta.",
+    titleQuoted: 'El pressupost',
+    totalLabelQuoted: 'Total',
+    vatNoteQuoted: 'Preus tancats. IVA no inclòs.',
   },
   cta: { label: 'Per confirmar disponibilitat o per a qualsevol dubte' },
 };
@@ -75,7 +80,7 @@ const copy: DossierCopy = {
 function build(
   c: DossierClientInfo,
   products: AnimacioProduct[],
-  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; location?: string },
+  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; location?: string; quoteLines?: { label: string; amount: number }[] },
 ): string {
   return buildDossierHtml(c, products, copy, { locale: 'ca-ES', ...options });
 }
@@ -170,25 +175,21 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('info@orbitaevents.com');
   });
 
-  it('numera els capítols des de 01', () => {
+  it('numera els serveis des de 01', () => {
     const html = build(client, [productWithTrams, productWithDjOptions]);
-    expect(html).toContain('Capítol 01');
-    expect(html).toContain('Capítol 02');
+    expect(html).toContain('class="fitxa-num">01<');
+    expect(html).toContain('class="fitxa-num">02<');
   });
 
-  it('inclou portada carbon amb logo si es proporciona logoDataUri', () => {
-    const html = build(client, [productWithTrams], {
-      logoDataUri: 'data:image/png;base64,abc',
-    });
-    expect(html).toContain('portada');
-    expect(html).toContain('data:image/png;base64,abc');
-    expect(html).toContain('Dossier preparat per a');
-  });
+  it('obre amb la portada carbon i el nom del client, amb logo o sense', () => {
+    const ambLogo = build(client, [productWithTrams], { logoDataUri: 'data:image/png;base64,abc' });
+    expect(ambLogo).toContain('class="capçal"');
+    expect(ambLogo).toContain('data:image/png;base64,abc');
+    expect(ambLogo).toContain('Dossier preparat per a');
 
-  it('inclou portada carbon també sense logoDataUri', () => {
-    const html = build(client, [productWithTrams]);
-    expect(html).toContain('class="portada"');
-    expect(html).toContain('portada-wordmark');
+    const senseLogo = build(client, [productWithTrams]);
+    expect(senseLogo).toContain('class="capçal"');
+    expect(senseLogo).toContain('capçal-marca');
   });
 
   it('afegeix script autoPrint si cal', () => {
@@ -196,8 +197,34 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('window.print()');
   });
 
-  it('pinta el preu canònic "des de X €" quan el producte té priceFrom', () => {
-    const djProduct: AnimacioProduct = {
+  /**
+   * L'explicació no es retalla mai.
+   *
+   * El document es va escurçar traient la pàgina en blanc que hi havia entre
+   * servei i servei, no traient text: el propietari el fa servir per vendre.
+   */
+  it('conserva tota l\'explicació i tot el que inclou cada servei', () => {
+    const producte: AnimacioProduct = {
+      id: 'orbita:dj',
+      nom: 'DJ professional',
+      descripcio: ['Primer paràgraf.', 'Segon paràgraf.', 'Tercer paràgraf.'],
+      inclou: ['Un', 'Dos', 'Tres', 'Quatre', 'Cinc', 'Sis'],
+      priceFrom: 150,
+    };
+    const html = build(client, [producte]);
+    for (const text of producte.descripcio) expect(html).toContain(text);
+    for (const item of producte.inclou) expect(html).toContain(`<li>${item}</li>`);
+  });
+
+  // ─── El preu ────────────────────────────────────────────────────────────────
+
+  /**
+   * Ordre del propietari (2026-08-10): «si li ofereixo 2 h de DJ, posa 2 h de
+   * DJ, no des de…». Amb el bolo muntat, el catàleg calla: un preu orientatiu
+   * al costat d'un preu real només fa dubtar el client.
+   */
+  it('amb bolo muntat, mana la línia real i el "des de" desapareix del document', () => {
+    const dj: AnimacioProduct = {
       id: 'orbita:dj-primera-hora',
       nom: 'DJ professional',
       descripcio: ['Servei base de DJ.'],
@@ -205,96 +232,76 @@ describe('buildDossierHtml', () => {
       priceFrom: 150,
       categoria: 'DJ',
     };
-    const html = build(client, [djProduct]);
-    expect(html).toContain('class="producte-preu"');
-    expect(html).toContain('des de');
-    expect(html).toContain('150');
+    const html = build(client, [dj], {
+      travelKm: 0,
+      quoteLines: [{ label: 'DJ · 2 hores', amount: 250 }],
+    });
+    expect(html).toContain('DJ · 2 hores');
+    expect(html).toContain('250');
+    expect(html).not.toContain('des de');
+    expect(html).not.toContain('class="fitxa-preu"');
   });
 
-  it('marca el preu del capítol "a mida" quan el producte no té priceFrom', () => {
-    const html = build(client, [productWithTrams]);
-    // Sense priceFrom el capítol mostra la inversió com a "a mida" (no s'amaga el bloc),
-    // i mai pinta el preu cru d'un tram.
-    expect(html).toContain('producte-preu--mida');
-    expect(html).not.toContain('900€');
+  it('amb bolo muntat, els rètols no diuen "orientatiu"', () => {
+    const dj: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 150 };
+    const html = build(client, [dj], { quoteLines: [{ label: 'DJ · 2 hores', amount: 250 }] });
+    expect(html).toContain('Total</span>');
+    expect(html).not.toContain('Total orientatiu');
+    expect(html).not.toContain('Pressupost orientatiu');
   });
 
-  it('inclou el resum econòmic amb total "des de" sumant els priceFrom', () => {
-    const a: AnimacioProduct = {
-      id: 'orbita:dj-base',
-      nom: 'DJ base',
+  it('sense bolo muntat, el catàleg orienta amb "des de" i amb "a mida"', () => {
+    const dj: AnimacioProduct = {
+      id: 'orbita:dj-primera-hora',
+      nom: 'DJ professional',
       descripcio: ['Servei base de DJ.'],
       inclou: ['DJ professional'],
       priceFrom: 150,
     };
-    const b: AnimacioProduct = {
-      id: 'orbita:photocall',
-      nom: 'Photocall',
-      descripcio: ['Racó fotogràfic.'],
-      inclou: ['Atrezzo'],
-      priceFrom: 200,
-    };
-    const html = build(client, [a, b]);
-    expect(html).toContain('Resum de la proposta');
-    expect(html).toContain('class="resum-total"');
-    expect(html).toContain('resum-total-value');
-    // 150 + 200 = 350 → total formatat amb formatCurrency
-    expect(html).toContain('350');
-    // El total és sempre "des de"
-    expect(html).toMatch(/resum-total-value">des de/);
+    const ambPreu = build(client, [dj]);
+    expect(ambPreu).toContain('des de');
+    expect(ambPreu).toContain('150');
+
+    // Un producte sense priceFrom es declara «a mida» i mai ensenya el preu cru
+    // d'un tram intern.
+    const aMida = build(client, [productWithTrams]);
+    expect(aMida).toContain('a mida');
+    expect(aMida).not.toContain('900€');
   });
 
-  it('el total marca "+ propostes a mida" si algun producte no té priceFrom', () => {
-    const amb: AnimacioProduct = {
-      id: 'orbita:dj-base',
-      nom: 'DJ base',
-      descripcio: ['Servei base de DJ.'],
-      inclou: ['DJ professional'],
-      priceFrom: 150,
-    };
-    const html = build(client, [amb, productWithTrams]);
-    // productWithTrams no té priceFrom → contribueix com "a mida"
-    expect(html).toContain('resum-total-mida');
-    expect(html).toContain('propostes a mida');
-    // El total només suma els priceFrom coneguts (150), mai els preus de trams
-    expect(html).toContain('150');
-    expect(html).not.toContain('900€');
-  });
-
-  it('no pinta el resum econòmic amb llista de productes buida', () => {
-    const html = build(client, []);
-    expect(html).not.toContain('class="resum-page"');
-    expect(html).not.toContain('class="resum-total"');
-  });
-
-  // ─── Pressupost desglossat amb desplaçament ──────────────────────────────────
-
-  it('NO pinta el pressupost desglossat si no hi ha travelKm', () => {
+  /**
+   * Regressió: abans la pàgina de preu només es pintava si hi havia
+   * quilòmetres de desplaçament, i un dossier sense distància coneguda sortia
+   * **sense cap preu enlloc**. El desplaçament és una secció de dins, no la
+   * condició per existir.
+   */
+  it('pinta el preu encara que no hi hagi desplaçament', () => {
     const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 150 };
     const html = build(client, [a]);
-    expect(html).not.toContain('class="bud-page"');
+    expect(html).toContain('class="full full--preu"');
+    expect(html).toContain('150');
+    expect(html).not.toContain('Desplaçament</div>');
   });
 
-  it('pinta el pressupost desglossat amb total = serveis + suplement de desplaçament', () => {
+  it('suma el suplement de desplaçament al total', () => {
     const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 200 };
-    // 90 km totals: 50 inclosos → 40 facturables → 2 trams × 10€ = 20€ suplement.
+    // 90 km totals: 50 inclosos → 40 facturables → 2 trams × 10 € = 20 €.
     const html = build(client, [a], { travelKm: 90, location: 'Arenys de Munt' });
-    expect(html).toContain('class="bud-page"');
-    expect(html).toContain('Pressupost orientatiu');
     expect(html).toContain('Arenys de Munt');
-    // Total = 200 (servei) + 20 (transport) = 220
-    expect(html).toContain('bud-total-value');
+    expect(html).toContain('total-xifra');
     expect(html).toContain('220');
   });
 
-  it('marca "desplaçament inclòs sense suplement" si la distància és dins els km inclosos', () => {
+  it('diu que el desplaçament va inclòs quan la distància hi cap', () => {
     const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 150 };
-    // 40 km totals < 50 inclosos → 0 suplement.
     const html = build(client, [a], { travelKm: 40 });
-    expect(html).toContain('class="bud-page"');
     expect(html).toContain('sense suplement');
-    // Total = només el servei (150), sense transport.
     expect(html).toContain('150');
+  });
+
+  it('no pinta cap pàgina de preu si no hi ha ni línies ni preus de catàleg', () => {
+    const html = build(client, [productWithTrams]);
+    expect(html).not.toContain('class="full full--preu"');
   });
 
   it('funciona amb llista de productes buida', () => {

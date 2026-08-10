@@ -7072,7 +7072,10 @@
       "travelLine": "Suplemento de desplazamiento",
       "travelNote": "Incluido hasta {includedKm} km desde Granollers; después, {blockPrice} por cada {blockKm} km.",
       "totalLabel": "Total orientativo",
-      "vatNote": "Precios orientativos. El IVA y los ajustes finales se cierran en la propuesta definitiva."
+      "vatNote": "Precios orientativos. El IVA y los ajustes finales se cierran en la propuesta definitiva.",
+      "titleQuoted": "El presupuesto",
+      "totalLabelQuoted": "Total",
+      "vatNoteQuoted": "Precios cerrados para los servicios de esta propuesta. IVA no incluido."
     },
     "cta": {
       "label": "Cualquier duda o para mirar fechas, escribidnos cuando queráis"
@@ -7092,18 +7095,32 @@
       },
       "bombolles": {
         "nom": "Máquina de burbujas",
-        "descripcio": ["Burbujas para los momentos más bonitos: la entrada, el primer baile o las fotos de recuerdo."],
-        "inclou": ["Máquina de burbujas", "La manejamos nosotros durante la fiesta"]
+        "descripcio": [
+          "Burbujas para los momentos más bonitos: la entrada, el primer baile o las fotos de recuerdo."
+        ],
+        "inclou": [
+          "Máquina de burbujas",
+          "La manejamos nosotros durante la fiesta"
+        ]
       },
       "pont-llums-caps-mobils": {
         "nom": "Puente de luces + cabezas móviles",
-        "descripcio": ["Un juego de luces y cabezas móviles que llena la pista de color y le da vida cuando llega la hora de bailar."],
-        "inclou": ["Puente de luces", "Cabezas móviles"]
+        "descripcio": [
+          "Un juego de luces y cabezas móviles que llena la pista de color y le da vida cuando llega la hora de bailar."
+        ],
+        "inclou": [
+          "Puente de luces",
+          "Cabezas móviles"
+        ]
       },
       "operari-extra": {
         "nom": "Una mano extra",
-        "descripcio": ["Una persona más para el montaje y el soporte técnico, para que todo salga rodado y no tengáis que preocuparos de nada."],
-        "inclou": ["Operario de apoyo"]
+        "descripcio": [
+          "Una persona más para el montaje y el soporte técnico, para que todo salga rodado y no tengáis que preocuparos de nada."
+        ],
+        "inclou": [
+          "Operario de apoyo"
+        ]
       }
     }
   },

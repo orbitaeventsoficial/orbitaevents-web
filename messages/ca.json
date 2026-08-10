@@ -7366,7 +7366,10 @@
       "travelLine": "Suplement de desplaçament",
       "travelNote": "Inclòs fins a {includedKm} km des de Granollers; després, {blockPrice} per cada {blockKm} km.",
       "totalLabel": "Total orientatiu",
-      "vatNote": "Preus orientatius. L'IVA i els ajustos finals es tanquen a la proposta definitiva."
+      "vatNote": "Preus orientatius. L'IVA i els ajustos finals es tanquen a la proposta definitiva.",
+      "titleQuoted": "El pressupost",
+      "totalLabelQuoted": "Total",
+      "vatNoteQuoted": "Preus tancats per als serveis d'aquesta proposta. IVA no inclòs."
     },
     "cta": {
       "label": "Qualsevol dubte o per mirar dates, escriviu-nos quan vulgueu"
@@ -7386,18 +7389,32 @@
       },
       "bombolles": {
         "nom": "Màquina de bombolles",
-        "descripcio": ["Bombolles per als moments més bonics: l'entrada, el primer ball o les fotos de record."],
-        "inclou": ["Màquina de bombolles", "La fem anar nosaltres durant la festa"]
+        "descripcio": [
+          "Bombolles per als moments més bonics: l'entrada, el primer ball o les fotos de record."
+        ],
+        "inclou": [
+          "Màquina de bombolles",
+          "La fem anar nosaltres durant la festa"
+        ]
       },
       "pont-llums-caps-mobils": {
         "nom": "Pont de llums + caps mòbils",
-        "descripcio": ["Un joc de llums i caps mòbils que omple la pista de color i li dona vida quan arriba l'hora de ballar."],
-        "inclou": ["Pont de llums", "Caps mòbils"]
+        "descripcio": [
+          "Un joc de llums i caps mòbils que omple la pista de color i li dona vida quan arriba l'hora de ballar."
+        ],
+        "inclou": [
+          "Pont de llums",
+          "Caps mòbils"
+        ]
       },
       "operari-extra": {
         "nom": "Una mà extra",
-        "descripcio": ["Una persona més per al muntatge i el suport tècnic, perquè tot vagi rodat i no us hàgiu de preocupar de res."],
-        "inclou": ["Operari de suport"]
+        "descripcio": [
+          "Una persona més per al muntatge i el suport tècnic, perquè tot vagi rodat i no us hàgiu de preocupar de res."
+        ],
+        "inclou": [
+          "Operari de suport"
+        ]
       }
     }
   },

@@ -7072,7 +7072,10 @@
       "travelLine": "Travel surcharge",
       "travelNote": "Included up to {includedKm} km from Granollers; after that, {blockPrice} per {blockKm} km.",
       "totalLabel": "Indicative total",
-      "vatNote": "Indicative prices. VAT and final adjustments are set in the definitive proposal."
+      "vatNote": "Indicative prices. VAT and final adjustments are set in the definitive proposal.",
+      "titleQuoted": "The quote",
+      "totalLabelQuoted": "Total",
+      "vatNoteQuoted": "Fixed prices for the services in this proposal. VAT not included."
     },
     "cta": {
       "label": "Any questions or to check dates, write to us whenever you like"
@@ -7092,18 +7095,32 @@
       },
       "bombolles": {
         "nom": "Bubble machine",
-        "descripcio": ["Bubbles for the loveliest moments: the entrance, the first dance or the photos to remember."],
-        "inclou": ["Bubble machine", "We run it for you during the party"]
+        "descripcio": [
+          "Bubbles for the loveliest moments: the entrance, the first dance or the photos to remember."
+        ],
+        "inclou": [
+          "Bubble machine",
+          "We run it for you during the party"
+        ]
       },
       "pont-llums-caps-mobils": {
         "nom": "Lighting bridge + moving heads",
-        "descripcio": ["A set of lights and moving heads that fills the dance floor with colour and brings it to life when it's time to dance."],
-        "inclou": ["Lighting bridge", "Moving heads"]
+        "descripcio": [
+          "A set of lights and moving heads that fills the dance floor with colour and brings it to life when it's time to dance."
+        ],
+        "inclou": [
+          "Lighting bridge",
+          "Moving heads"
+        ]
       },
       "operari-extra": {
         "nom": "An extra hand",
-        "descripcio": ["One more person for the setup and technical support, so everything runs smoothly and you don't have to worry about a thing."],
-        "inclou": ["Support operator"]
+        "descripcio": [
+          "One more person for the setup and technical support, so everything runs smoothly and you don't have to worry about a thing."
+        ],
+        "inclou": [
+          "Support operator"
+        ]
       }
     }
   },
