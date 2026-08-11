@@ -384,6 +384,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Dossier · portada',
     description: 'El fons de la primera pàgina, darrere el nom del client. Horitzontal i fosca: a sobre hi va text en blanc.',
     target: 'dossier-html-builder · capçal',
+    fallback: '/img/dossier/portada.jpg',
   },
   {
     key: 'dossier.orbita:dj-primera-hora',
@@ -391,6 +392,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Dossier · DJ',
     description: 'La cabina en marxa, amb gent ballant. Horitzontal.',
     target: 'dossier-html-builder · fitxa',
+    fallback: '/img/dossier/dj.jpg',
   },
   {
     key: 'dossier.orbita:bombolles',
@@ -398,6 +400,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Dossier · màquina de bombolles',
     description: 'Bombolles sobre la pista. Horitzontal.',
     target: 'dossier-html-builder · fitxa',
+    fallback: '/img/dossier/bombolles.jpg',
   },
   {
     key: 'dossier.orbita:pont-llums-caps-mobils',
@@ -405,6 +408,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Dossier · pont de llums',
     description: 'El pont de caps mòbils encès. Horitzontal.',
     target: 'dossier-html-builder · fitxa',
+    fallback: '/img/dossier/pont-llums.jpg',
   },
   {
     key: 'dossier.orbita:candybar-halloween',

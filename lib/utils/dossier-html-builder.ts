@@ -583,9 +583,15 @@ export function buildDossierHtml(
        costat. Una foto d'un bolo real explica en un segon el que un paràgraf
        no acaba d'explicar mai. */
     .fitxa--amb-foto { padding: 0; gap: 0; align-items: stretch; }
+    /* Proporció fixa.
+       Les fotos venen del mòbil i n'hi ha de verticals. Sense proporció, una
+       de vertical estirava la fitxa fins a mig full amb tres línies de text al
+       costat. Amb la proporció fixada, la fitxa fa el mateix tant si la foto és
+       dreta com ajaguda, i el retall el fa la foto, no la pàgina. */
     .fitxa-foto {
       flex: 0 0 40%;
-      align-self: stretch;
+      align-self: flex-start;
+      aspect-ratio: 4 / 3;
       overflow: hidden;
       background: var(--carbo);
     }
@@ -595,7 +601,6 @@ export function buildDossierHtml(
     .fitxa-foto img {
       display: block;
       width: 100%; height: 100%;
-      min-height: 40mm;
       object-fit: cover;
     }
     .fitxa--amb-foto .fitxa-cos { padding: 8mm; }

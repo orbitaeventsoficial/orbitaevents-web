@@ -4,6 +4,7 @@ import { formatCurrency, toIntlLocale } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import type { DossierCopy } from '@/lib/utils/dossier-html-builder';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
+import { IMAGE_MANAGER_PLACEMENTS } from '@/app/admin/image-manager/image-manager-config';
 import {
   DJ_FIRST_HOUR_PRICE,
   DJ_EXTRA_HOUR_PRICE,
@@ -61,6 +62,14 @@ export async function getOrbitaDossierProducts(locale = 'ca'): Promise<AnimacioP
   const fotos = await Promise.all(
     ORBITA_DOSSIER_PRODUCTS.map((def) => getManagedImageOverride(`dossier.${def.id}`)),
   );
+  /* Si ningú hi ha arrossegat res, val la que declara la ubicació. Sense això,
+     una foto triada pel propietari i declarada al gestor no arribava al
+     document fins que algú la tornava a pujar. */
+  const declarades = new Map(
+    IMAGE_MANAGER_PLACEMENTS
+      .filter((p) => p.section === 'dossier' && p.fallback)
+      .map((p) => [p.key, p.fallback as string]),
+  );
 
   return ORBITA_DOSSIER_PRODUCTS.flatMap((def, index) => {
     const service = byId.get(def.serviceId);
@@ -69,7 +78,7 @@ export async function getOrbitaDossierProducts(locale = 'ca'): Promise<AnimacioP
     return [{
       id: def.id,
       nom: raw.nom,
-      image: fotos[index]?.src || undefined,
+      image: fotos[index]?.src || declarades.get(`dossier.${def.id}`) || undefined,
       descripcio: (raw.descripcio ?? []).map(interp),
       inclou: (raw.inclou ?? []).map(interp),
       priceFrom: service.defaultPrice,

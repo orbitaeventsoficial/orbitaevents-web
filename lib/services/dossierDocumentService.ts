@@ -1,5 +1,6 @@
 import 'server-only';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
+import { IMAGE_MANAGER_PLACEMENTS } from '@/app/admin/image-manager/image-manager-config';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -165,11 +166,13 @@ export async function buildDossierDocument(
   // La portada la tria el propietari des del gestor d'imatges. Si la casella és
   // buida, la portada queda negra: cap foto és millor que la foto equivocada.
   const portada = await getManagedImageOverride('dossier.portada');
+  const portadaDeclarada = IMAGE_MANAGER_PLACEMENTS
+    .find((p) => p.key === 'dossier.portada')?.fallback;
 
   const html = buildDossierHtml(client, products, copy, {
     autoPrint: options.autoPrint,
     logoDataUri: readLogoDataUri(),
-    coverImage: portada?.src || undefined,
+    coverImage: portada?.src || portadaDeclarada || undefined,
     locale: toIntlLocale(locale),
     quoteLines: linies,
     travelKm: snapshot.travelKm,
