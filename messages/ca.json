@@ -7415,6 +7415,40 @@
         "inclou": [
           "Operari de suport"
         ]
+      },
+      "candybar-halloween": {
+        "nom": "Candybar de Halloween",
+        "descripcio": [
+          "El racó dolç de la festa, muntat i ambientat: taula parada amb estovalles esfilagarsades, la gàbia amb l’aranya i les teranyines, i els tres calderons de calavera plens de llaminadures."
+        ],
+        "inclou": [
+          "Taula i estovalles temàtiques",
+          "Gàbia amb aranya i teranyines",
+          "Tres calderons de calavera",
+          "Muntatge i desmuntatge",
+          "Les llaminadures es cobren a part, per nen"
+        ]
+      },
+      "llaminadures-per-nen": {
+        "nom": "Llaminadures del candybar · per nen",
+        "descripcio": [
+          "Les llaminadures que s’acaben la mateixa nit. Es compten per nen perquè vint no mengen com seixanta."
+        ],
+        "inclou": [
+          "Llaminadures per a cada nen"
+        ]
+      },
+      "deco-estand-dj-halloween": {
+        "nom": "Decoració de l’estand de DJ · Halloween",
+        "descripcio": [
+          "La imatge que surt a totes les fotos: els dos fantasmes gegants penjats sobre la cabina, el cadàver i el fum baix arran de terra."
+        ],
+        "inclou": [
+          "Dos fantasmes gegants",
+          "Cadàver",
+          "Estructura i muntatge",
+          "Màquina de fum baix inclosa"
+        ]
       }
     }
   },

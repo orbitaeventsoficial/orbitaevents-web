@@ -71,6 +71,15 @@ export const ORBITA_SERVICES: OrbitaService[] = [
   { id: 'bombolles', kind: 'EQUIPMENT', label: 'Màquina de bombolles', defaultPrice: 50, unit: 'unit', optional: true },
   { id: 'caps-mobils', kind: 'EQUIPMENT', label: 'Caps mòbils (llum)', defaultPrice: 120, unit: 'unit', optional: true },
   { id: 'operari-extra', kind: 'OTHER', label: 'Operari extra', defaultPrice: 50, unit: 'unit', optional: true },
+  // Decoració de Halloween. Els preus els va fixar el propietari el 2026-08-11
+  // sobre els costos reals: material propi de l'inventari, muntatge a 50 € l'hora
+  // (el mateix que l'operari extra) i, a l'estand, el fum baix que ens lloga en
+  // Tino, que aquí ja va inclòs i per tant no es torna a cobrar a part.
+  { id: 'candybar-halloween', kind: 'OTHER', label: 'Candybar de Halloween', defaultPrice: 120, unit: 'unit', optional: true },
+  // Les llaminadures es gasten a cada bolo, i vint nens no mengen com seixanta:
+  // per això va per nen i no és una xifra tancada.
+  { id: 'llaminadures-per-nen', kind: 'OTHER', label: 'Llaminadures del candybar · per nen', defaultPrice: 2, unit: 'unit', optional: true },
+  { id: 'deco-estand-dj-halloween', kind: 'OTHER', label: 'Decoració de l’estand de DJ · Halloween', defaultPrice: 280, unit: 'unit', optional: true },
 ];
 
 export function getOrbitaService(id: string): OrbitaService | undefined {

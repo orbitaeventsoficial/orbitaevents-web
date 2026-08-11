@@ -132,6 +132,9 @@ function shouldShowDossierCollaboratorProduct(product: CollaboratorProductForDos
     'batalla musical',
     'pintacares professional',
     'globoflexia',
+    // Halloween i temporada de tardor-hivern (alta del 2026-08-11).
+    'personatge addicional',
+    'blood and vampires',
   ].includes(name);
 }
 

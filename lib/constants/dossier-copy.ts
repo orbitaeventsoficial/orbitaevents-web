@@ -39,6 +39,9 @@ const ORBITA_DOSSIER_PRODUCTS: ReadonlyArray<{ id: string } & OwnProductDef> = [
   { id: 'orbita:bombolles', msgKey: 'bombolles', serviceId: 'bombolles', categoria: 'Efectes' },
   { id: 'orbita:pont-llums-caps-mobils', msgKey: 'pont-llums-caps-mobils', serviceId: 'caps-mobils', categoria: 'Llums' },
   { id: 'orbita:operari-extra', msgKey: 'operari-extra', serviceId: 'operari-extra', categoria: 'Operativa' },
+  { id: 'orbita:candybar-halloween', msgKey: 'candybar-halloween', serviceId: 'candybar-halloween', categoria: 'Decoració' },
+  { id: 'orbita:llaminadures-per-nen', msgKey: 'llaminadures-per-nen', serviceId: 'llaminadures-per-nen', categoria: 'Decoració' },
+  { id: 'orbita:deco-estand-dj-halloween', msgKey: 'deco-estand-dj-halloween', serviceId: 'deco-estand-dj-halloween', categoria: 'Decoració' },
 ];
 
 export async function getOrbitaDossierProducts(locale = 'ca'): Promise<AnimacioProduct[]> {

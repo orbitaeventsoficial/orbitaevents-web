@@ -7121,6 +7121,40 @@
         "inclou": [
           "Support operator"
         ]
+      },
+      "candybar-halloween": {
+        "nom": "Halloween candy bar",
+        "descripcio": [
+          "The sweet corner of the party, set up and dressed: a table with tattered cloths, the cage with the spider and cobwebs, and three skull cauldrons filled with sweets."
+        ],
+        "inclou": [
+          "Themed table and cloths",
+          "Cage with spider and cobwebs",
+          "Three skull cauldrons",
+          "Set-up and take-down",
+          "Sweets are charged separately, per child"
+        ]
+      },
+      "llaminadures-per-nen": {
+        "nom": "Candy bar sweets · per child",
+        "descripcio": [
+          "The sweets that are gone by the end of the night. Counted per child, because twenty do not eat like sixty."
+        ],
+        "inclou": [
+          "Sweets for each child"
+        ]
+      },
+      "deco-estand-dj-halloween": {
+        "nom": "DJ stand decoration · Halloween",
+        "descripcio": [
+          "The shot that ends up in every photo: two giant ghosts hanging over the booth, the corpse, and low fog across the floor."
+        ],
+        "inclou": [
+          "Two giant ghosts",
+          "Corpse",
+          "Structure and set-up",
+          "Low fog machine included"
+        ]
       }
     }
   },

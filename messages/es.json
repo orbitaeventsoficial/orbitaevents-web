@@ -7121,6 +7121,40 @@
         "inclou": [
           "Operario de apoyo"
         ]
+      },
+      "candybar-halloween": {
+        "nom": "Candybar de Halloween",
+        "descripcio": [
+          "El rincón dulce de la fiesta, montado y ambientado: mesa vestida con manteles deshilachados, la jaula con la araña y las telarañas, y los tres calderos de calavera llenos de chuches."
+        ],
+        "inclou": [
+          "Mesa y manteles temáticos",
+          "Jaula con araña y telarañas",
+          "Tres calderos de calavera",
+          "Montaje y desmontaje",
+          "Las chuches se cobran aparte, por niño"
+        ]
+      },
+      "llaminadures-per-nen": {
+        "nom": "Chuches del candybar · por niño",
+        "descripcio": [
+          "Las chuches que se acaban esa misma noche. Se cuentan por niño porque veinte no comen como sesenta."
+        ],
+        "inclou": [
+          "Chuches para cada niño"
+        ]
+      },
+      "deco-estand-dj-halloween": {
+        "nom": "Decoración del stand de DJ · Halloween",
+        "descripcio": [
+          "La imagen que sale en todas las fotos: los dos fantasmas gigantes colgados sobre la cabina, el cadáver y el humo bajo a ras de suelo."
+        ],
+        "inclou": [
+          "Dos fantasmas gigantes",
+          "Cadáver",
+          "Estructura y montaje",
+          "Máquina de humo bajo incluida"
+        ]
       }
     }
   },
