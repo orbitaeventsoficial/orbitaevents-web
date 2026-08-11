@@ -1,4 +1,5 @@
 import 'server-only';
+import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -68,6 +69,31 @@ export function parseLineSnapshot(value: unknown): DossierLineSnapshot {
   };
 }
 
+/**
+ * El client no ha de saber de qui subcontractem.
+ *
+ * Les línies del bolo es guarden amb el nom del proveïdor enganxat —«Bingo
+ * Musical (Masquerade Events)»— perquè a dins serveix per saber qui ho porta i
+ * quant costa. Al document que surt de casa, aquell nom sobra: el client
+ * contracta Òrbita.
+ *
+ * Només es retallen els noms de proveïdor **coneguts**. Res de treure tot el
+ * que hi ha entre parèntesis o després d'un punt volat: «DJ · 2 hores» ha de
+ * quedar intacte.
+ */
+export function netejaEtiquetaComercial(label: string, proveidors: readonly string[]): string {
+  let net = label;
+  for (const proveidor of proveidors) {
+    const nom = proveidor.trim();
+    if (!nom) continue;
+    const escapat = nom.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    net = net
+      .replace(new RegExp(`\\s*\\(\\s*${escapat}\\s*\\)`, 'gi'), '')
+      .replace(new RegExp(`\\s*[·–—-]\\s*${escapat}\\b`, 'gi'), '');
+  }
+  return net.replace(/\s{2,}/g, ' ').trim();
+}
+
 function dossierLocaleOf(value?: string | null): DossierLocale {
   const candidate = (value || '').toLowerCase().slice(0, 2) as DossierLocale;
   return DOSSIER_LOCALES.includes(candidate) ? candidate : 'es';
@@ -125,11 +151,27 @@ export async function buildDossierDocument(
 
   const snapshot = parseLineSnapshot(dossier.lineSnapshot);
 
+  /** Els noms que no han de sortir al document: qui ens ho subcontracta. */
+  const proveidors = Array.from(new Set(
+    products
+      .map((product) => product.sourceProviderName)
+      .filter((nom): nom is string => Boolean(nom) && nom !== 'Òrbita Events'),
+  ));
+  const linies = snapshot.lines?.map((line) => ({
+    ...line,
+    label: netejaEtiquetaComercial(line.label, proveidors),
+  }));
+
+  // La portada la tria el propietari des del gestor d'imatges. Si la casella és
+  // buida, la portada queda negra: cap foto és millor que la foto equivocada.
+  const portada = await getManagedImageOverride('dossier.portada');
+
   const html = buildDossierHtml(client, products, copy, {
     autoPrint: options.autoPrint,
     logoDataUri: readLogoDataUri(),
+    coverImage: portada?.src || undefined,
     locale: toIntlLocale(locale),
-    quoteLines: snapshot.lines,
+    quoteLines: linies,
     travelKm: snapshot.travelKm,
     location: dossier.eventDesc ?? undefined,
   });

@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { formatCurrency, toIntlLocale } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import type { DossierCopy } from '@/lib/utils/dossier-html-builder';
+import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 import {
   DJ_FIRST_HOUR_PRICE,
   DJ_EXTRA_HOUR_PRICE,
@@ -54,13 +55,21 @@ export async function getOrbitaDossierProducts(locale = 'ca'): Promise<AnimacioP
 
   const byId = new Map(ORBITA_SERVICES.map((service) => [service.id, service]));
 
-  return ORBITA_DOSSIER_PRODUCTS.flatMap((def) => {
+  /* La foto de cada servei propi surt del gestor d'imatges, amb la clau
+     `dossier.<id>`. Així es canvia arrossegant-n'hi una altra i no cal tocar
+     codi cada cop. Si la casella és buida, la fitxa surt sense foto. */
+  const fotos = await Promise.all(
+    ORBITA_DOSSIER_PRODUCTS.map((def) => getManagedImageOverride(`dossier.${def.id}`)),
+  );
+
+  return ORBITA_DOSSIER_PRODUCTS.flatMap((def, index) => {
     const service = byId.get(def.serviceId);
     if (!service) return [];
     const raw = t.raw(def.msgKey) as { nom: string; descripcio: string[]; inclou: string[] };
     return [{
       id: def.id,
       nom: raw.nom,
+      image: fotos[index]?.src || undefined,
       descripcio: (raw.descripcio ?? []).map(interp),
       inclou: (raw.inclou ?? []).map(interp),
       priceFrom: service.defaultPrice,

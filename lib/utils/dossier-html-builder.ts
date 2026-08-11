@@ -360,7 +360,7 @@ export function buildDossierHtml(
   client: DossierClientInfo,
   products: AnimacioProduct[],
   copy: DossierCopy,
-  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; location?: string; quoteLines?: DossierQuoteLine[] } = {},
+  options: { autoPrint?: boolean; logoDataUri?: string; coverImage?: string; locale?: string; travelKm?: number; location?: string; quoteLines?: DossierQuoteLine[] } = {},
 ): string {
   const locale = options.locale || 'ca-ES';
   const nom = escHtml(client.nom);
@@ -461,11 +461,22 @@ export function buildDossierHtml(
        al client no la pot triar el primer que passi. Fins que algú digui quina
        foto hi va, queda el carbó, que no menteix. */
     .capçal {
+      position: relative;
       background: var(--carbo);
       color: var(--paper);
       padding: 26mm 18mm 20mm;
       text-align: center;
     }
+
+    /* Amb foto de portada. El vel fosc no és decoració: sense ell, el nom del
+       client competeix amb la fotografia i no es llegeix cap dels dos. */
+    .capçal--foto { background-size: cover; background-position: center; }
+    .capçal--foto::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(10,9,7,0.78) 0%, rgba(10,9,7,0.66) 45%, rgba(10,9,7,0.90) 100%);
+    }
+    .capçal--foto > * { position: relative; z-index: 1; }
     .capçal-eyebrow {
       font-family: Helvetica, Arial, sans-serif;
       font-size: 7.5pt;
@@ -492,6 +503,21 @@ export function buildDossierHtml(
     .capçal-event {
       font-size: 10pt; font-style: italic;
       color: rgba(251, 248, 241, 0.6); margin-top: 3mm;
+    }
+
+    /* La portada, a pantalla, creix amb la pantalla.
+       En paper la mida és la que és, però en un monitor de 1400 px una portada
+       amb el nom a 20 punts es queda petita al mig de tot aquell negre: el nom
+       del client és el que ha de manar quan s'obre el document. */
+    @media screen and (min-width: 900px) {
+      .capçal { padding: 6vw 5vw 5vw; }
+      .capçal-logo { width: min(30vw, 120mm); margin-bottom: 4vw; }
+      .capçal-nom { font-size: clamp(20pt, 4.4vw, 46pt); letter-spacing: -0.015em; }
+      .capçal-event { font-size: clamp(10pt, 1.25vw, 15pt); margin-top: 5mm; }
+      .capçal-empresa { font-size: clamp(11pt, 1.5vw, 18pt); }
+      .capçal-eyebrow { font-size: clamp(7.5pt, 0.85vw, 11pt); }
+      .capçal-per { font-size: clamp(7pt, 0.8vw, 10pt); }
+      .capçal-regla { width: 26mm; margin-bottom: 4vw; }
     }
 
     .carta { padding: 14mm 18mm 0; flex: 1; }
@@ -714,7 +740,7 @@ export function buildDossierHtml(
 <body>
 
 <section class="full full--carta">
-  <div class="capçal">
+  <div class="capçal${options.coverImage ? ' capçal--foto' : ''}"${options.coverImage ? ` style="background-image:url('${escHtml(options.coverImage)}')"` : ''}>
     <div class="capçal-eyebrow">${escHtml(copy.portada.eyebrow)}</div>
     ${options.logoDataUri
       ? `<img class="capçal-logo" src="${options.logoDataUri}" alt="Òrbita Events" />`

@@ -1,4 +1,4 @@
-export type ImageManagerSectionId = 'home' | 'services' | 'themes' | 'portfolio' | 'seo' | 'layout';
+export type ImageManagerSectionId = 'home' | 'services' | 'themes' | 'portfolio' | 'seo' | 'layout' | 'dossier';
 
 export interface ImageManagerSection {
   id: ImageManagerSectionId;
@@ -56,6 +56,12 @@ export const IMAGE_MANAGER_SECTIONS: ImageManagerSection[] = [
     name: 'Layout / Marca',
     icon: '🎨',
     description: 'Logos, favicons, PWA icons i assets de marca globals.',
+  },
+  {
+    id: 'dossier',
+    name: 'Dossier',
+    icon: '📄',
+    description: 'La portada del dossier i la foto de cada servei propi. Arrossega-hi una imatge i surt al document que rep el client.',
   },
 ];
 
@@ -347,5 +353,56 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Layout · Apple Touch Icon',
     description: 'Icona iOS 180x180 /apple-touch-icon.png.',
     target: 'app/layout.tsx',
+  },
+
+  // ── DOSSIER ───────────────────────────────────────────────────────────
+  // El document que rep el client. Cada servei propi té la seva casella:
+  // s'hi arrossega una foto i surt al dossier; canviar-la és arrossegar-n'hi
+  // una altra.
+  //
+  // Els serveis de col·laborador no hi són: la seva foto viu a la fitxa del
+  // producte, al catàleg de proveïdors. Dues caselles per a la mateixa imatge
+  // serien dues veritats.
+  {
+    key: 'dossier.portada',
+    section: 'dossier',
+    label: 'Dossier · portada',
+    description: 'El fons de la primera pàgina, darrere el nom del client. Horitzontal i fosca: a sobre hi va text en blanc.',
+    target: 'dossier-html-builder · capçal',
+  },
+  {
+    key: 'dossier.orbita:dj-primera-hora',
+    section: 'dossier',
+    label: 'Dossier · DJ',
+    description: 'La cabina en marxa, amb gent ballant. Horitzontal.',
+    target: 'dossier-html-builder · fitxa',
+  },
+  {
+    key: 'dossier.orbita:bombolles',
+    section: 'dossier',
+    label: 'Dossier · màquina de bombolles',
+    description: 'Bombolles sobre la pista. Horitzontal.',
+    target: 'dossier-html-builder · fitxa',
+  },
+  {
+    key: 'dossier.orbita:pont-llums-caps-mobils',
+    section: 'dossier',
+    label: 'Dossier · pont de llums',
+    description: 'El pont de caps mòbils encès. Horitzontal.',
+    target: 'dossier-html-builder · fitxa',
+  },
+  {
+    key: 'dossier.orbita:candybar-halloween',
+    section: 'dossier',
+    label: 'Dossier · candybar de Halloween',
+    description: 'La taula parada amb la gàbia, les teranyines i els calderons. Horitzontal.',
+    target: 'dossier-html-builder · fitxa',
+  },
+  {
+    key: 'dossier.orbita:deco-estand-dj-halloween',
+    section: 'dossier',
+    label: 'Dossier · decoració de l’estand de DJ',
+    description: 'Els fantasmes gegants sobre la cabina, amb el fum baix. Horitzontal.',
+    target: 'dossier-html-builder · fitxa',
   },
 ];
