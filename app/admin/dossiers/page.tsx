@@ -180,9 +180,16 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           </div>
         </header>
         <DossierGeneratorClient
-          products={generatorProducts}
-          dossierCopy={generatorCatalog.copy}
-          locale={generatorLocale}
+          /* Els tres catàlegs ja estan carregats aquí dalt. Passar-los tots
+             costa el mateix que passar-ne un i permet canviar la llengua del
+             dossier sense recarregar ni perdre el que s'ha omplert. */
+          catalogs={Object.fromEntries(
+            DOSSIER_LOCALES.map((l) => {
+              const c = catalogFor(l);
+              return [l, { products: c.generator, copy: c.copy }];
+            }),
+          ) as Record<DossierLocale, { products: AnimacioProduct[]; copy: Awaited<ReturnType<typeof getDossierCopy>> }>}
+          initialLocale={generatorLocale}
           quoteLines={quoteLines}
           logoDataUri={logoDataUri}
           leadId={searchParams?.leadId}

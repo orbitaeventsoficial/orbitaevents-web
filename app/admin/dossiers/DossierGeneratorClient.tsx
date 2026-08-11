@@ -9,16 +9,20 @@ import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
 import { buildDossierHtml, type DossierCopy, type DossierQuoteLine } from '@/lib/utils/dossier-html-builder';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { DOSSIER_LOCALE_OPTIONS, type DossierLocale } from '@/lib/constants/dossier-locales';
 import { useBookingDistance } from '../bookings/useBookingDistance';
 import './dossiers.css';
 
 const DJ_FIRST_PRODUCT_ID = 'orbita:dj-primera-hora';
 
 interface Props {
-  products: AnimacioProduct[];
-  dossierCopy: DossierCopy;
-  /** Llengua del client: mana com es formaten els imports del dossier. */
-  locale: string;
+  /** El catàleg i els textos en cada llengua. La tria es fa aquí, no al servidor. */
+  catalogs: Record<DossierLocale, { products: AnimacioProduct[]; copy: DossierCopy }>;
+  /**
+   * La llengua amb què s'obre: la del client si el lead en té, i si no la que
+   * porta la base per defecte. A partir d'aquí la decideix qui envia el dossier.
+   */
+  initialLocale: DossierLocale;
   /** El bolo muntat a la fitxa. Si n'hi ha, el pressupost són aquestes línies. */
   quoteLines?: DossierQuoteLine[];
   logoDataUri?: string;
@@ -288,7 +292,13 @@ function productIdsFromServiceLines(lines: DossierServiceLine[], products: Anima
   return Array.from(new Set(ids));
 }
 
-export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLines, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialProductIds, initialEventLocation }: Props) {
+export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialProductIds, initialEventLocation }: Props) {
+  /* La llengua en què s'enviarà el dossier. S'obre amb la del client, però qui
+     l'envia la pot canviar: el lead pot tenir-la mal desada, o el client pot
+     ser una parella de dues llengües. Els tres catàlegs ja són aquí, així que
+     canviar-la no recarrega res ni esborra el que s'ha omplert. */
+  const [locale, setLocale] = useState<DossierLocale>(initialLocale);
+  const { products, copy: dossierCopy } = catalogs[locale] ?? catalogs[initialLocale];
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
   const productGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
@@ -870,6 +880,25 @@ export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLin
             <div className="dg__field">
               <label htmlFor="dg-email" className="dg__label">Email</label>
               <input id="dg-email" type="email" className="adm-input" value={email} onChange={(e) => { setEmail(e.target.value); setCustomerConflict(null); }} placeholder="client@exemple.com" autoComplete="off" />
+            </div>
+            <div className="dg__field">
+              <label htmlFor="dg-locale" className="dg__label">Idioma del dossier</label>
+              <select
+                id="dg-locale"
+                className="adm-input"
+                value={locale}
+                onChange={(e) => setLocale(e.target.value as DossierLocale)}
+                aria-describedby="dg-locale-nota"
+              >
+                {DOSSIER_LOCALE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <p id="dg-locale-nota" className="dg__hint">
+                {locale === initialLocale
+                  ? 'És la llengua que consta al client.'
+                  : 'Diferent de la que consta al client: mana la teva tria.'}
+              </p>
             </div>
             <div className="dg__field dg__field--full">
               <label htmlFor="dg-event" className="dg__label">{ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryLabel}</label>
