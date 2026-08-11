@@ -416,6 +416,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Dossier · candybar de Halloween',
     description: 'La taula parada amb la gàbia, les teranyines i els calderons. Horitzontal.',
     target: 'dossier-html-builder · fitxa',
+    fallback: '/img/dossier/candybar.jpg',
   },
   {
     key: 'dossier.orbita:deco-estand-dj-halloween',
@@ -423,5 +424,6 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Dossier · decoració de l’estand de DJ',
     description: 'Els fantasmes gegants sobre la cabina, amb el fum baix. Horitzontal.',
     target: 'dossier-html-builder · fitxa',
+    fallback: '/img/dossier/estand-dj.jpg',
   },
 ];
