@@ -408,7 +408,6 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Dossier · pont de llums',
     description: 'El pont de caps mòbils encès. Horitzontal.',
     target: 'dossier-html-builder · fitxa',
-    fallback: '/img/dossier/pont-llums.jpg',
   },
   {
     key: 'dossier.orbita:candybar-halloween',
