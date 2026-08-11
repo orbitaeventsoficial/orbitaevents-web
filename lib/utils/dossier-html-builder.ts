@@ -445,8 +445,10 @@ export function buildDossierHtml(
       background: var(--paper);
     }
 
+    /* A pantalla gran, el document ocupa la pantalla. Sense topall: un dossier
+       obert al monitor no ha de deixar dos marges buits com si fos un full. */
     @media screen and (min-width: 900px) {
-      .full, .flux { max-width: 260mm; padding-inline: 20mm; }
+      .full, .flux { max-width: none; padding-inline: 5vw; }
     }
 
     /* ── Full 1 · portada i carta alhora ─────────────────────────────── */
