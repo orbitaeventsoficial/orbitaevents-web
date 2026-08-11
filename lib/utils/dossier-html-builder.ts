@@ -454,10 +454,16 @@ export function buildDossierHtml(
     /* ── Full 1 · portada i carta alhora ─────────────────────────────── */
     .full--carta { padding: 0; }
 
+    /* La portada.
+       Vaig provar de posar-hi al darrere la foto del primer servei que en
+       tingués, i va sortir malament: en un dossier de Halloween hi va aparèixer
+       la foto d'una festa infantil de colors. La portada d'un document que va
+       al client no la pot triar el primer que passi. Fins que algú digui quina
+       foto hi va, queda el carbó, que no menteix. */
     .capçal {
       background: var(--carbo);
       color: var(--paper);
-      padding: 22mm 18mm 16mm;
+      padding: 26mm 18mm 20mm;
       text-align: center;
     }
     .capçal-eyebrow {
@@ -552,19 +558,38 @@ export function buildDossierHtml(
        no acaba d'explicar mai. */
     .fitxa--amb-foto { padding: 0; gap: 0; align-items: stretch; }
     .fitxa-foto {
-      flex: 0 0 34%;
+      flex: 0 0 40%;
       align-self: stretch;
       overflow: hidden;
       background: var(--carbo);
     }
+    /* La foto acompanya l'alçada del text, ni més ni menys. Amb un terra massa
+       alt, una fitxa de tres línies s'inflava; amb un sostre, la foto deixava
+       una franja negra a sota. Ni l'un ni l'altre: que segueixi el text. */
     .fitxa-foto img {
       display: block;
       width: 100%; height: 100%;
-      min-height: 42mm;
+      min-height: 40mm;
       object-fit: cover;
     }
-    .fitxa--amb-foto .fitxa-cos { padding: 6mm; }
-    .fitxa--amb-foto .fitxa-marge { padding: 6mm 6mm 6mm 0; }
+    .fitxa--amb-foto .fitxa-cos { padding: 8mm; }
+    .fitxa--amb-foto .fitxa-marge { padding: 8mm 8mm 8mm 0; }
+
+    /* La foto canvia de banda a cada fitxa. Set targetes idèntiques una sota
+       l'altra es llegeixen com un formulari; alternades, es llegeixen com una
+       proposta. */
+    .fitxa--amb-foto:nth-of-type(even) { flex-direction: row-reverse; }
+    .fitxa--amb-foto:nth-of-type(even) .fitxa-marge { padding: 8mm 0 8mm 8mm; }
+
+    /* A mòbil no hi caben dues columnes: la foto passa a dalt. */
+    @media screen and (max-width: 700px) {
+      .fitxa--amb-foto,
+      .fitxa--amb-foto:nth-of-type(even) { flex-direction: column; }
+      .fitxa-foto { flex-basis: auto; }
+      .fitxa-foto img { min-height: 40mm; max-height: 55mm; }
+      .fitxa--amb-foto .fitxa-marge,
+      .fitxa--amb-foto:nth-of-type(even) .fitxa-marge { padding: 0 8mm 8mm; }
+    }
 
     .fitxa-cos { flex: 1; min-width: 0; }
     .fitxa-titol-fila {
