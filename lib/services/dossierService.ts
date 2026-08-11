@@ -27,6 +27,8 @@ export type CreateDossierInput = {
   eventDesc?: string;
   salutacio?: string;
   productIds: string[];
+  /** La llengua triada per qui envia el dossier. Queda desada amb el document. */
+  locale?: DossierLocale;
   /**
    * La foto del bolo: línies de preu acordades i quilòmetres de desplaçament.
    * Sense això el document que refà el servidor no és el que s'ha vist a la
@@ -45,6 +47,7 @@ export async function createDossier(input: CreateDossierInput) {
       email: input.email || null,
       eventDesc: input.eventDesc || null,
       salutacio: input.salutacio || null,
+      locale: input.locale && DOSSIER_LOCALES.includes(input.locale) ? input.locale : null,
       productIds: input.productIds,
       lineSnapshot: input.lineSnapshot ? { ...input.lineSnapshot } : undefined,
     },

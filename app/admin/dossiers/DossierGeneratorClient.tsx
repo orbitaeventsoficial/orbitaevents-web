@@ -670,6 +670,9 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
           email: email.trim() || undefined,
           eventDesc: eventDesc.trim() || undefined,
           salutacio: salutacio.trim() || undefined,
+          /* La llengua triada viatja amb el dossier. Sense això el servidor
+             tornava a preguntar-la al lead i el document sortia en una altra. */
+          locale,
           productIds: Array.from(selectedIds),
           /**
            * La foto del bolo va amb el dossier.

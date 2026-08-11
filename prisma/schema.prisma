@@ -516,6 +516,11 @@ model Dossier {
   email       String?
   eventDesc   String?
   salutacio   String?   @db.Text
+  // La llengua en què es va fer el document. Forma part de la foto del client:
+  // qui l'envia la tria, i el lead pot canviar de llengua després sense que un
+  // dossier ja enviat es reescrigui sol en una altra. Nul·la als dossiers
+  // anteriors a aquesta columna, que cauen a la llengua del lead.
+  locale      String?
 
   // Productes seleccionats (array d'IDs: 'bingo-musical', 'batalla-musical', 'dj')
   productIds  String[]

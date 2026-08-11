@@ -98,7 +98,10 @@ export async function buildDossierDocument(
   });
   if (!dossier) return null;
 
-  const locale = dossierLocaleOf(dossier.lead?.preferredLocale);
+  // Mana la llengua amb què es va fer el document. El lead pot canviar de
+  // llengua després, i un dossier ja enviat no es pot reescriure sol en una
+  // altra. Els dossiers anteriors a aquesta columna cauen a la del lead.
+  const locale = dossierLocaleOf(dossier.locale ?? dossier.lead?.preferredLocale);
   const [allProducts, orbitaProducts, copy] = await Promise.all([
     getAnimacioProducts(locale),
     getOrbitaDossierProducts(locale),
