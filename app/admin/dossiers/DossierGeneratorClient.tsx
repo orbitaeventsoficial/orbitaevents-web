@@ -9,6 +9,7 @@ import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
 import { buildDossierHtml, type DossierCopy, type DossierQuoteLine } from '@/lib/utils/dossier-html-builder';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { useBookingDistance } from '../bookings/useBookingDistance';
 import './dossiers.css';
 
 const DJ_FIRST_PRODUCT_ID = 'orbita:dj-primera-hora';
@@ -28,6 +29,8 @@ interface Props {
   initialEmpresa?: string;
   initialEventDesc?: string;
   initialProductIds?: string;
+  /** La població del lead. Si n'hi ha, els km es calculen sols. */
+  initialEventLocation?: string;
 }
 
 type LeadResult = {
@@ -285,7 +288,7 @@ function productIdsFromServiceLines(lines: DossierServiceLine[], products: Anima
   return Array.from(new Set(ids));
 }
 
-export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLines, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialProductIds }: Props) {
+export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLines, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialProductIds, initialEventLocation }: Props) {
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
   const productGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
@@ -298,6 +301,17 @@ export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLin
   const [email, setEmail] = useState(initialEmail ?? '');
   const [eventDesc, setEventDesc] = useState(initialEventDesc ?? '');
   const [travelKm, setTravelKm] = useState('');
+  /* Si el lead ja diu la població, els km no s'han de teclejar: es calculen amb
+     la mateixa ruta que ja fan servir les Reserves. Si algú ja n'ha escrit un,
+     no se li toca: mana la persona. */
+  const omplirKmSiEstaBuit = useCallback((km: string) => {
+    setTravelKm((actual) => (actual.trim() ? actual : km));
+  }, []);
+  const { calculatingDistance, distanceMessage } = useBookingDistance({
+    eventVenue: '',
+    eventLocation: initialEventLocation ?? '',
+    onDistanceResolved: omplirKmSiEstaBuit,
+  });
   const [salutacio, setSalutacio] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     new Set(parseInitialProductIds(initialProductIds).filter((id) => validProductIds.has(id))),
@@ -863,7 +877,18 @@ export function DossierGeneratorClient({ products, dossierCopy, locale, quoteLin
             </div>
             <div className="dg__field">
               <label htmlFor="dg-travel-km" className="dg__label">Km desplaçament (anada + tornada)</label>
-              <input id="dg-travel-km" type="number" min={0} step={1} className="adm-input" value={travelKm} onChange={(e) => setTravelKm(e.target.value)} placeholder="Ex: 70" autoComplete="off" />
+              <input id="dg-travel-km" type="number" min={0} step={1} className="adm-input" value={travelKm} onChange={(e) => setTravelKm(e.target.value)} placeholder="Ex: 70" autoComplete="off" aria-describedby="dg-travel-km-nota" />
+              {/* D'on surt el número. Un import que ningú sap d'on ve no es pot
+                  defensar davant del client. */}
+              <p id="dg-travel-km-nota" className="dg__hint" role="status">
+                {calculatingDistance
+                  ? `Calculant la distància fins a ${initialEventLocation}…`
+                  : distanceMessage
+                    ? distanceMessage
+                    : initialEventLocation
+                      ? `El lead diu ${initialEventLocation}.`
+                      : 'Sense població al lead: escriu-los a mà.'}
+              </p>
             </div>
             <div className="dg__field dg__field--full">
               <label htmlFor="dg-salutacio" className="dg__label">

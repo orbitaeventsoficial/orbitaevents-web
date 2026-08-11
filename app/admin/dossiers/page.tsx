@@ -30,6 +30,7 @@ import { formatDateShort } from '@/lib/constants';
 import Link from 'next/link';
 import { DossierListActions } from './DossierListActions';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { prisma } from '@/lib/prisma';
 
 export const metadata = { title: 'Dossiers' };
 
@@ -95,13 +96,26 @@ async function resolveInitialProductIds(leadId?: string, explicitProductIds?: st
   return ids.length > 0 ? Array.from(new Set(ids)).join(',') : undefined;
 }
 
+/* La població de l'esdeveniment, tal com el lead la té desada.
+   El resum que arriba per l'adreça és text lliure —«2026-09-10 · 20:00-21:00 ·
+   igualada · 45 pax»— i no és autoritat de res. La població viu al lead, en el
+   seu camp, i és d'aquí que ha de sortir la distància. */
+async function resolveLeadEventLocation(leadId?: string): Promise<string | undefined> {
+  if (!leadId) return undefined;
+  const lead = await prisma.lead.findUnique({
+    where: { id: leadId },
+    select: { eventLocation: true },
+  });
+  return lead?.eventLocation?.trim() || undefined;
+}
+
 export default async function DossiersPage({ searchParams }: PageProps) {
   const logoDataUri = readLogoDataUri();
   // El dossier es fa en la llengua del client, i cada dossier de la llista pot
   // tenir la seva. Per això el catàleg i els textos es carreguen en les tres
   // llengües i després cadascú agafa la que li toca; abans tot estava clavat al
   // català i un client castellanoparlant rebia el dossier en català.
-  const [dossiers, deletedDossiers, collaboratorProducts, byLocale, generatorLocale, initialProductIds, quoteLines] = await Promise.all([
+  const [dossiers, deletedDossiers, collaboratorProducts, byLocale, generatorLocale, initialProductIds, quoteLines, leadEventLocation] = await Promise.all([
     getAllDossiers(50),
     getDeletedDossiers(),
     listDossierCollaboratorProducts(),
@@ -116,6 +130,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
     dossierLocaleForLead(searchParams?.leadId),
     resolveInitialProductIds(searchParams?.leadId, searchParams?.productIds),
     resolveQuoteLines(searchParams?.leadId),
+    resolveLeadEventLocation(searchParams?.leadId),
   ]) as [
     DossierRow[],
     DossierRow[],
@@ -128,6 +143,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
     DossierLocale,
     string | undefined,
     DossierQuoteLine[],
+    string | undefined,
   ];
 
   const catalogFor = (locale: DossierLocale) => {
@@ -176,6 +192,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           initialEmpresa={searchParams?.empresa}
           initialEventDesc={searchParams?.eventDesc}
           initialProductIds={initialProductIds}
+          initialEventLocation={leadEventLocation}
         />
       </section>
 
