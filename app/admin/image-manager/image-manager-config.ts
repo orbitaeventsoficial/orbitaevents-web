@@ -14,6 +14,13 @@ export interface ImagePlacementDefinition {
   description: string;
   /** Component, config file or function that consumes this image */
   target: string;
+  /**
+   * La imatge que es fa servir ara mateix quan la casella és buida, si el codi
+   * en porta cap. Serveix perquè la targeta pugui ensenyar què hi ha abans de
+   * canviar-ho: fins ara deia «auto» i prou, i no hi havia manera de saber si
+   * el web ensenya alguna cosa o no ensenya res.
+   */
+  fallback?: string;
 }
 
 // ---------------------------------------------------------------------------

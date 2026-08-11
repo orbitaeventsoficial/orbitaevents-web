@@ -199,6 +199,25 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
               {hasItems ? `manual · ${items.length} asset${items.length > 1 ? 's' : ''}` : 'auto'}
             </span>
           </div>
+          {/* Quina imatge s'està fent servir ara.
+              La targeta només ensenyava el que s'hi havia pujat: si la casella
+              era buida deia «auto» i prou, i no hi havia manera de saber si el
+              web ensenya una imatge per defecte o no n'ensenya cap. */}
+          <p className="mt-2 text-xs text-white/50">
+            {hasItems
+              ? 'Ara es fa servir la imatge que hi has posat.'
+              : placement.fallback
+                ? 'Ara es fa servir aquesta, que ve del codi. Arrossega-n’hi una per canviar-la.'
+                : 'Cap imatge pujada aquí: es fa servir la que porti el codi, si n’hi ha cap.'}
+          </p>
+          {!hasItems && placement.fallback ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={placement.fallback}
+              alt=""
+              className="mt-2 h-24 w-auto rounded-xl border border-white/10 object-cover"
+            />
+          ) : null}
         </div>
         {hasItems && (
           <button
