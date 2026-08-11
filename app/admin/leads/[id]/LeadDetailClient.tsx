@@ -91,6 +91,8 @@ export type LeadDetailData = {
   wx: WxData | null;
   eventPhone: string | null;
   eventAddress: string | null;
+  /** Km anada i tornada. Els omple el dossier quan calcula la ruta. */
+  distanceKm: number | null;
   preferredLocale: string | null;
   booking: {
     id: string;
@@ -666,6 +668,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
           }}
           contractedProducts={lead.booking?.contractedProducts ?? []}
           source={lead.channel}
+          distanceKm={lead.distanceKm ?? 0}
           vehicleCostPerKm={vehicleCostPerKm}
           onEconomiaChange={handleEconomia}
           compactEconomia

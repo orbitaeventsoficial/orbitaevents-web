@@ -6,7 +6,7 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, aggregateServiceLines, classifyBoloLines } from '@/lib/services/costEngine';
-import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
+import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM, calculateTravelCharge } from '@/lib/services/travelCost';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency } from '@/lib/constants';
 
@@ -33,6 +33,7 @@ export default function LeadBoloSection({
   documentContext,
   contractedProducts = [],
   source,
+  distanceKm = 0,
   vehicleCostPerKm = DEFAULT_VEHICLE_COST_PER_KM,
   onEconomiaChange,
   compactEconomia = false,
@@ -57,6 +58,8 @@ export default function LeadBoloSection({
     meta?: string | null;
   }>;
   source?: string | null;
+  /** Km anada i tornada del lead. Cobren amb la mateixa regla que el dossier. */
+  distanceKm?: number;
   vehicleCostPerKm?: number;
   onEconomiaChange?: (e: BoloEconomia | null) => void;
   compactEconomia?: boolean;
@@ -127,6 +130,12 @@ export default function LeadBoloSection({
     // viu al cost fix operatiu; imputar a més un % seria comptar-lo dos cops.
     const { revenue, cost } = aggregateServiceLines(allLines, 0);
     if (revenue <= 0) return null;
+    // El desplaçament també es cobra, i fins ara la fitxa no el comptava: els
+    // km es desaven al dossier i aquí no arribaven, de manera que el dossier i
+    // la fitxa deien totals diferents del mateix bolo. La regla no es copia,
+    // és la mateixa de `travelCost`: km inclosos i trams per sobre.
+    const travelCharge = calculateTravelCharge(distanceKm);
+    const revenueWithTravel = revenue + travelCharge;
     // Cost operatiu real (vegeu docs/bolo-flux.md):
     // - cost fix (desgast + amortització + consumibles) NOMÉS si el bolo porta
     //   equip propi d'Òrbita (DJ o material propi); Masquerade sol → 0.
@@ -135,17 +144,20 @@ export default function LeadBoloSection({
     const { hasOwnEquipment, hasEquipmentRental } = classifyBoloLines(allLines);
     const rentalTransport = hasEquipmentRental ? EQUIPMENT_RENTAL_TRANSPORT_KM * vehicleCostPerKm : 0;
     const summary = computeBookingFinancialSummary({
-      total: revenue,
+      total: revenueWithTravel,
       packPrice: 0, extrasTotal: 0, extraHours: 0, extraHourPrice: 0,
-      distanceKm: 0, travelCost: 0,
-      serviceLinesRevenue: revenue, serviceLinesCost: cost + rentalTransport,
+      // El cost del vehicle el calcula el motor amb aquests km; no li passem
+      // cap xifra feta per no tenir-ne dues.
+      distanceKm, travelCost: 0,
+      vehicleCostPerKm,
+      serviceLinesRevenue: revenueWithTravel, serviceLinesCost: cost + rentalTransport,
       source: source ?? null,
     }, {
       ...PROFITABILITY_MODEL_DEFAULTS,
       fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
     });
     return summary;
-  }, [buildVisibleLines, source, vehicleCostPerKm]);
+  }, [buildVisibleLines, source, distanceKm, vehicleCostPerKm]);
 
   // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
   useEffect(() => {

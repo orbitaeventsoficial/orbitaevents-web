@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { parseLineSnapshot } from '@/lib/services/dossierDocumentService';
 import { notFound } from 'next/navigation';
 import '../leads-design.css';
 import LeadDetailClient from './LeadDetailClient';
@@ -77,7 +78,9 @@ export default async function LeadDetailPage({ params }: Props) {
         take: 5,
       },
       dossiers: {
-        select: { id: true, nom: true, mode: true, sentAt: true, sentTo: true, createdAt: true },
+        // `lineSnapshot` hi entra pels km: la ruta es calcula al dossier i és
+        // ell qui la conserva. La fitxa del lead no en guarda una còpia.
+        select: { id: true, nom: true, mode: true, sentAt: true, sentTo: true, createdAt: true, lineSnapshot: true },
         orderBy: { createdAt: 'desc' },
         take: 5,
         where: { deletedAt: null },
@@ -269,6 +272,12 @@ export default async function LeadDetailPage({ params }: Props) {
         wx: leadWx,
         eventPhone: lead.eventPhone ?? null,
         eventAddress: lead.eventAddress ?? null,
+        // Els km del dossier més recent que en porti. El desplaçament es cobra
+        // igual a la fitxa i al document, amb la mateixa regla i la mateixa
+        // xifra: si no, el mateix bolo té dos totals.
+        distanceKm: lead.dossiers
+          .map((d) => parseLineSnapshot(d.lineSnapshot).travelKm)
+          .find((km) => typeof km === 'number' && km > 0) ?? null,
         preferredLocale: lead.preferredLocale ?? null,
         booking: lead.booking ? {
           id: lead.booking.id,
