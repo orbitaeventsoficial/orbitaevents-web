@@ -515,6 +515,8 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
   const [lostReason, setLostReason] = useState('');
   const [lostNote, setLostNote] = useState('');
   const [lostSaving, setLostSaving] = useState(false);
+  /* Els perduts no ocupen dia al calendari si no es demanen expressament. */
+  const [mostrarPerduts, setMostrarPerduts] = useState(false);
   const [dragLeadId, setDragLeadId] = useState<string | null>(null);
   const [dropStage, setDropStage] = useState<Stage | null>(null);
 
@@ -527,10 +529,22 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
   const activeLead = pageId ? effectiveLeads.find((l) => l.id === pageId) ?? null : null;
 
   const visibleMonths = useMemo(() => Array.from({ length: MONTH_WINDOW }, (_, i) => monthStart + i), [monthStart]);
+  /* Un lead perdut no ocupa dia al calendari.
+     El calendari de temporada respon a «què tinc aquest dia». Un lead perdut ja
+     no és res d'aquell dia: el dia continua lliure. Mesurat el 2026-08-11 sobre
+     la base viva: el 5 de setembre hi constaven 4 entrades i només 1 era viva;
+     les altres 3 eren perdudes i tapaven l'única que compta.
+     No s'esborren: continuen al Pipeline i a la Llista, que és on un lead
+     perdut té sentit, i es poden tornar a ensenyar amb el commutador. */
+  const perdutsAmbDia = useMemo(
+    () => effectiveLeads.filter((l) => l.dateISO && l.stage === 'perdut').length,
+    [effectiveLeads],
+  );
   const byDate = useMemo(() => {
     const m = new Map<string, LeadData[]>();
     for (const l of effectiveLeads) {
       if (!l.dateISO) continue;
+      if (!mostrarPerduts && l.stage === 'perdut') continue;
       const dayLeads = m.get(l.dateISO) ?? [];
       dayLeads.push(l);
       m.set(l.dateISO, dayLeads);
@@ -544,7 +558,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       });
     }
     return m;
-  }, [effectiveLeads]);
+  }, [effectiveLeads, mostrarPerduts]);
   const months = useMemo<MonthBlock[]>(() => visibleMonths.map((vm) => {
     const { y, m } = toCalMonth(year, vm);
     const weekendSlots: WeekendSlot[] = saturdaysInMonth(y, m).map((sat) => ({
@@ -791,6 +805,23 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
               </div>
               <button type="button" className="fx__calnav" onClick={() => setMonthStart((s) => Math.min(MONTH_MAX_START, s + 1))} disabled={monthStart >= MONTH_MAX_START} aria-label="Mesos següents">{I.arrow}</button>
             </div>
+
+            {/* Els perduts no s'esborren: s'aparten. Aquí es diu quants n'hi ha
+                i es poden tornar a posar al calendari quan calgui. */}
+            {perdutsAmbDia > 0 && (
+              <div className="fx__calbar fx__calbar--perduts">
+                <button
+                  type="button"
+                  className={`fx__calchip${mostrarPerduts ? ' is-on' : ''}`}
+                  aria-pressed={mostrarPerduts}
+                  onClick={() => setMostrarPerduts((v) => !v)}
+                >
+                  {mostrarPerduts
+                    ? `Amagant-ne cap · ${perdutsAmbDia} perdut${perdutsAmbDia === 1 ? '' : 's'} al calendari`
+                    : `${perdutsAmbDia} perdut${perdutsAmbDia === 1 ? '' : 's'} fora del calendari · mostra'ls`}
+                </button>
+              </div>
+            )}
 
             {/* ── Empty state global: cap lead a tota la temporada ── */}
             {effectiveLeads.length === 0 && (
