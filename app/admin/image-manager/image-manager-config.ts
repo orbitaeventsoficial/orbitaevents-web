@@ -91,6 +91,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Home mòbil · targeta Bodes',
     description: 'Imatge principal de la card mòbil de bodes.',
     target: 'MobileServicesCards · FALLBACK_SERVICE_IMAGES',
+    fallback: '/img/portfolio/bodas/bodas-01.avif',
   },
   {
     key: 'home.servicesCards.halloween',
@@ -98,6 +99,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Home mòbil · targeta Halloween',
     description: 'Imatge principal de la card mòbil de Halloween.',
     target: 'MobileServicesCards · FALLBACK_SERVICE_IMAGES',
+    fallback: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif',
   },
   {
     key: 'home.servicesCards.monmagic',
@@ -112,6 +114,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Home mòbil · targeta Festes',
     description: 'Imatge principal de la card mòbil de festes.',
     target: 'MobileServicesCards · FALLBACK_SERVICE_IMAGES',
+    fallback: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
   },
   {
     key: 'home.servicesCards.empresas',
@@ -119,6 +122,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Home mòbil · targeta Empreses',
     description: 'Imatge principal de la card mòbil d\'empreses.',
     target: 'MobileServicesCards · FALLBACK_SERVICE_IMAGES',
+    fallback: '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
   },
   {
     key: 'home.portfolioShowcase',
@@ -193,6 +197,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Temàtiques · hero Halloween',
     description: 'Hero principal, OG i card mòbil de tematica-halloween. Constant PUBLIC_HALLOWEEN_HERO_IMAGE.',
     target: 'tematica-halloween/page.tsx · PUBLIC_HALLOWEEN_HERO_IMAGE',
+    fallback: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-15.avif',
   },
   {
     key: 'themes.halloween.gallery',
@@ -207,6 +212,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Temàtiques · hero Món Màgic',
     description: 'Hero principal i OG de tematica-mon-magic. Constant PUBLIC_MON_MAGIC_IMAGES.hero.',
     target: 'tematica-mon-magic/page.tsx · PUBLIC_MON_MAGIC_IMAGES',
+    fallback: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-18.avif',
   },
   {
     key: 'themes.monmagic.featured',
@@ -214,6 +220,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Temàtiques · featured Món Màgic',
     description: 'Imatge destacada (.featured) de la pàgina Mon Màgic.',
     target: 'tematica-mon-magic/page.tsx · PUBLIC_MON_MAGIC_IMAGES.featured',
+    fallback: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-16.avif',
   },
   {
     key: 'themes.monmagic.cartell',
@@ -221,6 +228,7 @@ export const IMAGE_MANAGER_PLACEMENTS: ImagePlacementDefinition[] = [
     label: 'Temàtiques · cartell Món Màgic',
     description: 'Cartell promocional de Món Màgic.',
     target: 'tematica-mon-magic/page.tsx · PUBLIC_MON_MAGIC_IMAGES.cartell',
+    fallback: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-02.avif',
   },
   {
     key: 'themes.monmagic.gallery',
