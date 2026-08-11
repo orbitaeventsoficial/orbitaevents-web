@@ -119,10 +119,6 @@ function formatOfferCount(copy: DossierCopy, count: number): string {
   return escHtml(template.split('{count}').join(String(count)));
 }
 
-function chapterLabel(num: number): string {
-  return String(num).padStart(2, '0');
-}
-
 /**
  * La fitxa d'un servei: què és, **l'explicació sencera**, quant dura i tot el
  * que hi va inclòs.
@@ -146,6 +142,14 @@ function buildServiceCard(
   const explicacio = product.descripcio
     .map((paragraf) => `<p>${escHtml(paragraf)}</p>`)
     .join('');
+
+  /* La foto del que es contracta.
+     Les fitxes ja en portaven i el document no en feia servir ni una: qui rebia
+     el dossier llegia la descripció d'una nit sense veure-la. Quan el producte
+     no en té, la fitxa es queda com estava; no s'hi posa cap imatge de mostra. */
+  const foto = product.image
+    ? `<div class="fitxa-foto"><img src="${escHtml(product.image)}" alt="${escHtml(product.nom)}" loading="lazy"></div>`
+    : '';
 
   const inclou = product.inclou
     .map((item) => `<li>${escHtml(item)}</li>`)
@@ -171,9 +175,13 @@ function buildServiceCard(
     ? `<p class="fitxa-nota"><span>${escHtml(copy.chapter.noteLabel)}</span> ${escHtml(product.noInclou)}</p>`
     : '';
 
+  /* Sense numerar.
+     Això no és una seqüència: ningú contracta el DJ «primer» i la decoració
+     «segona». Numerar-ho era decorar. El que sí que diu alguna cosa és de què
+     va cada peça, i per això mana la categoria. */
   return `
-      <article class="fitxa">
-        <div class="fitxa-num">${chapterLabel(num)}</div>
+      <article class="fitxa${foto ? ' fitxa--amb-foto' : ''}">
+        ${foto}
         <div class="fitxa-cos">
           <div class="fitxa-titol-fila">
             <h3 class="fitxa-nom">${escHtml(product.nom)}</h3>
@@ -411,25 +419,34 @@ export function buildDossierHtml(
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Un full A4 sencer: només la carta i el preu en demanen un de propi. */
+    /* ── Pantalla i paper no són el mateix suport ─────────────────────────
+       El document es llegeix gairebé sempre a pantalla i només de tant en tant
+       s'imprimeix. Fins ara manava el paper: 210 mm centrats deixaven mig
+       monitor buit als costats, i l'alçada mínima d'un A4 obria un forat de
+       mig full entre la carta, els serveis i el preu.
+
+       Ara el paper mana només quan s'imprimeix. A pantalla, el document omple
+       l'amplada i les parts van seguides. */
     .full {
-      width: 210mm;
-      min-height: 297mm;
+      width: 100%;
+      max-width: 210mm;
       margin: 0 auto;
-      padding: 20mm 18mm 16mm;
+      padding: 14mm 12mm;
       background: var(--paper);
       display: flex;
       flex-direction: column;
     }
-    .full--carta { page-break-after: always; break-after: page; }
-    .full--preu { page-break-before: always; break-before: page; }
 
-    /* Els serveis no demanen full propi: s'encadenen i omplen el que hi hagi. */
     .flux {
-      width: 210mm;
+      width: 100%;
+      max-width: 210mm;
       margin: 0 auto;
-      padding: 20mm 18mm 12mm;
+      padding: 0 12mm 12mm;
       background: var(--paper);
+    }
+
+    @media screen and (min-width: 900px) {
+      .full, .flux { max-width: 260mm; padding-inline: 20mm; }
     }
 
     /* ── Full 1 · portada i carta alhora ─────────────────────────────── */
@@ -526,11 +543,28 @@ export function buildDossierHtml(
       border-left: 2px solid var(--or);
       page-break-inside: avoid; break-inside: avoid;
     }
-    .fitxa-num {
-      font-size: 15pt; color: var(--or); line-height: 1;
-      min-width: 10mm;
+
+    /* La foto del servei.
+       Quan n'hi ha, mana ella: ocupa un terç de la fitxa i el text s'hi posa al
+       costat. Una foto d'un bolo real explica en un segon el que un paràgraf
+       no acaba d'explicar mai. */
+    .fitxa--amb-foto { padding: 0; gap: 0; align-items: stretch; }
+    .fitxa-foto {
+      flex: 0 0 34%;
+      align-self: stretch;
+      overflow: hidden;
+      background: var(--carbo);
     }
-    .fitxa-cos { flex: 1; }
+    .fitxa-foto img {
+      display: block;
+      width: 100%; height: 100%;
+      min-height: 42mm;
+      object-fit: cover;
+    }
+    .fitxa--amb-foto .fitxa-cos { padding: 6mm; }
+    .fitxa--amb-foto .fitxa-marge { padding: 6mm 6mm 6mm 0; }
+
+    .fitxa-cos { flex: 1; min-width: 0; }
     .fitxa-titol-fila {
       display: flex; align-items: baseline; gap: 4mm; margin-bottom: 2mm;
     }
@@ -549,10 +583,14 @@ export function buildDossierHtml(
       text-transform: uppercase; color: var(--tinta-clara); margin-bottom: 2mm;
     }
     .fitxa-inclou { list-style: none; display: flex; flex-wrap: wrap; gap: 1.5mm 5mm; }
+    /* Dues columnes per als punts curts, i fila sencera per als llargs.
+       Una llista d'onze personatges encaixonada a mitja columna es llegia com
+       una escala; així ocupa el que necessita i prou. */
     .fitxa-inclou li {
       font-size: 9pt; color: var(--tinta-suau);
       padding-left: 4mm; position: relative;
-      flex: 0 1 calc(50% - 5mm);
+      flex: 1 1 calc(50% - 5mm);
+      min-width: 55mm;
     }
     .fitxa-inclou li::before {
       content: '·'; position: absolute; left: 1mm; color: var(--or);
@@ -633,6 +671,15 @@ export function buildDossierHtml(
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
       .fitxa { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+      /* Aquí sí que mana l'A4: amplada exacta, full propi per a la carta i per
+         al preu, i cap fitxa partida per la meitat. */
+      .full, .flux { width: 210mm; max-width: none; margin: 0 auto; }
+      .full { min-height: 297mm; padding: 20mm 18mm 16mm; }
+      .flux { padding: 20mm 18mm 12mm; }
+      .full--carta { padding: 0; page-break-after: always; break-after: page; }
+      .full--preu { page-break-before: always; break-before: page; }
+      .fitxa-foto { page-break-inside: avoid; break-inside: avoid; }
     }
   </style>
   ${options.autoPrint ? '<script>window.addEventListener("load", function(){ window.print(); });</script>' : ''}
