@@ -40,7 +40,7 @@ export async function GET(
   }
 
   try {
-    const pdf = await renderDossierPdf(document.html);
+    const pdf = await renderDossierPdf(document.html, req.nextUrl.origin);
     return new NextResponse(pdf, {
       headers: {
         'Content-Type': 'application/pdf',

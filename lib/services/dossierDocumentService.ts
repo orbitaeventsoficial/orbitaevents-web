@@ -218,6 +218,20 @@ export async function buildDossierHtmlFor(input: {
 }
 
 /**
+ * El document a imprimir, dient-li d'on penja el web.
+ *
+ * Les fotos del dossier van amb camí relatiu (`/img/…`). El navegador que fa el
+ * PDF rep l'HTML solt, sense pàgina de la qual penjar, i sense això no sap on
+ * anar-les a buscar: el PDF sortia sense fotos mentre la previsualització les
+ * ensenyava. Amb el `<base>`, els dos miren el mateix lloc.
+ */
+function ambBaseHref(html: string, baseUrl?: string): string {
+  if (!baseUrl) return html;
+  if (/<base\s/i.test(html)) return html;
+  return html.replace(/<head(\s[^>]*)?>/i, (etiqueta) => `${etiqueta}<base href="${baseUrl.replace(/"/g, '&quot;')}">`);
+}
+
+/**
  * L'HTML imprès a PDF, no redibuixat.
  *
  * És l'única manera que el PDF sigui idèntic a la previsualització: el mateix
@@ -227,7 +241,7 @@ export async function buildDossierHtmlFor(input: {
  * Si el navegador no hi és, això **falla i es veu**. Enviar un document
  * diferent del que s'ha aprovat seria pitjor que no enviar-ne cap.
  */
-export async function renderDossierPdf(html: string): Promise<Buffer> {
+export async function renderDossierPdf(html: string, baseUrl?: string): Promise<Buffer> {
   const { chromium } = await import('playwright-core');
 
   /**
@@ -245,7 +259,7 @@ export async function renderDossierPdf(html: string): Promise<Buffer> {
   );
   try {
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle' });
+    await page.setContent(ambBaseHref(html, baseUrl), { waitUntil: 'networkidle' });
     await page.emulateMedia({ media: 'print' });
     const pdf = await page.pdf({
       format: 'A4',

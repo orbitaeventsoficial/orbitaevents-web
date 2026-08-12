@@ -4,6 +4,7 @@ import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver'
 import { getDossierCopy, getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
 import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { sendEmail } from '@/lib/email';
+import { getSiteUrl } from '@/lib/site';
 import { toIntlLocale } from '@/lib/constants';
 import { EMAIL_CONTACT } from '@/lib/constants/email';
 import { recordEmailSend } from '@/lib/services/emailTrackingService';
@@ -186,7 +187,9 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
 
   let pdf: Buffer;
   try {
-    pdf = await renderDossierPdf(document.html);
+    // Mateixa base que la previsualització: si no, el client rep el dossier
+    // sense fotos i nosaltres n'hem aprovat un amb fotos.
+    pdf = await renderDossierPdf(document.html, getSiteUrl());
   } catch (err) {
     console.error('[dossierService] no s\'ha pogut imprimir el dossier a PDF:', err);
     return {
