@@ -41,6 +41,16 @@ function packLabel(pack: BookingPack): string {
   return pack.translations?.[0]?.name || pack.slug;
 }
 
+/** La màquina de fum baix que ens lloga en Tino, digui's com es digui la fila. */
+function esFumBaix(nom: string): boolean {
+  return /fum\s*baix/i.test(nom);
+}
+
+/** La decoració de l'estand de DJ de Halloween, que ja porta el fum baix a dins. */
+function esDecoEstandHalloween(label: string): boolean {
+  return /estand/i.test(label) && /halloween/i.test(label);
+}
+
 /** El DJ del catàleg: una sola entrada, la que es ven per hores. */
 function isDjService(svc: (typeof ORBITA_SERVICES)[number]): boolean {
   return svc.kind === 'DJ' && svc.unit === 'unit';
@@ -91,6 +101,8 @@ export default function BookingServiceLinesSection({
       .catch((e) => console.error('[ServiceLines] Error carregant productes', e));
   }, []);
 
+  const teDecoEstandHalloween = [...baseLines, ...lines].some((l) => esDecoEstandHalloween(l.label ?? ''));
+
   const update = (idx: number, patch: Partial<BookingServiceLineFormInput>) => {
     onChange(lines.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
   };
@@ -111,7 +123,14 @@ export default function BookingServiceLinesSection({
       onChange([...lines, djLineForHours(1)]);
       return;
     }
-    onChange([...lines, { kind: svc.kind, label: svc.label, revenueAmount: svc.defaultPrice, quantity: 1 }]);
+    const novaLinia = { kind: svc.kind, label: svc.label, revenueAmount: svc.defaultPrice, quantity: 1 };
+    // Posant l'estand de Halloween, el fum baix llogat surt del bolo: ja hi va
+    // inclòs i cobrar-lo dues vegades seria cobrar de més.
+    if (esDecoEstandHalloween(svc.label)) {
+      onChange([...lines.filter((l) => !esFumBaix(l.label ?? '')), novaLinia]);
+      return;
+    }
+    onChange([...lines, novaLinia]);
   };
 
   const addPartnerProduct = (id: string) => {
@@ -360,12 +379,25 @@ export default function BookingServiceLinesSection({
             <details className="nb__cfg-grp nb__cfg-grp--menu nb__cfg-grp--provider" key={name}>
               <summary>{name}</summary>
               <div className="nb__cfg-items">
-                {prods.map((p) => (
-                  <button type="button" key={p.id} className="nb__cfg-item" onClick={() => addPartnerProduct(p.id)}>
-                    <span className="nb__cfg-itemname">{p.name}</span>
-                    <span className="nb__cfg-itemprice">{p.sellPrice}€</span>
-                  </button>
-                ))}
+                {prods.map((p) => {
+                  // El fum baix va dins de la decoració de l'estand de Halloween:
+                  // si l'estand hi és, no es lloga a part ni es torna a cobrar.
+                  const jaVaInclos = esFumBaix(p.name) && teDecoEstandHalloween;
+                  return (
+                    <button
+                      type="button"
+                      key={p.id}
+                      className="nb__cfg-item"
+                      onClick={() => addPartnerProduct(p.id)}
+                      disabled={jaVaInclos}
+                      aria-disabled={jaVaInclos}
+                      title={jaVaInclos ? 'Ja va inclòs a la decoració de l\'estand de Halloween' : undefined}
+                    >
+                      <span className="nb__cfg-itemname">{p.name}</span>
+                      <span className="nb__cfg-itemprice">{jaVaInclos ? 'inclòs a l\'estand' : `${p.sellPrice}€`}</span>
+                    </button>
+                  );
+                })}
               </div>
             </details>
           ))}
