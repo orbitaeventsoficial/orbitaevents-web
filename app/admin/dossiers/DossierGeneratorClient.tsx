@@ -313,6 +313,10 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
   const [email, setEmail] = useState(initialEmail ?? '');
   const [eventDesc, setEventDesc] = useState(initialEventDesc ?? '');
   const [travelKm, setTravelKm] = useState('');
+  /* La població del destí. Ve del lead amb què s'obre la pantalla, però si aquí
+     dins se'n tria un altre, els km han d'anar al poble del nou: abans només
+     mirava el de l'adreça d'entrada i, entrant pel menú, es quedaven buits. */
+  const [eventLocation, setEventLocation] = useState(initialEventLocation ?? '');
   /* Si el lead ja diu la població, els km no s'han de teclejar: es calculen amb
      la mateixa ruta que ja fan servir les Reserves. Si algú ja n'ha escrit un,
      no se li toca: mana la persona. */
@@ -321,7 +325,7 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
   }, []);
   const { calculatingDistance, distanceMessage } = useBookingDistance({
     eventVenue: '',
-    eventLocation: initialEventLocation ?? '',
+    eventLocation,
     onDistanceResolved: omplirKmSiEstaBuit,
   });
   const [salutacio, setSalutacio] = useState('');
@@ -480,6 +484,10 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
     if (lead.eventDate) parts.push(lead.eventDate.slice(0, 10));
     if (lead.eventLocation) parts.push(lead.eventLocation);
     setEventDesc(parts.join(' · '));
+    // Els km són d'aquest client: es buiden perquè es tornin a calcular fins al
+    // seu poble. Deixar-hi els del client anterior seria cobrar un viatge fals.
+    setEventLocation(lead.eventLocation ?? '');
+    setTravelKm('');
     setSearchQuery('');
     setShowResults(false);
     setSavedId(null);
@@ -518,6 +526,8 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
     setEmail('');
     setTelefon('');
     setEventDesc('');
+    setEventLocation('');
+    setTravelKm('');
     setSelectedIds(new Set());
     setCreateLeadOnSave(false);
     setSendOnSave(false);
@@ -915,13 +925,13 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
               {/* D'on surt el número. Un import que ningú sap d'on ve no es pot
                   defensar davant del client. */}
               <p id="dg-travel-km-nota" className="dg__hint" role="status">
-                {calculatingDistance
-                  ? `Calculant la distància fins a ${initialEventLocation}…`
-                  : distanceMessage
-                    ? distanceMessage
-                    : initialEventLocation
-                      ? `El lead diu ${initialEventLocation}.`
-                      : 'Sense població al lead: escriu-los a mà.'}
+                {/* Sense població no es pot ensenyar cap ruta: la de l'últim
+                    client seria mentida sobre el que hi ha ara a la pantalla. */}
+                {!eventLocation
+                  ? 'Sense població al lead: escriu-los a mà.'
+                  : calculatingDistance
+                    ? `Calculant la distància fins a ${eventLocation}…`
+                    : distanceMessage || `El lead diu ${eventLocation}.`}
               </p>
             </div>
             <div className="dg__field dg__field--full">
