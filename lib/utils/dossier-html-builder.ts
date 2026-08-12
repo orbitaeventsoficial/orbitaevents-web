@@ -182,12 +182,38 @@ function formatOfferCount(copy: DossierCopy, count: number): string {
  * l'única orientació que tenim i val més dir «des de» que no dir res. Si hi ha
  * bolo, el preu és el del pressupost i aquí no se'n parla.
  */
+/**
+ * El preu pactat d'aquest servei, si el bolo el porta.
+ *
+ * Les línies del pressupost surten dels mateixos productes, però amb el nom
+ * escrit a mà i, de vegades, amb el proveïdor enganxat o les hores al darrere
+ * («DJ · 3 hores»). Per això es comparen normalitzats i n'hi ha prou que un
+ * contingui l'altre. Si no es reconeix, no s'inventa cap preu: la fitxa es
+ * queda sense i el pressupost del final continua dient la veritat.
+ */
+function preuDeLaLinia(product: AnimacioProduct, quoteLines?: DossierQuoteLine[]): number | undefined {
+  if (!quoteLines || quoteLines.length === 0) return undefined;
+  const net = (text: string) => text
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+  const nom = net(product.nom);
+  if (!nom) return undefined;
+  const linia = quoteLines.find((l) => {
+    const etiqueta = net(l.label);
+    return etiqueta === nom || etiqueta.startsWith(nom) || etiqueta.includes(nom) || nom.includes(etiqueta);
+  });
+  return linia?.amount;
+}
+
 function buildServiceCard(
   product: AnimacioProduct,
   num: number,
   copy: DossierCopy,
   locale: string,
   showCataloguePrice: boolean,
+  preuAcordat?: number,
 ): string {
   const explicacio = product.descripcio
     .map((paragraf) => `<p>${escHtml(paragraf)}</p>`)
@@ -209,13 +235,19 @@ function buildServiceCard(
     ? `<span class="fitxa-dada"><span>${escHtml(copy.chapter.durationLabel)}</span> ${escHtml(product.durada)}</span>`
     : '';
 
-  const preu = showCataloguePrice
-    ? `<span class="fitxa-preu">${
-        typeof product.priceFrom === 'number'
-          ? `${escHtml(copy.chapter.priceFromPrefix)} ${escHtml(formatCurrency(product.priceFrom, locale))}`
-          : escHtml(copy.chapter.priceCustom)
-      }</span>`
-    : '';
+  /* El preu de cada peça.
+     Amb bolo muntat, el preu que surt a la fitxa és el pactat per aquell
+     servei —el mateix que després es repeteix al pressupost—, no el «des de»
+     del catàleg. Sense bolo, el catàleg és l'única orientació que tenim. */
+  const preu = typeof preuAcordat === 'number'
+    ? `<span class="fitxa-preu">${escHtml(formatCurrency(preuAcordat, locale))}</span>`
+    : showCataloguePrice
+      ? `<span class="fitxa-preu">${
+          typeof product.priceFrom === 'number'
+            ? `${escHtml(copy.chapter.priceFromPrefix)} ${escHtml(formatCurrency(product.priceFrom, locale))}`
+            : escHtml(copy.chapter.priceCustom)
+        }</span>`
+      : '';
 
   const categoria = product.categoria
     ? `<span class="fitxa-cat">${escHtml(product.categoria)}</span>`
@@ -265,12 +297,13 @@ function buildServiceFlow(
   copy: DossierCopy,
   locale: string,
   showCataloguePrice: boolean,
+  quoteLines?: DossierQuoteLine[],
 ): string {
   if (products.length === 0) return '';
 
   const cards = products
     .map((product, index) =>
-      buildServiceCard(product, index + 1, copy, locale, showCataloguePrice))
+      buildServiceCard(product, index + 1, copy, locale, showCataloguePrice, preuDeLaLinia(product, quoteLines)))
     .join('');
 
   /**
@@ -426,7 +459,7 @@ export function buildDossierHtml(
    */
   const hasQuote = Boolean(options.quoteLines && options.quoteLines.length > 0);
 
-  const fitxes = buildServiceFlow(products, copy, locale, !hasQuote);
+  const fitxes = buildServiceFlow(products, copy, locale, !hasQuote, options.quoteLines);
   const tanca = buildClosing(copy, client);
   const preu = buildQuoteSheet(
     products,
@@ -614,8 +647,8 @@ ${paleta(tema)}
     .fitxes { display: flex; flex-direction: column; gap: 6mm; }
 
     .fitxa {
-      display: flex; gap: 6mm;
-      padding: 6mm;
+      display: flex; gap: 5mm;
+      padding: 5mm;
       background: var(--paper-fosc);
       border-left: 2px solid var(--or);
       page-break-inside: avoid; break-inside: avoid;
@@ -632,22 +665,25 @@ ${paleta(tema)}
        costat. Amb la proporció fixada, la fitxa fa el mateix tant si la foto és
        dreta com ajaguda, i el retall el fa la foto, no la pàgina. */
     .fitxa-foto {
-      flex: 0 0 40%;
-      align-self: flex-start;
-      aspect-ratio: 4 / 3;
+      /* La foto acompanya l'alçada del text, no al revés: una fitxa de tres
+         línies no ha de fer mig full perquè la imatge demani lloc. */
+      flex: 0 0 24%;
+      align-self: stretch;
+      min-height: 28mm;
       overflow: hidden;
-      background: var(--carbo);
+      background: var(--paper-fosc);
     }
-    /* La foto acompanya l'alçada del text, ni més ni menys. Amb un terra massa
-       alt, una fitxa de tres línies s'inflava; amb un sostre, la foto deixava
-       una franja negra a sota. Ni l'un ni l'altre: que segueixi el text. */
+    /* La foto sencera, sense retallar.
+       Omplint la caixa, la imatge s'estirava i el que sobrava es tallava: als
+       personatges, el que sobrava era la cara. Ara la foto es veu entera dins
+       la caixa i el que sobra és fons del mateix color de la fitxa. */
     .fitxa-foto img {
       display: block;
       width: 100%; height: 100%;
-      object-fit: cover;
+      object-fit: contain;
     }
-    .fitxa--amb-foto .fitxa-cos { padding: 8mm; }
-    .fitxa--amb-foto .fitxa-marge { padding: 8mm 8mm 8mm 0; }
+    .fitxa--amb-foto .fitxa-cos { padding: 6mm; }
+    .fitxa--amb-foto .fitxa-marge { padding: 6mm 6mm 6mm 0; }
 
     /* La foto canvia de banda a cada fitxa. Set targetes idèntiques una sota
        l'altra es llegeixen com un formulari; alternades, es llegeixen com una
@@ -660,7 +696,8 @@ ${paleta(tema)}
       .fitxa--amb-foto,
       .fitxa--amb-foto:nth-of-type(even) { flex-direction: column; }
       .fitxa-foto { flex-basis: auto; }
-      .fitxa-foto img { min-height: 40mm; max-height: 55mm; }
+      .fitxa-foto { aspect-ratio: auto; }
+      .fitxa-foto img { min-height: 32mm; max-height: 44mm; }
       .fitxa--amb-foto .fitxa-marge,
       .fitxa--amb-foto:nth-of-type(even) .fitxa-marge { padding: 0 8mm 8mm; }
     }
