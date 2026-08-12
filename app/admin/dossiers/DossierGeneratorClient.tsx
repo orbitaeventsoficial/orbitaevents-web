@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -985,8 +986,7 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
                             : [...actuals, c.id]
                         ))}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={c.foto} alt="" loading="lazy" />
+                        <Image src={c.foto} alt="" width={128} height={170} unoptimized />
                         <span>{c.nom}</span>
                       </button>
                     );

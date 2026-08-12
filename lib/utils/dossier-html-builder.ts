@@ -715,7 +715,7 @@ ${paleta(tema)}
     }
 
     /* La foto del servei.
-       Quan n'hi ha, mana ella: ocupa un terç de la fitxa i el text s'hi posa al
+       Quan la fitxa en porta, mana ella: ocupa un terç i el text va al
        costat. Una foto d'un bolo real explica en un segon el que un paràgraf
        no acaba d'explicar mai. */
     .fitxa--amb-foto { padding: 0; gap: 0; align-items: stretch; }
@@ -890,7 +890,7 @@ ${paleta(tema)}
     /* ── Halloween ────────────────────────────────────────────────────────
        La decoració no és un caprici: aquest dossier el rep algú que ja ha
        decidit que vol una festa de por. Les teranyines són dibuix vectorial,
-       s'imprimeixen i no demanen cap fitxer. Al tema general no n'hi ha cap. */
+       es poden imprimir i no demanen cap fitxer. Al tema general no surten. */
     .tema-halloween .full--carta { position: relative; }
     .teranyina { position: absolute; top: 0; z-index: 2; width: 46mm; height: 46mm; color: var(--or); opacity: .32; pointer-events: none; }
     .teranyina--esq { left: 0; }

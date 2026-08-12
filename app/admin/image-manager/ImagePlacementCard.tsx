@@ -211,7 +211,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
                 : 'Cap imatge pujada aquí: es fa servir la que porti el codi, si n’hi ha cap.'}
           </p>
           {!hasItems && placement.fallback ? (
-            // eslint-disable-next-line @next/next/no-img-element
+            // eslint-disable-next-line @next/next/no-img-element -- previsualització interna del gestor, sense optimitzador
             <img
               src={placement.fallback}
               alt=""
