@@ -57,10 +57,10 @@ describe('el candybar i les llaminadures', () => {
     expect(linies).toEqual([{ label: 'Candybar de Halloween · 30 nens', amount: 140 }]);
   });
 
-  it('el candybar sol es queda com és', () => {
+  it('el candybar sol ja porta les xuxes de vint nens', () => {
     const linies = buildQuoteLines([
       { kind: 'OTHER', label: 'Candybar de Halloween', revenueAmount: 120, quantity: 1 },
     ]);
-    expect(linies).toEqual([{ label: 'Candybar de Halloween', amount: 120 }]);
+    expect(linies).toEqual([{ label: 'Candybar de Halloween · 20 nens', amount: 120 }]);
   });
 });

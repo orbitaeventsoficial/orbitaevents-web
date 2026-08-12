@@ -60,19 +60,21 @@ function esPerNen(line: QuoteSourceLine): boolean {
  */
 function ajuntaCandybar(source: readonly QuoteSourceLine[]): { paquet?: QuoteLine; usades: Set<QuoteSourceLine> } {
   const moble = source.find((l) => esCandybar(l) && !esPerNen(l));
+  if (!moble) return { usades: new Set() };
+
+  // Les llaminadures dels vint primers nens ja van dins del candybar: encara
+  // que ningú n'hagi afegit cap línia, el paquet en porta. La línia de
+  // llaminadures, si hi és, només suma els nens que passen de vint.
   const llaminadures = source.find((l) => esCandybar(l) && esPerNen(l))
     ?? source.find((l) => esPerNen(l));
-  if (!moble || !llaminadures) return { usades: new Set() };
 
-  // La línia de llaminadures només porta els nens de més: els vint primers ja
-  // són dins del candybar. Al client se li diu el total, que és el que entén.
-  const nens = CANDYBAR_INCLUDED_CHILDREN + (llaminadures.quantity || 0);
-  const total = amountOf(moble) + amountOf(llaminadures);
+  const nens = CANDYBAR_INCLUDED_CHILDREN + (llaminadures?.quantity || 0);
+  const total = amountOf(moble) + (llaminadures ? amountOf(llaminadures) : 0);
   if (total <= 0) return { usades: new Set() };
 
   return {
     paquet: { label: `${moble.label ?? 'Candybar'} · ${nens} ${nens === 1 ? 'nen' : 'nens'}`, amount: total },
-    usades: new Set([moble, llaminadures]),
+    usades: new Set(llaminadures ? [moble, llaminadures] : [moble]),
   };
 }
 
