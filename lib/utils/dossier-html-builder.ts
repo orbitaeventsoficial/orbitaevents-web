@@ -175,6 +175,27 @@ function teranyina(classe: string): string {
   </svg>`;
 }
 
+
+/**
+ * El poble, tret del resum de l'esdeveniment.
+ *
+ * El resum és text lliure —«2026-09-05 · 00:00-00:03 · Viladecans · 80 pax»— i
+ * al pressupost sortia sencer darrere d'un «Fins a», que es llegia com una
+ * broma. Aquí es treuen les parts que no són un lloc: dates, hores i persones.
+ * Si no en queda res reconeixible, no es diu cap destí abans que dir-ne un de
+ * fals.
+ */
+function pobleDe(resum?: string): string | undefined {
+  if (!resum) return undefined;
+  const parts = resum.split('·').map((t) => t.trim()).filter(Boolean);
+  const nomes = parts.filter((t) => !/^\d{4}-\d{2}-\d{2}$/.test(t)
+    && !/^\d{1,2}[:.]\d{2}/.test(t)
+    && !/\d+\s*(pax|persones|personas|guests)/i.test(t)
+    && !/^\d+$/.test(t));
+  const poble = nomes[nomes.length - 1];
+  return poble && poble.length > 1 ? poble : undefined;
+}
+
 function escHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -503,7 +524,7 @@ export function buildDossierHtml(
     copy,
     locale,
     options.travelKm ?? 0,
-    options.location,
+    pobleDe(options.location),
     options.quoteLines,
     tanca,
   );
