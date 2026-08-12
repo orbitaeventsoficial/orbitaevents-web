@@ -81,6 +81,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Bodas – Bodas  03"
     },
     {
+      "src": "/img/portfolio/bodas/bodas-v01.mp4",
+      "alt": "Bodas – vídeo 01",
+      "type": "video"
+    },
+    {
       "src": "/img/portfolio/bodas/bodas-04.avif",
       "alt": "Bodas – Bodas  04"
     },
@@ -91,6 +96,11 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/bodas/bodas-06.avif",
       "alt": "Bodas – Bodas  06"
+    },
+    {
+      "src": "/img/portfolio/bodas/bodas-v02.mp4",
+      "alt": "Bodas – vídeo 02",
+      "type": "video"
     },
     {
       "src": "/img/portfolio/bodas/bodas-07.avif",
@@ -105,6 +115,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Bodas – Bodas  09"
     },
     {
+      "src": "/img/portfolio/bodas/bodas-v03.mp4",
+      "alt": "Bodas – vídeo 03",
+      "type": "video"
+    },
+    {
       "src": "/img/portfolio/bodas/bodas-10.avif",
       "alt": "Bodas – Bodas  10"
     },
@@ -115,6 +130,11 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/bodas/bodas-12.avif",
       "alt": "Bodas – Bodas  12"
+    },
+    {
+      "src": "/img/portfolio/bodas/bodas-v04.mp4",
+      "alt": "Bodas – vídeo 04",
+      "type": "video"
     },
     {
       "src": "/img/portfolio/bodas/bodas-13.avif",
@@ -175,6 +195,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Discomovil – Discomovil  07"
     },
     {
+      "src": "/img/portfolio/discomovil/discomovil-v01.mp4",
+      "alt": "Discomovil – vídeo 01",
+      "type": "video"
+    },
+    {
       "src": "/img/portfolio/discomovil/discomovil-08.avif",
       "alt": "Discomovil – Discomovil  08"
     },
@@ -203,6 +228,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Discomovil – Discomovil  14"
     },
     {
+      "src": "/img/portfolio/discomovil/discomovil-v02.mp4",
+      "alt": "Discomovil – vídeo 02",
+      "type": "video"
+    },
+    {
       "src": "/img/portfolio/discomovil/discomovil-15.avif",
       "alt": "Discomovil – Discomovil  15"
     },
@@ -229,6 +259,11 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/discomovil/discomovil-21.avif",
       "alt": "Discomovil – Discomovil  21"
+    },
+    {
+      "src": "/img/portfolio/discomovil/discomovil-v03.mp4",
+      "alt": "Discomovil – vídeo 03",
+      "type": "video"
     },
     {
       "src": "/img/portfolio/discomovil/discomovil-22.avif",
@@ -323,6 +358,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas infantiles – Fiestas infantiles  07"
     },
     {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-v01.mp4",
+      "alt": "Fiestas infantiles – vídeo 01",
+      "type": "video"
+    },
+    {
       "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-08.avif",
       "alt": "Fiestas infantiles – Fiestas infantiles  08"
     },
@@ -349,6 +389,11 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-14.avif",
       "alt": "Fiestas infantiles – Fiestas infantiles  14"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-v02.mp4",
+      "alt": "Fiestas infantiles – vídeo 02",
+      "type": "video"
     },
     {
       "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-15.avif",
@@ -379,6 +424,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas infantiles – Fiestas infantiles  21"
     },
     {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-v03.mp4",
+      "alt": "Fiestas infantiles – vídeo 03",
+      "type": "video"
+    },
+    {
       "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-22.avif",
       "alt": "Fiestas infantiles – Fiestas infantiles  22"
     },
@@ -405,6 +455,11 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-28.avif",
       "alt": "Fiestas infantiles – Fiestas infantiles  28"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-v04.mp4",
+      "alt": "Fiestas infantiles – vídeo 04",
+      "type": "video"
     },
     {
       "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-29.avif",
@@ -453,6 +508,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas privadas – Fiestas privadas  04"
     },
     {
+      "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-v01.mp4",
+      "alt": "Fiestas privadas – vídeo 01",
+      "type": "video"
+    },
+    {
       "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-05.avif",
       "alt": "Fiestas privadas – Fiestas privadas  05"
     },
@@ -469,6 +529,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas privadas – Fiestas privadas  08"
     },
     {
+      "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-v02.mp4",
+      "alt": "Fiestas privadas – vídeo 02",
+      "type": "video"
+    },
+    {
       "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-09.avif",
       "alt": "Fiestas privadas – Fiestas privadas  09"
     },
@@ -483,6 +548,11 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-12.avif",
       "alt": "Fiestas privadas – Fiestas privadas  12"
+    },
+    {
+      "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-v03.mp4",
+      "alt": "Fiestas privadas – vídeo 03",
+      "type": "video"
     },
     {
       "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-13.avif",
@@ -613,6 +683,11 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-26.avif",
       "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  26"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-v01.mp4",
+      "alt": "Fiestas tematicas halloween – vídeo 01",
+      "type": "video"
     },
     {
       "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-27.avif",

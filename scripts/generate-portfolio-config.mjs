@@ -8,6 +8,7 @@ const BASE = path.join(process.cwd(), 'public', 'img', 'portfolio');
 const OUTPUT = path.join(process.cwd(), 'app', 'config', 'portfolio-images.ts');
 
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif'];
+const VIDEO_EXTENSIONS = ['.mp4', '.webm'];
 const PRIORITY_ORDER = [
   'bodas',
   'discomovil',
@@ -45,6 +46,27 @@ const altFor = (file, categoryName) => {
 
 function isImageFile(file) {
   return IMAGE_EXTENSIONS.some((ext) => file.toLowerCase().endsWith(ext));
+}
+
+function isVideoFile(file) {
+  return VIDEO_EXTENSIONS.some((ext) => file.toLowerCase().endsWith(ext));
+}
+
+// Los vídeos se reparten por la galería en lugar de amontonarse al final.
+// La primera posición se reserva a una foto: es la portada de la categoría.
+function mezclarFotosYVideos(photos, videos) {
+  if (videos.length === 0) return photos;
+  if (photos.length === 0) return videos;
+
+  const items = [...photos];
+  const paso = Math.max(1, Math.floor(photos.length / (videos.length + 1)));
+
+  videos.forEach((video, index) => {
+    const posicion = Math.min(items.length, (index + 1) * paso + index);
+    items.splice(posicion, 0, video);
+  });
+
+  return items;
 }
 
 async function exists(targetPath) {
@@ -123,22 +145,32 @@ async function generateConfig() {
     const fullPath = path.join(BASE, folder);
     const files = await fs.readdir(fullPath);
 
-    const images = files
+    const photos = files
       .filter((file) => isImageFile(file))
+      .sort((a, b) => a.localeCompare(b))
       .map((file) => ({
         src: `/img/portfolio/${folder}/${file}`,
         alt: altFor(file, display),
       }));
 
-    if (images.length === 0) continue;
+    const videos = files
+      .filter((file) => isVideoFile(file))
+      .sort((a, b) => a.localeCompare(b))
+      .map((file) => ({
+        src: `/img/portfolio/${folder}/${file}`,
+        alt: `${display} – vídeo ${file.replace(/\.[^.]+$/, '').split('-v').pop()}`,
+        type: 'video',
+      }));
+
+    if (photos.length === 0) continue;
 
     categories.push({
       slug,
       name: display,
-      cover: images[0].src,
+      cover: photos[0].src,
     });
 
-    imagesBySlug[slug] = images;
+    imagesBySlug[slug] = mezclarFotosYVideos(photos, videos);
   }
 
   categories.sort((a, b) => {

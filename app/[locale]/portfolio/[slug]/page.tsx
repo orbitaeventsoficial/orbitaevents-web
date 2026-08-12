@@ -141,7 +141,7 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
   const t = await getTranslations({ locale, namespace: 'common' });
   const tPortfolio = await getTranslations({ locale, namespace: 'pages.portfolio' });
 
-  const staticImages = (PORTFOLIO_IMAGES as Record<string, { src: string; alt: string }[]>)[slug] ?? [];
+  const staticImages = (PORTFOLIO_IMAGES as Record<string, GalleryItem[]>)[slug] ?? [];
   const category = PORTFOLIO_CATEGORIES.find((c) => c.slug === slug);
 
   let bookingImages: GalleryItem[] = [];
@@ -197,14 +197,15 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
   const galleryImages = images.filter((_, index) => index !== heroIndex);
 
   const base = getSiteUrl();
+  const onlyImages = images.filter((item) => item.type !== 'video' && !isVideoAsset(item.src));
   const imageGalleryJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ImageGallery',
     name: title,
     description: `${title} - Òrbita Events Portfolio`,
     url: `${base}/${locale}/portfolio/${slug}`,
-    numberOfItems: images.length,
-    image: images.slice(0, 20).map((img) => ({
+    numberOfItems: onlyImages.length,
+    image: onlyImages.slice(0, 20).map((img) => ({
       '@type': 'ImageObject',
       contentUrl: img.src.startsWith('http') ? img.src : `${base}${img.src}`,
       description: img.alt,
