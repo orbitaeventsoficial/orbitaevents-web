@@ -42,12 +42,46 @@ export function djLabelForHours(hours: number): string {
   return hours === 1 ? 'DJ · 1 hora' : `DJ · ${hours} hores`;
 }
 
+function esCandybar(line: QuoteSourceLine): boolean {
+  return /candybar/i.test(line.label ?? '');
+}
+
+function esPerNen(line: QuoteSourceLine): boolean {
+  return /per\s*nen|por\s*ni[ñn]/i.test(line.label ?? '');
+}
+
+/**
+ * El candybar i les seves llaminadures són una sola cosa per al client.
+ *
+ * A dins van per separat perquè les llaminadures es gasten per nen i el moble
+ * no. Al pressupost, dues línies —una de 120 € i una de 2 €— fan pensar que
+ * les llaminadures són una propina. Es presenten com un paquet, amb els nens
+ * escrits i el preu del conjunt.
+ */
+function ajuntaCandybar(source: readonly QuoteSourceLine[]): { paquet?: QuoteLine; usades: Set<QuoteSourceLine> } {
+  const moble = source.find((l) => esCandybar(l) && !esPerNen(l));
+  const llaminadures = source.find((l) => esCandybar(l) && esPerNen(l))
+    ?? source.find((l) => esPerNen(l));
+  if (!moble || !llaminadures) return { usades: new Set() };
+
+  const nens = llaminadures.quantity || 1;
+  const total = amountOf(moble) + amountOf(llaminadures);
+  if (total <= 0) return { usades: new Set() };
+
+  return {
+    paquet: { label: `${moble.label ?? 'Candybar'} · ${nens} ${nens === 1 ? 'nen' : 'nens'}`, amount: total },
+    usades: new Set([moble, llaminadures]),
+  };
+}
+
 export function buildQuoteLines(source: readonly QuoteSourceLine[]): QuoteLine[] {
+  const { paquet, usades } = ajuntaCandybar(source);
   const dj = source.filter(isDjLine);
   const resta = source
-    .filter((line) => !isDjLine(line))
+    .filter((line) => !isDjLine(line) && !usades.has(line))
     .map((line) => ({ label: line.label ?? '', amount: amountOf(line) }))
     .filter((line) => line.label !== '' && line.amount > 0);
+  if (paquet) resta.push(paquet);
 
   if (dj.length === 0) return resta;
 

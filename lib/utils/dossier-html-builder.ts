@@ -831,7 +831,8 @@ ${paleta(tema)}
       display: block; font-size: 6.5pt; letter-spacing: 0.16em;
       text-transform: uppercase; color: var(--tinta-clara);
     }
-    .fitxa-preu { font-size: 11pt; color: var(--or); }
+    /* El preu no s'amaga: és el que el client busca amb els ulls. */
+    .fitxa-preu { font-size: 15pt; font-weight: 700; color: var(--or); letter-spacing: -0.01em; }
 
     /* ── Full de preu ─────────────────────────────────────────────────── */
     .grup-etiqueta {
@@ -849,7 +850,7 @@ ${paleta(tema)}
     .linia--sub .linia-nom { color: var(--tinta-clara); font-size: 9.5pt; }
     .linia-nom { flex: 0 1 auto; }
     .linia-punts { flex: 1 1 auto; border-bottom: 1px dotted var(--linia); }
-    .linia-val { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .linia-val { font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 12pt; font-weight: 700; }
     .linia-val--suau { color: var(--tinta-clara); font-size: 9.5pt; }
 
     .total {
@@ -862,7 +863,7 @@ ${paleta(tema)}
       font-size: 7pt; letter-spacing: 0.24em; text-transform: uppercase;
       color: var(--total-etiqueta);
     }
-    .total-xifra { font-size: 18pt; font-variant-numeric: tabular-nums; }
+    .total-xifra { font-size: 24pt; font-weight: 700; font-variant-numeric: tabular-nums; }
     .total-mida { font-size: 9pt; color: var(--total-etiqueta); margin-left: 3mm; }
 
     .peu-nota { font-size: 8.5pt; color: var(--tinta-clara); margin-top: 3mm; }

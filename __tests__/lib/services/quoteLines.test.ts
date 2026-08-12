@@ -46,3 +46,20 @@ describe('el pressupost que llegeix el client', () => {
     expect(linies).toEqual([{ label: 'Bingo Musical', amount: 400 }]);
   });
 });
+
+describe('el candybar i les llaminadures', () => {
+  it('van com un sol paquet, amb els nens escrits', () => {
+    const linies = buildQuoteLines([
+      { kind: 'OTHER', label: 'Candybar de Halloween', revenueAmount: 120, quantity: 1 },
+      { kind: 'OTHER', label: 'Llaminadures del candybar · per nen', revenueAmount: 2, quantity: 20 },
+    ]);
+    expect(linies).toEqual([{ label: 'Candybar de Halloween · 20 nens', amount: 160 }]);
+  });
+
+  it('el candybar sol es queda com és', () => {
+    const linies = buildQuoteLines([
+      { kind: 'OTHER', label: 'Candybar de Halloween', revenueAmount: 120, quantity: 1 },
+    ]);
+    expect(linies).toEqual([{ label: 'Candybar de Halloween', amount: 120 }]);
+  });
+});
