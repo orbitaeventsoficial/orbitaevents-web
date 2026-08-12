@@ -2,7 +2,7 @@
 
 import './nb-design.css';
 import { useEffect, useState } from 'react';
-import { ORBITA_SERVICES, SOUND_TECH_PRICE, SOUND_TECH_DURATION, productIncludesSoundTech } from '@/lib/constants/orbita-services';
+import { ORBITA_SERVICES, SOUND_TECH_PRICE, SOUND_TECH_DURATION, productIncludesSoundTech, djPriceForHours, DJ_FIRST_HOUR_PRICE, DJ_EXTRA_HOUR_PRICE } from '@/lib/constants/orbita-services';
 import { CUSTOM_BOOKING_PACK_SLUG } from '@/lib/constants/pricing';
 import type { BookingServiceLineFormInput, BookingPack } from './booking-form.types';
 
@@ -41,9 +41,32 @@ function packLabel(pack: BookingPack): string {
   return pack.translations?.[0]?.name || pack.slug;
 }
 
-/** La 1a hora del DJ: el servei d'unitat, no el d'hores. */
-function isDjFirstHourService(svc: (typeof ORBITA_SERVICES)[number]): boolean {
+/** El DJ del catàleg: una sola entrada, la que es ven per hores. */
+function isDjService(svc: (typeof ORBITA_SERVICES)[number]): boolean {
   return svc.kind === 'DJ' && svc.unit === 'unit';
+}
+
+/** El DJ es ven per hores: 1 h 150 €, 2 h 250 €, 3 h 350 € (`djPriceForHours`). */
+function djLineForHours(hours: number): BookingServiceLineFormInput {
+  const h = Math.max(1, Math.round(hours));
+  return {
+    kind: 'DJ',
+    label: h === 1 ? 'DJ · 1 hora' : `DJ · ${h} hores`,
+    revenueAmount: djPriceForHours(h),
+    quantity: 1,
+  };
+}
+
+/**
+ * Les hores que porta una línia de DJ, desfent el preu canònic. Una línia vella
+ * d'«hora addicional» (100 €) no dona un nombre d'hores sencer: aquella es
+ * queda com una línia normal i no ensenya el comptador.
+ */
+function djHoursOfLine(line: BookingServiceLineFormInput): number | null {
+  if (line.kind !== 'DJ') return null;
+  const preu = (line.revenueAmount ?? 0) * (line.quantity || 1);
+  const hores = 1 + (preu - DJ_FIRST_HOUR_PRICE) / DJ_EXTRA_HOUR_PRICE;
+  return Number.isInteger(hores) && hores >= 1 ? hores : null;
 }
 
 export default function BookingServiceLinesSection({
@@ -73,34 +96,22 @@ export default function BookingServiceLinesSection({
   };
   const remove = (idx: number) => onChange(lines.filter((_, i) => i !== idx));
 
+  /** Canvia les hores del DJ: el preu i el text de la línia el segueixen. */
+  const setDjHours = (idx: number, hours: number) => {
+    onChange(lines.map((l, i) => (i === idx ? { ...l, ...djLineForHours(hours) } : l)));
+  };
+
   const addOrbitaService = (id: string) => {
     const svc = ORBITA_SERVICES.find((s) => s.id === id);
     if (!svc) return;
-    const newLine = { kind: svc.kind, label: svc.label, revenueAmount: svc.defaultPrice, quantity: 1 };
-    // Regla DJ: la 1a hora (150€) sempre és obligatòria abans d'una hora addicional (100€).
-    // No es pot afegir una hora extra sola. Si encara no hi ha 1a hora, s'afegeixen les dues.
-    const isDjExtra = svc.kind === 'DJ' && svc.unit === 'hour';
-    if (isDjExtra) {
-      const firstHour = ORBITA_SERVICES.find((s) => s.kind === 'DJ' && s.unit === 'unit');
-      const hasFirstHour = firstHour && lines.some((l) => l.label === firstHour.label);
-      if (firstHour && !hasFirstHour) {
-        onChange([...lines,
-          { kind: firstHour.kind, label: firstHour.label, revenueAmount: firstHour.defaultPrice, quantity: 1 },
-          newLine,
-        ]);
-        return;
-      }
-      // Cada clic és una hora més, no una línia repetida: l'hora extra sempre
-      // se suma al total d'hores del DJ.
-      const idx = lines.findIndex((l) => l.label === svc.label);
-      if (idx >= 0) {
-        onChange(lines.map((l, i) => (i === idx ? { ...l, quantity: (l.quantity || 1) + 1 } : l)));
-        return;
-      }
+    // El DJ és un sol servei venut per hores: un bolo no en té dos. Si ja hi és,
+    // el botó no repeteix la línia; les hores es canvien a la mateixa línia.
+    if (isDjService(svc)) {
+      if (lines.some((l) => l.kind === 'DJ')) return;
+      onChange([...lines, djLineForHours(1)]);
+      return;
     }
-    // La 1a hora del DJ és una i prou: un bolo no en té dues.
-    if (isDjFirstHourService(svc) && lines.some((l) => l.label === svc.label)) return;
-    onChange([...lines, newLine]);
+    onChange([...lines, { kind: svc.kind, label: svc.label, revenueAmount: svc.defaultPrice, quantity: 1 }]);
   };
 
   const addPartnerProduct = (id: string) => {
@@ -211,13 +222,30 @@ export default function BookingServiceLinesSection({
           {/* Línies de servei (sumables) */}
           {lines.length > 0 && (
             <div className="nb__sl-list">
-              {lines.map((line, idx) => (
+              {lines.map((line, idx) => {
+                const djHores = djHoursOfLine(line);
+                return (
                 <div key={idx} className="nb__sl-row">
                   <input
                     className="nb__input nb__sl-label" placeholder="Descripció"
                     value={line.label} onChange={(e) => update(idx, { label: e.target.value })}
                     aria-label="Descripció de la línia"
                   />
+                  {djHores !== null && (
+                    <span className="nb__sl-hours" role="group" aria-label="Hores de DJ">
+                      <button
+                        type="button" className="nb__sl-hourbtn"
+                        onClick={() => setDjHours(idx, djHores - 1)}
+                        disabled={djHores <= 1} aria-label="Treure una hora de DJ"
+                      >−</button>
+                      <span className="nb__sl-hourval">{djHores} h</span>
+                      <button
+                        type="button" className="nb__sl-hourbtn"
+                        onClick={() => setDjHours(idx, djHores + 1)}
+                        aria-label="Afegir una hora de DJ"
+                      >+</button>
+                    </span>
+                  )}
                   <input
                     className="nb__input nb__sl-num" type="number" min={0} placeholder="PVP"
                     value={line.revenueAmount ?? ''}
@@ -258,7 +286,8 @@ export default function BookingServiceLinesSection({
                   />
                   <button type="button" className="nb__sl-del" onClick={() => remove(idx)} aria-label="Eliminar línia">✕</button>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
           <button type="button" className="nb__btn-ghost nb__cfg-free" onClick={addFreeLine}>+ Línia lliure</button>
@@ -297,21 +326,25 @@ export default function BookingServiceLinesSection({
           <details className="nb__cfg-grp nb__cfg-grp--menu">
             <summary>Productes d&apos;Òrbita</summary>
             <div className="nb__cfg-items">
-              {ORBITA_SERVICES.map((s) => {
-                // La 1a hora del DJ ja hi és: el botó ho diu i no deixa repetir-la.
-                const jaPosada = isDjFirstHourService(s) && lines.some((l) => l.label === s.label);
+              {/* L'hora extra del DJ no és un botó: el DJ es posa una vegada i
+                  se li diuen les hores a la seva línia. */}
+              {ORBITA_SERVICES.filter((s) => !(s.kind === 'DJ' && s.unit === 'hour')).map((s) => {
+                const esDj = isDjService(s);
+                const jaPosat = esDj && lines.some((l) => l.kind === 'DJ');
                 return (
                   <button
                     type="button"
                     key={s.id}
                     className="nb__cfg-item"
                     onClick={() => addOrbitaService(s.id)}
-                    disabled={jaPosada}
-                    aria-disabled={jaPosada}
-                    title={jaPosada ? 'Ja hi és: la 1a hora del DJ només es posa una vegada' : undefined}
+                    disabled={jaPosat}
+                    aria-disabled={jaPosat}
+                    title={jaPosat ? 'Ja hi és: les hores es canvien a la línia del DJ' : undefined}
                   >
-                    <span className="nb__cfg-itemname">{s.label}</span>
-                    <span className="nb__cfg-itemprice">{jaPosada ? 'ja hi és' : `${s.defaultPrice}€${s.unit === 'hour' ? '/h' : ''}`}</span>
+                    <span className="nb__cfg-itemname">{esDj ? 'DJ · per hores' : s.label}</span>
+                    <span className="nb__cfg-itemprice">
+                      {jaPosat ? 'ja hi és' : esDj ? `des de ${DJ_FIRST_HOUR_PRICE}€` : `${s.defaultPrice}€`}
+                    </span>
                   </button>
                 );
               })}

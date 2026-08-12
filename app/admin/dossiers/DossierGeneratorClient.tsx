@@ -170,7 +170,9 @@ function productBadge(product: AnimacioProduct): string {
 function productToServiceLine(product: AnimacioProduct, djHours = 1): LeadServiceLinePayload {
   const revenueAmount = productPriceValue(product, djHours);
   if (product.id === DJ_FIRST_PRODUCT_ID) {
-    return { kind: 'DJ', label: djHours > 1 ? `DJ · ${djHours} hores` : 'DJ · primera hora', revenueAmount, quantity: 1 };
+    // Les hores sempre surten escrites: al dossier el client ha de llegir
+    // quantes hores de DJ contracta, també quan només n'és una.
+    return { kind: 'DJ', label: djHours > 1 ? `DJ · ${djHours} hores` : 'DJ · 1 hora', revenueAmount, quantity: 1 };
   }
   if (product.id === 'orbita:bombolles') {
     return { kind: 'EQUIPMENT', label: 'Màquina de bombolles', revenueAmount, quantity: 1 };
