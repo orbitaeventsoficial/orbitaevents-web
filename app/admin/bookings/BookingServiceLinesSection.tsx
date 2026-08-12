@@ -123,7 +123,7 @@ export default function BookingServiceLinesSection({
       onChange([...lines, djLineForHours(1)]);
       return;
     }
-    const novaLinia = { kind: svc.kind, label: svc.label, revenueAmount: svc.defaultPrice, quantity: 1 };
+    const novaLinia = { kind: svc.kind, label: svc.label, revenueAmount: svc.defaultPrice, costAmount: svc.defaultCost, quantity: 1 };
     // Posant l'estand de Halloween, el fum baix llogat surt del bolo: ja hi va
     // inclòs i cobrar-lo dues vegades seria cobrar de més.
     if (esDecoEstandHalloween(svc.label)) {

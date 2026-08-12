@@ -27,6 +27,14 @@ export interface OrbitaService {
   unit: 'hour' | 'unit';
   /** Si és opcional (es pot afegir/treure lliurement, p. ex. el tècnic). */
   optional: boolean;
+  /**
+   * Cost real de sèrie, quan el servei en té un de conegut i propi.
+   *
+   * El DJ i el material no en porten: el seu desgast ja viu al cost operatiu
+   * fix del bolo i imputar-lo dues vegades seria mentir-se. El candybar sí:
+   * les llaminadures es compren cada cop i surten de la butxaca.
+   */
+  defaultCost?: number;
 }
 
 // ─── VERITAT ABSOLUTA DEL PREU (font única, propietari 2026-06-11) ────────────
@@ -78,7 +86,7 @@ export const ORBITA_SERVICES: OrbitaService[] = [
   // sobre els costos reals: material propi de l'inventari, muntatge a 50 € l'hora
   // (el mateix que l'operari extra) i, a l'estand, el fum baix que ens lloga en
   // Tino, que aquí ja va inclòs i per tant no es torna a cobrar a part.
-  { id: 'candybar-halloween', kind: 'OTHER', label: 'Candybar de Halloween', defaultPrice: 150, unit: 'unit', optional: true },
+  { id: 'candybar-halloween', kind: 'OTHER', label: 'Candybar de Halloween', defaultPrice: 150, unit: 'unit', optional: true, defaultCost: 20 },
   // El candybar es munta amb llaminadures per a vint nens i ja van dins dels
   // 150 €: és el mínim. Només es cobren les dels nens que passin d'aquí
   // (decisió del propietari, 2026-08-12). Amb vint o menys, cap línia de més.
