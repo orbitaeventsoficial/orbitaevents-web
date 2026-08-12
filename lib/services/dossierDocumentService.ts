@@ -35,6 +35,7 @@ import {
   buildDossierHtml,
   type DossierClientInfo,
   type DossierQuoteLine,
+  type DossierTema,
 } from '@/lib/utils/dossier-html-builder';
 import { readLogoDataUri } from '@/lib/utils/dossier-logo';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
@@ -51,6 +52,8 @@ import { DOSSIER_LOCALES, type DossierLocale } from '@/lib/constants/dossier-loc
 export type DossierLineSnapshot = {
   travelKm?: number;
   lines?: DossierQuoteLine[];
+  /** La decoració amb què es va fer el document: forma part de la foto. */
+  tema?: DossierTema;
 };
 
 export function parseLineSnapshot(value: unknown): DossierLineSnapshot {
@@ -67,6 +70,7 @@ export function parseLineSnapshot(value: unknown): DossierLineSnapshot {
   return {
     travelKm: Number.isFinite(km) && km > 0 ? km : undefined,
     lines: lines && lines.length > 0 ? lines : undefined,
+    tema: raw.tema === 'halloween' ? 'halloween' : undefined,
   };
 }
 
@@ -177,6 +181,7 @@ export async function buildDossierDocument(
     quoteLines: linies,
     travelKm: snapshot.travelKm,
     location: dossier.eventDesc ?? undefined,
+    tema: snapshot.tema,
   });
 
   const slug = dossier.nom

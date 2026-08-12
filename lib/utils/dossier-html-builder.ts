@@ -48,6 +48,56 @@ export type DossierClientInfo = {
 export type DossierQuoteLine = { label: string; amount: number };
 
 /**
+ * La decoració del dossier. El contingut no canvia: els mateixos productes,
+ * els mateixos preus i el mateix ordre. Només canvia la roba del document.
+ *
+ * Els colors del Halloween són els que el propietari ja va decidir al dossier
+ * del web nou (`orbitaevents-cat`, CommercialDossierDocument): paper negre,
+ * taronja de carabassa i lletra crema. No se n'ha inventat cap.
+ */
+export type DossierTema = 'general' | 'halloween';
+
+function paleta(tema: DossierTema): string {
+  if (tema === 'halloween') {
+    return [
+      '      --tinta: #f7eee2;',
+      '      --tinta-suau: #cbbdae;',
+      '      --tinta-clara: #9b8b7d;',
+      '      --or: #f47a36;',
+      '      --or-clar: #ffa168;',
+      '      --paper: #100d13;',
+      '      --paper-fosc: #1a141e;',
+      '      --linia: #3a2b33;',
+      '      --carbo: #140f16;',
+      // Lletra sobre fons fosc (portada). Al tema clar el paper ja fa aquest
+      // paper; al fosc, el paper també és fosc i el text hi desapareixeria.
+      '      --sobre-fosc: #f7eee2;',
+      // El bloc del total és el que crida: a Halloween, carabassa amb lletra fosca.
+      '      --total-fons: #f47a36;',
+      '      --total-lletra: #140f16;',
+      // Sobre la carabassa, l'or no es llegeix: l'etiqueta va amb la mateixa
+      // tinta fosca del total, una mica apagada.
+      '      --total-etiqueta: rgba(20, 15, 22, 0.68);',
+    ].join('\n');
+  }
+  return [
+    '      --tinta: #211d16;',
+    '      --tinta-suau: #56503f;',
+    '      --tinta-clara: #857c68;',
+    '      --or: #a9863f;',
+    '      --or-clar: #d7b86e;',
+    '      --paper: #fbf8f1;',
+    '      --paper-fosc: #f4efe3;',
+    '      --linia: #e3dccd;',
+    '      --carbo: #14120e;',
+    '      --sobre-fosc: #fbf8f1;',
+    '      --total-fons: #14120e;',
+    '      --total-lletra: #fbf8f1;',
+    '      --total-etiqueta: #d7b86e;',
+  ].join('\n');
+}
+
+/**
  * Tots els textos marc del dossier. Font única canònica: `messages.dossier.*`
  * (editables a /admin/text-manager → secció Dossiers). El builder no porta cap
  * string hardcoded; sempre rep aquest objecte resolt al servidor.
@@ -360,9 +410,10 @@ export function buildDossierHtml(
   client: DossierClientInfo,
   products: AnimacioProduct[],
   copy: DossierCopy,
-  options: { autoPrint?: boolean; logoDataUri?: string; coverImage?: string; locale?: string; travelKm?: number; location?: string; quoteLines?: DossierQuoteLine[] } = {},
+  options: { autoPrint?: boolean; logoDataUri?: string; coverImage?: string; locale?: string; travelKm?: number; location?: string; quoteLines?: DossierQuoteLine[]; tema?: DossierTema } = {},
 ): string {
   const locale = options.locale || 'ca-ES';
+  const tema: DossierTema = options.tema === 'halloween' ? 'halloween' : 'general';
   const nom = escHtml(client.nom);
   const empresa = client.empresa ? escHtml(client.empresa) : '';
   const eventDesc = client.eventDesc ? escHtml(client.eventDesc) : '';
@@ -395,15 +446,7 @@ export function buildDossierHtml(
   <title>Dossier Òrbita Events — ${nom}</title>
   <style>
     :root {
-      --tinta: #211d16;
-      --tinta-suau: #56503f;
-      --tinta-clara: #857c68;
-      --or: #a9863f;
-      --or-clar: #d7b86e;
-      --paper: #fbf8f1;
-      --paper-fosc: #f4efe3;
-      --linia: #e3dccd;
-      --carbo: #14120e;
+${paleta(tema)}
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -463,7 +506,7 @@ export function buildDossierHtml(
     .capçal {
       position: relative;
       background: var(--carbo);
-      color: var(--paper);
+      color: var(--sobre-fosc);
       padding: 26mm 18mm 20mm;
       text-align: center;
     }
@@ -694,15 +737,15 @@ export function buildDossierHtml(
     .total {
       display: flex; align-items: baseline; justify-content: space-between;
       margin-top: 8mm; padding: 6mm;
-      background: var(--carbo); color: var(--paper);
+      background: var(--total-fons); color: var(--total-lletra);
     }
     .total-etiqueta {
       font-family: Helvetica, Arial, sans-serif;
       font-size: 7pt; letter-spacing: 0.24em; text-transform: uppercase;
-      color: var(--or-clar);
+      color: var(--total-etiqueta);
     }
     .total-xifra { font-size: 18pt; font-variant-numeric: tabular-nums; }
-    .total-mida { font-size: 9pt; color: var(--or-clar); margin-left: 3mm; }
+    .total-mida { font-size: 9pt; color: var(--total-etiqueta); margin-left: 3mm; }
 
     .peu-nota { font-size: 8.5pt; color: var(--tinta-clara); margin-top: 3mm; }
 

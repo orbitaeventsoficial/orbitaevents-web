@@ -8,7 +8,7 @@ import { getEventLabel, toIntlLocale } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
 import { buildQuoteLines } from '@/lib/services/quoteLines';
-import { buildDossierHtml, type DossierCopy, type DossierQuoteLine } from '@/lib/utils/dossier-html-builder';
+import { buildDossierHtml, type DossierCopy, type DossierQuoteLine, type DossierTema } from '@/lib/utils/dossier-html-builder';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { DOSSIER_LOCALE_OPTIONS, type DossierLocale } from '@/lib/constants/dossier-locales';
 import { useBookingDistance } from '../bookings/useBookingDistance';
@@ -301,6 +301,9 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
      ser una parella de dues llengües. Els tres catàlegs ja són aquí, així que
      canviar-la no recarrega res ni esborra el que s'ha omplert. */
   const [locale, setLocale] = useState<DossierLocale>(initialLocale);
+  /* La decoració del document. No toca ni els productes ni els preus: el
+     dossier de Halloween és el mateix dossier amb una altra roba. */
+  const [tema, setTema] = useState<DossierTema>('general');
   const { products, copy: dossierCopy } = catalogs[locale] ?? catalogs[initialLocale];
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
@@ -708,6 +711,7 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
               ? Number(travelKm)
               : undefined,
             lines: pressupost.length > 0 ? pressupost : undefined,
+            tema: tema === 'halloween' ? 'halloween' : undefined,
           },
         }),
       });
@@ -923,6 +927,24 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
                 {locale === initialLocale
                   ? 'És la llengua que consta al client.'
                   : 'Diferent de la que consta al client: mana la teva tria.'}
+              </p>
+            </div>
+            <div className="dg__field">
+              <label htmlFor="dg-tema" className="dg__label">Decoració del dossier</label>
+              <select
+                id="dg-tema"
+                className="adm-input"
+                value={tema}
+                onChange={(e) => setTema(e.target.value as DossierTema)}
+                aria-describedby="dg-tema-nota"
+              >
+                <option value="general">General</option>
+                <option value="halloween">Halloween</option>
+              </select>
+              <p id="dg-tema-nota" className="dg__hint">
+                {tema === 'halloween'
+                  ? 'Mateixos productes i preus: només canvia la roba del document.'
+                  : 'La decoració de sempre.'}
               </p>
             </div>
             <div className="dg__field dg__field--full">
