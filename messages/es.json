@@ -7156,6 +7156,10 @@
           "Máquina de humo bajo incluida"
         ]
       }
+    },
+    "characters": {
+      "title": "Elige tu personaje",
+      "lead": "Estos son los personajes que os podemos llevar. Decidnos cuál queréis y va ese."
     }
   },
   "animacioProducts": {

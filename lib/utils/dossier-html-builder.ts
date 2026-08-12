@@ -154,7 +154,26 @@ export type DossierCopy = {
     vatNoteQuoted: string;
   };
   cta: { label: string };
+  /** El mostrari de personatges: només surt si el bolo en porta. */
+  characters?: { title: string; lead: string };
 };
+
+
+/**
+ * Una teranyina de cantonada, dibuixada aquí mateix.
+ *
+ * No és una imatge: és un dibuix vectorial dins del document. Així el PDF i el
+ * correu la porten sempre, sense anar a buscar cap fitxer, i s'imprimeix neta a
+ * qualsevol mida. Només surt al tema de Halloween.
+ */
+function teranyina(classe: string): string {
+  return `<svg class="teranyina ${classe}" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+    <g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">
+      <path d="M0 0 L120 0 M0 0 L0 120 M0 0 L110 110 M0 0 L60 118 M0 0 L118 60 M0 0 L30 120 M0 0 L120 30"/>
+      <path d="M22 0 Q13 13 0 22 M46 0 Q27 27 0 46 M72 0 Q42 42 0 72 M100 0 Q58 58 0 100"/>
+    </g>
+  </svg>`;
+}
 
 function escHtml(s: string): string {
   return s
@@ -237,7 +256,8 @@ function buildServiceCard(
      Quan el servei va amb personatge, el client ha de veure quins li van: un
      nom sol no diu res i una foto genèrica no és la seva festa. */
   const personatges = (personatgesTriats ?? []).length > 0
-    ? `<div class="fitxa-personatges">${(personatgesTriats ?? [])
+    ? `${copy.characters ? `<div class="fitxa-tria"><h4>${escHtml(copy.characters.title)}</h4><p>${escHtml(copy.characters.lead)}</p></div>` : ''}
+      <div class="fitxa-personatges">${(personatgesTriats ?? [])
         .map((p) => `<figure class="personatge">
             <img src="${escHtml(p.foto)}" alt="${escHtml(p.nom)}" loading="lazy">
             <figcaption>${escHtml(p.nom)}</figcaption>
@@ -839,11 +859,47 @@ ${paleta(tema)}
     }
     .tanca-client { margin-top: 2mm; }
 
+
+    /* ── Halloween ────────────────────────────────────────────────────────
+       La decoració no és un caprici: aquest dossier el rep algú que ja ha
+       decidit que vol una festa de por. Les teranyines són dibuix vectorial,
+       s'imprimeixen i no demanen cap fitxer. Al tema general no n'hi ha cap. */
+    .tema-halloween .full--carta { position: relative; }
+    .teranyina { position: absolute; top: 0; z-index: 2; width: 46mm; height: 46mm; color: var(--or); opacity: .32; pointer-events: none; }
+    .teranyina--esq { left: 0; }
+    .teranyina--dre { right: 0; transform: scaleX(-1); }
+    .tema-halloween .capçal { position: relative; overflow: hidden; }
+    .tema-halloween .fitxa { position: relative; overflow: hidden; }
+    .tema-halloween .fitxa::after {
+      content: ''; position: absolute; right: -12mm; bottom: -14mm;
+      width: 34mm; height: 34mm; border-radius: 50%;
+      background: radial-gradient(circle, rgba(244,122,54,.16), transparent 70%);
+      pointer-events: none;
+    }
+    .tema-halloween .full--preu { position: relative; }
+    /* La boira de sota del pressupost: el mateix efecte de fum baix que fem al bolo. */
+    .tema-halloween .full--preu::before {
+      content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 40mm;
+      background: linear-gradient(to top, rgba(244,122,54,.10), transparent);
+      pointer-events: none;
+    }
+
+    /* El mostrari de personatges: el client tria cara, no nom. */
+    .fitxa-tria { margin-top: 5mm; }
+    .fitxa-tria h4 {
+      font-family: Helvetica, Arial, sans-serif; font-size: 8pt;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--or);
+    }
+    .fitxa-tria p { font-size: 9.5pt; color: var(--tinta-suau); margin-top: 1mm; }
+
     @media print {
       .capçal, .total {
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
       .fitxa { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .teranyina, .tema-halloween .fitxa::after, .tema-halloween .full--preu::before {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
 
       /* Aquí sí que mana l'A4: amplada exacta, full propi per a la carta i per
          al preu, i cap fitxa partida per la meitat. */
@@ -857,9 +913,10 @@ ${paleta(tema)}
   </style>
   ${options.autoPrint ? '<script>window.addEventListener("load", function(){ window.print(); });</script>' : ''}
 </head>
-<body>
+<body class="${tema === 'halloween' ? 'tema-halloween' : ''}">
 
 <section class="full full--carta">
+  ${tema === 'halloween' ? teranyina('teranyina--esq') + teranyina('teranyina--dre') : ''}
   <div class="capçal${options.coverImage ? ' capçal--foto' : ''}"${options.coverImage ? ` style="background-image:url('${escHtml(options.coverImage)}')"` : ''}>
     <div class="capçal-eyebrow">${escHtml(copy.portada.eyebrow)}</div>
     ${options.logoDataUri

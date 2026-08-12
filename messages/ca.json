@@ -7450,6 +7450,10 @@
           "Màquina de fum baix inclosa"
         ]
       }
+    },
+    "characters": {
+      "title": "Tria el teu personatge",
+      "lead": "Aquests són els personatges que us podem portar. Digueu-nos quin voleu i ve aquell."
     }
   },
   "animacioProducts": {

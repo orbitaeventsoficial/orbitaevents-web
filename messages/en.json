@@ -7156,6 +7156,10 @@
           "Low fog machine included"
         ]
       }
+    },
+    "characters": {
+      "title": "Choose your character",
+      "lead": "These are the characters we can bring. Tell us which one you want and that one comes."
     }
   },
   "animacioProducts": {
