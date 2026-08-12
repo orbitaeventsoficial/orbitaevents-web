@@ -83,3 +83,6 @@ tmp/
 # Captures de debug/auditoria al root (mai al repo; usar .codex-captures/)
 /*.png
 /*.jpg
+
+# còpia de seguretat de la neteja del portfoli
+scripts/.copia-portfolio-media.json
