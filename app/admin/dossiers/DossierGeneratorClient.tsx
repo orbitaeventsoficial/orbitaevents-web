@@ -6,7 +6,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
 import { getEventLabel, toIntlLocale } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
-import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
+import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours, CANDYBAR_INCLUDED_CHILDREN } from '@/lib/constants/orbita-services';
 import { buildQuoteLines } from '@/lib/services/quoteLines';
 import { MASQUERADE_CHARACTERS, isCharacterProduct } from '@/lib/constants/masquerade-characters';
 import { buildDossierHtml, type DossierCopy, type DossierQuoteLine, type DossierTema } from '@/lib/utils/dossier-html-builder';
@@ -191,7 +191,9 @@ function productToServiceLine(product: AnimacioProduct, djHours = 1, nensPerLini
     return { kind: 'OTHER', label: 'Operari extra', revenueAmount, quantity: 1 };
   }
   if (esPerNen(product)) {
-    return { kind: "OTHER", label: product.nom, revenueAmount, quantity: nensPerLinia };
+    // Els vint primers ja van dins del candybar: aquí només els que sobren.
+    const deMes = Math.max(0, nensPerLinia - CANDYBAR_INCLUDED_CHILDREN);
+    return { kind: 'OTHER', label: product.nom, revenueAmount, quantity: deMes };
   }
   const group = productGroupKey(product);
   return {
@@ -1084,7 +1086,9 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
                               onClick={() => setNens((n) => n + 1)}
                               aria-label="Un nen més"
                             >+</button>
-                            <span className="dg__dj-hours-hint">{formatEuro(product.priceFrom ?? 0)} per nen</span>
+                            <span className="dg__dj-hours-hint">{nens <= CANDYBAR_INCLUDED_CHILDREN
+                              ? `${CANDYBAR_INCLUDED_CHILDREN} inclosos al candybar`
+                              : `${nens - CANDYBAR_INCLUDED_CHILDREN} de més × ${formatEuro(product.priceFrom ?? 0)} = ${formatEuro((nens - CANDYBAR_INCLUDED_CHILDREN) * (product.priceFrom ?? 0))}`}</span>
                           </div>
                         )}
                       </div>

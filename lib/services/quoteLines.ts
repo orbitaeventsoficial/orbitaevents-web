@@ -1,4 +1,4 @@
-import { DJ_FIRST_HOUR_PRICE, DJ_EXTRA_HOUR_PRICE } from '@/lib/constants/orbita-services';
+import { DJ_FIRST_HOUR_PRICE, DJ_EXTRA_HOUR_PRICE, CANDYBAR_INCLUDED_CHILDREN } from '@/lib/constants/orbita-services';
 
 /**
  * Les línies que el client llegeix al pressupost del dossier.
@@ -64,7 +64,9 @@ function ajuntaCandybar(source: readonly QuoteSourceLine[]): { paquet?: QuoteLin
     ?? source.find((l) => esPerNen(l));
   if (!moble || !llaminadures) return { usades: new Set() };
 
-  const nens = llaminadures.quantity || 1;
+  // La línia de llaminadures només porta els nens de més: els vint primers ja
+  // són dins del candybar. Al client se li diu el total, que és el que entén.
+  const nens = CANDYBAR_INCLUDED_CHILDREN + (llaminadures.quantity || 0);
   const total = amountOf(moble) + amountOf(llaminadures);
   if (total <= 0) return { usades: new Set() };
 
