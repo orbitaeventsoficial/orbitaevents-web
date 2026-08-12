@@ -86,11 +86,11 @@ export const ORBITA_SERVICES: OrbitaService[] = [
   // sobre els costos reals: material propi de l'inventari, muntatge a 50 € l'hora
   // (el mateix que l'operari extra) i, a l'estand, el fum baix que ens lloga en
   // Tino, que aquí ja va inclòs i per tant no es torna a cobrar a part.
-  { id: 'candybar-halloween', kind: 'OTHER', label: 'Candybar de Halloween', defaultPrice: 150, unit: 'unit', optional: true, defaultCost: 20 },
+  { id: 'candybar-halloween', kind: 'OTHER', label: 'Candybar de Halloween', defaultPrice: 200, unit: 'unit', optional: true, defaultCost: 20 },
   // El candybar es munta amb llaminadures per a vint nens i ja van dins dels
-  // 150 €: és el mínim. Només es cobren les dels nens que passin d'aquí
+  // 200 €: és el mínim. Només es cobren les dels nens que passin d'aquí
   // (decisió del propietari, 2026-08-12). Amb vint o menys, cap línia de més.
-  { id: 'llaminadures-per-nen', kind: 'OTHER', label: 'Llaminadures del candybar · per nen', defaultPrice: 5, unit: 'unit', optional: true },
+  { id: 'llaminadures-per-nen', kind: 'OTHER', label: 'Llaminadures del candybar · per nen', defaultPrice: 2, unit: 'unit', optional: true },
   { id: 'deco-estand-dj-halloween', kind: 'OTHER', label: 'Decoració de l’estand de DJ · Halloween', defaultPrice: 280, unit: 'unit', optional: true },
 ];
 
