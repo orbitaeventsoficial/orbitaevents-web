@@ -321,5 +321,9 @@ html.admin-mode .nb__cfg-items { display: flex; flex-direction: column; }
 html.admin-mode .nb__cfg-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 8px 12px; border: 0; border-top: 1px solid color-mix(in oklab, var(--line) 50%, transparent); background: transparent; color: var(--t); font: inherit; font-size: var(--o-text-sm); cursor: pointer; text-align: left; transition: background 120ms ease; }
 html.admin-mode .nb__cfg-item:first-child { border-top: 0; }
 html.admin-mode .nb__cfg-item:hover { background: color-mix(in oklab, var(--gold) 10%, transparent); }
+/* Servei que ja hi és (la 1a hora del DJ): es veu, però no es pot repetir. */
+html.admin-mode .nb__cfg-item:disabled { cursor: default; opacity: .45; }
+html.admin-mode .nb__cfg-item:disabled:hover { background: transparent; }
+html.admin-mode .nb__cfg-item:disabled .nb__cfg-itemprice { color: var(--t); font-weight: var(--o-fw-normal); }
 html.admin-mode .nb__cfg-itemname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 html.admin-mode .nb__cfg-itemprice { flex: none; color: var(--gold); font-weight: var(--o-fw-semi); font-variant-numeric: tabular-nums; }

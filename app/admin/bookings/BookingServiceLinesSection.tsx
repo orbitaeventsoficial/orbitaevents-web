@@ -41,6 +41,11 @@ function packLabel(pack: BookingPack): string {
   return pack.translations?.[0]?.name || pack.slug;
 }
 
+/** La 1a hora del DJ: el servei d'unitat, no el d'hores. */
+function isDjFirstHourService(svc: (typeof ORBITA_SERVICES)[number]): boolean {
+  return svc.kind === 'DJ' && svc.unit === 'unit';
+}
+
 export default function BookingServiceLinesSection({
   lines,
   onChange,
@@ -85,7 +90,16 @@ export default function BookingServiceLinesSection({
         ]);
         return;
       }
+      // Cada clic és una hora més, no una línia repetida: l'hora extra sempre
+      // se suma al total d'hores del DJ.
+      const idx = lines.findIndex((l) => l.label === svc.label);
+      if (idx >= 0) {
+        onChange(lines.map((l, i) => (i === idx ? { ...l, quantity: (l.quantity || 1) + 1 } : l)));
+        return;
+      }
     }
+    // La 1a hora del DJ és una i prou: un bolo no en té dues.
+    if (isDjFirstHourService(svc) && lines.some((l) => l.label === svc.label)) return;
     onChange([...lines, newLine]);
   };
 
@@ -283,12 +297,24 @@ export default function BookingServiceLinesSection({
           <details className="nb__cfg-grp nb__cfg-grp--menu">
             <summary>Productes d&apos;Òrbita</summary>
             <div className="nb__cfg-items">
-              {ORBITA_SERVICES.map((s) => (
-                <button type="button" key={s.id} className="nb__cfg-item" onClick={() => addOrbitaService(s.id)}>
-                  <span className="nb__cfg-itemname">{s.label}</span>
-                  <span className="nb__cfg-itemprice">{s.defaultPrice}€{s.unit === 'hour' ? '/h' : ''}</span>
-                </button>
-              ))}
+              {ORBITA_SERVICES.map((s) => {
+                // La 1a hora del DJ ja hi és: el botó ho diu i no deixa repetir-la.
+                const jaPosada = isDjFirstHourService(s) && lines.some((l) => l.label === s.label);
+                return (
+                  <button
+                    type="button"
+                    key={s.id}
+                    className="nb__cfg-item"
+                    onClick={() => addOrbitaService(s.id)}
+                    disabled={jaPosada}
+                    aria-disabled={jaPosada}
+                    title={jaPosada ? 'Ja hi és: la 1a hora del DJ només es posa una vegada' : undefined}
+                  >
+                    <span className="nb__cfg-itemname">{s.label}</span>
+                    <span className="nb__cfg-itemprice">{jaPosada ? 'ja hi és' : `${s.defaultPrice}€${s.unit === 'hour' ? '/h' : ''}`}</span>
+                  </button>
+                );
+              })}
             </div>
           </details>
 
