@@ -1,5 +1,5 @@
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
-import { masqueradeCharacter, isCharacterProduct, type MasqueradeCharacter } from '@/lib/constants/masquerade-characters';
+import { masqueradeCharacter, isCharacterProduct, fotoPropiaDe, teFotoPropia, type MasqueradeCharacter } from '@/lib/constants/masquerade-characters';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { formatCurrency } from '@/lib/constants';
 import {
@@ -265,8 +265,10 @@ function buildServiceCard(
      Les fitxes ja en portaven i el document no en feia servir ni una: qui rebia
      el dossier llegia la descripció d'una nit sense veure-la. Quan el producte
      no en té, la fitxa es queda com estava; no s'hi posa cap imatge de mostra. */
-  const foto = product.image
-    ? `<div class="fitxa-foto"><img src="${escHtml(product.image)}" alt="${escHtml(product.nom)}" loading="lazy"></div>`
+  const imatge = product.image || fotoPropiaDe(product.nom);
+  const granPresidint = teFotoPropia(product.nom);
+  const foto = imatge
+    ? `<div class="fitxa-foto"><img src="${escHtml(imatge)}" alt="${escHtml(product.nom)}" loading="lazy"></div>`
     : '';
 
   const inclou = product.inclou
@@ -317,7 +319,7 @@ function buildServiceCard(
      «segona». Numerar-ho era decorar. El que sí que diu alguna cosa és de què
      va cada peça, i per això mana la categoria. */
   return `
-      <article class="fitxa${foto ? ' fitxa--amb-foto' : ''}">
+      <article class="fitxa${foto ? ' fitxa--amb-foto' : ''}${granPresidint ? ' fitxa--presidida' : ''}">
         ${foto}
         <div class="fitxa-cos">
           <div class="fitxa-titol-fila">
@@ -907,6 +909,17 @@ ${paleta(tema)}
       background: linear-gradient(to top, rgba(244,122,54,.10), transparent);
       pointer-events: none;
     }
+
+    /* L'espectacle amb imatge pròpia: la seva foto presideix la fitxa, a dalt
+       i a tot l'ample. Una miniatura al costat del text no ven un espectacle. */
+    .fitxa--presidida, .fitxa--presidida:nth-of-type(even) { flex-direction: column; padding: 0; }
+    .fitxa--presidida .fitxa-foto {
+      flex: none; width: 100%; align-self: stretch;
+      min-height: 0; max-height: 105mm; background: var(--carbo);
+    }
+    .fitxa--presidida .fitxa-foto img { width: 100%; height: auto; max-height: 105mm; object-fit: contain; }
+    .fitxa--presidida .fitxa-cos { padding: 6mm; }
+    .fitxa--presidida .fitxa-marge { padding: 0 6mm 6mm; text-align: left; flex-direction: row; gap: 8mm; }
 
     /* El mostrari de personatges: el client tria cara, no nom. */
     .fitxa-tria { margin-top: 5mm; }

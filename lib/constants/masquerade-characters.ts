@@ -44,3 +44,18 @@ export function masqueradeCharacter(id: string): MasqueradeCharacter | undefined
 export function isCharacterProduct(nom: string): boolean {
   return /personatge|personaje/i.test(nom);
 }
+
+/**
+ * Un espectacle amb imatge pròpia, que va gran i a dalt de la fitxa.
+ *
+ * «Blood and Vampires» té el seu cartell: no es tria personatge i no s'ensenya
+ * una miniatura al costat del text, sinó la seva imatge sencera presidint la
+ * fitxa. De moment només ell.
+ */
+export function fotoPropiaDe(nom: string): string | undefined {
+  return /blood\s*and\s*vampires/i.test(nom) ? '/img/personatges/blood-and-vampires.jpg' : undefined;
+}
+
+export function teFotoPropia(nom: string): boolean {
+  return Boolean(fotoPropiaDe(nom));
+}
