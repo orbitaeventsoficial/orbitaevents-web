@@ -42,7 +42,11 @@ export function masqueradeCharacter(id: string): MasqueradeCharacter | undefined
  * deixen triar qui ve.
  */
 export function isCharacterProduct(nom: string): boolean {
-  return /personatge|personaje/i.test(nom);
+  // El personatge addicional no obre cap tria: és una unitat més d'una
+  // animació ja triada, i tornar a demanar cara seria preguntar dues vegades
+  // el mateix.
+  if (/addicional|adicional|extra/i.test(nom)) return false;
+  return /personatge|personaje|tem[àáa]tica/i.test(nom);
 }
 
 /**
