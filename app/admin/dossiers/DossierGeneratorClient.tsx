@@ -317,6 +317,9 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
      dins se'n tria un altre, els km han d'anar al poble del nou: abans només
      mirava el de l'adreça d'entrada i, entrant pel menú, es quedaven buits. */
   const [eventLocation, setEventLocation] = useState(initialEventLocation ?? '');
+  /* Les línies del bolo que van al pressupost. Obren amb les del client d'entrada
+     i se substitueixen per les del client que es triï aquí dins. */
+  const [pressupost, setPressupost] = useState<DossierQuoteLine[]>(quoteLines ?? []);
   /* Si el lead ja diu la població, els km no s'han de teclejar: es calculen amb
      la mateixa ruta que ja fan servir les Reserves. Si algú ja n'ha escrit un,
      no se li toca: mana la persona. */
@@ -434,6 +437,13 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
       const ids = productIdsFromServiceLines(lines, products, validProductIds);
       setSelectedIds(new Set(ids));
       setDjHours(djHoursFromServiceLines(lines));
+      // El pressupost del dossier és el bolo muntat a la fitxa. Fins ara només
+      // arribava quan la pantalla s'obria des del client; triant-lo aquí dins
+      // el dossier es quedava sense línies i ensenyava un «des de» del catàleg
+      // en comptes del preu d'aquest bolo.
+      setPressupost(lines
+        .map((line) => ({ label: line.label ?? '', amount: (line.revenueAmount ?? 0) * (line.quantity || 1) }))
+        .filter((line) => line.label !== '' && line.amount > 0));
     } catch (err) {
       console.error('[DossierGenerator] syncProductsFromLead error:', err);
     }
@@ -528,6 +538,7 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
     setEventDesc('');
     setEventLocation('');
     setTravelKm('');
+    setPressupost([]);
     setSelectedIds(new Set());
     setCreateLeadOnSave(false);
     setSendOnSave(false);
@@ -697,7 +708,7 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
             travelKm: Number.isFinite(Number(travelKm)) && Number(travelKm) > 0
               ? Number(travelKm)
               : undefined,
-            lines: quoteLines && quoteLines.length > 0 ? quoteLines : undefined,
+            lines: pressupost.length > 0 ? pressupost : undefined,
           },
         }),
       });
