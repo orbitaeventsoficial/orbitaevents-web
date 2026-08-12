@@ -7,6 +7,7 @@ import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
 import { getEventLabel, toIntlLocale } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
+import { buildQuoteLines } from '@/lib/services/quoteLines';
 import { buildDossierHtml, type DossierCopy, type DossierQuoteLine } from '@/lib/utils/dossier-html-builder';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { DOSSIER_LOCALE_OPTIONS, type DossierLocale } from '@/lib/constants/dossier-locales';
@@ -441,9 +442,7 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
       // arribava quan la pantalla s'obria des del client; triant-lo aquí dins
       // el dossier es quedava sense línies i ensenyava un «des de» del catàleg
       // en comptes del preu d'aquest bolo.
-      setPressupost(lines
-        .map((line) => ({ label: line.label ?? '', amount: (line.revenueAmount ?? 0) * (line.quantity || 1) }))
-        .filter((line) => line.label !== '' && line.amount > 0));
+      setPressupost(buildQuoteLines(lines));
     } catch (err) {
       console.error('[DossierGenerator] syncProductsFromLead error:', err);
     }

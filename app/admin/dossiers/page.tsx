@@ -30,6 +30,7 @@ import { formatDateShort } from '@/lib/constants';
 import Link from 'next/link';
 import { DossierListActions } from './DossierListActions';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildQuoteLines } from '@/lib/services/quoteLines';
 import { prisma } from '@/lib/prisma';
 
 export const metadata = { title: 'Dossiers' };
@@ -77,12 +78,7 @@ function toDossierProductId(id: string): string {
 async function resolveQuoteLines(leadId?: string): Promise<DossierQuoteLine[]> {
   if (!leadId) return [];
   const result = await listLeadServiceLines(leadId);
-  return (result.body.lines ?? [])
-    .map((line: { label: string; revenueAmount?: number | null; quantity?: number | null }) => ({
-      label: line.label,
-      amount: (line.revenueAmount ?? 0) * (line.quantity || 1),
-    }))
-    .filter((line) => line.amount > 0);
+  return buildQuoteLines(result.body.lines ?? []);
 }
 
 async function resolveInitialProductIds(leadId?: string, explicitProductIds?: string): Promise<string | undefined> {
