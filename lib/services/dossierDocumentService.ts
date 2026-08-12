@@ -54,6 +54,8 @@ export type DossierLineSnapshot = {
   lines?: DossierQuoteLine[];
   /** La decoració amb què es va fer el document: forma part de la foto. */
   tema?: DossierTema;
+  /** Els personatges de Masquerade triats per a aquest bolo. */
+  personatges?: string[];
 };
 
 export function parseLineSnapshot(value: unknown): DossierLineSnapshot {
@@ -71,6 +73,9 @@ export function parseLineSnapshot(value: unknown): DossierLineSnapshot {
     travelKm: Number.isFinite(km) && km > 0 ? km : undefined,
     lines: lines && lines.length > 0 ? lines : undefined,
     tema: raw.tema === 'halloween' ? 'halloween' : undefined,
+    personatges: Array.isArray(raw.personatges)
+      ? raw.personatges.filter((x): x is string => typeof x === 'string')
+      : undefined,
   };
 }
 
@@ -182,6 +187,7 @@ export async function buildDossierDocument(
     travelKm: snapshot.travelKm,
     location: dossier.eventDesc ?? undefined,
     tema: snapshot.tema,
+    personatges: snapshot.personatges,
   });
 
   const slug = dossier.nom

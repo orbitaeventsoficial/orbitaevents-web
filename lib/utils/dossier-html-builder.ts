@@ -1,4 +1,5 @@
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
+import { masqueradeCharacter, isCharacterProduct, type MasqueradeCharacter } from '@/lib/constants/masquerade-characters';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { formatCurrency } from '@/lib/constants';
 import {
@@ -214,6 +215,7 @@ function buildServiceCard(
   locale: string,
   showCataloguePrice: boolean,
   preuAcordat?: number,
+  personatgesTriats?: readonly MasqueradeCharacter[],
 ): string {
   const explicacio = product.descripcio
     .map((paragraf) => `<p>${escHtml(paragraf)}</p>`)
@@ -230,6 +232,18 @@ function buildServiceCard(
   const inclou = product.inclou
     .map((item) => `<li>${escHtml(item)}</li>`)
     .join('');
+
+  /* Els personatges triats per a aquest bolo.
+     Quan el servei va amb personatge, el client ha de veure quins li van: un
+     nom sol no diu res i una foto genèrica no és la seva festa. */
+  const personatges = (personatgesTriats ?? []).length > 0
+    ? `<div class="fitxa-personatges">${(personatgesTriats ?? [])
+        .map((p) => `<figure class="personatge">
+            <img src="${escHtml(p.foto)}" alt="${escHtml(p.nom)}" loading="lazy">
+            <figcaption>${escHtml(p.nom)}</figcaption>
+          </figure>`)
+        .join('')}</div>`
+    : '';
 
   const durada = product.durada
     ? `<span class="fitxa-dada"><span>${escHtml(copy.chapter.durationLabel)}</span> ${escHtml(product.durada)}</span>`
@@ -276,6 +290,7 @@ function buildServiceCard(
             <ul class="fitxa-inclou">${inclou}</ul>
           </div>`
             : ''}
+          ${personatges}
           ${nota}
         </div>
         <div class="fitxa-marge">
@@ -298,12 +313,14 @@ function buildServiceFlow(
   locale: string,
   showCataloguePrice: boolean,
   quoteLines?: DossierQuoteLine[],
+  personatges?: readonly string[],
 ): string {
   if (products.length === 0) return '';
 
+  const triats = (personatges ?? []).map(masqueradeCharacter).filter((c): c is MasqueradeCharacter => Boolean(c));
   const cards = products
     .map((product, index) =>
-      buildServiceCard(product, index + 1, copy, locale, showCataloguePrice, preuDeLaLinia(product, quoteLines)))
+      buildServiceCard(product, index + 1, copy, locale, showCataloguePrice, preuDeLaLinia(product, quoteLines), isCharacterProduct(product.nom) ? triats : undefined))
     .join('');
 
   /**
@@ -443,7 +460,7 @@ export function buildDossierHtml(
   client: DossierClientInfo,
   products: AnimacioProduct[],
   copy: DossierCopy,
-  options: { autoPrint?: boolean; logoDataUri?: string; coverImage?: string; locale?: string; travelKm?: number; location?: string; quoteLines?: DossierQuoteLine[]; tema?: DossierTema } = {},
+  options: { autoPrint?: boolean; logoDataUri?: string; coverImage?: string; locale?: string; travelKm?: number; location?: string; quoteLines?: DossierQuoteLine[]; tema?: DossierTema; personatges?: readonly string[] } = {},
 ): string {
   const locale = options.locale || 'ca-ES';
   const tema: DossierTema = options.tema === 'halloween' ? 'halloween' : 'general';
@@ -459,7 +476,7 @@ export function buildDossierHtml(
    */
   const hasQuote = Boolean(options.quoteLines && options.quoteLines.length > 0);
 
-  const fitxes = buildServiceFlow(products, copy, locale, !hasQuote, options.quoteLines);
+  const fitxes = buildServiceFlow(products, copy, locale, !hasQuote, options.quoteLines, options.personatges);
   const tanca = buildClosing(copy, client);
   const preu = buildQuoteSheet(
     products,
@@ -682,6 +699,24 @@ ${paleta(tema)}
       width: 100%; height: 100%;
       object-fit: contain;
     }
+    /* Els personatges que van a aquest bolo: foto petita i nom a sota. */
+    .fitxa-personatges {
+      display: flex; flex-wrap: wrap; gap: 3mm;
+      margin-top: 4mm;
+    }
+    .personatge { width: 26mm; }
+    .personatge img {
+      display: block; width: 100%; aspect-ratio: 3 / 4;
+      /* Sencera també aquí: cap personatge amb la cara tallada. */
+      object-fit: contain;
+      background: var(--paper);
+    }
+    .personatge figcaption {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 7pt; color: var(--tinta-suau);
+      margin-top: 1.5mm; text-align: center;
+    }
+
     .fitxa--amb-foto .fitxa-cos { padding: 6mm; }
     .fitxa--amb-foto .fitxa-marge { padding: 6mm 6mm 6mm 0; }
 

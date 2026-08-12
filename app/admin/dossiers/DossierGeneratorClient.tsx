@@ -8,6 +8,7 @@ import { getEventLabel, toIntlLocale } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
 import { buildQuoteLines } from '@/lib/services/quoteLines';
+import { MASQUERADE_CHARACTERS, isCharacterProduct } from '@/lib/constants/masquerade-characters';
 import { buildDossierHtml, type DossierCopy, type DossierQuoteLine, type DossierTema } from '@/lib/utils/dossier-html-builder';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { DOSSIER_LOCALE_OPTIONS, type DossierLocale } from '@/lib/constants/dossier-locales';
@@ -133,6 +134,11 @@ function productPriceValue(product: AnimacioProduct, djHours = 1): number | null
   return null;
 }
 
+/** Un producte que es cobra per nen: llavors cal saber quants nens hi ha. */
+function esPerNen(product: AnimacioProduct): boolean {
+  return /per\s*nen|por\s*ni[ñn]/i.test(product.nom) || product.id.endsWith(':llaminadures-per-nen');
+}
+
 function formatEuro(value: number): string {
   return `${value}€`;
 }
@@ -168,7 +174,7 @@ function productBadge(product: AnimacioProduct): string {
   return product.id.startsWith('collab:') ? 'Partner' : 'Òrbita';
 }
 
-function productToServiceLine(product: AnimacioProduct, djHours = 1): LeadServiceLinePayload {
+function productToServiceLine(product: AnimacioProduct, djHours = 1, nensPerLinia = 1): LeadServiceLinePayload {
   const revenueAmount = productPriceValue(product, djHours);
   if (product.id === DJ_FIRST_PRODUCT_ID) {
     // Les hores sempre surten escrites: al dossier el client ha de llegir
@@ -183,6 +189,9 @@ function productToServiceLine(product: AnimacioProduct, djHours = 1): LeadServic
   }
   if (product.id === 'orbita:operari-extra') {
     return { kind: 'OTHER', label: 'Operari extra', revenueAmount, quantity: 1 };
+  }
+  if (esPerNen(product)) {
+    return { kind: "OTHER", label: product.nom, revenueAmount, quantity: nensPerLinia };
   }
   const group = productGroupKey(product);
   return {
@@ -304,6 +313,12 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
   /* La decoració del document. No toca ni els productes ni els preus: el
      dossier de Halloween és el mateix dossier amb una altra roba. */
   const [tema, setTema] = useState<DossierTema>('general');
+  /* Els personatges que van a aquest bolo. Només es demanen quan hi ha un
+     servei amb personatge triat: si no, no hi ha res a dir. */
+  const [personatges, setPersonatges] = useState<string[]>([]);
+  /* Les llaminadures es venen per nen: sense saber quants nens, el preu no és
+     cap preu. Vint nens no mengen com seixanta. */
+  const [nens, setNens] = useState(20);
   const { products, copy: dossierCopy } = catalogs[locale] ?? catalogs[initialLocale];
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
@@ -452,7 +467,7 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
   }, [products, validProductIds]);
 
   const syncProductsToLead = useCallback(async (leadId: string) => {
-    const lines = selectedProducts.map((p) => productToServiceLine(p, djHours));
+    const lines = selectedProducts.map((p) => productToServiceLine(p, djHours, nens));
     const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -712,6 +727,7 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
               : undefined,
             lines: pressupost.length > 0 ? pressupost : undefined,
             tema: tema === 'halloween' ? 'halloween' : undefined,
+            personatges: personatges.length > 0 ? personatges : undefined,
           },
         }),
       });
@@ -947,6 +963,40 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
                   : 'La decoració de sempre.'}
               </p>
             </div>
+            {/* Els personatges només es demanen si el bolo en porta: si no, no
+                hi ha res a triar i la pantalla no ha de preguntar-ho. */}
+            {selectedProducts.some((p) => isCharacterProduct(p.nom)) && (
+              <div className="dg__field dg__field--full">
+                <span className="dg__label">Personatges que hi van</span>
+                <div className="dg__personatges">
+                  {MASQUERADE_CHARACTERS.map((c) => {
+                    const triat = personatges.includes(c.id);
+                    return (
+                      <button
+                        type="button"
+                        key={c.id}
+                        className={`dg__personatge${triat ? ' dg__personatge--on' : ''}`}
+                        aria-pressed={triat}
+                        onClick={() => setPersonatges((actuals) => (
+                          actuals.includes(c.id)
+                            ? actuals.filter((id) => id !== c.id)
+                            : [...actuals, c.id]
+                        ))}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={c.foto} alt="" loading="lazy" />
+                        <span>{c.nom}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="dg__hint">
+                  {personatges.length === 0
+                    ? 'Cap triat: el dossier no ensenyarà cap personatge.'
+                    : `${personatges.length} al dossier, amb la seva foto.`}
+                </p>
+              </div>
+            )}
             <div className="dg__field dg__field--full">
               <label htmlFor="dg-event" className="dg__label">{ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryLabel}</label>
               <input id="dg-event" type="text" className="adm-input" value={eventDesc} onChange={(e) => setEventDesc(e.target.value)} placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryPlaceholder} autoComplete="off" />
@@ -1016,6 +1066,25 @@ export function DossierGeneratorClient({ catalogs, initialLocale, quoteLines, lo
                               aria-label="Afegir una hora de DJ"
                             >+</button>
                             <span className="dg__dj-hours-hint">1a {formatEuro(DJ_FIRST_HOUR_PRICE)} · +{formatEuro(DJ_EXTRA_HOUR_PRICE)}/h</span>
+                          </div>
+                        )}
+                        {esPerNen(product) && (
+                          <div className="dg__dj-hours" role="group" aria-label="Nens del candybar">
+                            <button
+                              type="button"
+                              className="dg__dj-hours-btn"
+                              onClick={() => setNens((n) => Math.max(1, n - 1))}
+                              disabled={nens <= 1}
+                              aria-label="Un nen menys"
+                            >−</button>
+                            <span className="dg__dj-hours-val">{nens} {nens === 1 ? 'nen' : 'nens'}</span>
+                            <button
+                              type="button"
+                              className="dg__dj-hours-btn"
+                              onClick={() => setNens((n) => n + 1)}
+                              aria-label="Un nen més"
+                            >+</button>
+                            <span className="dg__dj-hours-hint">{formatEuro(product.priceFrom ?? 0)} per nen</span>
                           </div>
                         )}
                       </div>
