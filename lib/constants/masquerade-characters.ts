@@ -33,7 +33,14 @@ export function masqueradeCharacter(id: string): MasqueradeCharacter | undefined
   return MASQUERADE_CHARACTERS.find((c) => c.id === id);
 }
 
-/** Un producte que va amb personatges: llavors la tria té sentit. */
+/**
+ * Un producte que va amb personatges: llavors la tria té sentit.
+ *
+ * «Blood and Vampires» no hi entra encara que en porti: és un espectacle amb
+ * la seva pròpia foto, i posar-li a sota un mostrari per triar cara seria
+ * oferir el que no s'ofereix. Només els serveis d'animació amb personatge
+ * deixen triar qui ve.
+ */
 export function isCharacterProduct(nom: string): boolean {
-  return /personatge|blood and vampires|vampir/i.test(nom);
+  return /personatge|personaje/i.test(nom);
 }

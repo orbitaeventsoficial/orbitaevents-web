@@ -745,11 +745,14 @@ ${paleta(tema)}
       display: flex; flex-wrap: wrap; gap: 3mm;
       margin-top: 4mm;
     }
-    .personatge { width: 26mm; }
+    /* Prou grans per veure'ls la cara: són l'únic que el client ha de triar. */
+    .personatge { width: 40mm; }
+    /* Cada foto conserva la seva forma: n'hi ha de dretes i d'ajagudes. Amb
+       una caixa de mida fixa, o es tallaven o quedaven perdudes al mig d'una
+       franja buida. Amb l'amplada manada i l'alçada lliure, es veuen senceres
+       i tan grans com poden. */
     .personatge img {
-      display: block; width: 100%; aspect-ratio: 3 / 4;
-      /* Sencera també aquí: cap personatge amb la cara tallada. */
-      object-fit: contain;
+      display: block; width: 100%; height: auto;
       background: var(--paper);
     }
     .personatge figcaption {
