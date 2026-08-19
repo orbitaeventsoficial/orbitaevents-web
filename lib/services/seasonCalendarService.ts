@@ -2,7 +2,8 @@ import { prisma } from '@/lib/prisma';
 import {
   parseBudgetAmount,
   BOLO_LEAD_INACTIVE_STATUSES,
-  BOLO_BOOKING_INACTIVE_STATUSES,
+  isLeadBoloActive,
+  isBookingBoloActive,
 } from '@/lib/constants';
 
 // ─── Raw input types (de la BD) ──────────────────────────────────────────────
@@ -64,6 +65,12 @@ export interface SeasonCalendarEntry {
   id: string;
   type: 'lead' | 'booking';
   status: string;
+  /**
+   * Feina viva? Un lead perdut o una reserva cancel·lada segueixen sortint al
+   * calendari — s'han de veure — però no compten cap als diners de la
+   * temporada. L'estat és un atribut, no un filtre (#1163, #1164).
+   */
+  active: boolean;
   name: string;
   eventDate: Date | null;
   eventStartTime: string | null;
@@ -186,6 +193,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       id: lead.id,
       type: 'lead',
       status: lead.status,
+      active: isLeadBoloActive(lead.status),
       name: lead.name,
       eventDate: lead.eventDate,
       eventStartTime: lead.eventStartTime ?? null,
@@ -215,6 +223,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       id: booking.id,
       type: 'booking',
       status: booking.status,
+      active: isBookingBoloActive(booking.status),
       name: booking.clientName,
       eventDate: booking.eventDate,
       eventStartTime: null,
@@ -239,7 +248,8 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       const d = startOfDayUtc(e.eventDate as Date);
       return isSameDayUtc(d, w.fri) || isSameDayUtc(d, w.sat) || isSameDayUtc(d, w.sun);
     });
-    const totalValue = entries.reduce((sum, e) => sum + (e.estimatedValue ?? 0), 0);
+    // Es veuen totes les entrades; només les vives sumen.
+    const totalValue = entries.reduce((sum, e) => sum + (e.active ? e.estimatedValue ?? 0 : 0), 0);
     return { ...w, entries, totalValue };
   });
 
@@ -249,7 +259,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
   const scheduledLeads = input.leads.filter((l) => l.eventDate !== null).length;
   const scheduledBookings = input.bookings.length;
   const allScheduledEntries = [...scheduled];
-  const totalValue = allScheduledEntries.reduce((sum, e) => sum + (e.estimatedValue ?? 0), 0);
+  const totalValue = allScheduledEntries.reduce((sum, e) => sum + (e.active ? e.estimatedValue ?? 0 : 0), 0);
 
   return {
     windowStart,
@@ -320,7 +330,9 @@ export async function loadSeasonCalendar(
     }),
     prisma.booking.findMany({
       where: {
-        status: { notIn: [...BOLO_BOOKING_INACTIVE_STATUSES] },
+        // Sense filtre d'estat: una reserva cancel·lada segueix ocupant el seu
+        // dia i s'ha de veure, igual que ja passava amb els leads perduts.
+        // Arriba amb `active: false` i no suma als diners de la temporada.
         eventDate: { gte: start, lt: end },
       },
       select: {

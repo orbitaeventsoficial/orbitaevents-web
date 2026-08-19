@@ -1513,6 +1513,30 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1165 — 2026-08-19 — claude (TANCAT)
+
+**«S'ha de veure tot» — decisió del propietari. La Temporada deixa d'amagar.**
+
+- Context: el propietari, preguntat sobre si la feina descartada s'havia de veure a la Temporada, respon «s'ha de veure tot». Aquesta entrada registra que **es revoca una decisió anterior mesurada**, i per què el problema que la va motivar no torna.
+- **Decisió revocada**: el 2026-08-11 els leads perduts es van treure del calendari de temporada (commutador `mostrarPerduts`, per defecte `false`). No era arbitrari: es va mesurar sobre la base real que el 5 de setembre hi constaven 4 entrades i només 1 era viva, i les 3 perdudes sepultaven l'única que comptava.
+- **Per què ara es pot revocar sense recuperar el problema**: el mal no era que els perduts hi fossin, sinó que sortissin **barrejats** amb els vius. Ara la feina viva va sempre primer dins de cada dia, així que cap descartat pot tapar la que compta. És la mateixa regla d'ordenació del #1163.
+- Tres amagatalls tancats a la Temporada:
+  1. `mostrarPerduts` eliminat — els leads perduts es veuen sempre.
+  2. `seasonCalendarService` deixa de filtrar les reserves `CANCELLED`. Ja no queda cap asimetria: la pantalla ensenyava els leads perduts i amagava les reserves cancel·lades.
+  3. `leads/page.tsx` pintava **tota** reserva com a `guanyat` fos quin fos el seu estat. Una reserva cancel·lada hauria sortit en verd de guanyada; ara les mortes es pinten com el que són.
+- La barra de perduts deixa de ser un commutador i passa a ser un recompte: el nombre de descartats tampoc s'amaga.
+- **Diners**: `SeasonCalendarEntry` guanya `active`, i `totalValue` (per cap de setmana i global) només suma la feina viva. Això **corregeix una incoherència anterior**: fins ara un lead perdut amb pressupost sumava al «Valor temporada», inflant l'expectativa amb feina que no existeix. Sense aquest canvi, ensenyar les cancel·lades hauria empitjorat el número.
+- `LeadsSeasonClient.tsx` està marcat `TANCAT CHARLIE` (patró de referència validat pel propietari 2026-06-08). S'hi ha tocat el mínim: ordre, commutador i comentari d'historial. **Cap classe CSS nova, cap canvi de maquetació.**
+- `ADMIN_CHANGE_COUNTER` puja a `1165`; el següent canvi real ha de ser `#1166`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: 26/26 tests de temporada, amb 3 casos nous (una `CANCELLED` surt, un `LOST` surt, i la feina descartada es veu però no suma). `/admin/leads`, `/admin/calendario` i `/admin/cuadrant` responen 200.
+- Validació humana/UX: pendent validació visual del propietari — és un canvi que ha demanat ell i que afecta una pantalla `TANCAT CHARLIE`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1164 — 2026-08-19 — claude (TANCAT)
 
 **Una sola regla per a «quins bolos compten» — es desfà la teranyina de filtres.**

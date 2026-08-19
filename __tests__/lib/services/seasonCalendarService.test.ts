@@ -207,6 +207,62 @@ describe('buildSeasonCalendar', () => {
     expect(firstWeekend.weekKey).toBe('2026-06-05');
   });
 
+  it('s\'ha de veure tot: una reserva CANCELLED surt al seu cap de setmana', () => {
+    const cancelada = makeBooking({
+      id: 'b-cancel',
+      status: 'CANCELLED',
+      eventDate: new Date('2026-06-20T00:00:00.000Z'),
+    });
+    const result = buildSeasonCalendar(makeInput([], [cancelada]));
+    const entry = result.weekends.flatMap((w) => w.entries).find((e) => e.id === 'b-cancel');
+
+    expect(entry).toBeDefined();
+    expect(entry?.active).toBe(false);
+  });
+
+  it('s\'ha de veure tot: un lead LOST surt al seu cap de setmana', () => {
+    const perdut = makeLead({
+      id: 'l-perdut',
+      status: 'LOST',
+      eventDate: new Date('2026-06-20T00:00:00.000Z'),
+    });
+    const result = buildSeasonCalendar(makeInput([perdut]));
+    const entry = result.weekends.flatMap((w) => w.entries).find((e) => e.id === 'l-perdut');
+
+    expect(entry).toBeDefined();
+    expect(entry?.active).toBe(false);
+  });
+
+  it('la feina descartada es veu però no suma als diners de la temporada', () => {
+    const viu = makeLead({
+      id: 'l-viu',
+      status: 'NEW',
+      estimatedValue: 1000,
+      eventDate: new Date('2026-06-20T00:00:00.000Z'),
+    });
+    const perdut = makeLead({
+      id: 'l-perdut',
+      status: 'LOST',
+      estimatedValue: 5000,
+      eventDate: new Date('2026-06-20T00:00:00.000Z'),
+    });
+    const cancelada = makeBooking({
+      id: 'b-cancel',
+      status: 'CANCELLED',
+      total: 9000,
+      eventDate: new Date('2026-06-20T00:00:00.000Z'),
+    });
+
+    const result = buildSeasonCalendar(makeInput([viu, perdut], [cancelada]));
+    const weekend = result.weekends.find((w) => w.entries.length > 0);
+
+    // Les tres entrades hi són...
+    expect(weekend?.entries).toHaveLength(3);
+    // ...però només els 1000 del bolo viu compten.
+    expect(weekend?.totalValue).toBe(1000);
+    expect(result.stats.totalValue).toBe(1000);
+  });
+
   it('propaga priority del lead a l\'entry (i null als bookings)', () => {
     const lead = makeLead({ id: 'l1', priority: 'HIGH' });
     const booking = makeBooking({ id: 'b1' });

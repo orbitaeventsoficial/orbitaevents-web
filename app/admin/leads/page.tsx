@@ -75,7 +75,10 @@ function entryToLead(e: SeasonCalendarEntry, weather: EventWeather | null): Lead
     pax: e.guestCount ?? 0,
     product: typeLabel,
     value: e.estimatedValue ?? 0,
-    stage: kind === 'booking' ? 'guanyat' : statusToStage(e.status),
+    // Una reserva era sempre 'guanyat' sigui quin fos el seu estat. Ara que les
+    // cancel·lades també es veuen, una reserva morta ha de pintar-se com el que
+    // és — feina descartada — i no de guanyada.
+    stage: kind === 'booking' ? (e.active ? 'guanyat' : 'perdut') : statusToStage(e.status),
     kind,
     realStatus: kind === 'lead' ? toLeadStatus(e.status) : null,
     lostReason: kind === 'lead' ? e.lostReason : null,

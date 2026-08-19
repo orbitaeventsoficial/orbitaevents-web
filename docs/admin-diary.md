@@ -1,3 +1,27 @@
+## 2026-08-19 — «S'ha de veure tot»: la Temporada deixa d'amagar (Canvi #1165, claude)
+
+### Context
+Preguntat si la feina descartada s'havia de veure a la Temporada, el propietari respon **«s'ha de veure tot»**. Això revoca una decisió anterior que estava mesurada i documentada al codi, i per això queda registrat aquí amb el seu perquè.
+
+### Què s'ha fet
+- **Decisió revocada**: el 2026-08-11 els leads perduts es van treure del calendari de temporada perquè tapaven la feina viva (mesurat: el 5 de setembre, 4 entrades i només 1 viva).
+- **Per què ara no torna el problema**: el mal no era que els perduts hi fossin, sinó que sortissin barrejats. Ara els vius van sempre primer dins de cada dia — la mateixa regla del #1163.
+- Tres amagatalls tancats: el commutador `mostrarPerduts`, el filtre de reserves `CANCELLED` al servei, i el fet que `leads/page.tsx` pintés tota reserva com a `guanyat` fos quin fos el seu estat (una cancel·lada hauria sortit en verd de guanyada).
+- La barra de perduts passa de commutador a recompte: ni el número s'amaga.
+- **Diners**: `totalValue` només suma la feina viva. Corregeix de passada que un lead perdut amb pressupost inflava el «Valor temporada» amb feina que no existeix.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: 26/26 tests de temporada (3 de nous). `/admin/leads`, `/admin/calendario` i `/admin/cuadrant` responen 200.
+- Validació humana/UX: pendent validació visual del propietari. `LeadsSeasonClient.tsx` és `TANCAT CHARLIE`, així que s'hi ha tocat el mínim: ordre, commutador i comentari. Cap classe CSS nova ni canvi de maquetació.
+
+### Coordinació
+Counter -> 1165. La doctrina que queda fixada després de #1163, #1164 i #1165: **l'estat és un atribut, no un filtre**. Res no desapareix de la vista; la feina descartada es marca, va darrere i no compta als diners.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-08-19 — Una sola regla per a «quins bolos compten» (Canvi #1164, claude)
 
 ### Context
