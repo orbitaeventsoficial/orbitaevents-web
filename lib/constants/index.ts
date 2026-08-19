@@ -406,6 +406,21 @@ export const RECENT_FEED_EVENT_TYPE_ICONS: Record<string, 'check' | 'sparkles' |
   OTHER: 'check',
 };
 
+/**
+ * Bolos descartats al calendari.
+ *
+ * Un lead perdut o una reserva cancel·lada segueixen ocupant el seu dia i s'han
+ * de veure: el calendari els pinta apagats en comptes de filtrar-los. Aquests
+ * catàlegs diuen quins estats deixen un bolo fora de la feina viva, i les
+ * etiquetes amb què es marca.
+ */
+export const CALENDAR_LEAD_INACTIVE_STATUSES: readonly string[] = ['LOST'];
+export const CALENDAR_BOOKING_INACTIVE_STATUSES: readonly string[] = ['CANCELLED'];
+export const CALENDAR_BOLO_INACTIVE_LABELS: Record<string, string> = {
+  LOST: 'Perdut',
+  CANCELLED: 'Cancel·lat',
+};
+
 export const RECENT_FEED_BOOKING_STATUSES = ['CONFIRMED', 'PREPARING', 'COMPLETED'] as const;
 export const RECENT_FEED_ANONYMOUS_NAMES: Record<string, readonly string[]> = {
   WEDDING: ['Marc & Laura', 'Pau & Maria', 'Joan & Anna', 'Albert & Carla'],

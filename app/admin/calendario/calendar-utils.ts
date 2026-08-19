@@ -3,7 +3,7 @@
  * (Month, Week, Day). Font unica de veritat per evitar duplicats.
  */
 
-import { EVENT_TYPE_PLAIN, DEFAULT_LOCALE } from '@/lib/constants';
+import { EVENT_TYPE_PLAIN, DEFAULT_LOCALE, CALENDAR_BOLO_INACTIVE_LABELS } from '@/lib/constants';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
@@ -177,12 +177,6 @@ export function resolveTimeLabel(booking: CalendarApiDay['reservas'][number]): s
   });
 }
 
-/** Etiquetes dels estats que deixen un bolo fora de la feina viva. */
-export const BOLO_INACTIVE_LABELS: Record<string, string> = {
-  LOST: 'Perdut',
-  CANCELLED: 'Cancel·lat',
-};
-
 /**
  * Llista plana de bolos d'un dia. Cap vista ha de tornar a llegir `leads` i
  * `reservas` per separat: aixo era el que feia que un bolo pogues caure entre
@@ -224,7 +218,7 @@ export function resolveBoloHref(bolo: CalendarApiBolo): string {
 /** Etiqueta curta de l'estat, o cadena buida si el bolo es feina viva. */
 export function resolveBoloStateLabel(bolo: CalendarApiBolo): string {
   if (bolo.active) return '';
-  return BOLO_INACTIVE_LABELS[bolo.status] || 'Descartat';
+  return CALENDAR_BOLO_INACTIVE_LABELS[bolo.status] || 'Descartat';
 }
 
 export function formatKey(date: Date): string {

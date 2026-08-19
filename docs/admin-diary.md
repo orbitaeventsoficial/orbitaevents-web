@@ -1,3 +1,28 @@
+## 2026-08-19 — Calendari: aplanar les capes perquè cap bolo desaparegui (Canvi #1163, claude)
+
+### Context
+El propietari reporta que té «coses en local que no estan al .com», concretament un bolo el dia 22 que no surt al calendari. El diagnòstic descarta la hipòtesi de partida: no hi ha divergència local↔producció, perquè `.env`, `.env.local`, `.env.production` i `.env.railway` apunten tots al mateix Postgres de Railway. Hi ha una sola base de dades. El bolo hi era — el calendari l'amagava.
+
+### Què s'ha fet
+- Dues vies d'amagatall independents, ara tancades totes dues.
+- Cervell (`adminCalendarMonthService`): fora `notIn: ['LOST']` i `notIn: ['CANCELLED']`. L'estat passa a ser atribut (`active`), no filtre. Cada dia porta una llista plana `bolos` de forma única, vingui de `Lead` o de `Booking`. Ordre: feina viva primer.
+- Vistes (mes, setmana, dia): fora els sis interruptors `visibleLayers`. Les tres pinten `bolos` en un sol recorregut amb helpers compartits a `calendar-utils`. Els descartats surten apagats i ratllats, mai absents.
+- L'ocupació del dia la marca només la feina viva: una reserva cancel·lada ja no pinta el dia com a reservat.
+- Catàlegs d'estat a `lib/constants/index.ts`. `arch:layer:check` va rebutjar la primera passada per tenir-los locals al servei; el guard tenia raó i s'ha corregit.
+- La divisió `Lead`/`Booking` no s'ha tocat a la base de dades. Fusionar-les és una migració irreversible sobre l'única BD del negoci i queda fora d'aquest canvi, pendent de decisió del propietari.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: mes, setmana i dia responen 200 en local; l'API de l'agost retorna el bolo del 22 (Isaac Salas García) marcat `DESCARTAT`. 3 tests nous al servei, 9/9 verd.
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1163. Nota per a la propera passada: hi ha un sweep sense committejar al directori de treball (~154 fitxers modificats, sobretot la canonització de `getErrorMessage`) que havia esborrat 167 fitxers i desarmat `validate:core` a `package.json` i al CI. `main` mai no els va desarmar — el commit `29535319` va arreglar el codi que els guards rebutjaven, no els guards. Els fitxers s'han restaurat i el sweep queda a `git stash` a l'espera de decisió.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-25 — Fitxes Sistema + Post-event: mapa d'organs complet (Canvi #1162, claude)
 
 ### Context

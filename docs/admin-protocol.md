@@ -1513,6 +1513,29 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1163 — 2026-08-19 — claude (TANCAT)
+
+**Calendari: aplanar les capes perquè cap bolo desaparegui.**
+
+- Context: el propietari reporta que el bolo del 22 d'agost no surt al calendari. Diagnòstic: no és divergència local↔producció (els quatre `.env` apunten al mateix Postgres de Railway), sinó que el calendari amagava feina per dues vies independents.
+- Via 1 — el cervell descartava per estat: `adminCalendarMonthService` filtrava `notIn: ['LOST']` als leads i `notIn: ['CANCELLED']` a les reserves. El lead d'Isaac Salas García (22/08, `LOST`) existia a la BD i no es pintava enlloc.
+- Via 2 — les tres vistes tenien sis interruptors de capa (`visibleLayers`: leads, bookings, blocks, tasks, social, followUps) que podien deixar una llista sencera sense pintar.
+- Cervell: fora els filtres d'estat. L'estat passa a ser atribut (`active`) en comptes de filtre silenciós. Cada dia porta una sola llista plana `bolos` de forma única (`CalendarBolo`), vinguin de `Lead` o de `Booking`. Ordre únic: feina viva primer, després la descartada; per hora d'inici i nom. `booking: null` es manté als leads perquè és deduplicació, no filtre d'estat.
+- Vistes: fora els interruptors a mes, setmana i dia. Les tres pinten `bolos` en un sol recorregut via `getDayBolos` + `resolveBolo*` a `calendar-utils` (font única compartida). Els descartats surten apagats i ratllats, mai absents.
+- L'ocupació del dia la marca només la feina viva: una reserva cancel·lada ja no pinta el dia com a reservat.
+- Catàlegs a `lib/constants/index.ts` (`CALENDAR_LEAD_INACTIVE_STATUSES`, `CALENDAR_BOOKING_INACTIVE_STATUSES`, `CALENDAR_BOLO_INACTIVE_LABELS`) — `arch:layer:check` va rebutjar la primera passada amb els catàlegs locals al servei, i tenia raó.
+- La divisió `Lead`/`Booking` segueix intacta a la base de dades; només s'aplana a la lectura.
+- Tests: 3 casos nous a `adminCalendarMonthService.test.ts` (un `LOST` surt, un `CANCELLED` surt, ordre de la llista plana) — 9/9 verd.
+- `ADMIN_CHANGE_COUNTER` puja a `1163`; el següent canvi real ha de ser `#1164`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: les tres vistes responen 200 en local i l'API de l'agost retorna el bolo del 22 marcat `DESCARTAT`.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1162 — 2026-06-25 — claude (TANCAT)
 
 **Fitxes forenses Sistema + Post-event — MAPA D'ORGANS COMPLET.**
