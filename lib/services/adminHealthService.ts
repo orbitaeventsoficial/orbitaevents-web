@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES, ADMIN_HEALTH_ACTIVE_LEAD_STATUSES } from '@/lib/constants/admin';
+import { BOLO_BOOKING_INACTIVE_STATUSES } from '@/lib/constants';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getFinanceAlertsSummary } from '@/lib/services/financeAlertsService';
 import { computePackPricingHealth, getPackPricingModelConfigEditable } from '@/lib/services/packPricingHealth';
@@ -296,7 +297,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     prisma.booking.count({
       where: {
         total: 0,
-        status: { not: 'CANCELLED' },
+        status: { notIn: [...BOLO_BOOKING_INACTIVE_STATUSES] },
       },
     }),
     prisma.booking.findMany({

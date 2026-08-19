@@ -1513,6 +1513,29 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1164 — 2026-08-19 — claude (TANCAT)
+
+**Una sola regla per a «quins bolos compten» — es desfà la teranyina de filtres.**
+
+- Context: continuació del #1163. Si el calendari amagava feina per un filtre escrit a mà, calia veure quantes vegades més estava escrit aquell mateix filtre.
+- Troballa: 8 serveis consulten `Lead` i `Booking` per finestra de dates, i la regla «tots menys els descartats» hi apareixia amb **quatre ortografies diferents**: `notIn: ['CANCELLED']` (calendari, temporada), `not: 'CANCELLED'` (sincronització Google, feed públic, salut), i llistes positives locals `LEAD_STATUSES_ACTIVE` / `BOOKING_STATUSES_ACTIVE` declarades **dins** de `crewScheduleService`. Cap garantia que diguessin el mateix.
+- Equivalència verificada contra els enums de Prisma: `LeadStatus` és NEW/CONTACTED/QUOTE_SENT/NEGOTIATING/WON/LOST i `BookingStatus` és PENDING/CONFIRMED/PREPARING/COMPLETED/CANCELLED. Per tant les llistes positives eren exactament «tots menys `LOST`» i «tots menys `CANCELLED`». Les quatre ortografies eren la mateixa regla.
+- Font única a `lib/constants/index.ts`: `BOLO_LEAD_INACTIVE_STATUSES`, `BOLO_BOOKING_INACTIVE_STATUSES`, `BOLO_INACTIVE_LABELS` i els predicats `isLeadBoloActive` / `isBookingBoloActive`. Es declaren amb `as const` a posta perquè `[...X]` sigui acceptat per Prisma com a `LeadStatus[]` sense haver d'importar `@prisma/client` a `constants` (decisió existent documentada a `orbita-services.ts`).
+- Consumidors migrats: `adminCalendarMonthService`, `seasonCalendarService`, `crewScheduleService` (catàlegs locals eliminats), `googleCalendarSyncService`, `calendarFeedTokenService`, `adminHealthService`.
+- **No tocat a posta**: els `not: 'CANCELLED'` d'`invoiceService` són de l'enum `InvoiceStatus`, una regla diferent que només comparteix el nom.
+- **Zero canvi de comportament i zero canvi visual**: cap consulta retorna un conjunt diferent del que retornava, i no s'ha tocat cap component ni cap classe.
+- `seasonCalendarService.test.ts`: l'expectativa de l'enllaç a la reserva no incloïa `distanceKm`, que el builder propaga des que el transport té cervell propi. Test obsolet corregit (era vermell abans d'aquesta passada).
+- Pendent de decisió del propietari: la temporada mostra els leads `LOST` però amaga les reserves `CANCELLED`. Unificar-ho vol dir decidir si la feina descartada compta cap a `totalValue` — avui un lead perdut amb pressupost **sí** que hi suma. És una decisió de negoci, no tècnica.
+- `ADMIN_CHANGE_COUNTER` puja a `1164`; el següent canvi real ha de ser `#1165`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: 55/55 tests dels tres serveis de bolos en verd.
+- Validació humana/UX: sense superfície nova a validar (cap canvi visual).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1163 — 2026-08-19 — claude (TANCAT)
 
 **Calendari: aplanar les capes perquè cap bolo desaparegui.**

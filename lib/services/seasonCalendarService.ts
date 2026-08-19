@@ -1,5 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import { parseBudgetAmount } from '@/lib/constants';
+import {
+  parseBudgetAmount,
+  BOLO_LEAD_INACTIVE_STATUSES,
+  BOLO_BOOKING_INACTIVE_STATUSES,
+} from '@/lib/constants';
 
 // ─── Raw input types (de la BD) ──────────────────────────────────────────────
 
@@ -278,8 +282,9 @@ export async function loadSeasonCalendar(
         OR: [
           // qualsevol lead amb data dins la finestra (inclou LOST visibles al pipeline)
           { eventDate: { gte: start, lt: end } },
-          // unscheduled: sense data i NO perduts (els LOST sense data no es mostren)
-          { eventDate: null, status: { notIn: ['LOST'] } },
+          // unscheduled: sense data i NO descartats (un lead perdut sense data
+          // no té on col·locar-se, així que no entra al calaix de pendents)
+          { eventDate: null, status: { notIn: [...BOLO_LEAD_INACTIVE_STATUSES] } },
         ],
       },
       select: {
@@ -315,7 +320,7 @@ export async function loadSeasonCalendar(
     }),
     prisma.booking.findMany({
       where: {
-        status: { notIn: ['CANCELLED'] },
+        status: { notIn: [...BOLO_BOOKING_INACTIVE_STATUSES] },
         eventDate: { gte: start, lt: end },
       },
       select: {

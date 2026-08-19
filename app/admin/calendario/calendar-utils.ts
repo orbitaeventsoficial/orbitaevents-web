@@ -3,7 +3,7 @@
  * (Month, Week, Day). Font unica de veritat per evitar duplicats.
  */
 
-import { EVENT_TYPE_PLAIN, DEFAULT_LOCALE, CALENDAR_BOLO_INACTIVE_LABELS } from '@/lib/constants';
+import { EVENT_TYPE_PLAIN, DEFAULT_LOCALE, BOLO_INACTIVE_LABELS } from '@/lib/constants';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
@@ -218,7 +218,7 @@ export function resolveBoloHref(bolo: CalendarApiBolo): string {
 /** Etiqueta curta de l'estat, o cadena buida si el bolo es feina viva. */
 export function resolveBoloStateLabel(bolo: CalendarApiBolo): string {
   if (bolo.active) return '';
-  return CALENDAR_BOLO_INACTIVE_LABELS[bolo.status] || 'Descartat';
+  return BOLO_INACTIVE_LABELS[bolo.status] || 'Descartat';
 }
 
 export function formatKey(date: Date): string {

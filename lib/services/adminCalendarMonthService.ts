@@ -1,8 +1,4 @@
-import {
-  SUPPORTED_LOCALES,
-  CALENDAR_LEAD_INACTIVE_STATUSES,
-  CALENDAR_BOOKING_INACTIVE_STATUSES,
-} from '@/lib/constants';
+import { SUPPORTED_LOCALES, isLeadBoloActive, isBookingBoloActive } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import { loadPendingFollowUps } from '@/lib/services/responseTrackingService';
 
@@ -237,7 +233,7 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
     const key = lead.eventDate.toISOString().slice(0, 10);
     if (!days[key]) continue;
 
-    const active = !CALENDAR_LEAD_INACTIVE_STATUSES.includes(lead.status);
+    const active = isLeadBoloActive(lead.status);
 
     days[key].leads.push({
       id: lead.id,
@@ -275,7 +271,7 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
     const key = booking.eventDate.toISOString().slice(0, 10);
     if (!days[key]) continue;
 
-    const active = !CALENDAR_BOOKING_INACTIVE_STATUSES.includes(booking.status);
+    const active = isBookingBoloActive(booking.status);
     const ubicacion = booking.eventVenue || booking.eventLocation;
     const packName =
       booking.pack?.translations.find((translation) => translation.locale === 'ca')?.name ||

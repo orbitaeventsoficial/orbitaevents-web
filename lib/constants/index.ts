@@ -407,19 +407,46 @@ export const RECENT_FEED_EVENT_TYPE_ICONS: Record<string, 'check' | 'sparkles' |
 };
 
 /**
- * Bolos descartats al calendari.
+ * Bolos descartats — font única de la regla.
  *
- * Un lead perdut o una reserva cancel·lada segueixen ocupant el seu dia i s'han
- * de veure: el calendari els pinta apagats en comptes de filtrar-los. Aquests
- * catàlegs diuen quins estats deixen un bolo fora de la feina viva, i les
- * etiquetes amb què es marca.
+ * «Quins bolos compten» es decideix aquí i enlloc més. Abans cada superfície
+ * s'ho escrivia a mà i amb ortografies diferents — `notIn: ['CANCELLED']` al
+ * calendari i a la temporada, `not: 'CANCELLED'` a la sincronització amb
+ * Google, i llistes positives locals (`BOOKING_STATUSES_ACTIVE`) al cuadrant.
+ * Totes deien el mateix, però res no ho garantia: una quarta ortografia podia
+ * amagar feina en una sola pantalla i enlloc més, que és exactament com el
+ * bolo del 22 d'agost va desaparèixer del calendari (#1163).
+ *
+ * Un bolo descartat no s'esborra de la vista: es marca. L'estat és un atribut,
+ * no un filtre.
+ *
+ * Equivalència amb els enums de Prisma (verificada): `LeadStatus` és
+ * NEW/CONTACTED/QUOTE_SENT/NEGOTIATING/WON/LOST, i `BookingStatus` és
+ * PENDING/CONFIRMED/PREPARING/COMPLETED/CANCELLED. Per tant «tots menys els
+ * inactius» és exactament la llista activa que abans s'enumerava a mà.
  */
-export const CALENDAR_LEAD_INACTIVE_STATUSES: readonly string[] = ['LOST'];
-export const CALENDAR_BOOKING_INACTIVE_STATUSES: readonly string[] = ['CANCELLED'];
-export const CALENDAR_BOLO_INACTIVE_LABELS: Record<string, string> = {
+/**
+ * `as const` a posta: així `[...BOLO_*_INACTIVE_STATUSES]` és una llista de
+ * literals que Prisma accepta com a `LeadStatus[]` / `BookingStatus[]` sense
+ * haver d'importar `@prisma/client` aquí (aquest fitxer evita arrossegar-lo).
+ * Per avaluar un estat concret hi ha els predicats de sota.
+ */
+export const BOLO_LEAD_INACTIVE_STATUSES = ['LOST'] as const;
+export const BOLO_BOOKING_INACTIVE_STATUSES = ['CANCELLED'] as const;
+export const BOLO_INACTIVE_LABELS: Record<string, string> = {
   LOST: 'Perdut',
   CANCELLED: 'Cancel·lat',
 };
+
+/** Un lead segueix sent feina viva? */
+export function isLeadBoloActive(status: string): boolean {
+  return !(BOLO_LEAD_INACTIVE_STATUSES as readonly string[]).includes(status);
+}
+
+/** Una reserva segueix sent feina viva? */
+export function isBookingBoloActive(status: string): boolean {
+  return !(BOLO_BOOKING_INACTIVE_STATUSES as readonly string[]).includes(status);
+}
 
 export const RECENT_FEED_BOOKING_STATUSES = ['CONFIRMED', 'PREPARING', 'COMPLETED'] as const;
 export const RECENT_FEED_ANONYMOUS_NAMES: Record<string, readonly string[]> = {

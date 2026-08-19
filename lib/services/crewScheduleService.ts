@@ -15,6 +15,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { BOLO_LEAD_INACTIVE_STATUSES, BOLO_BOOKING_INACTIVE_STATUSES } from '@/lib/constants';
 import type { BookingServiceLineKind } from '@prisma/client';
 
 export const OWNER_KEY = 'OWNER';
@@ -380,21 +381,18 @@ export function buildPayoutSummary(
 
 // ─── Loaders (async) ───────────────────────────────────────────────────────────
 
-const LEAD_STATUSES_ACTIVE = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'] as const;
-const BOOKING_STATUSES_ACTIVE = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED'] as const;
-
 /** Carrega totes les línies (lead + booking) amb event dins [from, to]. */
 async function loadCrewLines(from: Date, to: Date): Promise<{ lines: CrewLineInput[]; names: Map<string, string> }> {
   const [leads, bookings] = await Promise.all([
     prisma.lead.findMany({
-      where: { status: { in: [...LEAD_STATUSES_ACTIVE] }, eventDate: { gte: from, lte: to } },
+      where: { status: { notIn: [...BOLO_LEAD_INACTIVE_STATUSES] }, eventDate: { gte: from, lte: to } },
       select: {
         id: true, name: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true,
         serviceLines: { select: { id: true, collaboratorId: true, kind: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true } },
       },
     }),
     prisma.booking.findMany({
-      where: { status: { in: [...BOOKING_STATUSES_ACTIVE] }, eventDate: { gte: from, lte: to } },
+      where: { status: { notIn: [...BOLO_BOOKING_INACTIVE_STATUSES] }, eventDate: { gte: from, lte: to } },
       select: {
         id: true, reference: true, clientName: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true,
         serviceLines: { select: { id: true, collaboratorId: true, kind: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true } },

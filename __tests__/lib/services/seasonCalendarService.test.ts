@@ -229,7 +229,9 @@ describe('buildSeasonCalendar', () => {
     const entries = result.weekends.flatMap((w) => w.entries);
     const won = entries.find((e) => e.id === 'l1');
     const plain = entries.find((e) => e.id === 'l2');
-    expect(won?.booking).toEqual({ id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', depositPaid: true, remainingPaid: false });
+    // `distanceKm` forma part de l'enllaç des que el transport té cervell propi:
+    // el builder pur el propaga tal qual i l'expectativa s'hi ha d'ajustar.
+    expect(won?.booking).toEqual({ id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', depositPaid: true, remainingPaid: false, distanceKm: 40 });
     expect(plain?.booking).toBeNull();
   });
 

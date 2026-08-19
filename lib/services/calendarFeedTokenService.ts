@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
+import { BOLO_BOOKING_INACTIVE_STATUSES } from '@/lib/constants';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 const SETTING_KEY = 'integrations.calendar.feedToken';
@@ -58,7 +59,7 @@ export async function buildCalendarFeedIcs(): Promise<string> {
   const bookings = await prisma.booking.findMany({
     where: {
       eventDate: { gte: now, lte: end },
-      status: { not: 'CANCELLED' },
+      status: { notIn: [...BOLO_BOOKING_INACTIVE_STATUSES] },
     },
     orderBy: { eventDate: 'asc' },
     select: {

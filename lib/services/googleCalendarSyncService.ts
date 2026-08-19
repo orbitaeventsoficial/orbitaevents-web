@@ -1,6 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { formatCurrency } from '@/lib/constants';
+import {
+  formatCurrency,
+  BOLO_LEAD_INACTIVE_STATUSES,
+  BOLO_BOOKING_INACTIVE_STATUSES,
+} from '@/lib/constants';
 import {
   GOOGLE_CALENDAR_BOOKING_REMINDERS,
   GOOGLE_CALENDAR_BOOKING_REMINDER_SUMMARY,
@@ -378,7 +382,7 @@ export async function reconcileGoogleCalendar(): Promise<GoogleCalendarReconcile
       select: { key: true, value: true },
     }),
     prisma.booking.findMany({
-      where: { status: { not: 'CANCELLED' } },
+      where: { status: { notIn: [...BOLO_BOOKING_INACTIVE_STATUSES] } },
       select: {
         id: true,
         reference: true,
@@ -399,7 +403,7 @@ export async function reconcileGoogleCalendar(): Promise<GoogleCalendarReconcile
       },
     }),
     prisma.lead.findMany({
-      where: { eventDate: { not: null }, status: { not: 'LOST' }, booking: null },
+      where: { eventDate: { not: null }, status: { notIn: [...BOLO_LEAD_INACTIVE_STATUSES] }, booking: null },
       select: {
         id: true,
         name: true,

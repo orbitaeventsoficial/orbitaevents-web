@@ -1,3 +1,27 @@
+## 2026-08-19 — Una sola regla per a «quins bolos compten» (Canvi #1164, claude)
+
+### Context
+El propietari demana seguir aplanant les capes i la teranyina de rutes, i que **la visual quedi igual**. Aquesta passada no toca cap píxel: va a buscar quantes vegades més estava escrit a mà el filtre que va fer desaparèixer el bolo del 22 (#1163).
+
+### Què s'ha fet
+- 8 serveis consulten `Lead` i `Booking` per finestra de dates. La regla «tots menys els descartats» hi estava escrita de **quatre maneres diferents**, una d'elles amagada dins d'un servei com a llista positiva local.
+- Verificat contra els enums de Prisma que les quatre deien exactament el mateix, i unificades a `lib/constants/index.ts` com a font única, amb predicats per avaluar i llistes `as const` per consultar.
+- Migrats: calendari del mes, temporada, cuadrant, sincronització Google, feed públic i salut.
+- `invoiceService` **no** s'ha tocat: el seu `CANCELLED` és d'`InvoiceStatus`, una altra regla que només comparteix el nom. Confondre-les hauria estat un error silenciós.
+- Test obsolet de temporada corregit (`distanceKm` a l'enllaç de reserva). Era vermell abans d'aquesta passada.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: 55/55 tests dels tres serveis de bolos.
+- Validació humana/UX: cap superfície nova a validar — cap component ni cap classe tocada, i cap consulta retorna un conjunt diferent del que retornava.
+
+### Coordinació
+Counter -> 1164. Queda sobre la taula una decisió de negoci, no tècnica: la temporada ensenya els leads perduts però amaga les reserves cancel·lades, i avui un lead perdut amb pressupost **suma** a `totalValue`. Decidir si la feina descartada compta cap als diners de la temporada és del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-08-19 — Calendari: aplanar les capes perquè cap bolo desaparegui (Canvi #1163, claude)
 
 ### Context
