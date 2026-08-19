@@ -1513,6 +1513,26 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1166 — 2026-08-19 — claude (TANCAT)
+
+**Talls silenciosos: un número fals i un historial sense sortida.**
+
+- Context: continuació de #1163–#1165. Un cop tancats els filtres per estat i els commutadors, quedava la tercera manera d'amagar: **tallar la llista**. Escombrada de tots els `slice(0, N)` i `take: N` de l'admin buscant els que amaguen sense dir-ho.
+- La majoria estaven bé: el catàleg avisa amb `+N` als tres llocs, i els talls d'`ActivityClient` són resums «top 3», no registres amagats.
+- **Troballa 1 — `/admin/mensajes`, un número fals.** El taulell «Total converses» mostrava `recentLeads.length`, i aquesta llista està capada a `take: 20`. Amb 38 converses reals a la base, el taulell deia **20 i l'anomenava total**. No és amagar: és afirmar una xifra incorrecta. Ara es consulta el total de debò (`prisma.lead.count`) i la llista diu quantes n'ensenya de quantes, amb enllaç a Leads per veure-les totes.
+- **Troballa 2 — fitxa de reserva, historial sense sortida.** «Historial de canvis» deia el total correcte a la capçalera, en pintava 8 i avisava honestament que la resta quedava amagada — però **no hi havia cap manera d'arribar-hi**. Les dades ja eren al servidor; simplement no es renderitzaven. Verificat sobre una reserva real de 30 moviments: abans el HTML en contenia 8, ara els 30.
+- Resolt amb `<details>` natiu perquè és un server component (sense estat de client) i reaprofitant la classe `bd__history-more`, de manera que la línia es veu igual. L'única addició CSS és `cursor: pointer` al `summary`.
+- El marcatge d'una entrada s'ha extret a `BookingTimelineEntries` en comptes de duplicar-lo per a les recents i les antigues.
+- `ADMIN_CHANGE_COUNTER` puja a `1166`; el següent canvi real ha de ser `#1167`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: verificat en viu contra la base real — `/admin/mensajes` passa de dir 20 a dir 38, i la reserva de 30 moviments renderitza els 30.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1165 — 2026-08-19 — claude (TANCAT)
 
 **«S'ha de veure tot» — decisió del propietari. La Temporada deixa d'amagar.**

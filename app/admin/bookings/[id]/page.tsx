@@ -74,6 +74,33 @@ function describeBookingTimelineEntry(entry: CanonicalTimelineEvent): string {
   return [flow, channel, reference ? `Ref. ${reference}` : ''].filter(Boolean).join(' · ');
 }
 
+/** Una entrada de l'historial. Una sola forma per a les recents i les antigues. */
+function BookingTimelineEntries({ entries }: { entries: CanonicalTimelineEvent[] }) {
+  return (
+    <div className="bd__entries">
+      {entries.map((entry) => {
+        const description = describeBookingTimelineEntry(entry);
+        return (
+          <article key={entry.id} className="bd__entry">
+            <div className="bd__entry-inner">
+              <div className="bd__entry-main">
+                <p className="bd__entry-eyebrow"><span>{getBookingTimelineSourceLabel(entry.source)}</span><span>·</span><span>{getBookingTimelineKindLabel(entry.kind)}</span></p>
+                <p className="bd__entry-title">{entry.title}</p>
+                {description && <p className="bd__entry-body">{description}</p>}
+                {entry.link && <Link href={entry.link.href} className="bd__entry-link">{entry.link.label}</Link>}
+              </div>
+              <div className="bd__entry-ts">
+                <p>{formatDateTimeFull(new Date(entry.occurredAt))}</p>
+                {entry.actor && <p className="bd__entry-actor">{entry.actor}</p>}
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
 async function getBooking(id: string) {
   try {
     const booking = await prisma.booking.findUnique({
@@ -660,29 +687,18 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <h2 className="bd__pnl-title">Historial de canvis</h2>
               <span className="bd__pnl-count">{bookingTimeline.length} entrades</span>
             </div>
-            <div className="bd__entries">
-              {bookingTimeline.slice(0, 8).map((entry) => {
-                const description = describeBookingTimelineEntry(entry);
-                return (
-                  <article key={entry.id} className="bd__entry">
-                    <div className="bd__entry-inner">
-                      <div className="bd__entry-main">
-                        <p className="bd__entry-eyebrow"><span>{getBookingTimelineSourceLabel(entry.source)}</span><span>·</span><span>{getBookingTimelineKindLabel(entry.kind)}</span></p>
-                        <p className="bd__entry-title">{entry.title}</p>
-                        {description && <p className="bd__entry-body">{description}</p>}
-                        {entry.link && <Link href={entry.link.href} className="bd__entry-link">{entry.link.label}</Link>}
-                      </div>
-                      <div className="bd__entry-ts">
-                        <p>{formatDateTimeFull(new Date(entry.occurredAt))}</p>
-                        {entry.actor && <p className="bd__entry-actor">{entry.actor}</p>}
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+            <BookingTimelineEntries entries={bookingTimeline.slice(0, 8)} />
+            {/* Abans això només avisava que hi havia moviments amagats i prou:
+                les dades ja eren aquí, però no hi havia manera d'arribar-hi.
+                `details` natiu — sense estat de client, que això és un server
+                component — i la mateixa classe, perquè es vegi igual. */}
             {bookingTimeline.length > 8 && (
-              <p className="bd__history-more">Mostrant les 8 últimes entrades. {bookingTimeline.length - 8} moviments antics amagats.</p>
+              <details>
+                <summary className="bd__history-more">
+                  Mostrant les 8 últimes entrades · veure els {bookingTimeline.length - 8} moviments antics
+                </summary>
+                <BookingTimelineEntries entries={bookingTimeline.slice(8)} />
+              </details>
             )}
           </section>
         )}

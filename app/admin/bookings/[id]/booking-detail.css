@@ -1726,6 +1726,12 @@ html.admin-mode .bd__history-more {
   font-weight: var(--o-fw-bold);
 }
 
+/* Quan la línia és el desplegable dels moviments antics: mateixa aparença,
+   només ha de dir amb el cursor que s'hi pot clicar. */
+html.admin-mode summary.bd__history-more {
+  cursor: pointer;
+}
+
 html.admin-mode .bd__fieldnotes {
   display: grid;
   grid-template-columns: minmax(170px, 0.35fr) minmax(260px, 1fr) auto;

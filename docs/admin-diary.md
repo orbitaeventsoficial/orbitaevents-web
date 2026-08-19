@@ -1,3 +1,27 @@
+## 2026-08-19 — Talls silenciosos: un número fals i un historial sense sortida (Canvi #1166, claude)
+
+### Context
+Tancats els filtres per estat (#1163, #1164) i els commutadors (#1165), quedava la tercera manera d'amagar: **tallar la llista**. Escombrada de tots els `slice(0, N)` i `take: N` de l'admin per trobar els que amaguen sense dir-ho.
+
+### Què s'ha fet
+- La majoria estaven bé: el catàleg avisa amb `+N` als tres llocs i els talls d'`ActivityClient` són resums «top 3», no registres amagats.
+- **`/admin/mensajes` afirmava una xifra falsa.** El taulell «Total converses» ensenyava la llargada d'una llista capada a 20. Amb 38 converses reals, deia **20 i l'anomenava total**. Ara consulta el total de debò i la llista diu quantes n'ensenya de quantes.
+- **La fitxa de reserva tenia un historial sense sortida.** Deia el total correcte, en pintava 8 i avisava honestament que amagava la resta — però no hi havia cap manera d'arribar-hi. Les dades ja eren al servidor, simplement no es renderitzaven.
+- Resolt amb `<details>` natiu (és un server component, no hi ha estat de client) reaprofitant la classe existent. L'única CSS afegida és `cursor: pointer`.
+- El marcatge de l'entrada s'ha extret a `BookingTimelineEntries` en comptes de duplicar-lo.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: verificat en viu contra la base real. `/admin/mensajes` passa de dir 20 a dir 38. Una reserva de 30 moviments: abans el HTML en contenia 8, ara els 30.
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1166. Tres maneres d'amagar tancades: **per estat** (#1163, #1164), **per commutador** (#1165) i **per tall** (#1166). Nota: `validate:core` mata el `next dev` viu perquè comparteixen `.next` — cal aixecar-lo després.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-08-19 — «S'ha de veure tot»: la Temporada deixa d'amagar (Canvi #1165, claude)
 
 ### Context

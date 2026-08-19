@@ -18,7 +18,7 @@ export const metadata = {
 async function getMessagesData() {
   try {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const [recentLeads, pendingLeads, todayLeads, stalePendingLeads] = await Promise.all([
+    const [recentLeads, pendingLeads, todayLeads, totalConverses, stalePendingLeads] = await Promise.all([
       prisma.lead.findMany({
         where: {
           message: { not: null },
@@ -42,6 +42,11 @@ async function getMessagesData() {
           },
         },
       }),
+      // El total real de converses. La llista de sota va capada a 20, i sense
+      // aquest recompte el taulell ensenyava el 20 com si fos el total.
+      prisma.lead.count({
+        where: { message: { not: null } },
+      }),
       prisma.lead.count({
         where: {
           status: 'NEW',
@@ -54,6 +59,7 @@ async function getMessagesData() {
       recentLeads,
       pendingLeads,
       todayLeads,
+      totalConverses,
       stalePendingLeads,
     };
   } catch (error) {
@@ -62,6 +68,7 @@ async function getMessagesData() {
       recentLeads: [],
       pendingLeads: 0,
       todayLeads: 0,
+      totalConverses: 0,
       stalePendingLeads: 0,
     };
   }
@@ -89,7 +96,7 @@ export default async function MensajesPage() {
   const systemItems = [
     `Pendents (NEW): ${data.pendingLeads}`,
     `Rebudes avui: ${data.todayLeads}`,
-    `Amb missatge (últimes 20): ${data.recentLeads.length}`,
+    `Amb missatge: ${data.totalConverses} en total · ${data.recentLeads.length} a la llista`,
   ];
   const manualItems: string[] = [];
   if (data.stalePendingLeads > 0)
@@ -167,7 +174,7 @@ export default async function MensajesPage() {
         </div>
         <div className="ap-kpi">
           <p className="ap-kpi-label">Total converses</p>
-          <p className="ap-kpi-value">{data.recentLeads.length}</p>
+          <p className="ap-kpi-value">{data.totalConverses}</p>
         </div>
       </section>
 
@@ -229,6 +236,12 @@ export default async function MensajesPage() {
       <section className="ap-card overflow-hidden rounded-2xl p-0">
         <div className="border-b p-4">
           <h3 className="font-semibold">📬 Missatges recents</h3>
+          {data.totalConverses > data.recentLeads.length && (
+            <p className="mt-1 text-xs admin-tone-text-neutral">
+              Els {data.recentLeads.length} més recents de {data.totalConverses}.{' '}
+              <Link href="/admin/leads" className="hover:underline">Veure&apos;ls tots a Leads →</Link>
+            </p>
+          )}
         </div>
         <div className="divide-y admin-tone-border-subtle">
           {data.recentLeads.map((lead) => {
