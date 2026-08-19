@@ -2,7 +2,38 @@ import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import { loadPendingFollowUps } from '@/lib/services/responseTrackingService';
 
+/**
+ * Un bolo, sigui quin sigui el seu origen.
+ *
+ * El calendari no ha de saber si una cosa viu a `Lead` o a `Booking`: aquesta
+ * divisio es interna del model i abans feia desapareixer feina de la vista.
+ * Aqui s'aplana a una sola forma i una sola llista per dia (`bolos`), i l'estat
+ * passa a ser un atribut (`active`) en comptes d'un filtre silencios.
+ */
+export type CalendarBolo = {
+  id: string;
+  kind: 'LEAD' | 'BOOKING';
+  leadId: string | null;
+  bookingId: string | null;
+  customerId: string | null;
+  eventDate: string;
+  title: string;
+  eventType: string | null;
+  location: string | null;
+  eventStartTime: string | null;
+  eventEndTime: string | null;
+  status: string;
+  active: boolean;
+  total: number | null;
+  packName: string | null;
+};
+
+/** Estats que no son feina viva pero que segueixen ocupant el seu dia. */
+const LEAD_INACTIVE_STATUSES = ['LOST'];
+const BOOKING_INACTIVE_STATUSES = ['CANCELLED'];
+
 type CalendarDay = {
+  bolos: CalendarBolo[];
   leads: {
     id: string;
     customerId: string | null;
@@ -10,6 +41,7 @@ type CalendarDay = {
     eventDate: string;
     eventType: string | null;
     status: string | null;
+    active: boolean;
     eventStartTime: string | null;
     eventEndTime: string | null;
     eventLocation: string | null;
@@ -22,6 +54,7 @@ type CalendarDay = {
     clientName: string | null;
     ubicacion: string | null;
     estado: string | null;
+    active: boolean;
     eventType: string | null;
     total: number | null;
     eventStartTime: string | null;
@@ -77,9 +110,9 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
           gte: fromDate,
           lte: toDate,
         },
-        status: {
-          notIn: ['LOST'],
-        },
+        // Sense filtre d'estat: un lead perdut segueix sent un bolo apuntat
+        // aquell dia i ha de ser visible. `booking: null` no es un filtre
+        // d'estat sino deduplicacio: si ja s'ha convertit, mana el booking.
         booking: null,
       },
       select: {
@@ -103,9 +136,7 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
           gte: fromDate,
           lte: toDate,
         },
-        status: {
-          notIn: ['CANCELLED'],
-        },
+        // Sense filtre d'estat: una reserva cancel·lada tambe s'ha de veure.
       },
       select: {
         id: true,
@@ -197,7 +228,7 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
   const currentDate = new Date(fromDate);
   while (currentDate <= toDate) {
     const key = currentDate.toISOString().slice(0, 10);
-    days[key] = { leads: [], reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
+    days[key] = { bolos: [], leads: [], reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
@@ -206,6 +237,8 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
     const key = lead.eventDate.toISOString().slice(0, 10);
     if (!days[key]) continue;
 
+    const active = !LEAD_INACTIVE_STATUSES.includes(lead.status);
+
     days[key].leads.push({
       id: lead.id,
       customerId: lead.customerId ?? null,
@@ -213,9 +246,28 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
       eventDate: lead.eventDate.toISOString(),
       eventType: lead.eventType,
       status: lead.status,
+      active,
       eventStartTime: lead.eventStartTime,
       eventEndTime: lead.eventEndTime,
       eventLocation: lead.eventLocation,
+    });
+
+    days[key].bolos.push({
+      id: `lead:${lead.id}`,
+      kind: 'LEAD',
+      leadId: lead.id,
+      bookingId: null,
+      customerId: lead.customerId ?? null,
+      eventDate: lead.eventDate.toISOString(),
+      title: lead.name,
+      eventType: lead.eventType,
+      location: lead.eventLocation,
+      eventStartTime: lead.eventStartTime,
+      eventEndTime: lead.eventEndTime,
+      status: lead.status,
+      active,
+      total: null,
+      packName: null,
     });
   }
 
@@ -223,24 +275,47 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
     const key = booking.eventDate.toISOString().slice(0, 10);
     if (!days[key]) continue;
 
+    const active = !BOOKING_INACTIVE_STATUSES.includes(booking.status);
+    const ubicacion = booking.eventVenue || booking.eventLocation;
+    const packName =
+      booking.pack?.translations.find((translation) => translation.locale === 'ca')?.name ||
+      booking.pack?.translations.find((translation) => translation.locale === 'es')?.name ||
+      booking.pack?.translations.find((translation) => translation.locale === 'en')?.name ||
+      booking.pack?.slug ||
+      null;
+
     days[key].reservas.push({
       id: booking.id,
       leadId: booking.leadId ?? null,
       customerId: booking.customerId ?? null,
       fechaEvento: booking.eventDate.toISOString(),
       clientName: booking.clientName,
-      ubicacion: booking.eventVenue || booking.eventLocation,
+      ubicacion,
       estado: booking.status,
+      active,
       eventType: booking.eventType,
       total: booking.total,
       eventStartTime: booking.eventStartTime,
       eventEndTime: booking.eventEndTime,
-      packName:
-        booking.pack?.translations.find((translation) => translation.locale === 'ca')?.name ||
-        booking.pack?.translations.find((translation) => translation.locale === 'es')?.name ||
-        booking.pack?.translations.find((translation) => translation.locale === 'en')?.name ||
-        booking.pack?.slug ||
-        null,
+      packName,
+    });
+
+    days[key].bolos.push({
+      id: `booking:${booking.id}`,
+      kind: 'BOOKING',
+      leadId: booking.leadId ?? null,
+      bookingId: booking.id,
+      customerId: booking.customerId ?? null,
+      eventDate: booking.eventDate.toISOString(),
+      title: booking.clientName,
+      eventType: booking.eventType,
+      location: ubicacion,
+      eventStartTime: booking.eventStartTime,
+      eventEndTime: booking.eventEndTime,
+      status: booking.status,
+      active,
+      total: booking.total,
+      packName,
     });
   }
 
@@ -302,5 +377,21 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
       });
     }
   }
+  // Ordre unic per a totes les vistes: primer la feina viva, despres la
+  // descartada; dins de cada grup, per hora d'inici i per nom.
+  for (const day of Object.values(days)) {
+    day.bolos.sort((a, b) => {
+      if (a.active !== b.active) return a.active ? -1 : 1;
+      const timeA = a.eventStartTime || '';
+      const timeB = b.eventStartTime || '';
+      if (timeA !== timeB) {
+        if (!timeA) return 1;
+        if (!timeB) return -1;
+        return timeA.localeCompare(timeB);
+      }
+      return a.title.localeCompare(b.title);
+    });
+  }
+
   return { status: 200, body: { days } };
 }

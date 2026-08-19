@@ -4,8 +4,37 @@
  */
 
 import { EVENT_TYPE_PLAIN, DEFAULT_LOCALE } from '@/lib/constants';
+import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+
+/**
+ * Un bolo aplanat, tal com el serveix el cervell del calendari.
+ *
+ * Les tres vistes pinten aquesta llista i prou: no han de saber si el bolo viu
+ * a `Lead` o a `Booking`, ni han de filtrar per estat. Un bolo descartat
+ * (lead perdut, reserva cancel·lada) arriba amb `active: false` i es pinta
+ * apagat, pero mai desapareix.
+ */
+export type CalendarApiBolo = {
+  id: string;
+  kind: 'LEAD' | 'BOOKING';
+  leadId?: string | null;
+  bookingId?: string | null;
+  customerId?: string | null;
+  eventDate: string;
+  title: string;
+  eventType?: string | null;
+  location?: string | null;
+  eventStartTime?: string | null;
+  eventEndTime?: string | null;
+  status: string;
+  active: boolean;
+  total?: number | null;
+  packName?: string | null;
+};
 
 export type CalendarApiDay = {
+  bolos?: CalendarApiBolo[];
   leads?: {
     id: string;
     customerId?: string | null;
@@ -13,6 +42,7 @@ export type CalendarApiDay = {
     eventDate: string;
     eventType?: string | null;
     status?: string | null;
+    active?: boolean;
     eventStartTime?: string | null;
     eventEndTime?: string | null;
     eventLocation?: string | null;
@@ -25,6 +55,7 @@ export type CalendarApiDay = {
     clientName?: string | null;
     ubicacion?: string | null;
     estado?: string | null;
+    active?: boolean;
     eventType?: string | null;
     eventStartTime?: string | null;
     eventEndTime?: string | null;
@@ -144,6 +175,56 @@ export function resolveTimeLabel(booking: CalendarApiDay['reservas'][number]): s
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+/** Etiquetes dels estats que deixen un bolo fora de la feina viva. */
+export const BOLO_INACTIVE_LABELS: Record<string, string> = {
+  LOST: 'Perdut',
+  CANCELLED: 'Cancel·lat',
+};
+
+/**
+ * Llista plana de bolos d'un dia. Cap vista ha de tornar a llegir `leads` i
+ * `reservas` per separat: aixo era el que feia que un bolo pogues caure entre
+ * dues llistes i no es veies.
+ */
+export function getDayBolos(day?: CalendarApiDay | null): CalendarApiBolo[] {
+  return day?.bolos ?? [];
+}
+
+export function resolveBoloServiceLabel(bolo: CalendarApiBolo): string {
+  const pack = bolo.packName?.trim();
+  if (pack) return pack;
+  const eventType = bolo.eventType?.trim();
+  if (eventType && CALENDAR_EVENT_LABELS[eventType]) return CALENDAR_EVENT_LABELS[eventType];
+  if (eventType) return eventType;
+  return bolo.kind === 'BOOKING' ? 'Servei' : 'Entrada';
+}
+
+export function resolveBoloTimeLabel(bolo: CalendarApiBolo): string {
+  const start = bolo.eventStartTime?.trim();
+  const end = bolo.eventEndTime?.trim();
+  if (start && end) return `${start} - ${end}`;
+  if (start) return start;
+  return new Date(bolo.eventDate).toLocaleTimeString(DEFAULT_LOCALE, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/** On porta un bolo en clicar-lo, sigui quin sigui el seu origen. */
+export function resolveBoloHref(bolo: CalendarApiBolo): string {
+  if (bolo.leadId) {
+    return buildLeadCustomerHref({ leadId: bolo.leadId, customerId: bolo.customerId ?? null });
+  }
+  if (bolo.bookingId) return buildBookingHref(bolo.bookingId);
+  return '/admin/calendario';
+}
+
+/** Etiqueta curta de l'estat, o cadena buida si el bolo es feina viva. */
+export function resolveBoloStateLabel(bolo: CalendarApiBolo): string {
+  if (bolo.active) return '';
+  return BOLO_INACTIVE_LABELS[bolo.status] || 'Descartat';
 }
 
 export function formatKey(date: Date): string {

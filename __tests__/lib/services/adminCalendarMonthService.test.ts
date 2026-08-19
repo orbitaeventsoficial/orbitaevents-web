@@ -108,6 +108,117 @@ describe('getAdminCalendarMonth', () => {
     expect(result.body.days!['2026-03-10'].reservas[0].packName).toBe('basic');
   });
 
+  it('no filtra cap estat: un lead LOST segueix sortint al seu dia', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([
+      {
+        id: 'l-lost',
+        customerId: null,
+        name: 'Isaac Salas García',
+        eventDate: new Date('2026-03-22T12:00:00Z'),
+        eventType: 'PARTY',
+        status: 'LOST',
+        eventStartTime: null,
+        eventEndTime: null,
+        eventLocation: null,
+      },
+    ]);
+
+    const result = await getAdminCalendarMonth('2026-03-01', '2026-03-31');
+
+    const where = mockPrisma.lead.findMany.mock.calls[0][0].where;
+    expect(where.status).toBeUndefined();
+
+    const day22 = result.body.days!['2026-03-22'];
+    expect(day22.leads).toHaveLength(1);
+    expect(day22.leads[0].active).toBe(false);
+    expect(day22.bolos).toHaveLength(1);
+    expect(day22.bolos[0].title).toBe('Isaac Salas García');
+    expect(day22.bolos[0].kind).toBe('LEAD');
+  });
+
+  it('no filtra cap estat: una reserva CANCELLED segueix sortint', async () => {
+    mockPrisma.booking.findMany.mockResolvedValue([
+      {
+        id: 'b-cancel',
+        leadId: null,
+        customerId: null,
+        eventDate: new Date('2026-03-18T12:00:00Z'),
+        clientName: 'Client cancel·lat',
+        eventLocation: 'Vic',
+        eventVenue: null,
+        status: 'CANCELLED',
+        eventType: 'OTHER',
+        total: 100,
+        eventStartTime: null,
+        eventEndTime: null,
+        pack: { slug: 'basic', translations: [] },
+      },
+    ]);
+
+    const result = await getAdminCalendarMonth('2026-03-01', '2026-03-31');
+
+    expect(mockPrisma.booking.findMany.mock.calls[0][0].where.status).toBeUndefined();
+
+    const day18 = result.body.days!['2026-03-18'];
+    expect(day18.reservas[0].active).toBe(false);
+    expect(day18.bolos[0].kind).toBe('BOOKING');
+    expect(day18.bolos[0].active).toBe(false);
+  });
+
+  it('aplana leads i reserves en una sola llista, la feina viva primer', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([
+      {
+        id: 'l-viu',
+        customerId: null,
+        name: 'Marta nogue',
+        eventDate: new Date('2026-03-22T12:00:00Z'),
+        eventType: 'PARTY',
+        status: 'NEW',
+        eventStartTime: '21:00',
+        eventEndTime: null,
+        eventLocation: null,
+      },
+      {
+        id: 'l-perdut',
+        customerId: null,
+        name: 'Isaac Salas García',
+        eventDate: new Date('2026-03-22T12:00:00Z'),
+        eventType: 'PARTY',
+        status: 'LOST',
+        eventStartTime: '18:00',
+        eventEndTime: null,
+        eventLocation: null,
+      },
+    ]);
+    mockPrisma.booking.findMany.mockResolvedValue([
+      {
+        id: 'b-viu',
+        leadId: null,
+        customerId: null,
+        eventDate: new Date('2026-03-22T12:00:00Z'),
+        clientName: 'Reserva ferma',
+        eventLocation: 'Vic',
+        eventVenue: null,
+        status: 'CONFIRMED',
+        eventType: 'WEDDING',
+        total: 900,
+        eventStartTime: '19:00',
+        eventEndTime: null,
+        pack: { slug: 'basic', translations: [] },
+      },
+    ]);
+
+    const bolos = (await getAdminCalendarMonth('2026-03-01', '2026-03-31')).body.days!['2026-03-22'].bolos;
+
+    expect(bolos.map((bolo) => bolo.title)).toEqual([
+      'Reserva ferma',
+      'Marta nogue',
+      'Isaac Salas García',
+    ]);
+    expect(bolos.map((bolo) => bolo.active)).toEqual([true, true, false]);
+    expect(bolos.map((bolo) => bolo.id)).toEqual(['booking:b-viu', 'lead:l-viu', 'lead:l-perdut']);
+  });
+
   it('propaga customerId als follow-ups del dia', async () => {
     const today = new Date();
     const todayKey = today.toISOString().slice(0, 10);

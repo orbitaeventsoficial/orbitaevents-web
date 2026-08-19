@@ -1,10 +1,10 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/utils/errors';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
-import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
@@ -13,7 +13,7 @@ import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse, MonthYear, CalendarCell } from './calendar-utils';
-import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, formatKey, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
+import { weekdayLabels, formatKey, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel, getDayBolos, resolveBoloHref, resolveBoloServiceLabel, resolveBoloTimeLabel, resolveBoloStateLabel } from './calendar-utils';
 
 type OwnerTone = 'info' | 'warning' | 'success';
 type OwnerStripConfig = {
@@ -64,11 +64,6 @@ export default function CalendarMonthClient() {
   const [blockingDate, setBlockingDate] = useState(false);
   const [blockNote, setBlockNote] = useState('');
   const [showBlockForm, setShowBlockForm] = useState(false);
-  const [visibleLayers, setVisibleLayers] = useState({ leads: true, bookings: true, blocks: true, tasks: true, social: true, followUps: true });
-
-  const toggleLayer = useCallback((layer: 'leads' | 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps') => {
-    setVisibleLayers((prev) => ({ ...prev, [layer]: !prev[layer] }));
-  }, []);
 
   const blockDay = useCallback(async (dateKey: string, note?: string) => {
     setBlockingDate(true);
@@ -85,7 +80,7 @@ export default function CalendarMonthClient() {
       setBlockNote('');
     } catch (err) {
       console.error('Error bloquejant dia del calendari', err);
-      toast.error(err instanceof Error ? err.message : 'Error bloquejant dia');
+      toast.error(getErrorMessage(err, 'Error bloquejant dia'));
     } finally {
       setBlockingDate(false);
     }
@@ -101,7 +96,7 @@ export default function CalendarMonthClient() {
       setRefreshKey((k) => k + 1);
     } catch (err) {
       console.error('Error desbloquejant dia del calendari', err);
-      toast.error(err instanceof Error ? err.message : 'Error desbloquejant dia');
+      toast.error(getErrorMessage(err, 'Error desbloquejant dia'));
     }
   }, [toast]);
 
@@ -120,7 +115,7 @@ export default function CalendarMonthClient() {
       setRefreshKey((k) => k + 1);
     } catch (err) {
       console.error('Error movent reserva al calendari', err);
-      toast.error(err instanceof Error ? err.message : 'Error movent reserva');
+      toast.error(getErrorMessage(err, 'Error movent reserva'));
     }
   }, [toast]);
 
@@ -180,7 +175,7 @@ export default function CalendarMonthClient() {
         }
       } catch (e) {
         if (!cancelled) {
-          const errorMessage = e instanceof Error ? e.message : 'Error carregant el calendari';
+          const errorMessage = getErrorMessage(e, 'Error carregant el calendari');
           setError(errorMessage);
         }
       } finally {
@@ -211,12 +206,18 @@ export default function CalendarMonthClient() {
     };
   }, [selectedDateKey, cells, data]);
 
+  const selectedDayBolos = useMemo(
+    () => getDayBolos(selectedDayData.payload),
+    [selectedDayData.payload]
+  );
+
   // Stats del mes visible
   const stats = useMemo(() => {
     if (!cells.length) {
       return {
         totalReservas: 0,
         totalLeads: 0,
+        totalDescartats: 0,
         totalBloqueos: 0,
         freeDays: 0,
         reservaDays: 0,
@@ -230,6 +231,7 @@ export default function CalendarMonthClient() {
 
     let totalReservas = 0;
     let totalLeads = 0;
+    let totalDescartats = 0;
     let totalBloqueos = 0;
     let freeDays = 0;
     let reservaDays = 0;
@@ -251,13 +253,16 @@ export default function CalendarMonthClient() {
           followUps: [],
         } as CalendarApiDay);
 
-      const hasReservas = dayData.reservas.length > 0;
-      const leadsCount = dayData.leads?.length ?? 0;
+      const bolos = getDayBolos(dayData);
+      // L'ocupacio del dia la marca la feina viva: un bolo descartat es veu,
+      // pero no pinta el dia com a reservat.
+      const hasReservas = bolos.some((bolo) => bolo.active && bolo.kind === 'BOOKING');
       const hasBloqueos = dayData.bloqueos.length > 0;
       const hasWork = dayData.tasks.length > 0 || dayData.socialPosts.length > 0;
 
-      totalReservas += dayData.reservas.length;
-      totalLeads += leadsCount;
+      totalReservas += bolos.filter((bolo) => bolo.active && bolo.kind === 'BOOKING').length;
+      totalLeads += bolos.filter((bolo) => bolo.active && bolo.kind === 'LEAD').length;
+      totalDescartats += bolos.filter((bolo) => !bolo.active).length;
       totalBloqueos += dayData.bloqueos.length;
       totalTasks += dayData.tasks.length;
       totalSocialPosts += dayData.socialPosts.length;
@@ -277,6 +282,7 @@ export default function CalendarMonthClient() {
     return {
       totalReservas,
       totalLeads,
+      totalDescartats,
       totalBloqueos,
       freeDays,
       reservaDays,
@@ -289,9 +295,6 @@ export default function CalendarMonthClient() {
   }, [cells, data]);
 
   const strip = useMemo<OwnerStripConfig>(() => {
-    const hiddenLayers = Object.entries(visibleLayers)
-      .filter(([, visible]) => !visible)
-      .map(([layer]) => layer);
     const selectedPayload = selectedDayData.payload;
     const selectedHasItems = selectedPayload
       ? (selectedPayload.leads?.length ?? 0) +
@@ -313,8 +316,8 @@ export default function CalendarMonthClient() {
     if (stats.mixedDays > 0) {
       manualItems.push(`${stats.mixedDays} ${stats.mixedDays === 1 ? 'dia mixt' : 'dies mixtes'} amb reserva i bloqueig`);
     }
-    if (hiddenLayers.length > 0) {
-      manualItems.push(`${hiddenLayers.length} ${hiddenLayers.length === 1 ? 'capa amagada' : 'capes amagades'} a la lectura actual`);
+    if (stats.totalDescartats > 0) {
+      manualItems.push(`${stats.totalDescartats} ${stats.totalDescartats === 1 ? 'bolo descartat' : 'bolos descartats'} al rang visible`);
     }
     if (selectedDayData.key && selectedHasItems > 0) {
       manualItems.push(`${selectedHasItems} elements oberts al detall del ${formatDateShort(selectedDayData.key)}`);
@@ -384,7 +387,6 @@ export default function CalendarMonthClient() {
     selectedDayData.payload,
     showBlockForm,
     stats,
-    visibleLayers,
   ]);
 
   return (
@@ -467,26 +469,6 @@ export default function CalendarMonthClient() {
       </div>
 
 
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
-        <span className="font-semibold opacity-60">Capes:</span>
-        {[
-          ['bookings', 'Reserves'],
-          ['leads', 'Entrades'],
-          ['blocks', 'Bloquejos'],
-          ['tasks', 'Tasques'],
-          ['social', 'Social'],
-          ['followUps', 'Follow-ups'],
-        ].map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => toggleLayer(key as 'leads' | 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps')}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
       {/* Stats ràpids del mes visible */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-6" {...helpAttrs(ADMIN_CALENDAR_HELP.stats)}>
         <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
@@ -600,9 +582,8 @@ export default function CalendarMonthClient() {
             data?.days?.[cell.key] ??
             ({ leads: [], reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] } as CalendarApiDay);
 
-          const hasReservas = dayData.reservas.length > 0;
-          const dayLeads = dayData.leads ?? [];
-          const hasLeads = dayLeads.length > 0;
+          const dayBolos = getDayBolos(dayData);
+          const hasReservas = dayBolos.some((bolo) => bolo.active && bolo.kind === 'BOOKING');
           const hasBloqueos = dayData.bloqueos.length > 0;
 
           const tone = getCalendarTone(hasReservas, hasBloqueos);
@@ -652,72 +633,58 @@ export default function CalendarMonthClient() {
                 </span>
               </div>
               <div className="mt-1 flex-1 min-h-0 min-w-0 overflow-hidden">
-                {visibleLayers.bookings && hasReservas && (
+                {dayBolos.length > 0 && (
                   <div className="space-y-0.5 text-xs sm:text-xs overflow-hidden">
-                    {dayData.reservas.slice(0, 2).map((r) => (
-                      <div
-                        key={r.id}
-                        draggable
-                        onDragStart={(e) => {
-                          e.stopPropagation();
-                          e.dataTransfer.setData('text/plain', r.id);
-                          e.dataTransfer.effectAllowed = 'move';
-                          setDraggingBookingId(r.id);
-                        }}
-                        onDragEnd={() => {
-                          setDraggingBookingId(null);
-                          setDragOverDateKey(null);
-                        }}
-                        className="cursor-grab rounded-md px-1 py-0.5 admin-tone-soft-success admin-tone-text-success active:cursor-grabbing">
-                        <div className="truncate font-semibold">
-                          {r.leadId ? (
+                    {dayBolos.slice(0, 3).map((bolo) => {
+                      const stateLabel = resolveBoloStateLabel(bolo);
+                      const isBooking = bolo.kind === 'BOOKING';
+                      return (
+                        <div
+                          key={bolo.id}
+                          draggable={isBooking && bolo.active}
+                          onDragStart={(e) => {
+                            if (!isBooking || !bolo.active || !bolo.bookingId) return;
+                            e.stopPropagation();
+                            e.dataTransfer.setData('text/plain', bolo.bookingId);
+                            e.dataTransfer.effectAllowed = 'move';
+                            setDraggingBookingId(bolo.bookingId);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingBookingId(null);
+                            setDragOverDateKey(null);
+                          }}
+                          className={[
+                            'rounded-md px-1 py-0.5',
+                            isBooking
+                              ? 'admin-tone-soft-success admin-tone-text-success'
+                              : 'admin-tone-soft-info admin-tone-text-info',
+                            bolo.active ? '' : 'opacity-55 line-through',
+                            isBooking && bolo.active ? 'cursor-grab active:cursor-grabbing' : '',
+                          ].join(' ')}
+                        >
+                          <div className="truncate font-semibold">
                             <Link
-                              href={buildLeadCustomerHref({
-                                leadId: r.leadId,
-                                customerId: r.customerId,
-                              })}
+                              href={resolveBoloHref(bolo)}
                               onClick={(event) => event.stopPropagation()}
                               className="hover:underline"
                             >
-                              {r.clientName || 'Client'}
+                              {bolo.title || 'Client'}
                             </Link>
-                          ) : (
-                            r.clientName || 'Client'
-                          )}
+                          </div>
+                          <div className="truncate">
+                            {resolveBoloTimeLabel(bolo)} · {resolveBoloServiceLabel(bolo)}
+                            {stateLabel ? ` · ${stateLabel}` : ''}
+                          </div>
                         </div>
-                        <div className="truncate">
-                          {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
-                        </div>
-                      </div>
-                    ))}
-                    {dayData.reservas.length > 2 && (
-                      <div className="">+{dayData.reservas.length - 2} més</div>
+                      );
+                    })}
+                    {dayBolos.length > 3 && (
+                      <div>+{dayBolos.length - 3} més</div>
                     )}
                   </div>
                 )}
 
-                {visibleLayers.leads && hasLeads && (
-                  <div className="mt-0.5 space-y-0.5 text-xs sm:text-xs overflow-hidden">
-                    {dayLeads.slice(0, 2).map((leadItem) => (
-                      <Link
-                        key={leadItem.id}
-                        href={buildLeadCustomerHref({
-                          leadId: leadItem.id,
-                          customerId: leadItem.customerId,
-                        })}
-                        onClick={(event) => event.stopPropagation()}
-                        className="block truncate rounded-md px-1 py-0.5 admin-tone-soft-info admin-tone-text-info hover:underline"
-                      >
-                        Entrada · {leadItem.name}
-                      </Link>
-                    ))}
-                    {dayLeads.length > 2 && (
-                      <div>+{dayLeads.length - 2} entrades</div>
-                    )}
-                  </div>
-                )}
-
-                {visibleLayers.blocks && hasBloqueos && (
+                {hasBloqueos && (
                   <div className="line-clamp-1 text-xs sm:text-xs mt-0.5 admin-tone-text-danger/80">
                     {dayData.bloqueos[0].motivo || 'Bloquejat'}
                     {dayData.bloqueos.length > 1
@@ -726,19 +693,19 @@ export default function CalendarMonthClient() {
                   </div>
                 )}
 
-                {visibleLayers.tasks && dayData.tasks.length > 0 && (
+                {dayData.tasks.length > 0 && (
                   <div className="mt-0.5 truncate rounded-md px-1 py-0.5 text-xs sm:text-xs admin-tone-soft-info admin-tone-text-info">
                     ✓ {dayData.tasks[0].title}{dayData.tasks.length > 1 ? ` +${dayData.tasks.length - 1}` : ''}
                   </div>
                 )}
 
-                {visibleLayers.social && dayData.socialPosts.length > 0 && (
+                {dayData.socialPosts.length > 0 && (
                   <div className="mt-0.5 truncate rounded-md px-1 py-0.5 text-xs sm:text-xs admin-tone-soft-warning admin-tone-text-warning">
                     📣 {dayData.socialPosts[0].title}{dayData.socialPosts.length > 1 ? ` +${dayData.socialPosts.length - 1}` : ''}
                   </div>
                 )}
 
-                {visibleLayers.followUps && dayData.followUps.length > 0 && (
+                {dayData.followUps.length > 0 && (
                   <div className="mt-0.5 truncate rounded-md border admin-tone-border-danger admin-tone-bg-danger px-1 py-0.5 text-xs sm:text-xs admin-tone-text-danger">
                     ☎ {dayData.followUps[0].name}{dayData.followUps.length > 1 ? ` +${dayData.followUps.length - 1}` : ''}
                   </div>
@@ -834,144 +801,107 @@ export default function CalendarMonthClient() {
           )}
 
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
-            {visibleLayers.leads && (
-              <div className="flex flex-col">
-                <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
-                  <span className="h-2 w-2 rounded-full" />
-                  Entrades ({selectedDayData.payload?.leads?.length || 0})
-                </h3>
-                <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
-                  {selectedDayData.payload?.leads?.length ? (
-                    selectedDayData.payload.leads.map((leadItem) => (
-                      <Link
-                        key={leadItem.id}
-                        href={buildLeadCustomerHref({
-                          leadId: leadItem.id,
-                          customerId: leadItem.customerId,
-                        })}
-                        className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass"
+            {/* Una sola llista: entrades i reserves, vives i descartades. */}
+            <div className="flex flex-col">
+              <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
+                <span className="h-2 w-2 rounded-full" />
+                Bolos ({selectedDayBolos.length})
+              </h3>
+              <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
+                {selectedDayBolos.length ? (
+                  selectedDayBolos.map((bolo) => {
+                    const stateLabel = resolveBoloStateLabel(bolo);
+                    return (
+                      <div
+                        key={bolo.id}
+                        className={`rounded-xl border px-3 py-2.5 transition-all admin-card-glass ${bolo.active ? '' : 'opacity-60'}`}
                       >
-                        <div className="truncate text-sm font-medium">{leadItem.name}</div>
-                        <div className="mt-1 text-xs opacity-70">
-                          {(leadItem.eventStartTime || leadItem.eventEndTime)
-                            ? `${leadItem.eventStartTime || '--:--'} - ${leadItem.eventEndTime || '--:--'}`
-                            : resolveWorkTimeLabel(leadItem.eventDate)}
-                          {leadItem.eventType ? ` · ${leadItem.eventType}` : ''}
-                          {leadItem.status ? ` · ${leadItem.status}` : ''}
-                        </div>
-                        {leadItem.eventLocation && (
-                          <div className="mt-1 truncate text-xs opacity-60">{leadItem.eventLocation}</div>
-                        )}
-                      </Link>
-                    ))
-                  ) : (
-                    <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
-                      Cap entrada en aquest dia
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {visibleLayers.bookings && (
-              <div className="flex flex-col">
-                <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
-                  <span className="h-2 w-2 rounded-full" />
-                  Reserves ({selectedDayData.payload?.reservas?.length || 0})
-                </h3>
-                <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
-                  {selectedDayData.payload?.reservas?.length ? (
-                    selectedDayData.payload.reservas.map((r) => (
-                      <div key={r.id} className="rounded-xl border px-3 py-2.5 transition-all">
                         <div className="flex items-center justify-between gap-2">
-                          <div className="font-medium text-sm">{r.clientName ?? 'Client sense nom'}</div>
-                          {r.estado && (
-                            <span className="rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wide">
-                              {r.estado}
-                            </span>
-                          )}
+                          <div className={`truncate text-sm font-medium ${bolo.active ? '' : 'line-through'}`}>
+                            {bolo.title || 'Client sense nom'}
+                          </div>
+                          <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wide">
+                            {bolo.kind === 'BOOKING' ? 'Reserva' : 'Entrada'}
+                            {stateLabel ? ` · ${stateLabel}` : ''}
+                          </span>
                         </div>
                         <div className="mt-1 text-xs">
-                          {r.ubicacion && <>{r.ubicacion}{' · '}</>}
-                          {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
+                          {bolo.location && <>{bolo.location}{' · '}</>}
+                          {resolveBoloTimeLabel(bolo)} · {resolveBoloServiceLabel(bolo)}
                         </div>
                         <div className="mt-2 flex flex-wrap items-center gap-2">
-                          <Link href={buildBookingHref(r.id)} onClick={(e) => e.stopPropagation()} className="text-xs font-medium hover:underline">
-                            Reserva →
+                          <Link
+                            href={resolveBoloHref(bolo)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-xs font-medium hover:underline"
+                          >
+                            {bolo.kind === 'BOOKING' ? 'Reserva →' : 'Entrada →'}
                           </Link>
-                          {r.leadId && (
+                          {bolo.customerId && (
                             <Link
-                              href={buildLeadCustomerHref({
-                                leadId: r.leadId,
-                                customerId: r.customerId,
-                              })}
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-xs font-medium hover:underline"
-                            >
-                              {r.customerId ? 'Workspace →' : 'Entrada →'}
-                            </Link>
-                          )}
-                          {r.customerId && (
-                            <Link
-                              href={buildCustomerWorkspaceTabHref(r.customerId, 'bookings')}
+                              href={buildCustomerWorkspaceTabHref(bolo.customerId, 'bookings')}
                               onClick={(e) => e.stopPropagation()}
                               className="text-xs font-medium hover:underline"
                             >
                               👤 Client →
                             </Link>
                           )}
-                          {changingDateForBooking === r.id ? (
-                            <input
-                              type="date"
-                              autoFocus
-                              className="ap-input px-2 py-0.5 text-xs"
-                              defaultValue={r.fechaEvento.slice(0, 10)}
-                              onBlur={() => setChangingDateForBooking(null)}
-                              onChange={(e) => {
-                                const newDate = e.target.value;
-                                if (newDate && newDate !== r.fechaEvento.slice(0, 10)) {
-                                  void moveBookingToDate(r.id, newDate);
-                                  setChangingDateForBooking(null);
-                                }
-                              }}
-                            />
-                          ) : (
-                            <button onClick={() => setChangingDateForBooking(r.id)} className="rounded-xl border px-2 py-0.5 text-xs font-medium transition-colors admin-tone-idle">
-                              Canviar data
-                            </button>
+                          {bolo.bookingId && (
+                            changingDateForBooking === bolo.bookingId ? (
+                              <input
+                                type="date"
+                                autoFocus
+                                className="ap-input px-2 py-0.5 text-xs"
+                                defaultValue={bolo.eventDate.slice(0, 10)}
+                                onBlur={() => setChangingDateForBooking(null)}
+                                onChange={(e) => {
+                                  const newDate = e.target.value;
+                                  if (newDate && newDate !== bolo.eventDate.slice(0, 10)) {
+                                    void moveBookingToDate(bolo.bookingId!, newDate);
+                                    setChangingDateForBooking(null);
+                                  }
+                                }}
+                              />
+                            ) : (
+                              <button
+                                onClick={() => setChangingDateForBooking(bolo.bookingId ?? null)}
+                                className="rounded-xl border px-2 py-0.5 text-xs font-medium transition-colors admin-tone-idle"
+                              >
+                                Canviar data
+                              </button>
+                            )
                           )}
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
-                      Cap reserva en aquest dia
-                    </div>
-                  )}
-                </div>
+                    );
+                  })
+                ) : (
+                  <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
+                    Cap bolo en aquest dia
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
-            {(visibleLayers.tasks || visibleLayers.social || visibleLayers.followUps) && (
-              <div className="flex flex-col">
+            <div className="flex flex-col">
                 <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
                   <span className="h-2 w-2 rounded-full" />
-                  Feina ({(visibleLayers.tasks ? (selectedDayData.payload?.tasks?.length || 0) : 0) + (visibleLayers.social ? (selectedDayData.payload?.socialPosts?.length || 0) : 0) + (visibleLayers.followUps ? (selectedDayData.payload?.followUps?.length || 0) : 0)})
+                  Feina ({(selectedDayData.payload?.tasks?.length || 0) + (selectedDayData.payload?.socialPosts?.length || 0) + (selectedDayData.payload?.followUps?.length || 0)})
                 </h3>
                 <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
-                  {visibleLayers.tasks && selectedDayData.payload?.tasks?.map((task) => (
+                  {selectedDayData.payload?.tasks?.map((task) => (
                     <Link key={task.id} href="/admin/tasks" className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass">
                       <div className="truncate text-sm font-medium">{task.title}</div>
                       <div className="mt-1 text-xs opacity-70">Tasca · {resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
                     </Link>
                   ))}
-                  {visibleLayers.social && selectedDayData.payload?.socialPosts?.map((post) => (
+                  {selectedDayData.payload?.socialPosts?.map((post) => (
                     <Link key={post.id} href="/admin/social" className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass">
                       <div className="truncate text-sm font-medium">{post.title}</div>
                       <div className="mt-1 text-xs opacity-70">Social · {resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
                     </Link>
                   ))}
-                  {visibleLayers.followUps && selectedDayData.payload?.followUps?.map((item) => (
+                  {selectedDayData.payload?.followUps?.map((item) => (
                     <Link
                       key={item.leadId}
                       href={buildLeadCustomerHref({
@@ -985,17 +915,15 @@ export default function CalendarMonthClient() {
                       <div className="mt-1 text-xs opacity-70">{item.urgency} · {item.suggestedAction}</div>
                     </Link>
                   ))}
-                  {(!visibleLayers.tasks || !selectedDayData.payload?.tasks?.length) && (!visibleLayers.social || !selectedDayData.payload?.socialPosts?.length) && (!visibleLayers.followUps || !selectedDayData.payload?.followUps?.length) && (
+                  {!selectedDayData.payload?.tasks?.length && !selectedDayData.payload?.socialPosts?.length && !selectedDayData.payload?.followUps?.length && (
                     <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
                       Cap feina planificada en aquest dia
                     </div>
                   )}
                 </div>
               </div>
-            )}
 
-            {visibleLayers.blocks && (
-              <div className="flex flex-col">
+            <div className="flex flex-col">
                 <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
                   <span className="h-2 w-2 rounded-full" />
                   Bloquejos ({selectedDayData.payload?.bloqueos?.length || 0})
@@ -1020,17 +948,16 @@ export default function CalendarMonthClient() {
                   )}
                 </div>
               </div>
-            )}
           </div>
 
-          {selectedDayData.payload?.reservas?.[0] && (
+          {selectedDayBolos[0] && (
             <div className="mt-4 rounded-xl border p-4">
               <h3 className="text-sm font-semibold">Fitxa de l&apos;esdeveniment</h3>
               <div className="mt-2 grid gap-2 text-sm sm:grid-cols-2">
-                <p><span className="">Client:</span> {selectedDayData.payload.reservas[0].clientName || '-'}</p>
-                <p><span className="">Horari:</span> {resolveTimeLabel(selectedDayData.payload.reservas[0])}</p>
-                <p><span className="">Servei:</span> {resolveServiceLabel(selectedDayData.payload.reservas[0])}</p>
-                <p><span className="">Ubicació:</span> {selectedDayData.payload.reservas[0].ubicacion || '-'}</p>
+                <p><span className="">Client:</span> {selectedDayBolos[0].title || '-'}</p>
+                <p><span className="">Horari:</span> {resolveBoloTimeLabel(selectedDayBolos[0])}</p>
+                <p><span className="">Servei:</span> {resolveBoloServiceLabel(selectedDayBolos[0])}</p>
+                <p><span className="">Ubicació:</span> {selectedDayBolos[0].location || '-'}</p>
               </div>
             </div>
           )}

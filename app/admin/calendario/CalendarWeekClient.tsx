@@ -1,19 +1,17 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/utils/errors';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
-import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { useRouter } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
-import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
-
-type CalendarLayer = 'bookings' | 'blocks' | 'leads' | 'tasks' | 'social' | 'followUps';
+import type { CalendarApiResponse } from './calendar-utils';
+import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel, getDayBolos, resolveBoloHref, resolveBoloServiceLabel, resolveBoloTimeLabel, resolveBoloStateLabel } from './calendar-utils';
 
 export default function CalendarWeekClient() {
   const toast = useToast();
@@ -27,12 +25,8 @@ export default function CalendarWeekClient() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [blockingDate, setBlockingDate] = useState<string | null>(null);
   const [blockNote, setBlockNote] = useState('');
-  const [visibleLayers, setVisibleLayers] = useState({ bookings: true, blocks: true, leads: true, tasks: true, social: true, followUps: true });
 
   const weekDays = useMemo(() => getWeekDays(baseDate), [baseDate]);
-  const toggleLayer = useCallback((layer: CalendarLayer) => {
-    setVisibleLayers((prev) => ({ ...prev, [layer]: !prev[layer] }));
-  }, []);
 
   const fromStr = useMemo(() => formatKey(weekDays[0]), [weekDays]);
   const toStr = useMemo(() => {
@@ -58,7 +52,7 @@ export default function CalendarWeekClient() {
         const json = (await res.json()) as CalendarApiResponse;
         if (!cancelled) setData(json);
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : 'Error carregant');
+        if (!cancelled) setError(getErrorMessage(e, 'Error carregant'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -89,7 +83,7 @@ export default function CalendarWeekClient() {
       setBlockNote('');
     } catch (err) {
       console.error('Error bloquejant dia del calendari', err);
-      toast.error(err instanceof Error ? err.message : 'Error bloquejant dia');
+      toast.error(getErrorMessage(err, 'Error bloquejant dia'));
     }
   }, [toast]);
 
@@ -103,7 +97,7 @@ export default function CalendarWeekClient() {
       setRefreshKey((k) => k + 1);
     } catch (err) {
       console.error('Error desbloquejant dia del calendari', err);
-      toast.error(err instanceof Error ? err.message : 'Error desbloquejant dia');
+      toast.error(getErrorMessage(err, 'Error desbloquejant dia'));
     }
   }, [toast]);
 
@@ -201,36 +195,15 @@ export default function CalendarWeekClient() {
       </div>
 
 
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
-        <span className="font-semibold opacity-60">Capes:</span>
-        {[
-          ['bookings', 'Reserves'],
-          ['leads', 'Entrades'],
-          ['blocks', 'Bloquejos'],
-          ['tasks', 'Tasques'],
-          ['social', 'Social'],
-          ['followUps', 'Follow-ups'],
-        ].map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => toggleLayer(key as CalendarLayer)}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
       {/* Graella setmanal amb scroll controlat en mòbil */}
       <div className="overflow-x-auto rounded-2xl">
         <div className="grid min-w-[980px] grid-cols-7 gap-2 overflow-x-auto" {...helpAttrs(ADMIN_CALENDAR_HELP.weekGrid)}>
         {weekDays.map((day) => {
           const key = formatKey(day);
           const dayData = data?.days?.[key] ?? { leads: [], reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
-          const dayLeads = dayData.leads ?? [];
-          const hasReservas = dayData.reservas.length > 0;
+          const dayBolos = getDayBolos(dayData);
+          const hasReservas = dayBolos.some((bolo) => bolo.active && bolo.kind === 'BOOKING');
           const hasBloqueos = dayData.bloqueos.length > 0;
-          const hasLeads = dayLeads.length > 0;
           const todayClass = isToday(day);
           const tone = getCalendarTone(hasReservas, hasBloqueos);
           const toneClasses = getCalendarToneClasses(tone);
@@ -310,7 +283,7 @@ export default function CalendarWeekClient() {
               )}
 
               {/* Bloquejos */}
-              {visibleLayers.blocks && hasBloqueos && dayData.bloqueos.map((b) => (
+              {hasBloqueos && dayData.bloqueos.map((b) => (
                 <div
                   key={b.id}
                   className="mb-2 rounded-xl border px-2.5 py-2 text-xs admin-tone-soft-danger admin-tone-border-danger"
@@ -324,7 +297,7 @@ export default function CalendarWeekClient() {
 
               {/* Reserves */}
               <div className="flex-1 space-y-1.5 overflow-auto">
-                {visibleLayers.tasks && dayData.tasks.map((task) => (
+                {dayData.tasks.map((task) => (
                   <Link
                     key={task.id}
                     href="/admin/tasks"
@@ -334,7 +307,7 @@ export default function CalendarWeekClient() {
                     <div className="mt-0.5 text-xs opacity-70">{resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
                   </Link>
                 ))}
-                {visibleLayers.social && dayData.socialPosts.map((post) => (
+                {dayData.socialPosts.map((post) => (
                   <Link
                     key={post.id}
                     href="/admin/social"
@@ -344,7 +317,7 @@ export default function CalendarWeekClient() {
                     <div className="mt-0.5 text-xs opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
                   </Link>
                 ))}
-                {visibleLayers.followUps && dayData.followUps.map((item) => (
+                {dayData.followUps.map((item) => (
                   <Link
                     key={item.leadId}
                     href={buildLeadCustomerHref({
@@ -358,50 +331,35 @@ export default function CalendarWeekClient() {
                     <div className="mt-0.5 text-xs opacity-70">{item.urgency}</div>
                   </Link>
                 ))}
-                {visibleLayers.leads && dayLeads.map((lead) => (
-                  <Link
-                    key={lead.id}
-                    href={buildLeadCustomerHref({
-                      leadId: lead.id,
-                      customerId: lead.customerId,
-                    })}
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info"
-                  >
-                    <div className="truncate text-xs font-semibold">Nova entrada · {lead.name}</div>
-                    <div className="mt-0.5 text-xs opacity-70">
-                      {lead.eventStartTime || '--:--'}{lead.eventEndTime ? ` - ${lead.eventEndTime}` : ''}
-                      {lead.eventType ? ` · ${lead.eventType}` : ''}
-                    </div>
-                  </Link>
-                ))}
-                {visibleLayers.bookings && dayData.reservas.map((r) => (
-                  <Link
-                    key={r.id}
-                    href={buildBookingHref(r.id)}
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass"
-                  >
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="text-xs font-semibold truncate">
-                        {r.clientName || 'Client'}
-                      </span>
-                      {r.estado && (
-                        <span className="rounded-full px-1.5 py-0.5 text-xs font-semibold uppercase admin-tone-idle">
-                          {r.estado}
+                {dayBolos.map((bolo) => {
+                  const stateLabel = resolveBoloStateLabel(bolo);
+                  return (
+                    <Link
+                      key={bolo.id}
+                      href={resolveBoloHref(bolo)}
+                      className={[
+                        'block rounded-xl border px-2.5 py-2 transition-all admin-card-glass',
+                        bolo.kind === 'LEAD' ? 'admin-tone-soft-info' : '',
+                        bolo.active ? '' : 'opacity-55',
+                      ].join(' ')}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`text-xs font-semibold truncate ${bolo.active ? '' : 'line-through'}`}>
+                          {bolo.title || 'Client'}
                         </span>
-                      )}
-                    </div>
-                    {resolveTimeLabel(r) && (
-                      <div className="mt-0.5 text-xs">
-                        {resolveTimeLabel(r)}
+                        <span className="rounded-full px-1.5 py-0.5 text-xs font-semibold uppercase admin-tone-idle">
+                          {stateLabel || (bolo.kind === 'BOOKING' ? 'Reserva' : 'Entrada')}
+                        </span>
                       </div>
-                    )}
-                    <div className="mt-0.5 truncate text-xs">
-                      {resolveServiceLabel(r)}
-                      {r.ubicacion ? ` · ${r.ubicacion}` : ''}
-                    </div>
-                  </Link>
-                ))}
-                {(!visibleLayers.bookings || !hasReservas) && (!visibleLayers.blocks || !hasBloqueos) && (!visibleLayers.leads || !hasLeads) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (
+                      <div className="mt-0.5 text-xs">{resolveBoloTimeLabel(bolo)}</div>
+                      <div className="mt-0.5 truncate text-xs">
+                        {resolveBoloServiceLabel(bolo)}
+                        {bolo.location ? ` · ${bolo.location}` : ''}
+                      </div>
+                    </Link>
+                  );
+                })}
+                {dayBolos.length === 0 && !hasBloqueos && dayData.tasks.length === 0 && dayData.socialPosts.length === 0 && dayData.followUps.length === 0 && (
                   <div className="flex h-full items-center justify-center text-xs">
                     Lliure
                   </div>

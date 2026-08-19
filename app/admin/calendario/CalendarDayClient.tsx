@@ -1,19 +1,17 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/utils/errors';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
-import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { useRouter } from 'next/navigation';
-import { formatDateFull, formatWeekdayLong, getBookingStatusBadgeDisplay } from '@/lib/constants';
+import { formatDateFull, formatWeekdayLong } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { formatKey, isToday, resolveServiceLabel, HOURS, parseHour, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
-
-type CalendarLayer = 'bookings' | 'blocks' | 'leads' | 'tasks' | 'social' | 'followUps';
+import { formatKey, isToday, HOURS, parseHour, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel, getDayBolos, resolveBoloHref, resolveBoloServiceLabel, resolveBoloTimeLabel, resolveBoloStateLabel } from './calendar-utils';
 
 export default function CalendarDayClient() {
   const toast = useToast();
@@ -27,12 +25,8 @@ export default function CalendarDayClient() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [blockNote, setBlockNote] = useState('');
   const [showBlockForm, setShowBlockForm] = useState(false);
-  const [visibleLayers, setVisibleLayers] = useState({ bookings: true, blocks: true, leads: true, tasks: true, social: true, followUps: true });
 
   const dateKey = useMemo(() => formatKey(currentDate), [currentDate]);
-  const toggleLayer = useCallback((layer: CalendarLayer) => {
-    setVisibleLayers((prev) => ({ ...prev, [layer]: !prev[layer] }));
-  }, []);
   const nextDay = useMemo(() => {
     const d = new Date(currentDate);
     d.setDate(d.getDate() + 1);
@@ -43,11 +37,15 @@ export default function CalendarDayClient() {
     if (!data?.days?.[dateKey]) return { leads: [], reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
     return data.days[dateKey];
   }, [data, dateKey]);
-  const dayLeads = dayData.leads ?? [];
+  const dayBolos = useMemo(() => getDayBolos(dayData), [dayData]);
+  const bolosActius = useMemo(() => dayBolos.filter((bolo) => bolo.active), [dayBolos]);
 
   const isBlocked = dayData.bloqueos.length > 0;
   const isTodayDate = isToday(currentDate);
-  const dayTone = getCalendarTone(dayData.reservas.length > 0, isBlocked);
+  const dayTone = getCalendarTone(
+    bolosActius.some((bolo) => bolo.kind === 'BOOKING'),
+    isBlocked
+  );
   const dayToneClasses = getCalendarToneClasses(dayTone);
 
   useEffect(() => {
@@ -62,7 +60,7 @@ export default function CalendarDayClient() {
         if (!cancelled) setData(json);
       } catch (e) {
         console.error('Error carregant dia del calendari', e);
-        if (!cancelled) setError(e instanceof Error ? e.message : 'Error carregant');
+        if (!cancelled) setError(getErrorMessage(e, 'Error carregant'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -116,18 +114,14 @@ export default function CalendarDayClient() {
   const dayLabel = formatDateFull(currentDate).replace(/^\w/, (c) => c.toUpperCase());
   const weekdayLabel = formatWeekdayLong(currentDate).replace(/^\w/, (c) => c.toUpperCase());
 
-  // Build timeline data
-  const timelineBookings = useMemo(() => {
-    return dayData.reservas.map((b) => {
-      const startH = parseHour(b.eventStartTime);
-      const endH = parseHour(b.eventEndTime);
-      return { ...b, startH, endH };
-    });
-  }, [dayData.reservas]);
-
-  const visibleTimelineBookings = useMemo(() => {
-    return visibleLayers.bookings ? timelineBookings : [];
-  }, [timelineBookings, visibleLayers.bookings]);
+  // La linia de temps pinta tots els bolos del dia, siguin entrades o reserves.
+  const timelineBolos = useMemo(() => {
+    return dayBolos.map((bolo) => ({
+      ...bolo,
+      startH: parseHour(bolo.eventStartTime),
+      endH: parseHour(bolo.eventEndTime),
+    }));
+  }, [dayBolos]);
 
   return (
     <AdminPage
@@ -178,26 +172,6 @@ export default function CalendarDayClient() {
       </div>
 
 
-      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
-        <span className="font-semibold opacity-60">Capes:</span>
-        {[
-          ['bookings', 'Reserves'],
-          ['leads', 'Entrades'],
-          ['blocks', 'Bloquejos'],
-          ['tasks', 'Tasques'],
-          ['social', 'Social'],
-          ['followUps', 'Follow-ups'],
-        ].map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => toggleLayer(key as CalendarLayer)}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
       {loading && !data && (
         <div className="flex items-center justify-center py-24">
           <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
@@ -218,10 +192,10 @@ export default function CalendarDayClient() {
               <div className={`flex items-center justify-between border-b px-5 py-3 ${isTodayDate ? 'admin-card-glass' : ''} ${dayToneClasses.card}`}>
                 <div className="flex items-center gap-2">
                   {isBlocked && <span className="w-2.5 h-2.5 rounded-full" />}
-                  {!isBlocked && dayData.reservas.length > 0 && <span className="w-2.5 h-2.5 rounded-full" />}
-                  {!isBlocked && dayData.reservas.length === 0 && <span className="h-2.5 w-2.5 rounded-full admin-tone-bg-neutral" />}
+                  {!isBlocked && bolosActius.length > 0 && <span className="w-2.5 h-2.5 rounded-full" />}
+                  {!isBlocked && bolosActius.length === 0 && <span className="h-2.5 w-2.5 rounded-full admin-tone-bg-neutral" />}
                   <span className="text-sm font-medium">
-                    {isBlocked ? 'Dia bloquejat' : `${dayData.reservas.length} reserv${dayData.reservas.length === 1 ? 'a' : 'es'} · ${dayLeads.length} entrad${dayLeads.length === 1 ? 'a' : 'es'}`}
+                    {isBlocked ? 'Dia bloquejat' : `${dayBolos.length} bolo${dayBolos.length === 1 ? '' : 's'}${dayBolos.length !== bolosActius.length ? ` (${dayBolos.length - bolosActius.length} descartat${dayBolos.length - bolosActius.length === 1 ? '' : 's'})` : ''}`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -276,10 +250,10 @@ export default function CalendarDayClient() {
               {/* Timeline grid */}
               <div className="relative">
                 {HOURS.map((hour) => {
-                  const bookingsAtHour = visibleTimelineBookings.filter((b) => {
-                    if (b.startH === null) return false;
-                    const end = b.endH ?? b.startH + 4;
-                    return hour >= b.startH && hour < end;
+                  const bolosAtHour = timelineBolos.filter((bolo) => {
+                    if (bolo.startH === null) return false;
+                    const end = bolo.endH ?? bolo.startH + 4;
+                    return hour >= bolo.startH && hour < end;
                   });
 
                   return (
@@ -288,42 +262,47 @@ export default function CalendarDayClient() {
                         {String(hour).padStart(2, '0')}:00
                       </div>
                       <div className="flex-1 flex items-stretch gap-1 px-2 py-1">
-                        {bookingsAtHour.map((b) => {
-                          const badge = getBookingStatusBadgeDisplay(b.estado || '');
-                          return (
-                            <Link
-                              key={`${b.id}-${hour}`}
-                              href={buildBookingHref(b.id)}
-                              className={`flex-1 rounded-lg px-3 py-1.5 text-xs transition-colors ${
-                                b.startH === hour ? 'border admin-tone-soft-info admin-tone-border-info' : 'border admin-tone-idle'
-                              }`}
-                            >
-                              {b.startH === hour && (
-                                <>
-                                  <span className="font-medium">{resolveServiceLabel(b)}</span>
-                                  {b.clientName && <span className=" ml-2">{b.clientName}</span>}
-                                </>
-                              )}
-                            </Link>
-                          );
-                        })}
+                        {bolosAtHour.map((bolo) => (
+                          <Link
+                            key={`${bolo.id}-${hour}`}
+                            href={resolveBoloHref(bolo)}
+                            className={[
+                              'flex-1 rounded-lg px-3 py-1.5 text-xs transition-colors border',
+                              bolo.startH === hour ? 'admin-tone-soft-info admin-tone-border-info' : 'admin-tone-idle',
+                              bolo.active ? '' : 'opacity-55',
+                            ].join(' ')}
+                          >
+                            {bolo.startH === hour && (
+                              <>
+                                <span className={`font-medium ${bolo.active ? '' : 'line-through'}`}>
+                                  {resolveBoloServiceLabel(bolo)}
+                                </span>
+                                {bolo.title && <span className="ml-2">{bolo.title}</span>}
+                                {!bolo.active && <span className="ml-2">· {resolveBoloStateLabel(bolo)}</span>}
+                              </>
+                            )}
+                          </Link>
+                        ))}
                       </div>
                     </div>
                   );
                 })}
 
-                {/* Bookings without time */}
-                {visibleTimelineBookings.filter((b) => b.startH === null).length > 0 && (
+                {/* Bolos sense hora */}
+                {timelineBolos.filter((bolo) => bolo.startH === null).length > 0 && (
                   <div className="border-t px-5 py-3 admin-card-glass">
                     <p className="mb-2 text-xs">Sense hora definida:</p>
-                    {visibleTimelineBookings.filter((b) => b.startH === null).map((b) => (
+                    {timelineBolos.filter((bolo) => bolo.startH === null).map((bolo) => (
                       <Link
-                        key={b.id}
-                        href={buildBookingHref(b.id)}
-                        className="mb-1 block rounded-xl border px-3 py-2 transition-colors admin-tone-idle"
+                        key={bolo.id}
+                        href={resolveBoloHref(bolo)}
+                        className={`mb-1 block rounded-xl border px-3 py-2 transition-colors admin-tone-idle ${bolo.active ? '' : 'opacity-55'}`}
                       >
-                        <span className="text-sm font-medium">{resolveServiceLabel(b)}</span>
-                        {b.clientName && <span className="text-xs  ml-2">{b.clientName}</span>}
+                        <span className={`text-sm font-medium ${bolo.active ? '' : 'line-through'}`}>
+                          {resolveBoloServiceLabel(bolo)}
+                        </span>
+                        {bolo.title && <span className="text-xs ml-2">{bolo.title}</span>}
+                        {!bolo.active && <span className="text-xs ml-2">· {resolveBoloStateLabel(bolo)}</span>}
                       </Link>
                     ))}
                   </div>
@@ -339,74 +318,80 @@ export default function CalendarDayClient() {
               <h3 className="mb-3 text-sm font-semibold">Resum del dia</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="">Reserves</span>
-                  <span className="font-medium">{visibleLayers.bookings ? dayData.reservas.length : 0}</span>
+                  <span className="">Bolos</span>
+                  <span className="font-medium">{dayBolos.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="">Entrades</span>
-                  <span className="font-medium">{visibleLayers.leads ? dayLeads.length : 0}</span>
+                  <span className="">Descartats</span>
+                  <span className="font-medium">{dayBolos.length - bolosActius.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="">Bloquejos</span>
-                  <span className="font-medium">{visibleLayers.blocks ? dayData.bloqueos.length : 0}</span>
+                  <span className="font-medium">{dayData.bloqueos.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="">Feina pendent</span>
-                  <span className="font-medium">{(visibleLayers.tasks ? dayData.tasks.length : 0) + (visibleLayers.social ? dayData.socialPosts.length : 0) + (visibleLayers.followUps ? dayData.followUps.length : 0)}</span>
+                  <span className="font-medium">{dayData.tasks.length + dayData.socialPosts.length + dayData.followUps.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="">Estat</span>
                   <span className={`font-medium ${dayToneClasses.text}`}>
-                    {isBlocked ? 'Bloquejat' : dayData.reservas.length > 0 ? 'Ocupat' : 'Lliure'}
+                    {isBlocked ? 'Bloquejat' : bolosActius.length > 0 ? 'Ocupat' : 'Lliure'}
                   </span>
                 </div>
               </div>
             </div>
 
-            {visibleLayers.leads && dayLeads.length > 0 && (
+            {dayBolos.length > 0 && (
               <div className="rounded-2xl border p-5 admin-card-glass">
-                <h3 className="mb-3 text-sm font-semibold">Entrades del web</h3>
+                <h3 className="mb-3 text-sm font-semibold">Bolos del dia</h3>
                 <div className="space-y-2">
-                  {dayLeads.map((lead) => (
-                    <Link
-                      key={lead.id}
-                      href={buildLeadCustomerHref({
-                        leadId: lead.id,
-                        customerId: lead.customerId,
-                      })}
-                      className="block rounded-xl border px-3 py-2 admin-tone-soft-info"
-                    >
-                      <div className="truncate text-sm font-medium">Nova entrada · {lead.name}</div>
-                      <div className="mt-1 text-xs opacity-70">
-                        {lead.eventStartTime || '--:--'}{lead.eventEndTime ? ` - ${lead.eventEndTime}` : ''}
-                        {lead.eventType ? ` · ${lead.eventType}` : ''}
-                      </div>
-                      {lead.eventLocation && (
-                        <div className="mt-1 truncate text-xs opacity-70">{lead.eventLocation}</div>
-                      )}
-                    </Link>
-                  ))}
+                  {dayBolos.map((bolo) => {
+                    const stateLabel = resolveBoloStateLabel(bolo);
+                    return (
+                      <Link
+                        key={bolo.id}
+                        href={resolveBoloHref(bolo)}
+                        className={[
+                          'block rounded-xl border px-3 py-2',
+                          bolo.kind === 'LEAD' ? 'admin-tone-soft-info' : '',
+                          bolo.active ? '' : 'opacity-55',
+                        ].join(' ')}
+                      >
+                        <div className={`truncate text-sm font-medium ${bolo.active ? '' : 'line-through'}`}>
+                          {bolo.kind === 'BOOKING' ? 'Reserva' : 'Entrada'} · {bolo.title}
+                        </div>
+                        <div className="mt-1 text-xs opacity-70">
+                          {resolveBoloTimeLabel(bolo)} · {resolveBoloServiceLabel(bolo)}
+                          {stateLabel ? ` · ${stateLabel}` : ''}
+                        </div>
+                        {bolo.location && (
+                          <div className="mt-1 truncate text-xs opacity-70">{bolo.location}</div>
+                        )}
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {((visibleLayers.tasks && dayData.tasks.length > 0) || (visibleLayers.social && dayData.socialPosts.length > 0) || (visibleLayers.followUps && dayData.followUps.length > 0)) && (
+            {(dayData.tasks.length > 0 || dayData.socialPosts.length > 0 || dayData.followUps.length > 0) && (
               <div className="rounded-2xl border p-5 admin-card-glass">
                 <h3 className="mb-3 text-sm font-semibold">Feina planificada</h3>
                 <div className="space-y-2">
-                  {visibleLayers.tasks && dayData.tasks.map((task) => (
+                  {dayData.tasks.map((task) => (
                     <Link key={task.id} href="/admin/tasks" className="block rounded-xl border px-3 py-2 admin-tone-soft-info">
                       <div className="truncate text-sm font-medium">✓ {task.title}</div>
                       <div className="mt-1 text-xs opacity-70">{resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
                     </Link>
                   ))}
-                  {visibleLayers.social && dayData.socialPosts.map((post) => (
+                  {dayData.socialPosts.map((post) => (
                     <Link key={post.id} href="/admin/social" className="block rounded-xl border px-3 py-2 admin-tone-soft-warning">
                       <div className="truncate text-sm font-medium">📣 {post.title}</div>
                       <div className="mt-1 text-xs opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
                     </Link>
                   ))}
-                  {visibleLayers.followUps && dayData.followUps.map((item) => (
+                  {dayData.followUps.map((item) => (
                     <Link
                       key={item.leadId}
                       href={buildLeadCustomerHref({
@@ -424,7 +409,7 @@ export default function CalendarDayClient() {
               </div>
             )}
             {/* Blockage details */}
-            {visibleLayers.blocks && dayData.bloqueos.length > 0 && (
+            {dayData.bloqueos.length > 0 && (
               <div className="rounded-2xl border p-5">
                 <h3 className="text-sm font-semibold mb-2">Bloquejos</h3>
                 {dayData.bloqueos.map((b) => (
@@ -435,35 +420,7 @@ export default function CalendarDayClient() {
               </div>
             )}
 
-            {/* Booking details */}
-            {visibleLayers.bookings && dayData.reservas.map((b) => {
-              const badge = getBookingStatusBadgeDisplay(b.estado || '');
-              return (
-                <Link
-                  key={b.id}
-                  href={buildBookingHref(b.id)}
-                  className="block rounded-2xl border p-5 transition-colors admin-card-glass"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold">{resolveServiceLabel(b)}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${badge.className}`}>{badge.label}</span>
-                  </div>
-                  {b.clientName && (
-                    <p className="text-sm">{b.clientName}</p>
-                  )}
-                  {b.ubicacion && (
-                    <p className="text-xs  mt-1">{b.ubicacion}</p>
-                  )}
-                  {(b.eventStartTime || b.eventEndTime) && (
-                    <p className="text-xs  mt-1">
-                      {b.eventStartTime}{b.eventEndTime ? ` – ${b.eventEndTime}` : ''}
-                    </p>
-                  )}
-                </Link>
-              );
-            })}
-
-            {(visibleLayers.bookings ? dayData.reservas.length === 0 : true) && (!visibleLayers.blocks || !isBlocked) && (!visibleLayers.leads || dayLeads.length === 0) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (
+            {dayBolos.length === 0 && !isBlocked && dayData.tasks.length === 0 && dayData.socialPosts.length === 0 && dayData.followUps.length === 0 && (
               <div className="rounded-2xl border p-5 text-center admin-card-glass">
                 <p className="text-sm">Dia lliure</p>
                 <Link
